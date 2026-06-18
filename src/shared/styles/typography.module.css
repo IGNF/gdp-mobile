@@ -1,0 +1,94 @@
+/* Classic styles for typography */
+.italic {
+  font-style: italic;
+}
+
+/* Titles */
+.title {
+  font-size: 1.8rem; /* was 2.8rem */
+  font-weight: 600;
+  color: var(--color-primary);
+  text-align: center;
+  margin-bottom: 5px;
+  margin-top: 5px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.subtitle {
+  font-size: 1rem; /* was 1.3rem */
+  font-style: italic;
+  font-weight: 600;
+  color: var(--color-dark);
+  text-align: center;
+  margin-top: 0;
+}
+
+/* Paragraphs */
+.paragraph {
+  font-size: 1rem;
+  line-height: 1.9;
+}
+
+/* Headings */
+.heading1 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--color-dark);
+  margin: 0;
+}
+
+.heading2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--color-dark);
+  margin: 0;
+}
+
+/* Text size */
+.textSmall {
+  font-size: 0.8rem;
+}
+
+.textMedium {
+  font-size: 1rem;
+}
+
+.textLarge {
+  font-size: 1.2rem;
+}
+
+.textXLarge {
+  font-size: 1.4rem;
+}
+
+.textXXLarge {
+  font-size: 1.6rem;
+}
+
+/* Body */
+.body {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--color-dark);
+}
+
+/* Captions */
+.caption {
+  font-size: 0.875rem;
+  color: var(--color-medium);
+}
+
+/* Links */
+a {
+  color: var(--color-primary);
+  text-decoration-thickness: 2.5px;
+  text-underline-offset: 0.5rem;
+}
+
+/* Error text */
+.error {
+  color: var(--color-danger);
+  text-align: center;
+  font-size: 0.9rem;
+}

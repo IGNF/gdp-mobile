@@ -1,0 +1,11 @@
+# Fallback SPA pour déploiement sous un sous-chemin (ex. /qlf-gdp/)
+# Copié en dist/.htaccess par npm run build:qualif
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /qlf-gdp/
+  RewriteRule ^index\.html$ - [L]
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule . /qlf-gdp/index.html [L]
+</IfModule>

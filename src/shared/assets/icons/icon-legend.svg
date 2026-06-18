@@ -1,0 +1,16 @@
+<svg id="icon-legend" xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30">
+  <rect id="Rectangle_123" data-name="Rectangle 123" width="30" height="30" fill="none"/>
+  <g id="Légende" transform="translate(6.25 3.752)">
+    <path id="Soustraction_11" data-name="Soustraction 11" d="M16.5,22.5H1a1,1,0,0,1-1-1V1A1,1,0,0,1,1,0H16.5a1,1,0,0,1,1,1V21.5A1,1,0,0,1,16.5,22.5ZM2,2V20.5H15.5V2Z" fill="#091625"/>
+    <g id="Groupe_32" data-name="Groupe 32" transform="translate(4.625 4.624)">
+      <rect id="Rectangle_126" data-name="Rectangle 126" width="5.25" height="2" rx="1" transform="translate(2.999)" fill="#091625"/>
+      <rect id="Rectangle_160" data-name="Rectangle 160" width="2" height="2" rx="0.5" fill="#091625"/>
+      <rect id="Rectangle_161" data-name="Rectangle 161" width="2" height="2" rx="0.5" transform="translate(0 3.75)" fill="#091625"/>
+      <rect id="Rectangle_162" data-name="Rectangle 162" width="2" height="2" rx="0.5" transform="translate(0 7.5)" fill="#091625"/>
+      <rect id="Rectangle_163" data-name="Rectangle 163" width="2" height="2" rx="0.5" transform="translate(0 11.25)" fill="#091625"/>
+      <rect id="Rectangle_127" data-name="Rectangle 127" width="5.251" height="2" rx="1" transform="translate(2.998 3.75)" fill="#091625"/>
+      <rect id="Rectangle_128" data-name="Rectangle 128" width="5.251" height="2" rx="1" transform="translate(2.998 7.5)" fill="#091625"/>
+      <rect id="Rectangle_129" data-name="Rectangle 129" width="5.251" height="2" rx="1" transform="translate(2.998 11.25)" fill="#091625"/>
+    </g>
+  </g>
+</svg>

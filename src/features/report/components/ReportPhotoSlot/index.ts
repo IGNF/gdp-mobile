@@ -1,0 +1,1 @@
+export { ReportPhotoSlot } from './ReportPhotoSlot';

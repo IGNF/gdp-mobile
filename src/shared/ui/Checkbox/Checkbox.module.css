@@ -1,0 +1,50 @@
+.checkbox {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.checkbox.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  border: 2px solid var(--color-light-shade);
+  background: white;
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+}
+
+.boxChecked {
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+  color: white;
+}
+
+.checkIcon {
+  width: 12px;
+  height: 12px;
+}
+
+.label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-dark);
+}

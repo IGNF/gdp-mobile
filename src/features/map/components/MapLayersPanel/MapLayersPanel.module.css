@@ -1,0 +1,160 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.3);
+  z-index: 90;
+  opacity: 0;
+  transition: opacity 0.3s ease-out;
+  pointer-events: none;
+}
+
+.overlayVisible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.panel {
+  z-index: 100;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: white;
+  border-radius: 16px 16px 0 0;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+  transform: translateY(100%);
+  transition: transform 0.3s ease-out;
+  max-height: 70vh;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: var(--safe-bottom);
+}
+
+.panelVisible {
+  transform: translateY(0);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.25rem 0.75rem;
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--color-dark);
+  margin: 0;
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.closeIcon {
+  width: 20px;
+  height: 20px;
+}
+
+.closeIcon path {
+  fill: var(--color-dark);
+}
+
+.content {
+  overflow-y: auto;
+  padding: 0.5rem 1.25rem 1.25rem;
+}
+
+.groupList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.groupItem {
+  margin: 0;
+  display: flex;
+  align-items: stretch;
+  gap: 0.5rem;
+}
+
+.groupVisibilityButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  border: 1px solid var(--color-light-tint);
+  border-radius: 10px;
+  background: white;
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.groupVisibilityButton:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.groupVisibilityIcon {
+  width: 20px;
+  height: 20px;
+  color: var(--color-medium);
+}
+
+.groupButton {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid var(--color-light-tint);
+  border-radius: 10px;
+  background: white;
+  padding: 1rem;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+}
+
+.groupTitle {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--color-dark);
+  min-width: 0;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.groupMeta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--color-medium);
+}
+
+.groupCount {
+  min-width: 1.5rem;
+  text-align: right;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.groupArrowIcon {
+  width: 16px;
+  height: 16px;
+}
+
+.groupArrowIcon path {
+  fill: currentColor;
+}

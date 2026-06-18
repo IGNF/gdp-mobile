@@ -1,0 +1,16 @@
+.externalLink {
+  font-weight: 600;
+  font-style: normal !important;
+  display: inline;
+  color: var(--color-primary);
+  text-decoration-thickness: 2.5px;
+  text-underline-offset: 0.5rem;
+}
+
+.icon {
+  display: inline-block;
+  width: 22px;
+  height: 22px;
+  vertical-align: middle;
+}
+

@@ -1,0 +1,90 @@
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--color-light);
+}
+
+.sectionTitle {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-dark);
+}
+
+.cacheSummary {
+  display: grid;
+  gap: 10px;
+  margin: 0 0 16px;
+}
+
+.cacheSummaryRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 0;
+}
+
+.cacheSummaryRow dt {
+  margin: 0;
+  font-size: 14px;
+  color: var(--color-dark);
+}
+
+.cacheSummaryRow dd {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-dark);
+  text-align: right;
+}
+
+.cacheSummaryRowMuted dt,
+.cacheSummaryRowMuted dd {
+  color: var(--color-medium-shade);
+  font-weight: 400;
+}
+
+.modeHint {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--color-medium-shade);
+}
+
+.sliderRow {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-areas:
+    'label value'
+    'slider slider';
+  gap: 8px 12px;
+  margin-top: 8px;
+  align-items: center;
+}
+
+.sliderLabel {
+  grid-area: label;
+  font-size: 14px;
+  color: var(--color-dark);
+}
+
+.sliderValue {
+  grid-area: value;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-dark);
+  text-align: right;
+}
+
+.sliderRow input[type='range'] {
+  grid-area: slider;
+  width: 100%;
+}

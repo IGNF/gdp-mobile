@@ -1,0 +1,11 @@
+<svg id="icon-star-full" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="30" height="30" viewBox="0 0 30 30">
+  <defs>
+    <clipPath id="clip-path">
+      <path id="Shape" d="M6.588,5.77,9.186.507a.909.909,0,0,1,1.63,0l2.6,5.263,5.81.849a.909.909,0,0,1,.5,1.551l-4.2,4.094.992,5.783a.909.909,0,0,1-1.319.958L10,16.273l-5.2,2.732a.909.909,0,0,1-1.319-.958l.992-5.783L.276,8.17a.909.909,0,0,1,.5-1.551Z" transform="translate(0)" fill="#091625"/>
+    </clipPath>
+  </defs>
+  <rect id="Rectangle_148" data-name="Rectangle 148" width="30" height="30" fill="none"/>
+  <g id="Groupe_7" data-name="Groupe 7" transform="translate(5 5)">
+    <path id="Shape-2" data-name="Shape" d="M6.588,5.77,9.186.507a.909.909,0,0,1,1.63,0l2.6,5.263,5.81.849a.909.909,0,0,1,.5,1.551l-4.2,4.094.992,5.783a.909.909,0,0,1-1.319.958L10,16.273l-5.2,2.732a.909.909,0,0,1-1.319-.958l.992-5.783L.276,8.17a.909.909,0,0,1,.5-1.551Z" transform="translate(0)" fill="#091625"/>
+  </g>
+</svg>

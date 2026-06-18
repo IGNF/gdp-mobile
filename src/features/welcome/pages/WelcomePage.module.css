@@ -1,0 +1,11 @@
+.container {
+  margin-top: 1.75rem;
+  min-height: 100dvh;
+}
+
+.content {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 0 1rem 2rem;
+  text-align: center;
+}

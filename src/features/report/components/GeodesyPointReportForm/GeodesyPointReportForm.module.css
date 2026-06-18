@@ -1,0 +1,75 @@
+.pointCard {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: var(--color-light-light, #f7f9fb);
+  border: 1px solid var(--color-light);
+}
+
+.pointCardHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.pointTitle {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--color-dark);
+}
+
+.pointMeta {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--color-medium);
+  font-variant-numeric: tabular-nums;
+}
+
+.expandButton {
+  align-self: flex-start;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-primary);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.expandButton:hover {
+  color: var(--color-primary-shade);
+}
+
+.themeHintShort {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--color-warning) 12%, transparent);
+  color: var(--color-dark);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.themeBadge {
+  margin: 0;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--color-primary) 10%, transparent);
+  color: var(--color-dark);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.themeBadge strong {
+  font-weight: 700;
+  color: var(--color-primary-shade, var(--color-primary));
+}

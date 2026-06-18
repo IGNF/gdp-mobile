@@ -1,0 +1,7 @@
+<svg id="icon-tag" xmlns="http://www.w3.org/2000/svg" width="30.001" height="29.633" viewBox="0 0 30.001 29.633">
+  <rect id="Rectangle_210" data-name="Rectangle 210" width="29.001" height="29.001" transform="translate(0 0.631)" fill="none"/>
+  <g id="Mot_clé" data-name="Mot clé" transform="translate(3.156 16.932) rotate(-45)">
+    <path id="Tracé_45" data-name="Tracé 45" d="M.967,0H17.3A.966.966,0,0,1,18,.3l5.685,6.042a.969.969,0,0,1,0,1.324L18,13.713a.966.966,0,0,1-.705.3H.967A.966.966,0,0,1,0,13.051V.967A.966.966,0,0,1,.967,0ZM16.879,1.934H1.934v10.15H16.879l4.774-5.075Z" fill="#091625"/>
+    <path id="Ellipse_58" data-name="Ellipse 58" d="M1.813,1.208a.6.6,0,1,0,.6.6.6.6,0,0,0-.6-.6M1.813,0A1.813,1.813,0,1,1,0,1.813,1.813,1.813,0,0,1,1.813,0Z" transform="translate(15.332 5.196)" fill="#091625"/>
+  </g>
+</svg>

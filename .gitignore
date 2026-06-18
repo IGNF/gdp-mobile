@@ -1,0 +1,41 @@
+# Dépendances et artefacts de build
+node_modules/
+dist/
+dist-ssr/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Cache TypeScript / outils
+*.tsbuildinfo
+.eslintcache
+
+# Variables d'environnement locales (secrets OAuth, clés API, etc.)
+.env
+.env.*
+!.env.dist
+!.env.qualif.dist
+
+# Fichiers locaux Vite
+*.local
+
+# Capacitor
+.capacitor/
+
+# Tests
+coverage/
+
+# Éditeur / OS
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.swp
+*.swo
+*~

@@ -1,0 +1,10 @@
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  text-align: center;
+}
+
+.backButton {
+  margin-top: 1.5rem;
+}

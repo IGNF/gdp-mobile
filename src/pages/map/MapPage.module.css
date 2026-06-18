@@ -1,0 +1,235 @@
+.mapPage {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  margin-top: calc(-1 * var(--safe-top));
+  background: var(--color-dark);
+  --map-tabbar-height: 4.75rem;
+}
+
+.mapContainer {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  isolation: isolate;
+}
+
+.mapTarget {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.mapOverlays {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.mapTopBar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: max(0.5rem, var(--safe-top)) 1rem 0.5rem;
+  pointer-events: none;
+}
+
+.menuButton,
+.searchButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border: none;
+  cursor: pointer;
+  pointer-events: auto;
+  flex-shrink: 0;
+}
+
+.menuButton {
+  background-color: var(--color-primary);
+  border-radius: 0;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.16);
+}
+
+.searchButton {
+  background-color: var(--color-dark-contrast, #fff);
+  border-radius: 50%;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.16);
+}
+
+.searchButtonActive {
+  background-color: var(--color-secondary-light);
+}
+
+.menuIcon {
+  width: 24px;
+  height: 24px;
+}
+
+.menuIcon path {
+  fill: var(--color-primary-contrast);
+}
+
+.searchIcon {
+  width: 24px;
+  height: 24px;
+}
+
+.searchIcon path {
+  fill: var(--color-dark);
+}
+
+/* OpenLayers — ne pas laisser le viewport intercepter les contrôles */
+.mapTarget :global(.ol-viewport) {
+  z-index: 0 !important;
+}
+
+.mapTarget :global(.ol-scale-line) {
+  bottom: 0.75rem;
+  left: 8px;
+}
+
+.mapTarget :global(.ol-attribution) {
+  display: none;
+  bottom: 0.25rem;
+  right: auto;
+  left: 0;
+}
+
+.filterButton {
+  --map-action-button-size: 48px;
+  position: absolute;
+  right: 1rem;
+  bottom: calc(0.75rem + var(--map-action-button-size) + 0.5rem);
+  z-index: 2;
+  width: var(--map-action-button-size);
+  height: var(--map-action-button-size);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  border-radius: 100px;
+  background-color: var(--color-dark-contrast, #fff);
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.16);
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.filterButton:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.filterButtonActive {
+  background-color: var(--color-primary-light);
+}
+
+.filterIcon {
+  width: 24px;
+  height: 24px;
+}
+
+.filterIcon path {
+  fill: var(--color-dark);
+}
+
+.geolocationButton {
+  --map-action-button-size: 48px;
+  position: absolute;
+  right: 1rem;
+  bottom: 0.75rem;
+  z-index: 2;
+  width: var(--map-action-button-size);
+  height: var(--map-action-button-size);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  border-radius: 100px;
+  background-color: var(--color-dark-contrast, #fff);
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.16);
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.geolocationButton:disabled {
+  opacity: 1;
+  cursor: default;
+}
+
+.geolocationIcon {
+  width: 30px;
+  height: 30px;
+}
+
+.geolocationIcon path {
+  fill: var(--color-dark);
+}
+
+.geolocationLoading {
+  gap: 0;
+}
+
+.locked {
+  background-color: var(--color-primary-light);
+}
+
+.loadingOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(9, 22, 37, 0.35);
+  pointer-events: none;
+}
+
+.wfsLoadingBadge {
+  position: absolute;
+  left: 50%;
+  bottom: 4.5rem;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  max-width: calc(100% - 6rem);
+  padding: 0.5rem 0.875rem;
+  border-radius: 999px;
+  background: rgba(9, 22, 37, 0.92);
+  color: #fff;
+  font-size: 0.8125rem;
+  line-height: 1.2;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.24);
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.wfsLoadingBadge :global([class*='container']) {
+  flex-direction: row;
+  gap: 0;
+  padding: 0;
+}
+
+.mapHint {
+  margin: 0;
+  flex-shrink: 0;
+  padding: 0.75rem 1rem;
+  font-size: 0.8125rem;
+  color: var(--color-medium);
+  background: var(--color-light-light);
+  border-top: 1px solid var(--color-light);
+}

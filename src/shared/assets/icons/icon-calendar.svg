@@ -1,0 +1,11 @@
+<svg id="icon_calendar" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="30" height="30" viewBox="0 0 30 30">
+  <defs>
+    <clipPath id="clip-path">
+      <path id="Mask" d="M20,25H2.5A2.5,2.5,0,0,1,0,22.5L.012,5A2.5,2.5,0,0,1,2.5,2.5H3.75V0h2.5V2.5h10V0h2.5V2.5H20A2.5,2.5,0,0,1,22.5,5V22.5A2.5,2.5,0,0,1,20,25ZM2.5,8.75V22.5H20V8.75Zm15,5H15v-2.5h2.5v2.5Zm-5,0H10v-2.5h2.5v2.5Zm-5,0H5v-2.5H7.5v2.5Z" transform="translate(0 0)" fill="#091625"/>
+    </clipPath>
+  </defs>
+  <rect id="Rectangle_260" data-name="Rectangle 260" width="30" height="30" fill="none"/>
+  <g id="Groupe_4" data-name="Groupe 4" transform="translate(3.75 2.5)">
+    <path id="Mask-2" data-name="Mask" d="M20,25H2.5A2.5,2.5,0,0,1,0,22.5L.012,5A2.5,2.5,0,0,1,2.5,2.5H3.75V0h2.5V2.5h10V0h2.5V2.5H20A2.5,2.5,0,0,1,22.5,5V22.5A2.5,2.5,0,0,1,20,25ZM2.5,8.75V22.5H20V8.75Zm15,5H15v-2.5h2.5v2.5Zm-5,0H10v-2.5h2.5v2.5Zm-5,0H5v-2.5H7.5v2.5Z" transform="translate(0 0)" fill="#091625"/>
+  </g>
+</svg>

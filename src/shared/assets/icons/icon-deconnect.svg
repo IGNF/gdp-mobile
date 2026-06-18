@@ -1,0 +1,5 @@
+<svg id="icon-deconnect" xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30">
+  <rect id="Rectangle" width="30" height="30" transform="translate(30) rotate(90)" fill="none"/>
+  <path id="Fill_1" data-name="Fill 1" d="M.4,4.726A1.037,1.037,0,0,0,.235,6.2a1.088,1.088,0,0,0,1.506.164L5.357,3.53V13.95a1.071,1.071,0,0,0,2.143,0V3.529l3.617,2.837A1.088,1.088,0,0,0,12.622,6.2a1.038,1.038,0,0,0-.167-1.477L6.428,0Z" transform="translate(26.25 8.419) rotate(90)" fill="#091625"/>
+  <path id="Tracé_7" data-name="Tracé 7" d="M18.258,9H1.063A1.062,1.062,0,0,1,0,7.939V1.063a1.063,1.063,0,1,1,2.125,0V6.878H17.2V1.25a1.062,1.062,0,0,1,2.124,0V7.939A1.061,1.061,0,0,1,18.258,9Z" transform="translate(14.563 5.188) rotate(90)" fill="#091625"/>
+</svg>

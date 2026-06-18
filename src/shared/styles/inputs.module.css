@@ -1,0 +1,143 @@
+/* Shared form input styles — import as `inputs` and use classes */
+
+/* Field layout: label + input + error stacked vertically */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-dark);
+}
+
+.required {
+  color: var(--color-danger);
+}
+
+.error {
+  font-size: 12px;
+  color: var(--color-danger);
+}
+
+/* Text input / number / date */
+.input {
+  padding: 12px 14px;
+  border-radius: 8px;
+  border: 1.5px solid var(--color-light-shade);
+  font-size: 1rem;
+  font-family: inherit;
+  background: white;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.input::placeholder {
+  color: var(--color-medium);
+}
+
+/* Select */
+.select {
+  padding: 12px 14px;
+  padding-right: 36px;
+  border-radius: 8px;
+  border: 1.5px solid var(--color-light-shade);
+  font-size: 1rem;
+  font-family: inherit;
+  background-color: white;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  cursor: pointer;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+
+.select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+/* Textarea */
+.textarea {
+  padding: 12px 14px;
+  border-radius: 8px;
+  border: 1.5px solid var(--color-light-shade);
+  font-size: 1rem;
+  font-family: inherit;
+  background: white;
+  resize: vertical;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+
+.textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.textarea::placeholder {
+  color: var(--color-medium);
+}
+
+/* Error state — compose with .input, .select, or .textarea */
+.inputError {
+  border-color: var(--color-danger);
+}
+
+/* Radio */
+.radioInput {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.radioCircle {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid var(--color-light-shade);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.2s;
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+
+.radioCircle::after {
+  content: '';
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: transparent;
+  transition: background 0.2s;
+}
+
+.radioInput:checked + .radioCircle {
+  border-color: var(--color-secondary);
+}
+
+.radioInput:checked + .radioCircle::after {
+  background: var(--color-secondary);
+}
+
+.radioLabel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-dark);
+}

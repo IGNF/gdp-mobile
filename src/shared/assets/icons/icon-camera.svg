@@ -1,0 +1,8 @@
+<svg id="icon-camera" xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30">
+  <rect id="Rectangle_431" data-name="Rectangle 431" width="30" height="30" fill="none"/>
+  <g id="Camera" transform="translate(3.75 6.25)">
+    <path id="Union_5" data-name="Union 5" d="M20,15.5a.5.5,0,0,0,.5-.5V5a.5.5,0,0,0-.5-.5H14.25V2h-6V4.5H2.5A.5.5,0,0,0,2,5V15a.5.5,0,0,0,.5.5H20m0,2H2.5A2.5,2.5,0,0,1,0,15V5A2.5,2.5,0,0,1,2.5,2.5H6.251V1.25A1.249,1.249,0,0,1,7.5,0H15a1.249,1.249,0,0,1,1.25,1.25V2.5H20A2.5,2.5,0,0,1,22.5,5V15A2.5,2.5,0,0,1,20,17.5Z" transform="translate(0 0)" fill="#091625"/>
+    <path id="Ellipse_142" data-name="Ellipse 142" d="M4.375,2A2.375,2.375,0,1,0,6.75,4.375,2.378,2.378,0,0,0,4.375,2m0-2A4.375,4.375,0,1,1,0,4.375,4.375,4.375,0,0,1,4.375,0Z" transform="translate(6.875 5.625)" fill="#091625"/>
+    <path id="Ellipse_143" data-name="Ellipse 143" d="M.938,0A.938.938,0,1,1,0,.938.938.938,0,0,1,.938,0Z" transform="translate(16.875 5.625)" fill="#091625"/>
+  </g>
+</svg>

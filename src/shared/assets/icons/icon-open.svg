@@ -1,0 +1,7 @@
+<svg id="icon-open" xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30">
+  <rect id="Rectangle_104" data-name="Rectangle 104" width="30" height="30" fill="none"/>
+  <g id="Icône_Ouvrir" data-name="Icône Ouvrir" transform="translate(3.75 6.246)">
+    <path id="Soustraction_16" data-name="Soustraction 16" d="M18.75,18.749H1.253A1.251,1.251,0,0,1,0,17.5V1.254A1.255,1.255,0,0,1,1.253,0h7.5A1.251,1.251,0,0,1,10,1.254V2.5H18.75A1.253,1.253,0,0,1,20,3.752v5H18V4.507H8V2H2V16.748h.476l-.373.932,16.966.1L20,15.328V17.5A1.251,1.251,0,0,1,18.75,18.749Z" fill="#091625"/>
+    <path id="Tracé_14_-_Contour" data-name="Tracé 14 - Contour" d="M-15274.151-8968.922h-.006l-16.963-.1a1,1,0,0,1-.824-.442,1,1,0,0,1-.1-.929l3.57-8.926a1,1,0,0,1,.928-.629h16.824a1,1,0,0,1,.822.432,1,1,0,0,1,.113.924l-3.432,9.023A1,1,0,0,1-15274.151-8968.922Zm-15.49-2.089,14.8.085,2.67-7.02h-14.7Z" transform="translate(15293.222 8987.699)" fill="#091625"/>
+  </g>
+</svg>

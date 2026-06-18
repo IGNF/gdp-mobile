@@ -1,0 +1,23 @@
+.logo {
+  display: block;
+  object-fit: contain;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.sm {
+  width: 80px;
+  height: 80px;
+}
+
+.md {
+  width: min(100%, 120px);
+  height: auto;
+  margin-bottom: 1.5rem;
+}
+
+.lg {
+  width: min(100%, 200px);
+  height: auto;
+  margin-bottom: 1.5rem;
+}

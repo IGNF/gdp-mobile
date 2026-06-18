@@ -1,0 +1,11 @@
+<svg id="icon-arrow-down-right" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="30" height="30" viewBox="0 0 30 30">
+  <defs>
+    <clipPath id="clip-path">
+      <path id="Combined_Shape" data-name="Combined Shape" d="M8.292,23.707a1,1,0,0,1,0-1.414L11.585,19H5a5,5,0,0,1-5-5V1A1,1,0,0,1,2,1V14a3,3,0,0,0,3,3h6.586L8.292,13.707a1,1,0,0,1,1.415-1.414l5,5a1,1,0,0,1,0,1.415l-5,5a1,1,0,0,1-1.415,0Z" fill="#091625"/>
+    </clipPath>
+  </defs>
+  <rect id="Rectangle_151" data-name="Rectangle 151" width="30" height="30" fill="none"/>
+  <g id="Groupe_11" data-name="Groupe 11" transform="translate(7.5 2.5)">
+    <path id="Combined_Shape-2" data-name="Combined Shape" d="M8.292,23.707a1,1,0,0,1,0-1.414L11.585,19H5a5,5,0,0,1-5-5V1A1,1,0,0,1,2,1V14a3,3,0,0,0,3,3h6.586L8.292,13.707a1,1,0,0,1,1.415-1.414l5,5a1,1,0,0,1,0,1.415l-5,5a1,1,0,0,1-1.415,0Z" fill="#091625"/>
+  </g>
+</svg>

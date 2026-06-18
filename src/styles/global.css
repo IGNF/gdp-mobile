@@ -1,0 +1,94 @@
+:root {
+  /* Capacitor Android injecte --safe-area-inset-* ; env() seul est souvent à 0 */
+  --safe-top: var(--safe-area-inset-top, env(safe-area-inset-top, 0px));
+  --safe-bottom: var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px));
+  --safe-left: var(--safe-area-inset-left, env(safe-area-inset-left, 0px));
+  --safe-right: var(--safe-area-inset-right, env(safe-area-inset-right, 0px));
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  padding-top: var(--safe-top);
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+:root {
+  --color-primary: #26A581;
+  --color-primary-rgb: 38,165,129;
+  --color-primary-contrast: #ffffff;
+  --color-primary-contrast-rgb: 0,0,0;
+  --color-primary-shade: #1C7B66;
+  --color-primary-tint: #3cae8e;
+  --color-primary-light: #E3F5EF;
+
+  --color-secondary: #786af2;
+  --color-secondary-rgb: 120,106,242;
+  --color-secondary-contrast: #ffffff;
+  --color-secondary-contrast-rgb: 0,0,0;
+  --color-secondary-shade: #2112a4;
+  --color-secondary-tint: #8679f3;
+  --color-secondary-light: #c6ccff66;
+
+  --color-tertiary: #6030ff;
+  --color-tertiary-rgb: 96,48,255;
+  --color-tertiary-contrast: #ffffff;
+  --color-tertiary-contrast-rgb: 255,255,255;
+  --color-tertiary-shade: #542ae0;
+  --color-tertiary-tint: #7045ff;
+
+  --color-success: #5CFF98;
+  --color-success-rgb: 92,255,152;
+  --color-success-contrast: #000000;
+  --color-success-contrast-rgb: 0,0,0;
+  --color-success-shade: #51e086;
+  --color-success-tint: #6cffa2;
+
+  --color-warning: #F18345;
+  --color-warning-rgb: 241,131,69;
+  --color-warning-contrast: #000000;
+  --color-warning-contrast-rgb: 0,0,0;
+  --color-warning-shade: #d4733d;
+  --color-warning-tint: #f28f58;
+  --color-warning-light: #FFEEE4;
+
+  --color-danger: #E86F4A;
+  --color-danger-rgb: 232,111,74;
+  --color-danger-contrast: #000000;
+  --color-danger-contrast-rgb: 0,0,0;
+  --color-danger-shade: #cc6241;
+  --color-danger-tint: #ea7d5c;
+
+  --color-light: #E9ECEF;
+  --color-light-rgb: 233,236,239;
+  --color-light-contrast: #000000;
+  --color-light-contrast-rgb: 0,0,0;
+  --color-light-shade: #cdd0d2;
+  --color-light-tint: #DDE1E6;
+  --color-light-light: #F4F6F8;
+
+  --color-medium: #788089;
+  --color-medium-rgb: 120,128,137;
+  --color-medium-contrast: #000000;
+  --color-medium-contrast-rgb: 0,0,0;
+  --color-medium-shade: #6A727A;
+  --color-medium-tint: #868d95;
+
+  --color-dark: #091625;
+  --color-dark-rgb: 9,22,37;
+  --color-dark-contrast: #ffffff;
+  --color-dark-contrast-rgb: 255,255,255;
+  --color-dark-shade: #081321;
+  --color-dark-tint: #222d3b;
+}

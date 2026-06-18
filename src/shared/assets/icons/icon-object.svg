@@ -1,0 +1,13 @@
+<svg id="icon-object" xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30">
+  <rect id="Rectangle_120" data-name="Rectangle 120" width="30" height="30" fill="none"/>
+  <g id="Polygone" transform="translate(3.001 3.002)">
+    <path id="Tracé_39" data-name="Tracé 39" d="M15463.8,10468.6a2.8,2.8,0,1,1,2.8-2.8A2.8,2.8,0,0,1,15463.8,10468.6Zm0-3.467a.668.668,0,1,0,.668.668A.668.668,0,0,0,15463.8,10465.133Z" transform="translate(-15461 -10444.601)" fill="#091625"/>
+    <path id="Tracé_37" data-name="Tracé 37" d="M15463.8,10468.6a2.8,2.8,0,1,1,2.8-2.8A2.8,2.8,0,0,1,15463.8,10468.6Zm0-3.468a.668.668,0,1,0,.668.668A.668.668,0,0,0,15463.8,10465.132Z" transform="translate(-15442.6 -10463)" fill="#091625"/>
+    <path id="Tracé_38" data-name="Tracé 38" d="M15463.8,10468.6a2.8,2.8,0,1,1,2.8-2.8A2.8,2.8,0,0,1,15463.8,10468.6Zm0-3.467a.668.668,0,1,0,.668.668A.668.668,0,0,0,15463.8,10465.133Z" transform="translate(-15442.602 -10444.601)" fill="#091625"/>
+    <path id="Tracé_36" data-name="Tracé 36" d="M15463.8,10468.6a2.8,2.8,0,1,1,2.8-2.8A2.8,2.8,0,0,1,15463.8,10468.6Zm0-3.468a.668.668,0,1,0,.668.668A.668.668,0,0,0,15463.8,10465.132Z" transform="translate(-15461 -10462.999)" fill="#091625"/>
+    <path id="Tracé_106" data-name="Tracé 106" d="M3143.434,805.434H3141.3V790.355h2.133Z" transform="translate(-3139.568 -785.884)" fill="#091625"/>
+    <path id="Tracé_107" data-name="Tracé 107" d="M3158.347,790.435H3143.5V788.3h14.848Z" transform="translate(-3138.835 -786.569)" fill="#091625"/>
+    <path id="Tracé_108" data-name="Tracé 108" d="M3158.1,804.88h-2.133V789.839h2.133Z" transform="translate(-3135.979 -785.533)" fill="#091625"/>
+    <path id="Tracé_109" data-name="Tracé 109" d="M3158.347,804.234H3143.5V802.1h14.848Z" transform="translate(-3138.835 -781.969)" fill="#091625"/>
+  </g>
+</svg>

@@ -1,0 +1,10 @@
+<svg id="icon-properties" xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30">
+  <rect id="Rectangle_123" data-name="Rectangle 123" width="30" height="30" fill="none"/>
+  <g id="Propriétés" transform="translate(6.25 3.752)">
+    <path id="Soustraction_11" data-name="Soustraction 11" d="M16.5,22.5H1a1,1,0,0,1-1-1V1A1,1,0,0,1,1,0H16.5a1,1,0,0,1,1,1V21.5A1,1,0,0,1,16.5,22.5ZM2,2V20.5H15.5V2Z" fill="#091625"/>
+    <rect id="Rectangle_126" data-name="Rectangle 126" width="8.25" height="2" rx="1" transform="translate(4.626 4.623)" fill="#091625"/>
+    <rect id="Rectangle_127" data-name="Rectangle 127" width="8.25" height="2" rx="1" transform="translate(4.626 8.373)" fill="#091625"/>
+    <rect id="Rectangle_128" data-name="Rectangle 128" width="8.25" height="2" rx="1" transform="translate(4.626 12.123)" fill="#091625"/>
+    <rect id="Rectangle_129" data-name="Rectangle 129" width="8.25" height="2" rx="1" transform="translate(4.626 15.873)" fill="#091625"/>
+  </g>
+</svg>

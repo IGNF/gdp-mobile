@@ -1,0 +1,25 @@
+.slideUpPage {
+	position: fixed;
+	inset: 0;
+	transform: translateY(100%);
+	transition: transform 0.3s ease-out;
+	z-index: 100;
+	overflow-y: auto;
+}
+
+.slideUpPageVisible {
+	transform: translateY(0);
+}
+
+.slideUpPageInner {
+	min-height: 100%;
+	background-color: white;
+}
+
+.slideUpPageInnerFullPage {
+	--page-header-safe-top: var(--safe-top, 0px);
+	padding-top: var(--safe-top, 0px);
+	padding-bottom: var(--safe-bottom, 0px);
+	padding-left: var(--safe-left, 0px);
+	padding-right: var(--safe-right, 0px);
+}

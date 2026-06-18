@@ -1,0 +1,103 @@
+.section {
+  margin-bottom: 24px;
+}
+
+.sectionTitle {
+  margin: 0 0 8px;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-dark);
+}
+
+.emptySection,
+.endOfList {
+  margin: 0;
+  padding: 16px 0;
+  text-align: center;
+  font-size: 14px;
+  color: var(--color-medium);
+}
+
+.page .empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  background: var(--color-light-light);
+}
+
+.main {
+  flex: 1;
+  overflow: auto;
+  padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
+}
+
+.titleSection {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.count {
+  font-size: 16px;
+  color: var(--color-dark);
+  margin: 0 0 16px;
+}
+
+.count strong {
+  font-weight: 700;
+}
+
+.reportList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.reportItem {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.loading,
+.empty,
+.error {
+  padding: 32px 16px;
+  text-align: center;
+  color: var(--color-medium);
+}
+
+.error {
+  color: var(--color-danger);
+}
+
+.successMessage {
+  margin: 0 0 16px;
+  font-size: 14px;
+  color: var(--color-primary-shade);
+  text-align: center;
+}
+
+.authHint {
+  margin: 0 0 16px;
+  font-size: 13px;
+  color: var(--color-medium);
+  text-align: center;
+}
+
+.failureList {
+  margin: 16px 0 0;
+  padding-left: 20px;
+  color: var(--color-danger);
+  font-size: 13px;
+}
+
+.actions {
+  margin-top: 24px;
+}

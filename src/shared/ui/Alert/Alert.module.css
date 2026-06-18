@@ -1,0 +1,77 @@
+.overlay {
+	position: fixed;
+	inset: 0;
+	z-index: 200;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background-color: rgba(0, 0, 0, 0);
+	transition: background-color 0.2s ease;
+	padding: 24px;
+}
+
+.overlayVisible {
+	background-color: rgba(0, 0, 0, 0.5);
+}
+
+.card {
+	position: relative;
+	background: white;
+	border-radius: 16px;
+	width: 100%;
+	max-width: 400px;
+	max-height: calc(100vh - 48px);
+	display: flex;
+	flex-direction: column;
+	opacity: 0;
+	transform: scale(0.95);
+	transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.cardWide {
+	max-width: 960px;
+}
+
+.overlayVisible .card {
+	opacity: 1;
+	transform: scale(1);
+}
+
+.closeButton {
+	position: absolute;
+	top: 16px;
+	right: 16px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 36px;
+	height: 36px;
+	padding: 0;
+	background: none;
+	border: 1px solid var(--color-light-tint);
+	border-radius: 50%;
+	cursor: pointer;
+}
+
+.closeIcon {
+	width: 18px;
+	height: 18px;
+	color: var(--color-dark);
+}
+
+.content {
+	padding: 24px;
+	padding-top: 20px;
+	overflow-y: auto;
+}
+
+.childrenContainer {
+	margin-top: 16px;
+}
+
+.buttons {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+	margin-top: 20px;
+}

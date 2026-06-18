@@ -1,0 +1,8 @@
+<svg id="icon-model" xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30">
+  <rect id="Rectangle_122" data-name="Rectangle 122" width="30" height="30" fill="none"/>
+  <g id="Groupe" transform="translate(3.75 6.25)">
+    <path id="Ligne_36" data-name="Ligne 36" d="M21.25,1.2H0v-2H21.25Z" transform="translate(0.625 5.427)" fill="#091625"/>
+    <path id="Ligne_37" data-name="Ligne 37" d="M1.2,11.25h-2V0h2Z" transform="translate(7.925 5.627)" fill="#091625"/>
+    <path id="Combined_Shape" data-name="Combined Shape" d="M19.687,17.5H2.813A2.869,2.869,0,0,1,0,14.583V2.917A2.869,2.869,0,0,1,2.813,0H19.687A2.869,2.869,0,0,1,22.5,2.917V14.583A2.869,2.869,0,0,1,19.687,17.5ZM2.813,1.945a.956.956,0,0,0-.938.972V14.583a.956.956,0,0,0,.938.972H19.687a.956.956,0,0,0,.938-.972V2.917a.956.956,0,0,0-.938-.972Z" transform="translate(0 0)" fill="#091625"/>
+  </g>
+</svg>

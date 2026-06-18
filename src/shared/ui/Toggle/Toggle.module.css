@@ -1,0 +1,71 @@
+/* Color mappings */
+.primary { --toggle-color: var(--color-primary); }
+.secondary { --toggle-color: var(--color-secondary); }
+.tertiary { --toggle-color: var(--color-tertiary); }
+.success { --toggle-color: var(--color-success); }
+.warning { --toggle-color: var(--color-warning); }
+.danger { --toggle-color: var(--color-danger); }
+
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.toggle.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.track {
+  position: relative;
+  flex-shrink: 0;
+}
+
+/* Slider track */
+.slider {
+  display: block;
+  width: 44px;
+  height: 26px;
+  border-radius: 13px;
+  background-color: var(--color-light-shade);
+  transition: background-color 0.3s ease;
+  position: relative;
+}
+
+.sliderChecked {
+  background-color: var(--toggle-color);
+}
+
+/* Knob */
+.knob {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sliderChecked .knob {
+  transform: translateX(18px);
+}
+
+.label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-dark);
+}
