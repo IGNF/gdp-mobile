@@ -1,0 +1,1 @@
+export { LegendPage } from './LegendPage';

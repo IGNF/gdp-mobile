@@ -13,7 +13,7 @@
 
 .slideUpPageInner {
 	min-height: 100%;
-	background-color: white;
+	background-color: var(--color-white);
 }
 
 .slideUpPageInnerFullPage {

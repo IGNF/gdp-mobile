@@ -35,7 +35,7 @@
 .main {
   flex: 1;
   overflow: auto;
-  padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
+  padding-bottom: 1rem;
 }
 
 .titleSection {

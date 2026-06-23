@@ -1,41 +1,52 @@
+import { useNavigate } from 'react-router-dom';
+
+import IconArticle from '@/shared/assets/icons/icon-article.svg?react';
+import IconMap from '@/shared/assets/icons/icon-map.svg?react';
+
 import styles from './BottomTabbar.module.css';
 
-import IconLayers from '@/shared/assets/icons/icon-layers.svg?react';
-import IconLocation from '@/shared/assets/icons/icon-location.svg?react';
-
-export type MapTabId = 'signalement' | 'couches';
+export type AppTabId = 'carte' | 'signalements';
 
 export interface BottomTabbarProps {
-  activeTab?: MapTabId | null;
-  onTabClick?: (tab: MapTabId) => void;
+  activeTab: AppTabId;
 }
 
-export function BottomTabbar({ activeTab, onTabClick }: BottomTabbarProps) {
-  const getTabClassName = (tab: MapTabId) => {
-    const classes = [styles.tab];
-    if (activeTab === tab) {
-      classes.push(styles.active);
+export function BottomTabbar({ activeTab }: BottomTabbarProps) {
+  const navigate = useNavigate();
+
+  const handleTabClick = (tab: AppTabId) => {
+    if (tab === activeTab) {
+      return;
     }
-    return classes.join(' ');
+
+    navigate(tab === 'carte' ? '/map' : '/reports');
   };
 
   return (
-    <nav className={styles.tabbar} aria-label="Actions carte">
+    <nav className={styles.tabbar} aria-label="Navigation principale">
       <button
         type="button"
-        className={getTabClassName('signalement')}
-        onClick={() => onTabClick?.('signalement')}
+        className={`${styles.tab} ${activeTab === 'carte' ? styles.active : ''}`}
+        onClick={() => handleTabClick('carte')}
+        aria-current={activeTab === 'carte' ? 'page' : undefined}
       >
-        <IconLocation className={styles.tabIcon} aria-hidden />
-        Signalement
+        <span className={`${styles.iconCircle} ${activeTab === 'carte' ? styles.iconCircleActive : ''}`}>
+          <IconMap className={styles.tabIcon} aria-hidden />
+        </span>
+        <span className={styles.tabLabel}>Carte</span>
       </button>
       <button
         type="button"
-        className={getTabClassName('couches')}
-        onClick={() => onTabClick?.('couches')}
+        className={`${styles.tab} ${activeTab === 'signalements' ? styles.active : ''}`}
+        onClick={() => handleTabClick('signalements')}
+        aria-current={activeTab === 'signalements' ? 'page' : undefined}
       >
-        <IconLayers className={styles.tabIcon} aria-hidden />
-        Couches
+        <span
+          className={`${styles.iconCircle} ${activeTab === 'signalements' ? styles.iconCircleActive : ''}`}
+        >
+          <IconArticle className={styles.tabIcon} aria-hidden />
+        </span>
+        <span className={styles.tabLabel}>Signalements</span>
       </button>
     </nav>
   );

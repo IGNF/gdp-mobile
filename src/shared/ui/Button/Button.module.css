@@ -107,6 +107,14 @@
 	background-color: var(--btn-shade);
 }
 
+.primary.solid:hover:not(:disabled) {
+	background-color: var(--color-primary-hover);
+}
+
+.primary.solid:active:not(:disabled) {
+	background-color: var(--color-primary-active);
+}
+
 /* Outline variant */
 .outline {
 	background-color: transparent;
@@ -118,7 +126,7 @@
 }
 
 .iconOnly.outline {
-  background-color: white;
+  background-color: var(--color-white);
   border-color: rgba(var(--btn-rgb), 0.24);
 }
 

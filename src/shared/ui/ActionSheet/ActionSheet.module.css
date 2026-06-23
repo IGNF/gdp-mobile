@@ -23,7 +23,7 @@
   flex-direction: column;
   max-height: 55vh;
   padding-bottom: var(--safe-bottom, 0px);
-  background-color: white;
+  background-color: var(--color-white);
   border-radius: 16px 16px 0 0;
   box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
   transform: translateY(100%);

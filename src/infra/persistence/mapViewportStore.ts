@@ -23,6 +23,10 @@ import {
   DEFAULT_MAP_ZOOM,
   GEOPORTAIL_LAYERS,
 } from '@/shared/constants/map';
+import {
+  DEFAULT_REPORT_MAP_LAYER_VISIBILITY,
+  type ReportMapLayerVisibility,
+} from '@/shared/constants/reportMapLayers';
 import { storageKey } from '@/shared/constants/storage';
 
 const MAP_PREFERENCES_STORAGE_KEY = storageKey('MAP_VIEWPORT');
@@ -48,6 +52,7 @@ export interface PersistedMapPreferences extends PersistedMapViewport {
   geodesyVisibility: GeodesyLayerVisibility;
   geodesyWfsAttributeFilterValues: GeodesyWfsAttributeFilterValues;
   wfsClusterPreferences: GdpWfsClusterPreferences;
+  reportMapLayers: ReportMapLayerVisibility;
 }
 
 function readFiniteNumber(value: unknown): number | null {
@@ -161,12 +166,28 @@ function normalizeGeodesyWfsAttributeFilterValues(
       return;
     }
 
-    if (filter.type !== 'boolean' && typeof value === 'string') {
+    if ((filter.type === 'date' || filter.type === 'text' || filter.type === 'choice' || filter.type === 'multiChoice') && typeof value === 'string') {
       values[filter.id] = value;
     }
   });
 
   return values;
+}
+
+function normalizeReportMapLayers(rawLayers: unknown): ReportMapLayerVisibility {
+  const defaults = DEFAULT_REPORT_MAP_LAYER_VISIBILITY;
+
+  if (!rawLayers || typeof rawLayers !== 'object') {
+    return defaults;
+  }
+
+  const candidate = rawLayers as Partial<ReportMapLayerVisibility>;
+
+  return {
+    myReports: typeof candidate.myReports === 'boolean' ? candidate.myReports : defaults.myReports,
+    groupReports:
+      typeof candidate.groupReports === 'boolean' ? candidate.groupReports : defaults.groupReports,
+  };
 }
 
 function normalizeMapPreferences(rawPreferences: unknown): PersistedMapPreferences | null {
@@ -186,6 +207,7 @@ function normalizeMapPreferences(rawPreferences: unknown): PersistedMapPreferenc
     geodesyMode,
   );
   const wfsClusterPreferences = normalizeWfsClusterPreferences(candidate.wfsClusterPreferences);
+  const reportMapLayers = normalizeReportMapLayers(candidate.reportMapLayers);
 
   return {
     ...viewport,
@@ -194,6 +216,7 @@ function normalizeMapPreferences(rawPreferences: unknown): PersistedMapPreferenc
     geodesyVisibility,
     geodesyWfsAttributeFilterValues,
     wfsClusterPreferences,
+    reportMapLayers,
   };
 }
 
@@ -232,6 +255,13 @@ export async function saveMapPreferences(
     };
   }
 
+  if (partial.reportMapLayers) {
+    merged.reportMapLayers = {
+      ...current.reportMapLayers,
+      ...partial.reportMapLayers,
+    };
+  }
+
   const normalized = normalizeMapPreferences(merged);
   if (!normalized) {
     return;
@@ -252,6 +282,7 @@ export function getDefaultMapPreferences(): PersistedMapPreferences {
     geodesyVisibility: createDefaultGeodesyVisibility(geodesyMode),
     geodesyWfsAttributeFilterValues: getGdpGeodesyDefaultWfsAttributeFilterValues(geodesyMode),
     wfsClusterPreferences: DEFAULT_GDP_WFS_CLUSTER_PREFERENCES,
+    reportMapLayers: DEFAULT_REPORT_MAP_LAYER_VISIBILITY,
   };
 }
 

@@ -1,0 +1,23 @@
+.title {
+  margin: 0 0 0.75rem;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--color-dark);
+}
+
+.preview {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  margin-bottom: 1rem;
+  border-radius: 0.75rem;
+  border: 1px solid var(--color-light-shade);
+  background: var(--gradient-geodesy-layer-preview);
+}
+
+.description {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--color-medium-shade);
+  white-space: pre-line;
+}

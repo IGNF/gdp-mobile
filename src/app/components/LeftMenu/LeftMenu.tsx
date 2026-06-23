@@ -138,6 +138,7 @@ export function LeftMenu({
         aria-label="Menu principal"
         aria-hidden={!isOpen}
       >
+        <p className="debug-banner">TODO — Écran pas encore développé</p>
         <div className={styles.userSection}>
           <div className={styles.avatar}>
             <div className={styles.avatarPlaceholder}>{getUserInitial(user)}</div>

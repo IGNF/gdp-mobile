@@ -82,8 +82,12 @@ Notes :
 | Route | Écran |
 |-------|-------|
 | `/` | Redirect → `/map` ou `/welcome` |
-| `/map` | Carte (écran central) |
+| `/map` | Carte (écran central) — fiche point au clic sur un repère ([détail](./FICHE_POINT.md)) |
 | `/report/geodesy/new` | Signalement repère |
 | `/login`, `/auth/callback` | SSO |
 
 Voir `cursor_nouvelle_application_g_od_sie_de.md` pour le plan complet.
+
+## Documentation métier carte
+
+- [Fiche point](./FICHE_POINT.md) — bottom sheet, snaps, variantes géodésie/nivellement, carrousel, mode debug champs

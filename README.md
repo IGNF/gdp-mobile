@@ -160,6 +160,7 @@ Branding (icône lanceur) : voir [scripts/GDP/readme.md](./scripts/GDP/readme.md
 ## Documentation
 
 - [Architecture](./docs/ARCHITECTURE.md)
+- [Fiche point (carte)](./docs/FICHE_POINT.md)
 - [Mode d'emploi](./docs/MODE_EMPLOI.md)
 
 ## Références

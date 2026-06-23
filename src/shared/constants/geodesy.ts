@@ -1,6 +1,5 @@
 import {
   createGeodesyCatalogForProfile,
-  DEFAULT_GEODESY_EXPERT_WFS_ATTRIBUTE_FILTERS,
   defaultGeodesyActiveLayerIdsForProfile,
   defaultGeodesyWfsAttributeFilterValuesForProfile,
   isGeodesyProfile,
@@ -43,8 +42,55 @@ export const GDP_GEODESY_ATTRIBUTE_KEYS = [
 
 const wfsApiKeyOption = GDP_GEODESY_WFS_API_KEY || undefined;
 
+/** Filtres expert GDP — ordre et libellés alignés sur la maquette Figma. */
 export const GDP_GEODESY_EXPERT_WFS_ATTRIBUTE_FILTERS: readonly GeodesyWfsAttributeFilterDefinition[] =
-  DEFAULT_GEODESY_EXPERT_WFS_ATTRIBUTE_FILTERS;
+  [
+    {
+      id: 'NETWORK_CATEGORY',
+      type: 'multiChoice',
+      title: 'Type de point',
+      property: 'groupe_type',
+      matcher: 'network-category',
+      options: [
+        { value: 'RBF', label: 'RBF' },
+        { value: 'RDF', label: 'RDF' },
+        { value: 'TRIPLET', label: 'Triplets' },
+        { value: 'NON_TRIPLET', label: 'Non triplets' },
+      ],
+    },
+    {
+      id: 'PROPRIO',
+      type: 'choice',
+      title: 'Origine',
+      property: 'proprio_sigle',
+      options: [
+        { value: 'IGN', label: 'IGN' },
+        { value: '__other__', label: 'Partenaire', matchOthers: true },
+      ],
+    },
+    {
+      id: 'HAS_PHOTO',
+      type: 'boolean',
+      title: 'Photo',
+      property: 'img1_url',
+      trueLabel: 'Avec photo',
+      falseLabel: 'Sans photo',
+    },
+    {
+      id: 'OBS_DATE_FROM',
+      type: 'date',
+      title: "Date d'observation",
+      property: 'obs_date',
+      operator: 'after',
+    },
+    {
+      id: 'OBS_DATE_TO',
+      type: 'date',
+      title: "Date d'observation",
+      property: 'obs_date',
+      operator: 'before',
+    },
+  ];
 
 /** Préférences utilisateur pour le regroupement des repères WFS (mode expert). */
 export interface GdpWfsClusterPreferences {
@@ -57,7 +103,7 @@ export const GDP_WFS_CLUSTER_DISTANCE_MIN = 10;
 export const GDP_WFS_CLUSTER_DISTANCE_MAX = 100;
 
 export const DEFAULT_GDP_WFS_CLUSTER_PREFERENCES: GdpWfsClusterPreferences = {
-  enabled: false,
+  enabled: true,
   distance: 40,
 };
 

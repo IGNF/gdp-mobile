@@ -12,15 +12,22 @@ import {
   GEOPORTAIL_API_KEY,
   SEARCH_ADDRESS_MAX_HISTORY,
 } from '@/shared/constants/map';
+import { SEARCH_GEOPORTAIL_CLASS_NAME } from '@/features/search/constants/searchGeoportail';
+import type { AddressSearchHistoryEntry } from '@/features/search/utils/addressSearchHistory';
+import { fromLonLat } from 'ol/proj';
 
 interface UseSearchGeoportailOptions {
   map: Map | null;
   addressContainerRef: React.RefObject<HTMLDivElement | null>;
   isOpen: boolean;
+  placeholder?: string;
+  onFocus?: () => void;
+  onSelect?: () => void;
 }
 
 export interface UseSearchGeoportailReturn {
   clearMarker: () => void;
+  selectHistoryEntry: (entry: AddressSearchHistoryEntry) => void;
 }
 
 function clearAutocompleteList(container: HTMLElement | null, selector: string) {
@@ -29,13 +36,15 @@ function clearAutocompleteList(container: HTMLElement | null, selector: string) 
     return;
   }
   list.innerHTML = '';
-  list.style.display = 'none';
 }
 
 export function useSearchGeoportail({
   map,
   addressContainerRef,
   isOpen,
+  placeholder = 'Rechercher une adresse',
+  onFocus,
+  onSelect,
 }: UseSearchGeoportailOptions): UseSearchGeoportailReturn {
   const overlayRef = useRef<Overlay | null>(null);
 
@@ -85,8 +94,8 @@ export function useSearchGeoportail({
     const addressOptions: SearchGeoportailOptions = {
       target: addressContainerRef.current,
       apiKey: GEOPORTAIL_API_KEY,
-      className: 'IGNF-gdp-address',
-      placeholder: 'Rechercher une adresse',
+      className: SEARCH_GEOPORTAIL_CLASS_NAME,
+      placeholder,
       collapsed: false,
       noCollapse: true,
       maxHistory: SEARCH_ADDRESS_MAX_HISTORY,
@@ -94,20 +103,89 @@ export function useSearchGeoportail({
     (addressOptions as Record<string, unknown>).type = 'StreetAddress,PositionOfInterest';
 
     const addressSearch = new SearchGeoportail(addressOptions);
+    addressSearch.set('copy', null);
     addressSearch.setMap(map);
+
+    const container = addressContainerRef.current;
+    const input = container.querySelector<HTMLInputElement>('input.search');
+
+    const hideAutocomplete = () => {
+      clearAutocompleteList(container, 'ul.autocomplete');
+    };
+
+    const keepFocusForSuggestionPick = (event: Event) => {
+      const target = event.target;
+      if (!(target instanceof Element)) {
+        return;
+      }
+
+      const item = target.closest('ul.autocomplete li');
+      if (item && !item.classList.contains('copy')) {
+        event.preventDefault();
+      }
+    };
+
+    const handleBlur = () => {
+      window.setTimeout(hideAutocomplete, 200);
+    };
+
+    const handleFocus = () => {
+      onFocus?.();
+    };
+
+    container.addEventListener('mousedown', keepFocusForSuggestionPick);
+    container.addEventListener('pointerdown', keepFocusForSuggestionPick);
+    input?.addEventListener('blur', handleBlur);
+    input?.addEventListener('focus', handleFocus);
 
     addressSearch.on('select', (event: SearchEvent) => {
       if (event.coordinate) {
         showMarkerAtCoordinate(event.coordinate);
       }
-      clearAutocompleteList(addressContainerRef.current, 'ul.autocomplete');
+      if (input) {
+        const label =
+          typeof event.search === 'object' &&
+          event.search !== null &&
+          'fulltext' in event.search &&
+          typeof event.search.fulltext === 'string'
+            ? event.search.fulltext
+            : input.value;
+        input.value = label;
+      }
+      hideAutocomplete();
+      input?.blur();
+      onSelect?.();
     });
 
     return () => {
+      container.removeEventListener('mousedown', keepFocusForSuggestionPick);
+      container.removeEventListener('pointerdown', keepFocusForSuggestionPick);
+      input?.removeEventListener('blur', handleBlur);
+      input?.removeEventListener('focus', handleFocus);
       addressSearch.setMap(null as unknown as Map);
       clearMarker();
     };
-  }, [addressContainerRef, clearMarker, isOpen, map, showMarkerAtCoordinate]);
+  }, [addressContainerRef, clearMarker, isOpen, map, onFocus, onSelect, placeholder, showMarkerAtCoordinate]);
 
-  return { clearMarker };
+  const selectHistoryEntry = useCallback(
+    (entry: AddressSearchHistoryEntry) => {
+      if (!map) {
+        return;
+      }
+
+      const coordinate = fromLonLat([entry.longitude, entry.latitude]);
+      showMarkerAtCoordinate(coordinate);
+
+      const input = addressContainerRef.current?.querySelector<HTMLInputElement>('input.search');
+      if (input) {
+        input.value = entry.subtitle ? `${entry.title}, ${entry.subtitle}` : entry.title;
+        input.blur();
+      }
+
+      onSelect?.();
+    },
+    [addressContainerRef, map, onSelect, showMarkerAtCoordinate],
+  );
+
+  return { clearMarker, selectHistoryEntry };
 }

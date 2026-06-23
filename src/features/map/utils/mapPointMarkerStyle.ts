@@ -1,14 +1,21 @@
 import { Icon, Style } from 'ol/style';
 
+import { getColorCode } from '@/shared/utils/color';
+
 function encodeMarkerSvg(svg: string): string {
   return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
 }
 
+function markerContrastColor(): string {
+  return getColorCode('white');
+}
+
 function createFilledMapMarkerIconSrc(color: string): string {
+  const contrast = markerContrastColor();
   const markerSvg = `
     <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 36 36">
-      <circle cx="18" cy="18" r="14" fill="${color}" stroke="#ffffff" stroke-width="3"/>
-      <circle cx="18" cy="18" r="5" fill="#ffffff"/>
+      <circle cx="18" cy="18" r="14" fill="${color}" stroke="${contrast}" stroke-width="3"/>
+      <circle cx="18" cy="18" r="5" fill="${contrast}"/>
     </svg>
   `;
 
@@ -16,11 +23,12 @@ function createFilledMapMarkerIconSrc(color: string): string {
 }
 
 function createRingMapMarkerIconSrc(color: string): string {
+  const contrast = markerContrastColor();
   const markerSvg = `
     <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48">
       <circle cx="24" cy="24" r="20" fill="${color}" fill-opacity="0.22"/>
       <circle cx="24" cy="24" r="14" fill="none" stroke="${color}" stroke-width="4"/>
-      <circle cx="24" cy="24" r="5" fill="${color}" stroke="#ffffff" stroke-width="2"/>
+      <circle cx="24" cy="24" r="5" fill="${color}" stroke="${contrast}" stroke-width="2"/>
     </svg>
   `;
 

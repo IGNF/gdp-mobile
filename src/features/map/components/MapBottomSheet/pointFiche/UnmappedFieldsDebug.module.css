@@ -1,0 +1,57 @@
+.debug {
+  margin-top: 0.5rem;
+  padding: 0.75rem;
+  border-radius: 0.75rem;
+  border: 1px dashed var(--color-medium-tint);
+  background: var(--color-light-light);
+}
+
+.title {
+  margin: 0 0 0.5rem;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--color-medium-shade);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.empty {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--color-medium);
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.item {
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.fieldLabel {
+  flex-shrink: 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-medium-shade);
+}
+
+.fieldLabel::after {
+  content: ' :';
+}
+
+.fieldValue {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.8125rem;
+  color: var(--color-dark);
+  word-break: break-word;
+}

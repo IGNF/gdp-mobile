@@ -3,7 +3,7 @@
   align-items: center;
   gap: 12px;
   padding: 16px;
-  background: white;
+  background: var(--color-white);
   border: none;
   border-radius: 10px;
   width: 100%;

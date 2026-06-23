@@ -41,10 +41,11 @@ export interface ReportPositionMapProps {
 }
 
 function createReportMarkerIconSrc(color: string): string {
+  const contrast = getColorCode('white');
   const markerSvg = `
     <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 36 36">
       <circle cx="18" cy="18" r="14" fill="${color}" fill-opacity="0.2"/>
-      <circle cx="18" cy="18" r="7" fill="${color}" stroke="#ffffff" stroke-width="3"/>
+      <circle cx="18" cy="18" r="7" fill="${color}" stroke="${contrast}" stroke-width="3"/>
     </svg>
   `;
 
@@ -92,7 +93,11 @@ export function ReportPositionMap({
         return;
       }
 
-      const markerColor = getColorCode('primary') || '#26a581';
+      const markerColor = getColorCode('primary');
+      if (!markerColor) {
+        return;
+      }
+
       const markerFeature = new Feature<Point>();
       markerFeatureRef.current = markerFeature;
 

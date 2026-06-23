@@ -1,12 +1,188 @@
+/*
+ * Design tokens — correspondance Figma (palette_couleurs.png) ↔ CSS
+ *
+ * FIGMA VERT (primaire)              → TOKEN CSS
+ * ─────────────────────────────────────────────────────────────
+ * Light                              → --figma-green-light
+ * Light :hover                       → --figma-green-light-hover
+ * Light :active                      → --figma-green-light-active
+ * Normal                             → --figma-green
+ * Normal :hover                      → --figma-green-hover
+ * Normal :active                     → --figma-green-active
+ * Dark                               → --figma-green-dark
+ * Dark :hover                        → --figma-green-dark-hover
+ * Dark :active                       → --figma-green-dark-active
+ * Darker                             → --figma-green-darker
+ *
+ * FIGMA GRIS (neutre)                → TOKEN CSS
+ * ─────────────────────────────────────────────────────────────
+ * Light                              → --figma-neutral-light
+ * Light :hover                       → --figma-neutral-light-hover
+ * Light :active                      → --figma-neutral-light-active
+ * Normal                             → --figma-neutral
+ * Normal :hover                      → --figma-neutral-hover
+ * Normal :active                     → --figma-neutral-active
+ * Dark                               → --figma-neutral-dark
+ * Dark :hover                        → --figma-neutral-dark-hover
+ * Dark :active                       → --figma-neutral-dark-active
+ * Darker                             → --figma-neutral-darker
+ *
+ * ALIASES SÉMANTIQUES (usage composants) → SOURCE FIGMA
+ * ─────────────────────────────────────────────────────────────
+ * --color-primary                      → --figma-green
+ * --color-primary-hover                → --figma-green-hover
+ * --color-primary-active               → --figma-green-active
+ * --color-primary-shade                → --figma-green-dark
+ * --color-primary-tint                 → --figma-green-hover
+ * --color-primary-light                → --figma-green-light
+ * --color-light / bordures             → --figma-neutral
+ * --color-light-light / surfaces     → --figma-neutral-light
+ * --color-medium / texte secondaire    → --figma-neutral-dark-hover
+ * --color-dark / texte principal       → --figma-neutral-darker
+ * --color-white                        → blanc pur (contraste sur fonds foncés)
+ * --color-surface                      → --figma-neutral-light
+ * --color-fiche-canvas                 → fond fiche repère (gris maquette)
+ * --color-fiche-surface                → cartes blanches sur la fiche
+ *
+ * Hors palette Figma (inchangés) : secondary, tertiary, success, warning, danger.
+ * Pour réadapter la charte : modifier uniquement les --figma-* ci-dessous.
+ */
+
 :root {
   /* Capacitor Android injecte --safe-area-inset-* ; env() seul est souvent à 0 */
   --safe-top: var(--safe-area-inset-top, env(safe-area-inset-top, 0px));
   --safe-bottom: var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px));
   --safe-left: var(--safe-area-inset-left, env(safe-area-inset-left, 0px));
   --safe-right: var(--safe-area-inset-right, env(safe-area-inset-right, 0px));
+
+  /* ── Figma : vert ── */
+  --figma-green-light: #e9f6f2;
+  --figma-green-light-hover: #def2ec;
+  --figma-green-light-active: #bce3d8;
+  --figma-green: #26a581;
+  --figma-green-hover: #229574;
+  --figma-green-active: #1e8467;
+  --figma-green-dark: #1d7c61;
+  --figma-green-dark-hover: #17634d;
+  --figma-green-dark-active: #114a3a;
+  --figma-green-darker: #0d3a2d;
+
+  /* ── Figma : gris ── */
+  --figma-neutral-light: #fbfbfb;
+  --figma-neutral-light-hover: #f9f9f9;
+  --figma-neutral-light-active: #f3f3f3;
+  --figma-neutral: #d9d9d9;
+  --figma-neutral-hover: #c3c3c3;
+  --figma-neutral-active: #aeaeae;
+  --figma-neutral-dark: #a3a3a3;
+  --figma-neutral-dark-hover: #828282;
+  --figma-neutral-dark-active: #626262;
+  --figma-neutral-darker: #091625;
+
+  /* ── Utilitaires ── */
+  --color-white: #ffffff;
+  --color-surface: var(--figma-neutral-light);
+  --color-fiche-canvas: var(--figma-neutral-light-active);
+  --color-fiche-surface: var(--color-white);
+  --gradient-geodesy-layer-preview: linear-gradient(
+    145deg,
+    var(--figma-green-light-hover) 0%,
+    var(--figma-green-light-active) 45%,
+    var(--figma-green) 100%
+  );
+
+  /* ── Primaire (vert Figma) ── */
+  --color-primary: var(--figma-green);
+  --color-primary-rgb: 38, 165, 129;
+  --color-primary-contrast: var(--color-white);
+  --color-primary-contrast-rgb: 255, 255, 255;
+  --color-primary-hover: var(--figma-green-hover);
+  --color-primary-active: var(--figma-green-active);
+  --color-primary-shade: var(--figma-green-dark);
+  --color-primary-tint: var(--figma-green-hover);
+  --color-primary-light: var(--figma-green-light);
+
+  /* ── Hors palette Figma ── */
+  --color-secondary: #786af2;
+  --color-secondary-rgb: 120, 106, 242;
+  --color-secondary-contrast: var(--color-white);
+  --color-secondary-contrast-rgb: 255, 255, 255;
+  --color-secondary-shade: #2112a4;
+  --color-secondary-tint: #8679f3;
+  --color-secondary-light: #c6ccff66;
+
+  --color-tertiary: #6030ff;
+  --color-tertiary-rgb: 96, 48, 255;
+  --color-tertiary-contrast: var(--color-white);
+  --color-tertiary-contrast-rgb: 255, 255, 255;
+  --color-tertiary-shade: #542ae0;
+  --color-tertiary-tint: #7045ff;
+
+  --color-success: #5cff98;
+  --color-success-rgb: 92, 255, 152;
+  --color-success-contrast: #000000;
+  --color-success-contrast-rgb: 0, 0, 0;
+  --color-success-shade: #51e086;
+  --color-success-tint: #6cffa2;
+
+  --color-warning: #f18345;
+  --color-warning-rgb: 241, 131, 69;
+  --color-warning-contrast: #000000;
+  --color-warning-contrast-rgb: 0, 0, 0;
+  --color-warning-shade: #d4733d;
+  --color-warning-tint: #f28f58;
+  --color-warning-light: #ffeee4;
+
+  --color-danger: #e86f4a;
+  --color-danger-rgb: 232, 111, 74;
+  --color-danger-contrast: #000000;
+  --color-danger-contrast-rgb: 0, 0, 0;
+  --color-danger-shade: #cc6241;
+  --color-danger-tint: #ea7d5c;
+
+  /* ── Neutres (gris Figma) ── */
+  --color-light: var(--figma-neutral);
+  --color-light-rgb: 217, 217, 217;
+  --color-light-contrast: #000000;
+  --color-light-contrast-rgb: 0, 0, 0;
+  --color-light-shade: var(--figma-neutral-hover);
+  --color-light-tint: var(--figma-neutral-light-active);
+  --color-light-light: var(--figma-neutral-light);
+
+  --color-medium: var(--figma-neutral-dark-hover);
+  --color-medium-rgb: 130, 130, 130;
+  --color-medium-contrast: #000000;
+  --color-medium-contrast-rgb: 0, 0, 0;
+  --color-medium-shade: var(--figma-neutral-dark-active);
+  --color-medium-tint: var(--figma-neutral-dark);
+
+  --color-dark: var(--figma-neutral-darker);
+  --color-dark-rgb: 9, 22, 37;
+  --color-dark-contrast: var(--color-white);
+  --color-dark-contrast-rgb: 255, 255, 255;
+  --color-dark-shade: #081321;
+  --color-dark-tint: #222d3b;
 }
 
-html, body {
+/* Bandeau WIP / DEBUG — classe globale réutilisable (pas d’import CSS module). */
+.debug-banner {
+  margin: 0 0 1rem;
+  padding: 0.5rem 0.625rem 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px dashed var(--color-warning);
+  border-left: 4px solid var(--color-warning);
+  background: var(--color-warning-light);
+  font-size: 0.75rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--color-warning-shade);
+  letter-spacing: 0.02em;
+  word-break: break-all;
+}
+
+html,
+body {
   margin: 0;
   padding: 0;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
@@ -22,73 +198,4 @@ html, body {
   padding-top: var(--safe-top);
   min-height: 100vh;
   box-sizing: border-box;
-}
-
-:root {
-  --color-primary: #26A581;
-  --color-primary-rgb: 38,165,129;
-  --color-primary-contrast: #ffffff;
-  --color-primary-contrast-rgb: 0,0,0;
-  --color-primary-shade: #1C7B66;
-  --color-primary-tint: #3cae8e;
-  --color-primary-light: #E3F5EF;
-
-  --color-secondary: #786af2;
-  --color-secondary-rgb: 120,106,242;
-  --color-secondary-contrast: #ffffff;
-  --color-secondary-contrast-rgb: 0,0,0;
-  --color-secondary-shade: #2112a4;
-  --color-secondary-tint: #8679f3;
-  --color-secondary-light: #c6ccff66;
-
-  --color-tertiary: #6030ff;
-  --color-tertiary-rgb: 96,48,255;
-  --color-tertiary-contrast: #ffffff;
-  --color-tertiary-contrast-rgb: 255,255,255;
-  --color-tertiary-shade: #542ae0;
-  --color-tertiary-tint: #7045ff;
-
-  --color-success: #5CFF98;
-  --color-success-rgb: 92,255,152;
-  --color-success-contrast: #000000;
-  --color-success-contrast-rgb: 0,0,0;
-  --color-success-shade: #51e086;
-  --color-success-tint: #6cffa2;
-
-  --color-warning: #F18345;
-  --color-warning-rgb: 241,131,69;
-  --color-warning-contrast: #000000;
-  --color-warning-contrast-rgb: 0,0,0;
-  --color-warning-shade: #d4733d;
-  --color-warning-tint: #f28f58;
-  --color-warning-light: #FFEEE4;
-
-  --color-danger: #E86F4A;
-  --color-danger-rgb: 232,111,74;
-  --color-danger-contrast: #000000;
-  --color-danger-contrast-rgb: 0,0,0;
-  --color-danger-shade: #cc6241;
-  --color-danger-tint: #ea7d5c;
-
-  --color-light: #E9ECEF;
-  --color-light-rgb: 233,236,239;
-  --color-light-contrast: #000000;
-  --color-light-contrast-rgb: 0,0,0;
-  --color-light-shade: #cdd0d2;
-  --color-light-tint: #DDE1E6;
-  --color-light-light: #F4F6F8;
-
-  --color-medium: #788089;
-  --color-medium-rgb: 120,128,137;
-  --color-medium-contrast: #000000;
-  --color-medium-contrast-rgb: 0,0,0;
-  --color-medium-shade: #6A727A;
-  --color-medium-tint: #868d95;
-
-  --color-dark: #091625;
-  --color-dark-rgb: 9,22,37;
-  --color-dark-contrast: #ffffff;
-  --color-dark-contrast-rgb: 255,255,255;
-  --color-dark-shade: #081321;
-  --color-dark-tint: #222d3b;
 }

@@ -49,10 +49,12 @@ export function useMapClickSelectionMarker({
 
       if (Number.isFinite(longitude) && Number.isFinite(latitude)) {
         const feature = new Feature<Point>(new Point(fromLonLat([longitude, latitude])));
-        const markerColor = getColorCode('primary') || '#26a581';
+        const markerColor = getColorCode('primary');
 
-        feature.setStyle(createMapPointMarkerStyle(markerColor, 'ring'));
-        source.addFeature(feature);
+        if (markerColor) {
+          feature.setStyle(createMapPointMarkerStyle(markerColor, 'ring'));
+          source.addFeature(feature);
+        }
       }
     }
 

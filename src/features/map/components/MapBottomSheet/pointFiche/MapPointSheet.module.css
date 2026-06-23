@@ -1,0 +1,402 @@
+.sheetLayout {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  flex: 1;
+  background: var(--color-fiche-canvas);
+}
+
+.dragZone {
+  flex-shrink: 0;
+  cursor: grab;
+  touch-action: none;
+}
+
+.dragZone:active {
+  cursor: grabbing;
+}
+
+.dragZoneFull {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  cursor: grab;
+  touch-action: none;
+}
+
+.dragZoneFull:active {
+  cursor: grabbing;
+}
+
+.handleArea {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 1.75rem;
+  padding: 0.375rem 0 0.25rem;
+  flex-shrink: 0;
+}
+
+.handle {
+  width: 2.5rem;
+  height: 0.25rem;
+  border-radius: 999px;
+  background: var(--color-light-shade);
+}
+
+.header {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0 1rem 0.5rem;
+}
+
+.headerTop {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.titleRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+  flex: 1;
+}
+
+.title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--color-dark);
+}
+
+.favoriteButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: var(--color-primary-light);
+  cursor: default;
+  flex-shrink: 0;
+  opacity: 0.6;
+}
+
+.favoriteIcon {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.favoriteIcon path {
+  fill: var(--color-primary);
+}
+
+.closeButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.closeIcon {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.closeIcon path {
+  fill: var(--color-medium);
+}
+
+.statusBadge {
+  align-self: flex-start;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  background: var(--color-warning-light);
+  color: var(--color-danger-shade);
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.statusBadgeGood {
+  background: var(--color-primary-light);
+  color: var(--color-primary-shade);
+}
+
+.meta {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--color-medium);
+}
+
+.body {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 0.75rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.footer {
+  flex-shrink: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem calc(0.5rem + var(--safe-bottom));
+  background: var(--color-fiche-canvas);
+}
+
+.sectionTitle {
+  margin: 0 0 0.5rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-medium);
+}
+
+.descriptionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.descriptionHeader .sectionTitle {
+  margin-bottom: 0;
+}
+
+.gpsExploitabilityBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.625rem;
+  border-radius: 999px;
+  background: var(--gps-exploitability-bg, var(--color-light));
+  color: var(--gps-exploitability-fg, var(--color-medium-shade));
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-align: right;
+}
+
+/* TODO: palette Figma — ajuster les couleurs par variante. */
+.gpsExploitabilityBadge[data-variant='exploitable'],
+.gpsExploitabilityBadge[data-variant='excentrated'],
+.gpsExploitabilityBadge[data-variant='inexploitable'],
+.gpsExploitabilityBadge[data-variant='neutral'] {
+  --gps-exploitability-bg: var(--color-light);
+  --gps-exploitability-fg: var(--color-medium-shade);
+}
+
+.gpsExploitabilityIcon {
+  width: 0.875rem;
+  height: 0.875rem;
+  flex-shrink: 0;
+}
+
+.gpsExploitabilityIcon path {
+  fill: currentColor;
+}
+
+.fieldGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+
+.fieldCard {
+  padding: 0.625rem 0.75rem;
+  border-radius: 0.625rem;
+  background: var(--color-fiche-surface);
+}
+
+.fieldCardWide {
+  grid-column: 1 / -1;
+}
+
+.fieldLabel {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-size: 0.75rem;
+  color: var(--color-medium);
+}
+
+.fieldValue {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-dark);
+  word-break: break-word;
+}
+
+.partnerCard {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.partnerLogoSlot {
+  flex-shrink: 0;
+  width: 3.5rem;
+  height: 3.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.5rem;
+  border: 1px solid var(--figma-neutral-light-active);
+  background: var(--color-fiche-surface);
+  overflow: hidden;
+}
+
+.partnerLogoImage {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.partnerLogoPlaceholder {
+  font-size: 0.625rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-medium);
+}
+
+.partnerName {
+  margin: 0;
+  flex: 1;
+  min-width: 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--color-dark);
+  word-break: break-word;
+}
+
+.textBlock {
+  margin: 0;
+  padding: 0.75rem;
+  border-radius: 0.625rem;
+  background: var(--color-fiche-surface);
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: var(--color-dark);
+}
+
+.remarkBlock {
+  margin: 0;
+  padding: 0.75rem 0.75rem 0.75rem 1rem;
+  border-radius: 0.625rem;
+  border-left: 4px solid var(--color-warning);
+  background: var(--color-warning-light);
+  font-size: 0.875rem;
+  font-style: italic;
+  line-height: 1.45;
+  color: var(--figma-green-darker);
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.625rem;
+  border-radius: 999px;
+  background: var(--color-light);
+  color: var(--color-medium-shade);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.placeholderBlock {
+  margin: 0;
+  padding: 0.75rem;
+  border-radius: 0.625rem;
+  border: 1px dashed var(--color-light-shade);
+  font-size: 0.8125rem;
+  color: var(--color-medium);
+}
+
+.coordSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+}
+
+.coordTabs {
+  display: flex;
+  border-bottom: 1px solid var(--figma-neutral-light-active);
+}
+
+.coordTab,
+.coordTabActive {
+  flex: 1;
+  padding: 0.625rem 0.5rem;
+  border: none;
+  background: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-medium);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+}
+
+.coordTabActive {
+  color: var(--color-primary);
+  font-weight: 600;
+  border-bottom-color: var(--color-primary);
+}
+
+.coordTab:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.coordFieldsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  border-radius: 0.625rem;
+  background: var(--color-fiche-surface);
+  overflow: hidden;
+  border: 1px solid var(--figma-neutral-light-active);
+}
+
+.coordField {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+  padding: 0.625rem 0.75rem;
+  border-right: 1px solid var(--figma-neutral-light-active);
+  border-bottom: 1px solid var(--figma-neutral-light-active);
+}
+
+.coordField:nth-child(2n) {
+  border-right: none;
+}
+
+.coordFieldWide {
+  grid-column: 1 / -1;
+  border-right: none;
+}
+
+.coordEmpty {
+  margin: 0;
+  padding: 0.75rem;
+  border-radius: 0.625rem;
+  background: var(--color-fiche-surface);
+  font-size: 0.8125rem;
+  color: var(--color-medium);
+  text-align: center;
+}

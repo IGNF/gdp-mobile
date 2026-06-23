@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type MouseEvent } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { defaultGeodesyLayerVisibility, isGeodesyLayerReportingEnabled } from '@ign/gdp-tools';
-import { GeodesyPointDetails, GeodesyPointTitle, useGeodesyOnMap, useGeodesyWfsLoading } from '@ign/gdp-tools/react';
+import { useGeodesyOnMap, useGeodesyWfsLoading } from '@ign/gdp-tools/react';
 
-import { BottomTabbar, type MapTabId } from '@/app/components/BottomTabbar';
+import { BottomTabbar } from '@/app/components/BottomTabbar';
 import { LeftMenu, isLeftMenuOverlayRoute, type LeftMenuOverlayRoute } from '@/app/components/LeftMenu';
 import { AboutPage } from '@/features/about/pages/AboutPage';
 import { LogoutPage } from '@/features/auth/pages/Logout';
@@ -11,18 +11,20 @@ import { MyAccountPage } from '@/features/auth/pages/MyAccount';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { HelpPage } from '@/features/help/pages/HelpPage';
 import { SettingsPage } from '@/features/settings/pages/SettingsPage';
-import { SearchPanel } from '@/features/search/components/SearchPanel';
+import { LegendPage } from '@/features/legend/pages/LegendPage';
+import { MapBottomSheet } from '@/features/map/components/MapBottomSheet';
 import { MapLayersPanelFlow } from '@/features/map/components/MapLayersPanelFlow';
 import { countActiveMapGeodesyFilters } from '@/features/map/components/MapGeodesyFiltersPanel';
 import type { MapLayerGroupId } from '@/features/map/types/mapLayerGroups';
+import type { GroupReport } from '@/domain/report/groupReportModels';
 import { useMap } from '@/features/map/hooks/useMap';
 import { useMapGeodesyClick } from '@/features/map/hooks/useMapGeodesyClick';
 import { useMapClickSelectionMarker } from '@/features/map/hooks/useMapClickSelectionMarker';
 import { usePersistedMapLayers } from '@/features/map/hooks/usePersistedMapLayers';
+import { useReportMapLayers } from '@/features/map/hooks/useReportMapLayers';
 import { useUserLocationMarker } from '@/features/map/hooks/useUserLocationMarker';
 import { Gdp_Geolocation } from '@/platform/device/geolocation';
 import { Loading } from '@/shared/ui/Loading';
-import { ActionSheet } from '@/shared/ui/ActionSheet';
 import {
   GEOLOCATION_DOUBLE_TAP_DELAY_MS,
   GEOPORTAIL_LAYERS,
@@ -38,6 +40,10 @@ import {
   type GdpWfsClusterPreferences,
 } from '@/shared/constants/geodesy';
 import {
+  DEFAULT_REPORT_MAP_LAYER_VISIBILITY,
+  type ReportMapLayerVisibility,
+} from '@/shared/constants/reportMapLayers';
+import {
   getGeoportailLayerGroup,
   setActiveGeoportailLayer,
 } from '@/infra/map/openlayers/geoportailLayers';
@@ -45,7 +51,8 @@ import {
 import IconGeolocation from '@/shared/assets/icons/icon-geolocation.svg?react';
 import IconFilter from '@/shared/assets/icons/icon-filter.svg?react';
 import IconBurger from '@/shared/assets/icons/icon-burger.svg?react';
-import IconSearch from '@/shared/assets/icons/icon-search.svg?react';
+import IconLayers from '@/shared/assets/icons/icon-layers.svg?react';
+import IconLegend from '@/shared/assets/icons/icon-legend.svg?react';
 
 import styles from './MapPage.module.css';
 
@@ -95,11 +102,28 @@ export function MapPage() {
   const [isLayersPanelOpen, setIsLayersPanelOpen] = useState(false);
   const [layersPanelFocus, setLayersPanelFocus] = useState<MapLayerGroupId | null>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isLegendOpen, setIsLegendOpen] = useState(false);
+  const [sheetHeight, setSheetHeight] = useState(88);
+  const [fabSheetOffset, setFabSheetOffset] = useState(88);
+  const [isTabbarHiddenByPoint, setIsTabbarHiddenByPoint] = useState(false);
+  const [isTabbarHiddenByFilters, setIsTabbarHiddenByFilters] = useState(false);
+  const isTabbarVisible = !isTabbarHiddenByPoint && !isTabbarHiddenByFilters;
+
+  useEffect(() => {
+    const tabbarHeight = isTabbarVisible ? '5.5rem' : '0px';
+    document.documentElement.style.setProperty('--map-tabbar-height', tabbarHeight);
+
+    return () => {
+      document.documentElement.style.removeProperty('--map-tabbar-height');
+    };
+  }, [isTabbarVisible]);
   const [activeOverlay, setActiveOverlay] = useState<LeftMenuOverlayRoute | null>(null);
   const [geodesyMode, setGeodesyMode] = useState<GdpGeodesyMode>(GDP_GEODESY_DEFAULT_MODE);
   const [wfsClusterPreferences, setWfsClusterPreferences] = useState<GdpWfsClusterPreferences>(
     DEFAULT_GDP_WFS_CLUSTER_PREFERENCES,
+  );
+  const [reportMapLayers, setReportMapLayers] = useState<ReportMapLayerVisibility>(
+    DEFAULT_REPORT_MAP_LAYER_VISIBILITY,
   );
   const geodesyCatalog = useMemo(
     () => createGdpGeodesyCatalog(geodesyMode, wfsClusterPreferences),
@@ -134,15 +158,17 @@ export function MapPage() {
     geodesyVisibility: geodesy.visibility,
     geodesyWfsAttributeFilterValues: geodesy.wfsAttributeFilterValues,
     wfsClusterPreferences,
+    reportMapLayers,
     onBasemapChange: setActiveBasemap,
     onGeodesyModeChange: setGeodesyMode,
     onGeodesyVisibilityChange: geodesy.setVisibility,
     onGeodesyWfsAttributeFilterValuesChange: geodesy.setWfsAttributeFilterValues,
     onWfsClusterPreferencesChange: setWfsClusterPreferences,
+    onReportMapLayersChange: setReportMapLayers,
   });
   const mapClick = useMapGeodesyClick(map, {
     isMapReady,
-    enabled: !isSearchOpen,
+    enabled: true,
     attributeCatalog: geodesy.catalog.attributes,
     pictoUrlMaps: geodesy.catalog.wfsPictoUrlMaps,
   });
@@ -151,6 +177,26 @@ export function MapPage() {
 
   useUserLocationMarker({ map, isMapReady });
   useMapClickSelectionMarker({ map, isMapReady, pendingAction: mapClick.pendingAction });
+
+  const handleReportMapSelect = useCallback(
+    (report: GroupReport) => {
+      if (report.longitude === null || report.latitude === null) {
+        return;
+      }
+
+      void focusOnCoordinate(report.longitude, report.latitude);
+    },
+    [focusOnCoordinate],
+  );
+
+  useReportMapLayers({
+    map,
+    isMapReady,
+    isAuthenticated,
+    userId: user?.id,
+    visibility: reportMapLayers,
+    onReportSelect: handleReportMapSelect,
+  });
 
   const handleGeolocationButtonClick = (event: MouseEvent<HTMLButtonElement>) => {
     const now = event.timeStamp;
@@ -197,21 +243,6 @@ export function MapPage() {
   }, []);
 
   useEffect(() => {
-    if (!map || !isSearchOpen) {
-      return;
-    }
-
-    const handleMapClick = () => {
-      setIsSearchOpen(false);
-    };
-
-    map.on('singleclick', handleMapClick);
-    return () => {
-      map.un('singleclick', handleMapClick);
-    };
-  }, [isSearchOpen, map]);
-
-  useEffect(() => {
     if (!map) {
       return;
     }
@@ -232,28 +263,21 @@ export function MapPage() {
     pendingAction !== null &&
     isGeodesyLayerReportingEnabled(geodesy.catalog, pendingAction.reportContext.layerId);
 
-  const handleSearchClick = () => {
+  const handleOpenLayers = () => {
     mapClick.closeActionSheet();
-    setIsLayersPanelOpen(false);
     setLayersPanelFocus(null);
-    setIsSearchOpen((current) => !current);
-  };
-
-  const handleTabClick = (tab: MapTabId) => {
-    mapClick.closeActionSheet();
-    setIsSearchOpen(false);
-
-    if (tab === 'couches') {
-      setLayersPanelFocus(null);
-      setIsLayersPanelOpen((current) => !current);
-    }
+    setIsLayersPanelOpen((current) => !current);
   };
 
   const handleOpenFilters = () => {
     mapClick.closeActionSheet();
-    setIsSearchOpen(false);
     setLayersPanelFocus('geodesy-filters');
     setIsLayersPanelOpen(true);
+  };
+
+  const handleOpenLegend = () => {
+    mapClick.closeActionSheet();
+    setIsLegendOpen(true);
   };
 
   const handleCloseLayersPanel = () => {
@@ -270,6 +294,21 @@ export function MapPage() {
     navigate(route);
   };
 
+  const handleFocusCoordinate = useCallback(
+    (longitude: number, latitude: number) => {
+      void focusOnCoordinate(longitude, latitude);
+    },
+    [focusOnCoordinate],
+  );
+
+  const handleReportPoint = useCallback(() => {
+    if (!isGeodesyReportable) {
+      return;
+    }
+
+    mapClick.reportOnExistingPoint();
+  }, [isGeodesyReportable, mapClick]);
+
   const hasActiveFilters =
     geodesyMode === 'expert' &&
     countActiveMapGeodesyFilters(
@@ -280,7 +319,14 @@ export function MapPage() {
   const showExpertFiltersButton = geodesyMode === 'expert';
 
   return (
-    <div className={styles.mapPage}>
+    <div
+      className={styles.mapPage}
+      style={{
+        ['--map-sheet-height' as string]: `${sheetHeight}px`,
+        ['--map-fab-sheet-offset' as string]: `${fabSheetOffset}px`,
+        ['--map-tabbar-height' as string]: isTabbarVisible ? '5.5rem' : '0px',
+      }}
+    >
       <LeftMenu
         isOpen={isMenuOpen}
         onClose={() => setIsMenuOpen(false)}
@@ -293,31 +339,46 @@ export function MapPage() {
         <div ref={mapElementRef} className={styles.mapTarget} />
 
         <div className={styles.mapOverlays}>
-          <div className={styles.mapTopBar}>
+          <button
+            type="button"
+            className={styles.mapFab}
+            style={{ top: 'max(0.75rem, var(--safe-top))', left: '1rem' }}
+            onClick={() => setIsMenuOpen(true)}
+            aria-label="Menu"
+          >
+            <IconBurger className={styles.mapFabIcon} aria-hidden />
+          </button>
+
+          <div className={styles.mapFabStack}>
+            {showExpertFiltersButton ? (
+              <button
+                type="button"
+                className={`${styles.mapFab} ${isTabbarHiddenByFilters || hasActiveFilters ? styles.mapFabActive : ''}`}
+                aria-label="Filtres d'affichage des repères"
+                disabled={!isMapReady}
+                onClick={handleOpenFilters}
+              >
+                <IconFilter className={styles.mapFabIcon} aria-hidden />
+              </button>
+            ) : null}
             <button
               type="button"
-              className={styles.menuButton}
-              onClick={() => setIsMenuOpen(true)}
-              aria-label="Menu"
+              className={`${styles.mapFab} ${isLayersPanelOpen && !isTabbarHiddenByFilters ? styles.mapFabActive : ''}`}
+              aria-label="Couches"
+              disabled={!isMapReady}
+              onClick={handleOpenLayers}
             >
-              <IconBurger className={styles.menuIcon} aria-hidden />
+              <IconLayers className={styles.mapFabIcon} aria-hidden />
             </button>
             <button
               type="button"
-              className={`${styles.searchButton} ${isSearchOpen ? styles.searchButtonActive : ''}`}
-              onClick={handleSearchClick}
-              aria-label="Rechercher"
-              aria-pressed={isSearchOpen}
+              className={styles.mapFab}
+              aria-label="Légende"
+              onClick={handleOpenLegend}
             >
-              <IconSearch className={styles.searchIcon} aria-hidden />
+              <IconLegend className={styles.mapFabIcon} aria-hidden />
             </button>
           </div>
-
-          <SearchPanel
-            isOpen={isSearchOpen}
-            onClose={() => setIsSearchOpen(false)}
-            map={map}
-          />
 
           {!isMapReady && (
             <div className={styles.loadingOverlay}>
@@ -329,27 +390,15 @@ export function MapPage() {
             <div className={styles.wfsLoadingBadge} aria-live="polite">
               <Loading size="small" />
               <span>
-                Chargement des repères…{' '}
+                Chargement des points…{' '}
                 {(geodesyWfsLoading.elapsedMs / 1000).toFixed(1).replace('.', ',')} s
               </span>
             </div>
           )}
 
-          {showExpertFiltersButton && (
-            <button
-              type="button"
-              className={`${styles.filterButton} ${hasActiveFilters ? styles.filterButtonActive : ''}`}
-              aria-label="Filtres d'affichage des repères"
-              disabled={!isMapReady}
-              onClick={handleOpenFilters}
-            >
-              <IconFilter className={styles.filterIcon} aria-hidden />
-            </button>
-          )}
-
           <button
             type="button"
-            className={`${styles.geolocationButton} ${isLockedUserLocation ? styles.locked : ''}`}
+            className={`${styles.mapFab} ${styles.geolocationFab} ${isLockedUserLocation ? styles.mapFabActive : ''}`}
             aria-label={
               isLockedUserLocation
                 ? 'Désactiver le verrouillage de position'
@@ -365,34 +414,32 @@ export function MapPage() {
             )}
           </button>
         </div>
+
+        <div className={styles.mapChrome}>
+          <MapBottomSheet
+            map={map}
+            isMapReady={isMapReady}
+            selectedPoint={pendingAction}
+            canReportPoint={isGeodesyReportable}
+            onClosePoint={mapClick.closeActionSheet}
+            onReportPoint={handleReportPoint}
+            onFocusCoordinate={handleFocusCoordinate}
+            onSheetHeightChange={setSheetHeight}
+            onFabSheetOffsetChange={setFabSheetOffset}
+            onTabbarVisibleChange={(visible) => setIsTabbarHiddenByPoint(!visible)}
+            hideBrowseSheet={isTabbarHiddenByFilters}
+            collapseBrowseSearch={isLayersPanelOpen || isTabbarHiddenByFilters}
+          />
+
+          {isTabbarVisible ? <BottomTabbar activeTab="carte" /> : null}
+        </div>
       </div>
-
-      <p className={styles.mapHint}>
-        Touchez un repère géodésique pour consulter sa fiche.
-        {' '}
-        Fond Géoportail
-        {geodesy.activeLabels.length > 0 ? (
-          <>
-            {' '}
-            + géodésie
-            {geodesyMode === 'expert' ? ' (expert)' : ' (public)'}
-            {' '}
-            : <strong>{geodesy.activeLabels.join(', ')}</strong>
-          </>
-        ) : (
-          <> — aucune couche géodésie active</>
-        )}
-      </p>
-
-      <BottomTabbar
-        activeTab={isLayersPanelOpen ? 'couches' : null}
-        onTabClick={handleTabClick}
-      />
 
       <MapLayersPanelFlow
         isOpen={isLayersPanelOpen}
         onClose={handleCloseLayersPanel}
         focusGroupId={layersPanelFocus}
+        map={map}
         activeBasemap={activeBasemap}
         onActiveBasemapChange={setActiveBasemap}
         geoservicesVisible={geoservicesVisible}
@@ -411,42 +458,13 @@ export function MapPage() {
         geodesyWfsAttributeFilterValues={geodesy.wfsAttributeFilterValues}
         onGeodesyWfsAttributeFilterValuesChange={geodesy.setWfsAttributeFilterValues}
         onClearGeodesyWfsAttributeFilterValues={geodesy.clearWfsAttributeFilterValues}
+        reportMapLayers={reportMapLayers}
+        onReportMapLayersChange={setReportMapLayers}
+        isAuthenticated={isAuthenticated}
+        onFiltersPanelOpenChange={setIsTabbarHiddenByFilters}
       />
 
-      <ActionSheet
-        isOpen={pendingAction !== null}
-        onClose={mapClick.closeActionSheet}
-        title={
-          pendingAction ? (
-            <GeodesyPointTitle
-              title={pendingAction.point.title}
-              picto={pendingAction.point.titlePicto}
-            />
-          ) : (
-            'Repère géodésique'
-          )
-        }
-        buttons={
-          isGeodesyReportable
-            ? [
-                {
-                  label: 'Faire un signalement sur ce point',
-                  onClick: mapClick.reportOnExistingPoint,
-                },
-                { label: 'Fermer', onClick: mapClick.closeActionSheet },
-              ]
-            : [{ label: 'Fermer', onClick: mapClick.closeActionSheet }]
-        }
-      >
-        {pendingAction && (
-          <GeodesyPointDetails
-            layerTitle={pendingAction.point.layerTitle}
-            longitude={pendingAction.point.longitude}
-            latitude={pendingAction.point.latitude}
-            attributes={pendingAction.point.attributes}
-          />
-        )}
-      </ActionSheet>
+      <LegendPage isOpen={isLegendOpen} onClose={() => setIsLegendOpen(false)} />
 
       <MyAccountPage
         isOpen={activeOverlay === '/my-account'}

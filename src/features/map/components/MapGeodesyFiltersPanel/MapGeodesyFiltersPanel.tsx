@@ -1,13 +1,16 @@
+import { useEffect, useState } from 'react';
+
 import {
   countActiveGeodesyWfsAttributeFilters,
   createDefaultGeodesyWfsAttributeFilterValues,
   type GeodesyWfsAttributeFilterDefinition,
   type GeodesyWfsAttributeFilterValues,
 } from '@ign/gdp-tools';
-import { GeodesyWfsAttributeFiltersPanel } from '@ign/gdp-tools/react';
 
-import { PageHeader } from '@/shared/ui/PageHeader';
-import { SlideUpPage } from '@/shared/ui/SlideUpPage';
+import { MapOverlaySheet } from '@/features/map/components/MapOverlaySheet';
+import { Button } from '@/shared/ui/Button';
+
+import { GdpGeodesyFiltersForm } from './GdpGeodesyFiltersForm';
 
 import styles from './MapGeodesyFiltersPanel.module.css';
 
@@ -26,24 +29,54 @@ export function MapGeodesyFiltersPanel({
   filters,
   values,
   onChange,
-  onClear,
 }: MapGeodesyFiltersPanelProps) {
+  const [draftValues, setDraftValues] = useState(values);
+
+  useEffect(() => {
+    if (isOpen) {
+      setDraftValues(values);
+    }
+  }, [isOpen, values]);
+
   if (!filters.length) {
     return null;
   }
 
+  const activeCount = countActiveMapGeodesyFilters(filters, draftValues);
+
+  const handleReset = () => {
+    setDraftValues(createDefaultMapGeodesyFilterValues(filters));
+  };
+
+  const handleApply = () => {
+    onChange(draftValues);
+    onClose();
+  };
+
   return (
-    <SlideUpPage isOpen={isOpen} onClose={onClose} level={2}>
-      <PageHeader title="Filtres repères" showBackButton showCloseButton={false} onBack={onClose} />
-      <div className={styles.content}>
-        <GeodesyWfsAttributeFiltersPanel
-          filters={filters}
-          values={values}
-          onChange={onChange}
-          onClear={onClear}
-        />
+    <MapOverlaySheet
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Filtres"
+      titleAlign="left"
+      titleBadge={activeCount > 0 ? activeCount : undefined}
+      sheetClassName={styles.sheetLarge}
+      ariaLabel="Filtres repères"
+      footer={
+        <div className={styles.footer}>
+          <Button type="button" variant="outline" fullWidth onClick={handleReset}>
+            Réinitialiser
+          </Button>
+          <Button type="button" fullWidth onClick={handleApply}>
+            Appliquer
+          </Button>
+        </div>
+      }
+    >
+      <div className={styles.sheetContent}>
+        <GdpGeodesyFiltersForm filters={filters} values={draftValues} onChange={setDraftValues} />
       </div>
-    </SlideUpPage>
+    </MapOverlaySheet>
   );
 }
 

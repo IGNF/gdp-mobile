@@ -8,6 +8,7 @@ import {
   saveMapPreferences,
 } from '@/infra/persistence/mapViewportStore';
 import type { GdpGeodesyMode, GdpWfsClusterPreferences } from '@/shared/constants/geodesy';
+import type { ReportMapLayerVisibility } from '@/shared/constants/reportMapLayers';
 
 const LAYER_SAVE_DEBOUNCE_MS = 300;
 
@@ -18,11 +19,13 @@ interface UsePersistedMapLayersOptions {
   geodesyVisibility: GeodesyLayerVisibility;
   geodesyWfsAttributeFilterValues: GeodesyWfsAttributeFilterValues;
   wfsClusterPreferences: GdpWfsClusterPreferences;
+  reportMapLayers: ReportMapLayerVisibility;
   onBasemapChange: (basemap: string) => void;
   onGeodesyModeChange: (mode: GdpGeodesyMode) => void;
   onGeodesyVisibilityChange: (visibility: GeodesyLayerVisibility) => void;
   onGeodesyWfsAttributeFilterValuesChange: (values: GeodesyWfsAttributeFilterValues) => void;
   onWfsClusterPreferencesChange: (preferences: GdpWfsClusterPreferences) => void;
+  onReportMapLayersChange: (layers: ReportMapLayerVisibility) => void;
 }
 
 export function usePersistedMapLayers({
@@ -32,11 +35,13 @@ export function usePersistedMapLayers({
   geodesyVisibility,
   geodesyWfsAttributeFilterValues,
   wfsClusterPreferences,
+  reportMapLayers,
   onBasemapChange,
   onGeodesyModeChange,
   onGeodesyVisibilityChange,
   onGeodesyWfsAttributeFilterValuesChange,
   onWfsClusterPreferencesChange,
+  onReportMapLayersChange,
 }: UsePersistedMapLayersOptions) {
   const [isHydrated, setIsHydrated] = useState(false);
   const onBasemapChangeRef = useRef(onBasemapChange);
@@ -44,11 +49,13 @@ export function usePersistedMapLayers({
   const onGeodesyVisibilityChangeRef = useRef(onGeodesyVisibilityChange);
   const onGeodesyWfsAttributeFilterValuesChangeRef = useRef(onGeodesyWfsAttributeFilterValuesChange);
   const onWfsClusterPreferencesChangeRef = useRef(onWfsClusterPreferencesChange);
+  const onReportMapLayersChangeRef = useRef(onReportMapLayersChange);
   onBasemapChangeRef.current = onBasemapChange;
   onGeodesyModeChangeRef.current = onGeodesyModeChange;
   onGeodesyVisibilityChangeRef.current = onGeodesyVisibilityChange;
   onGeodesyWfsAttributeFilterValuesChangeRef.current = onGeodesyWfsAttributeFilterValuesChange;
   onWfsClusterPreferencesChangeRef.current = onWfsClusterPreferencesChange;
+  onReportMapLayersChangeRef.current = onReportMapLayersChange;
 
   useEffect(() => {
     let cancelled = false;
@@ -64,6 +71,7 @@ export function usePersistedMapLayers({
       onGeodesyVisibilityChangeRef.current(preferences.geodesyVisibility);
       onGeodesyWfsAttributeFilterValuesChangeRef.current(preferences.geodesyWfsAttributeFilterValues);
       onWfsClusterPreferencesChangeRef.current(preferences.wfsClusterPreferences);
+      onReportMapLayersChangeRef.current(preferences.reportMapLayers);
       setIsHydrated(true);
     })();
 
@@ -77,18 +85,22 @@ export function usePersistedMapLayers({
       return;
     }
 
+    const preferences = {
+      basemap: activeBasemap,
+      geodesyMode,
+      geodesyVisibility,
+      geodesyWfsAttributeFilterValues,
+      wfsClusterPreferences,
+      reportMapLayers,
+    };
+
     const timeoutId = window.setTimeout(() => {
-      void saveMapPreferences({
-        basemap: activeBasemap,
-        geodesyMode,
-        geodesyVisibility,
-        geodesyWfsAttributeFilterValues,
-        wfsClusterPreferences,
-      });
+      void saveMapPreferences(preferences);
     }, LAYER_SAVE_DEBOUNCE_MS);
 
     return () => {
       window.clearTimeout(timeoutId);
+      void saveMapPreferences(preferences);
     };
   }, [
     activeBasemap,
@@ -96,6 +108,7 @@ export function usePersistedMapLayers({
     geodesyVisibility,
     geodesyWfsAttributeFilterValues,
     wfsClusterPreferences,
+    reportMapLayers,
     isHydrated,
     isMapReady,
   ]);

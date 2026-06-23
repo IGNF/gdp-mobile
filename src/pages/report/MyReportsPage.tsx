@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
+import { BottomTabbar } from '@/app/components/BottomTabbar';
 import type { GroupReport } from '@/domain/report/groupReportModels';
 import { GroupReportRow } from '@/features/report/components/GroupReportRow';
 import { useAuth } from '@/features/auth/hooks/useAuth';
@@ -138,6 +139,7 @@ export function MyReportsPage() {
 
   return (
     <div className={styles.page}>
+      <p className="debug-banner">DOING — Écran en cours de dev</p>
       <PageHeader
         title="Signalements"
         subtitle="Mes signalements"
@@ -157,13 +159,9 @@ export function MyReportsPage() {
         {successMessage ? <p className={styles.successMessage}>{successMessage}</p> : null}
 
         {renderContent()}
-
-        <div className={styles.actions}>
-          <Button type="button" fullWidth onClick={() => navigate('/map')}>
-            Retour à la carte
-          </Button>
-        </div>
       </main>
+
+      <BottomTabbar activeTab="signalements" />
     </div>
   );
 }

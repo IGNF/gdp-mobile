@@ -16,7 +16,7 @@
 
 .card {
 	position: relative;
-	background: white;
+	background: var(--color-white);
 	border-radius: 16px;
 	width: 100%;
 	max-width: 400px;
