@@ -111,9 +111,7 @@ export function MapPointGeodesyFicheBody({ action, snapIndex }: MapPointGeodesyF
               <h3 className={styles.sectionTitle}>Remarques</h3>
               <p className={styles.remarkBlock}>{remark}</p>
             </section>
-          ) : (
-            <p className={styles.placeholderBlock}>Remarques — à remplir.</p>
-          )}
+          ) : null}
 
           <section>
             <h3 className={styles.sectionTitle}>Partenaire</h3>
