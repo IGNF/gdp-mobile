@@ -62,7 +62,6 @@ Exemple : « étant donné un repère sans photo, quand j'ouvre sa fiche, alors 
 Si vous dépassez 8 critères, le ticket est trop gros : découpez-le.
 -->
 - [ ] étant donné [contexte], quand [action], alors [résultat attendu]
-- [ ]
 
 ## Questions ouvertes
 <!--
@@ -72,7 +71,7 @@ Formulez de vraies questions, si possible avec les options envisagées.
 Exemple : « que fait-on des champs non renseignés : masqués ou mention "non renseigné" ? »
 Quand une question est tranchée, reportez la décision dans les règles métier et cochez-la ici.
 -->
-- [ ]
+- [ ] question
 
 ## Découpage technique (rempli par les développeurs)
 <!--
@@ -84,4 +83,4 @@ Exemple :
 - [ ] point d'accès API pour récupérer les données du repère
 - [ ] composant volet déroulant avec bandeau fixe
 -->
-- [ ]
+- [ ] tâche technique
