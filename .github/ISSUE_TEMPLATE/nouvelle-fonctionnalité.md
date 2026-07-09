@@ -74,7 +74,7 @@ Quand une question est tranchée, reportez la décision dans les règles métier
 -->
 - [ ]
 
-Découpage technique (rempli par les développeurs)
+## Découpage technique (rempli par les développeurs)
 <!--
 Cette section appartient aux développeurs : la personne qui rédige le ticket la laisse vide.
 Elle se remplit APRÈS la discussion du ticket en équipe, jamais avant : les règles métier et les questions ouvertes doivent avoir été échangées d'abord.
