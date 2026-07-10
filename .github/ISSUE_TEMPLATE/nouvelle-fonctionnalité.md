@@ -1,5 +1,5 @@
 ---
-name: nouvelle fonctionnalité
+name: nouvelle fonctionnalité ✨
 about: Décrire une fonctionnalité du point de vue de l'utilisateur (écrans, règles
   métier, critères d'acceptation)
 title: ''
