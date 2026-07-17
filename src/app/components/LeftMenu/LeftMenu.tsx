@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { IonMenu } from '@ionic/react';
 
 import type { AppUser } from '@/domain/user/models';
 
@@ -8,8 +9,6 @@ import IconHelp from '@/shared/assets/icons/icon-help.svg?react';
 import IconInfo from '@/shared/assets/icons/icon-info.svg?react';
 import IconLocation from '@/shared/assets/icons/icon-location.svg?react';
 import IconUser from '@/shared/assets/icons/icon-user.svg?react';
-
-import screen from '@/shared/styles/screen.module.css';
 
 import styles from './LeftMenu.module.css';
 
@@ -89,7 +88,21 @@ export function LeftMenu({
   isAuthenticated,
   onNavigate,
 }: LeftMenuProps) {
+  const menuRef = useRef<HTMLIonMenuElement>(null);
   const [expandedGroups, setExpandedGroups] = useState<Set<MenuGroupId>>(new Set());
+
+  useEffect(() => {
+    const menu = menuRef.current;
+    if (!menu) {
+      return;
+    }
+
+    if (isOpen) {
+      void menu.open();
+    } else {
+      void menu.close();
+    }
+  }, [isOpen]);
 
   const toggleGroup = (groupId: MenuGroupId) => {
     setExpandedGroups((previous) => {
@@ -127,17 +140,16 @@ export function LeftMenu({
   };
 
   return (
-    <>
-      <div
-        className={`${screen.overlay} ${styles.overlay} ${isOpen ? styles.overlayVisible : ''}`}
-        onClick={onClose}
-        aria-hidden="true"
-      />
-      <nav
-        className={`${styles.menu} ${isOpen ? styles.menuOpen : ''}`}
-        aria-label="Menu principal"
-        aria-hidden={!isOpen}
-      >
+    <IonMenu
+      ref={menuRef}
+      menuId="left-menu"
+      contentId="main-content"
+      side="start"
+      aria-label="Menu principal"
+      className={styles.menu}
+      onIonDidClose={onClose}
+    >
+      <div className={styles.menuInner}>
         <p className="debug-banner">TODO — Écran pas encore développé</p>
         <div className={styles.userSection}>
           <div className={styles.avatar}>
@@ -211,7 +223,7 @@ export function LeftMenu({
             })}
           </div>
         </div>
-      </nav>
-    </>
+      </div>
+    </IonMenu>
   );
 }

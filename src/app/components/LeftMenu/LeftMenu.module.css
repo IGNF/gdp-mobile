@@ -1,34 +1,14 @@
-.overlay {
-  z-index: 999;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.3s ease, visibility 0.3s ease;
-}
-
-.overlayVisible {
-  opacity: 1;
-  visibility: visible;
-}
-
 .menu {
-  position: fixed;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  width: 85%;
-  max-width: 320px;
-  background-color: var(--color-dark-contrast);
-  z-index: 1000;
-  transform: translateX(-100%);
-  transition: transform 0.3s ease;
+  --width: min(85vw, 320px);
+  --background: var(--color-dark-contrast);
+}
+
+.menuInner {
   display: flex;
   flex-direction: column;
+  height: 100%;
   overflow-y: auto;
   padding-top: var(--safe-top, 0px);
-}
-
-.menuOpen {
-  transform: translateX(0);
 }
 
 .userSection {

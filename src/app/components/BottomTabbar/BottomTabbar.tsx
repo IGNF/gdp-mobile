@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { IonTabBar, IonTabButton } from '@ionic/react';
 
 import IconArticle from '@/shared/assets/icons/icon-article.svg?react';
 import IconMap from '@/shared/assets/icons/icon-map.svg?react';
@@ -23,31 +24,33 @@ export function BottomTabbar({ activeTab }: BottomTabbarProps) {
   };
 
   return (
-    <nav className={styles.tabbar} aria-label="Navigation principale">
-      <button
-        type="button"
-        className={`${styles.tab} ${activeTab === 'carte' ? styles.active : ''}`}
+    <IonTabBar selectedTab={activeTab} className={styles.tabbar} aria-label="Navigation principale">
+      <IonTabButton
+        tab="carte"
+        className={styles.tab}
         onClick={() => handleTabClick('carte')}
-        aria-current={activeTab === 'carte' ? 'page' : undefined}
       >
         <span className={`${styles.iconCircle} ${activeTab === 'carte' ? styles.iconCircleActive : ''}`}>
           <IconMap className={styles.tabIcon} aria-hidden />
         </span>
-        <span className={styles.tabLabel}>Carte</span>
-      </button>
-      <button
-        type="button"
-        className={`${styles.tab} ${activeTab === 'signalements' ? styles.active : ''}`}
+        <span className={`${styles.tabLabel} ${activeTab === 'carte' ? styles.tabLabelActive : ''}`}>
+          Carte
+        </span>
+      </IonTabButton>
+      <IonTabButton
+        tab="signalements"
+        className={styles.tab}
         onClick={() => handleTabClick('signalements')}
-        aria-current={activeTab === 'signalements' ? 'page' : undefined}
       >
         <span
           className={`${styles.iconCircle} ${activeTab === 'signalements' ? styles.iconCircleActive : ''}`}
         >
           <IconArticle className={styles.tabIcon} aria-hidden />
         </span>
-        <span className={styles.tabLabel}>Signalements</span>
-      </button>
-    </nav>
+        <span className={`${styles.tabLabel} ${activeTab === 'signalements' ? styles.tabLabelActive : ''}`}>
+          Signalements
+        </span>
+      </IonTabButton>
+    </IonTabBar>
   );
 }

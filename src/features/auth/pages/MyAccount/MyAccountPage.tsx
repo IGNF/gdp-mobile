@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { IonModal } from '@ionic/react';
 
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { Button } from '@/shared/ui/Button';
 import { ExternalLink } from '@/shared/ui/ExternalLink';
 import { PageHeader } from '@/shared/ui/PageHeader';
-import { SlideUpPage } from '@/shared/ui/SlideUpPage';
 import { EXTERNAL_LINKS } from '@/shared/constants/externalLinks';
 import { joinTruthy } from '@/shared/utils/join';
 
@@ -41,75 +41,77 @@ export function MyAccountPage({ isOpen, onClose }: MyAccountPageProps) {
   };
 
   return (
-    <SlideUpPage isOpen={isOpen} onClose={onClose}>
-      <PageHeader title="Mon compte" onClose={onClose} />
+    <IonModal isOpen={isOpen} onDidDismiss={onClose} className={styles.modal}>
+      <div className={styles.modalInner}>
+        <PageHeader title="Mon compte" onClose={onClose} />
 
-      <main className={`${screen.screenContainer} ${styles.content}`}>
-        <h1 className={typography.title}>Mon compte</h1>
-        <p className={typography.subtitle}>Informations de votre compte IGN.</p>
+        <main className={`${screen.screenContainer} ${styles.content}`}>
+          <h1 className={typography.title}>Mon compte</h1>
+          <p className={typography.subtitle}>Informations de votre compte IGN.</p>
 
-        {!isAuthenticated ? (
-          <div className={styles.notConnected}>
-            <p className={typography.paragraph}>
-              Vous n’êtes pas connecté. Connectez-vous pour consulter vos signalements envoyés
-              et transmettre vos contributions.
-            </p>
-            <Button
-              type="button"
-              fullWidth
-              onClick={() => {
-                onClose();
-                navigate('/login');
-              }}
-            >
-              Se connecter
-            </Button>
-          </div>
-        ) : (
-          <>
-            <p className={`${typography.paragraph} ${typography.italic}`}>
-              Pour modifier votre profil, rendez-vous sur{' '}
-              <ExternalLink href={EXTERNAL_LINKS.ESPACE_COLLABORATIF}>
-                l’Espace collaboratif
-              </ExternalLink>
-              .
-            </p>
-
-            <div className={styles.infoTable}>
-              <div className={styles.infoRow}>
-                <span className={styles.infoLabel}>Identifiant</span>
-                <span className={styles.infoValue}>{user?.username ?? '—'}</span>
-              </div>
-              <div className={styles.infoRow}>
-                <span className={styles.infoLabel}>Nom</span>
-                <span className={styles.infoValue}>{fullName ?? '—'}</span>
-              </div>
-              <div className={styles.infoRow}>
-                <span className={styles.infoLabel}>E-mail</span>
-                <span className={styles.infoValue}>{user?.email ?? '—'}</span>
-              </div>
-              <div className={styles.infoRow}>
-                <span className={styles.infoLabel}>Identifiant utilisateur</span>
-                <span className={styles.infoValue}>{user?.id ?? '—'}</span>
-              </div>
-            </div>
-
-            <div className={styles.actions}>
+          {!isAuthenticated ? (
+            <div className={styles.notConnected}>
+              <p className={typography.paragraph}>
+                Vous n’êtes pas connecté. Connectez-vous pour consulter vos signalements envoyés
+                et transmettre vos contributions.
+              </p>
               <Button
                 type="button"
-                color="secondary"
-                variant="outline"
                 fullWidth
-                loading={isRefreshing}
-                onClick={() => void handleRefresh()}
+                onClick={() => {
+                  onClose();
+                  navigate('/login');
+                }}
               >
-                Synchroniser mon profil et le formulaire de signalement
+                Se connecter
               </Button>
-              {refreshError && <p className={typography.error}>{refreshError}</p>}
             </div>
-          </>
-        )}
-      </main>
-    </SlideUpPage>
+          ) : (
+            <>
+              <p className={`${typography.paragraph} ${typography.italic}`}>
+                Pour modifier votre profil, rendez-vous sur{' '}
+                <ExternalLink href={EXTERNAL_LINKS.ESPACE_COLLABORATIF}>
+                  l’Espace collaboratif
+                </ExternalLink>
+                .
+              </p>
+
+              <div className={styles.infoTable}>
+                <div className={styles.infoRow}>
+                  <span className={styles.infoLabel}>Identifiant</span>
+                  <span className={styles.infoValue}>{user?.username ?? '—'}</span>
+                </div>
+                <div className={styles.infoRow}>
+                  <span className={styles.infoLabel}>Nom</span>
+                  <span className={styles.infoValue}>{fullName ?? '—'}</span>
+                </div>
+                <div className={styles.infoRow}>
+                  <span className={styles.infoLabel}>E-mail</span>
+                  <span className={styles.infoValue}>{user?.email ?? '—'}</span>
+                </div>
+                <div className={styles.infoRow}>
+                  <span className={styles.infoLabel}>Identifiant utilisateur</span>
+                  <span className={styles.infoValue}>{user?.id ?? '—'}</span>
+                </div>
+              </div>
+
+              <div className={styles.actions}>
+                <Button
+                  type="button"
+                  color="secondary"
+                  variant="outline"
+                  fullWidth
+                  loading={isRefreshing}
+                  onClick={() => void handleRefresh()}
+                >
+                  Synchroniser mon profil et le formulaire de signalement
+                </Button>
+                {refreshError && <p className={typography.error}>{refreshError}</p>}
+              </div>
+            </>
+          )}
+        </main>
+      </div>
+    </IonModal>
   );
 }

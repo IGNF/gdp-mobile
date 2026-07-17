@@ -335,7 +335,7 @@ export function MapPage() {
         onNavigate={handleMenuNavigate}
       />
 
-      <div className={styles.mapContainer}>
+      <div id="main-content" className={styles.mapContainer}>
         <div ref={mapElementRef} className={styles.mapTarget} />
 
         <div className={styles.mapOverlays}>

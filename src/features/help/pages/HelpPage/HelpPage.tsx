@@ -1,6 +1,7 @@
+import { IonModal } from '@ionic/react';
+
 import { AppLogo } from '@/shared/ui/AppLogo';
 import { PageHeader } from '@/shared/ui/PageHeader';
-import { SlideUpPage } from '@/shared/ui/SlideUpPage';
 import { ExternalLink } from '@/shared/ui/ExternalLink';
 import { EXTERNAL_LINKS } from '@/shared/constants/externalLinks';
 
@@ -38,34 +39,36 @@ export interface HelpPageProps {
 
 export function HelpPage({ isOpen, onClose }: HelpPageProps) {
   return (
-    <SlideUpPage isOpen={isOpen} onClose={onClose}>
-      <PageHeader title="Aide" onClose={onClose} />
+    <IonModal isOpen={isOpen} onDidDismiss={onClose} className={styles.modal}>
+      <div className={styles.modalInner}>
+        <PageHeader title="Aide" onClose={onClose} />
 
-      <main className={`${screen.screenContainer} ${styles.content}`}>
-        <AppLogo size="sm" />
-        <h1 className={typography.title}>Aide</h1>
-        <p className={typography.subtitle}>Questions fréquentes sur Géodésie de poche.</p>
+        <main className={`${screen.screenContainer} ${styles.content}`}>
+          <AppLogo size="sm" />
+          <h1 className={typography.title}>Aide</h1>
+          <p className={typography.subtitle}>Questions fréquentes sur Géodésie de poche.</p>
 
-        <section className={styles.faqSection}>
-          {FAQ_ITEMS.map((item) => (
-            <article key={item.question} className={styles.faqItem}>
-              <p className={styles.question}>{item.question}</p>
-              {item.answer === 'menu' ? (
-                <p className={typography.paragraph}>
-                  Ouvrez le menu latéral, section « Mon compte », puis « Se connecter ». Vous pouvez
-                  aussi créer un compte sur{' '}
-                  <ExternalLink href={EXTERNAL_LINKS.ESPACE_COLLABORATIF}>
-                    l’Espace collaboratif IGN
-                  </ExternalLink>
-                  .
-                </p>
-              ) : (
-                <p className={typography.paragraph}>{item.answer}</p>
-              )}
-            </article>
-          ))}
-        </section>
-      </main>
-    </SlideUpPage>
+          <section className={styles.faqSection}>
+            {FAQ_ITEMS.map((item) => (
+              <article key={item.question} className={styles.faqItem}>
+                <p className={styles.question}>{item.question}</p>
+                {item.answer === 'menu' ? (
+                  <p className={typography.paragraph}>
+                    Ouvrez le menu latéral, section « Mon compte », puis « Se connecter ». Vous pouvez
+                    aussi créer un compte sur{' '}
+                    <ExternalLink href={EXTERNAL_LINKS.ESPACE_COLLABORATIF}>
+                      l’Espace collaboratif IGN
+                    </ExternalLink>
+                    .
+                  </p>
+                ) : (
+                  <p className={typography.paragraph}>{item.answer}</p>
+                )}
+              </article>
+            ))}
+          </section>
+        </main>
+      </div>
+    </IonModal>
   );
 }
