@@ -20,12 +20,30 @@ function getBrowseSnapHeights(viewportHeight: number): readonly number[] {
   return [88, Math.min(Math.round(viewportHeight * 0.58), 560)];
 }
 
-function getPointSnapHeights(viewportHeight: number): readonly number[] {
+// 3 boutons de 3rem + 2 espaces de 0.5rem + 0.75rem de marge = 10.75rem (172px),
+// doit rester cohérent avec le max-height de .sheetPointFiche (MapBottomSheet.module.css)
+// pour que la fiche ne recouvre jamais la pile de FAB (filtre/couches/légende).
+const FAB_STACK_RESERVE_PX = 172;
+
+function getSafeAreaTopPx(): number {
+  if (typeof window === 'undefined') {
+    return 0;
+  }
+
+  const parsed = parseFloat(
+    getComputedStyle(document.documentElement).getPropertyValue('--safe-top'),
+  );
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function getPointSnapHeights(viewportHeight: number, safeAreaTop: number): readonly number[] {
+  const maxHeight = Math.max(220, viewportHeight - Math.max(12, safeAreaTop) - FAB_STACK_RESERVE_PX);
+
   return [
     220,
-    Math.round(viewportHeight * 0.48),
-    Math.round(viewportHeight * 0.68),
-    Math.min(Math.round(viewportHeight * 0.82), 720),
+    Math.min(Math.round(viewportHeight * 0.48), maxHeight),
+    Math.min(Math.round(viewportHeight * 0.68), maxHeight),
+    maxHeight,
   ];
 }
 
@@ -65,11 +83,13 @@ export function MapBottomSheet({
   const browseSnapIndexRef = useRef(0);
   const isPointMode = selectedPoint !== null;
   const [viewportHeight, setViewportHeight] = useState(() => window.innerHeight);
+  const [safeAreaTop, setSafeAreaTop] = useState(() => getSafeAreaTopPx());
   const [browseView, setBrowseView] = useState<BrowsePanelView>('search');
 
   useEffect(() => {
     const handleResize = () => {
       setViewportHeight(window.innerHeight);
+      setSafeAreaTop(getSafeAreaTopPx());
     };
 
     window.addEventListener('resize', handleResize);
@@ -77,7 +97,10 @@ export function MapBottomSheet({
   }, []);
 
   const browseSnapHeights = useMemo(() => getBrowseSnapHeights(viewportHeight), [viewportHeight]);
-  const pointSnapHeights = useMemo(() => getPointSnapHeights(viewportHeight), [viewportHeight]);
+  const pointSnapHeights = useMemo(
+    () => getPointSnapHeights(viewportHeight, safeAreaTop),
+    [viewportHeight, safeAreaTop],
+  );
 
   const browseSnap = useBottomSheetSnap({
     snapHeights: browseSnapHeights,
