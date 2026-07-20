@@ -350,16 +350,6 @@
   color: var(--figma-green-darker);
 }
 
-.badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.25rem 0.625rem;
-  border-radius: 999px;
-  background: var(--color-light);
-  color: var(--color-medium-shade);
-  font-size: 0.75rem;
-  font-weight: 600;
-}
 
 .placeholderBlock {
   margin: 0;

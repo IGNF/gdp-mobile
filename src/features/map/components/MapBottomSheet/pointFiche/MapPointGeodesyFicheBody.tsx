@@ -9,9 +9,11 @@ import {
   readProperty,
 } from './pointFicheUtils';
 import { getDisplayedFieldIds } from './getDisplayedFieldIds';
+import { resolveGpsExploitabilityVariant } from './gpsExploitabilityBadge';
 import { PointCoordinatesSection } from './PointCoordinatesSection';
 import { PointImageCarousel } from './PointImageCarousel';
 import { UnmappedFieldsDebug } from './UnmappedFieldsDebug';
+import IconAlertCircle from '@/shared/assets/icons/icon-alert-circle.svg?react';
 
 import styles from './MapPointSheet.module.css';
 
@@ -52,6 +54,10 @@ export function MapPointGeodesyFicheBody({ action, snapIndex }: MapPointGeodesyF
   const sketchId = readProperty(action, 'id') ?? action.reportContext.geodesyId ?? null;
   const description = readProperty(action, 'localisation');
   const explGps = readProperty(action, 'expl_gps');
+  const explGpsCode = readProperty(action, 'expl_gpscode');
+  const explGpsVariant = explGps ? resolveGpsExploitabilityVariant(explGps, explGpsCode) : null;
+  const explGpsLabel = explGpsVariant === 'inexploitable' ? 'Inexploitable' : 'Exploitable par GPS';
+  const repereType = readProperty(action, 'type');
   const commune = readProperty(action, 'commune');
   const pdfUrl = readProperty(action, 'url_pdf');
   const majDate = readProperty(action, 'maj_date');
@@ -73,22 +79,21 @@ export function MapPointGeodesyFicheBody({ action, snapIndex }: MapPointGeodesyF
             </div>
           </section>
 
-          {description || explGps ? (
+          {description || explGps || repereType ? (
             <section>
-              <div className={styles.fieldGrid}>
+              <div className={styles.descriptionHeader}>
+                <h3 className={styles.sectionTitle}>Description</h3>
                 {explGps ? (
-                  <div className={`${styles.fieldCard} ${styles.fieldCardWide}`}>
-                    <span className={styles.fieldLabel}>Exploitabilité GPS</span>
-                    <span className={styles.badge}>{explGps}</span>
-                  </div>
+                  <span className={styles.gpsExploitabilityBadge} data-variant={explGpsVariant}>
+                    <IconAlertCircle className={styles.gpsExploitabilityIcon} aria-hidden />
+                    {explGpsLabel}
+                  </span>
                 ) : null}
               </div>
-              {description ? (
-                <>
-                  <h3 className={styles.sectionTitle}>Description</h3>
-                  <p className={styles.textBlock}>{description}</p>
-                </>
-              ) : null}
+              <div className={styles.fieldGrid}>
+                <FieldCard label="Type" value={repereType} wide />
+              </div>
+              {description ? <p className={styles.textBlock}>{description}</p> : null}
             </section>
           ) : null}
         </>
