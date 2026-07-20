@@ -56,7 +56,7 @@ export interface MapBottomSheetProps {
   onReportPoint: () => void;
   onFocusCoordinate: (longitude: number, latitude: number) => void;
   onSheetHeightChange?: (height: number) => void;
-  /** Offset carte pour GPS / échelle — suit la hauteur de la sheet, 0 quand elle est en mini-fiche. */
+  /** Offset carte pour GPS / échelle — suit la hauteur de la sheet, y compris en mini-fiche. */
   onFabSheetOffsetChange?: (offset: number) => void;
   onTabbarVisibleChange?: (visible: boolean) => void;
   hideBrowseSheet?: boolean;
@@ -218,7 +218,7 @@ export function MapBottomSheet({
 
     const reportOffsets = (height: number) => {
       onSheetHeightChange?.(height);
-      onFabSheetOffsetChange?.(isPointMiniFiche ? 0 : height);
+      onFabSheetOffsetChange?.(height);
     };
 
     if (!isSheetAuto) {
@@ -243,7 +243,6 @@ export function MapBottomSheet({
   }, [
     currentHeight,
     hideBrowseSheet,
-    isPointMiniFiche,
     isPointMode,
     isSheetAuto,
     onFabSheetOffsetChange,

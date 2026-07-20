@@ -62,6 +62,8 @@ export function MapPointGeodesyFicheBody({ action, snapIndex }: MapPointGeodesyF
         <>
           <PointImageCarousel items={carouselItems} />
 
+          {majDate ? <p className={styles.carouselCaption}>Determiné en {majDate}</p> : null}
+
           <section>
             <h3 className={styles.sectionTitle}>Point géodésique</h3>
             <div className={styles.fieldGrid}>
