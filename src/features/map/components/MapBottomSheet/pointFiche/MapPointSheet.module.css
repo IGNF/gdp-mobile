@@ -73,6 +73,35 @@
   color: var(--color-dark);
 }
 
+.copyButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.copyIcon {
+  width: 1.125rem;
+  height: 1.125rem;
+}
+
+.copyIcon path {
+  fill: var(--color-medium);
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
 .favoriteButton {
   display: flex;
   align-items: center;
@@ -119,8 +148,15 @@
   fill: var(--color-medium);
 }
 
+.statusMetaRow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.375rem 0.5rem;
+}
+
 .statusBadge {
-  align-self: flex-start;
+  flex-shrink: 0;
   padding: 0.25rem 0.75rem;
   border-radius: 999px;
   background: var(--color-warning-light);
@@ -163,6 +199,14 @@
   margin: 0 0 0.5rem;
   font-size: 0.8125rem;
   font-weight: 600;
+  color: var(--color-medium);
+}
+
+.carouselCaption {
+  margin: 0;
+  font-size: 0.875rem;
+  font-style: italic;
+  font-weight: 400;
   color: var(--color-medium);
 }
 
@@ -306,16 +350,6 @@
   color: var(--figma-green-darker);
 }
 
-.badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.25rem 0.625rem;
-  border-radius: 999px;
-  background: var(--color-light);
-  color: var(--color-medium-shade);
-  font-size: 0.75rem;
-  font-weight: 600;
-}
 
 .placeholderBlock {
   margin: 0;
@@ -330,6 +364,10 @@
   display: flex;
   flex-direction: column;
   gap: 0.625rem;
+}
+
+.coordSection .sectionTitle {
+  margin-bottom: 0;
 }
 
 .coordTabs {
@@ -360,43 +398,4 @@
 .coordTab:disabled {
   opacity: 0.35;
   cursor: not-allowed;
-}
-
-.coordFieldsGrid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0;
-  border-radius: 0.625rem;
-  background: var(--color-fiche-surface);
-  overflow: hidden;
-  border: 1px solid var(--figma-neutral-light-active);
-}
-
-.coordField {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  min-width: 0;
-  padding: 0.625rem 0.75rem;
-  border-right: 1px solid var(--figma-neutral-light-active);
-  border-bottom: 1px solid var(--figma-neutral-light-active);
-}
-
-.coordField:nth-child(2n) {
-  border-right: none;
-}
-
-.coordFieldWide {
-  grid-column: 1 / -1;
-  border-right: none;
-}
-
-.coordEmpty {
-  margin: 0;
-  padding: 0.75rem;
-  border-radius: 0.625rem;
-  background: var(--color-fiche-surface);
-  font-size: 0.8125rem;
-  color: var(--color-medium);
-  text-align: center;
 }

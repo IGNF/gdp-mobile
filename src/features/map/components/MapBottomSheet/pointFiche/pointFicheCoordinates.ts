@@ -2,7 +2,7 @@ import { toStringHDMS } from 'ol/coordinate';
 
 import type { MapGeodesyClickAction } from '@/features/map/hooks/useMapGeodesyClick';
 
-import { readProperty, stripAltitudeSystemLabel, parseGeographicEllipsoid, parseGeographicReferenceSystem, parseProjectedProjection } from './pointFicheUtils';
+import { readProperty, stripAltitudeSystemLabel, parseGeographicReferenceSystem, parseProjectedProjection } from './pointFicheUtils';
 
 export type CoordinateTabId = 'geographic' | 'projection';
 
@@ -76,21 +76,6 @@ function readGeographicSystem(action: MapGeodesyClickAction): string | null {
   return parsed || null;
 }
 
-function readGeographicEllipsoid(action: MapGeodesyClickAction): string | null {
-  const dedicated = readProperty(action, 'cg1_ell') ?? readProperty(action, 'ellipsoide');
-  if (dedicated) {
-    return dedicated;
-  }
-
-  const cg1Srt = readProperty(action, 'cg1_srt');
-  if (!cg1Srt) {
-    return null;
-  }
-
-  const parsed = parseGeographicEllipsoid(cg1Srt);
-  return parsed || null;
-}
-
 function readProjectedProjection(action: MapGeodesyClickAction): string | null {
   const cp1Srt = readProperty(action, 'cp1_srt');
   if (!cp1Srt) {
@@ -104,8 +89,12 @@ function readProjectedProjection(action: MapGeodesyClickAction): string | null {
 export function buildPointCoordinatesView(action: MapGeodesyClickAction): PointCoordinatesView {
   const { longitude, latitude } = action.point;
 
+  const referenceSystem = readGeographicSystem(action);
+  const altimetricPrecision = readProperty(action, 'cp1_precv');
+
   /* Les champs géographiques sont l'ensemble des champs cg1_*** */
   const geographic = buildFields([
+    field('Répère géodésique', referenceSystem, { wide: true }),
     field(
       'Latitude',
       readProperty(action, 'cg1_coord2_dms') ??
@@ -118,27 +107,22 @@ export function buildPointCoordinatesView(action: MapGeodesyClickAction): PointC
         readProperty(action, 'cg1_coord1') ??
         formatHdmsLongitude(longitude, latitude),
     ),
-    field('Hauteur', readProperty(action, 'cg1_coord3'), { wide: true, format: appendMeterSuffix }),
-    field('Système', readGeographicSystem(action)),
-    field('Ellipsoïde', readGeographicEllipsoid(action)),
+    field('Hauteur', readProperty(action, 'cg1_coord3'), { format: appendMeterSuffix }),
+    field('Precision', altimetricPrecision),
   ]);
 
-
-  
-   /* Les champs en projection sont l'ensemble des champs cp1_*** */
+  /* Les champs en projection sont l'ensemble des champs cp1_*** */
   const projection = buildFields([
-    field('Système', readGeographicSystem(action)),
-    field('Ellipsoïde', readGeographicEllipsoid(action)),
+    field('Répère géodésique', referenceSystem),
+    field('Projection', readProjectedProjection(action)),
     field('Easting', readProperty(action, 'cp1_coord1'), { format: appendMeterSuffix }),
     field('Northing', readProperty(action, 'cp1_coord2'), { format: appendMeterSuffix }),
-    field('Précision planimétrique', readProperty(action, 'cp1_prec')),
-    field('Projection', readProjectedProjection(action)),
-    field('Système altimétrique', readProperty(action, 'cp1_srv'), {
-      wide: true,
+    field('Systeme altimetrique', readProperty(action, 'cp1_srv'), {
       format: (value) => stripAltitudeSystemLabel(value) || null,
     }),
     field('Altitude', readProperty(action, 'cp1_coord3'), { format: appendMeterSuffix }),
-    field('Précision altimétrique', readProperty(action, 'cp1_precv')),
+    field('Precision planimetrique', readProperty(action, 'cp1_prec')),
+    field('Précision altimétrique', altimetricPrecision),
   ]);
 
   const defaultTab: CoordinateTabId =

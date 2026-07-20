@@ -7,6 +7,7 @@ app/ → features/ → infra/ → platform/ → domain/
          ↓
       shared/ + styles/
 ```
+blabla
 
 | Couche | Rôle |
 |--------|------|

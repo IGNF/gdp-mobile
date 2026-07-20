@@ -16,6 +16,9 @@
 
 .sheetPointFiche {
   background: var(--color-fiche-canvas);
+  /* Ne jamais couvrir la pile de FAB (filtre/couches/légende) de MapPage : 3 boutons de
+     3rem + 2 espaces de 0.5rem, plus une marge de respiration. */
+  max-height: calc(100dvh - max(0.75rem, var(--safe-top)) - 10.75rem);
 }
 
 .contentPointMini {
