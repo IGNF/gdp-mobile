@@ -9,6 +9,7 @@ import {
   readProperty,
 } from './pointFicheUtils';
 import { getDisplayedFieldIds } from './getDisplayedFieldIds';
+import { PointCoordinatesSection } from './PointCoordinatesSection';
 import { PointImageCarousel } from './PointImageCarousel';
 import { UnmappedFieldsDebug } from './UnmappedFieldsDebug';
 
@@ -95,18 +96,16 @@ export function MapPointGeodesyFicheBody({ action, snapIndex }: MapPointGeodesyF
 
       {snapIndex >= 2 ? (
         <>
-          <section>
-            <h3 className={styles.sectionTitle}>Coordonnées géographiques</h3>
-            <div className={styles.fieldGrid}>
-              <FieldCard label="Latitude" value={action.point.latitude.toFixed(6)} />
-              <FieldCard label="Longitude" value={action.point.longitude.toFixed(6)} />
-              <FieldCard label="Commune" value={commune} wide />
-              <FieldCard label="Dernière MAJ" value={majDate} wide />
-              {pdfUrl ? (
+          <PointCoordinatesSection action={action} />
+
+          {commune || pdfUrl ? (
+            <section>
+              <div className={styles.fieldGrid}>
+                <FieldCard label="Commune" value={commune} wide />
                 <FieldCard label="Fiche PDF" value={pdfUrl} wide />
-              ) : null}
-            </div>
-          </section>
+              </div>
+            </section>
+          ) : null}
 
           {remark ? (
             <section>

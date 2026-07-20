@@ -16,7 +16,7 @@ export interface PointCoordinatesSectionProps {
 
 function CoordinateFieldCard({ label, value, wide = false }: CoordinateField) {
   return (
-    <div className={wide ? `${styles.coordField} ${styles.coordFieldWide}` : styles.coordField}>
+    <div className={wide ? `${styles.fieldCard} ${styles.fieldCardWide}` : styles.fieldCard}>
       <span className={styles.fieldLabel}>{label}</span>
       <span className={styles.fieldValue}>{value}</span>
     </div>
@@ -45,6 +45,7 @@ export function PointCoordinatesSection({ action }: PointCoordinatesSectionProps
 
   return (
     <section className={styles.coordSection}>
+      <h3 className={styles.sectionTitle}>Coordonnées</h3>
       <div className={styles.coordTabs} role="tablist" aria-label="Type de coordonnées">
         <button
           type="button"
@@ -74,13 +75,13 @@ export function PointCoordinatesSection({ action }: PointCoordinatesSectionProps
         aria-label={resolvedTab === 'geographic' ? 'Coordonnées géographiques' : 'Coordonnées projetées'}
       >
         {resolvedFields.length > 0 ? (
-          <div className={styles.coordFieldsGrid}>
+          <div className={styles.fieldGrid}>
             {resolvedFields.map((field) => (
               <CoordinateFieldCard key={`${resolvedTab}-${field.label}`} {...field} />
             ))}
           </div>
         ) : (
-          <p className={styles.coordEmpty}>Aucune coordonnée disponible pour cet onglet.</p>
+          <p className={styles.placeholderBlock}>Aucune coordonnée disponible pour cet onglet.</p>
         )}
       </div>
     </section>

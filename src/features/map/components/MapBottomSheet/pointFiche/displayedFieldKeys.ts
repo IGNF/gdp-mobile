@@ -30,8 +30,6 @@ export const GEODESY_FICHE_SNAP2_FIELD_KEYS = [
   'cg1_coord2_dms',
   'cg1_coord3',
   'cg1_srt',
-  'cg1_ell',
-  'ellipsoide',
   'cp1_coord1',
   'cp1_coord2',
   'cp1_coord3',
