@@ -26,6 +26,48 @@ app/ → features/ → infra/ → platform/ → domain/
 - `OpenLayers` + `ol-ext` : carte Géoportail
 - `Capacitor` : SSO natif, géolocalisation, métadonnées appareil (phase mobile)
 
+```mermaid
+flowchart TB
+  APP["gdp-mobile"]
+
+  subgraph ign["Packages IGN"]
+    direction TB
+    GDP["@ign/gdp-tools<br/>WMS/WFS · GetFeatureInfo · hooks carte · signalements repère"]
+    MC["@ign/mobile-core<br/>AuthManager · OAuth PKCE · User · ReportStatus"]
+    MD["@ign/mobile-device<br/>Storage — tokens, profil, préférences carte"]
+    MC --> MD
+  end
+
+  CC["collaboratif-client-api<br/>signalements · communautés"]
+
+  subgraph cap["Capacitor — phase mobile"]
+    CAP["Browser · Geolocation · App · Device<br/>SSO natif · position · métadonnées appareil"]
+  end
+
+  subgraph carte["Carte Géoportail"]
+    direction LR
+    OL["OpenLayers"]
+    OLE["ol-ext"]
+    OL --- OLE
+  end
+
+  APP --> GDP
+  APP --> MC
+  APP --> MD
+  APP --> CC
+  APP --> CAP
+  APP -.->|"infra/map"| OL
+
+  GDP --> OL
+  GDP --> OLE
+
+  CC -.->|"session auth"| MC
+  CC -.->|"tokens"| MD
+
+  cap ~~~ carte
+  CC ~~~ carte
+```
+
 ## Flux utilisateur
 
 ```mermaid
