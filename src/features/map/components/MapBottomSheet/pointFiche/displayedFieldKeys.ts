@@ -13,6 +13,16 @@ export const GEODESY_FICHE_SNAP1_FIELD_KEYS = [
   'expl_gps',
   'EXPL_GPS',
   'expl_gpscode',
+  'voie_suivie',
+  'voie_de',
+  'voie_vers',
+  'voie_cote',
+  'voisin_distance',
+  'voisin',
+  'support',
+  'support_part',
+  'rep_hori',
+  'rep_vert',
 ] as const;
 
 export const GEODESY_FICHE_SNAP2_FIELD_KEYS = [
@@ -54,6 +64,17 @@ export const NIVELLEMENT_FICHE_SNAP1_FIELD_KEYS = [
   'nom',
   'no',
   'id',
+  'localisation',
+  'voie_suivie',
+  'voie_de',
+  'voie_vers',
+  'voie_cote',
+  'voisin_distance',
+  'voisin',
+  'support',
+  'support_part',
+  'rep_hori',
+  'rep_vert',
 ] as const;
 
-export const NIVELLEMENT_FICHE_SNAP2_FIELD_KEYS = ['comment', 'url_pdf', 'maj_date', 'localisation'] as const;
+export const NIVELLEMENT_FICHE_SNAP2_FIELD_KEYS = ['comment', 'url_pdf', 'maj_date'] as const;

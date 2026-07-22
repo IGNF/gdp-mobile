@@ -63,6 +63,27 @@ export function MapPointGeodesyFicheBody({ action, snapIndex }: MapPointGeodesyF
   const majDate = readProperty(action, 'maj_date');
   const remark = action.point.comment.trim() || null;
 
+  const voieSuivie = readProperty(action, 'voie_suivie');
+  const voieDe = readProperty(action, 'voie_de');
+  const voieVers = readProperty(action, 'voie_vers');
+  const voieSuivieValue = [voieSuivie, voieDe && voieVers ? `De ${voieDe} à ${voieVers}` : null]
+    .filter(Boolean)
+    .join(', ') || null;
+
+  const voisinDistance = readProperty(action, 'voisin_distance');
+  const voisin = readProperty(action, 'voisin');
+  const distance = voisinDistance ? `${voisinDistance} Km${voisin ? ` du repère ${voisin}` : ''}` : null;
+
+  const cote = readProperty(action, 'voie_cote');
+  const support = readProperty(action, 'support');
+  const supportPart = readProperty(action, 'support_part');
+
+  const repHori = readProperty(action, 'rep_hori');
+  const repVert = readProperty(action, 'rep_vert');
+  const reperements = [repHori, repVert].filter(Boolean).join('; ') || null;
+
+  const hasDetails = voieSuivieValue || distance || cote || support || supportPart || reperements;
+
   return (
     <>
       {snapIndex >= 1 ? (
@@ -94,6 +115,20 @@ export function MapPointGeodesyFicheBody({ action, snapIndex }: MapPointGeodesyF
                 <FieldCard label="Type" value={repereType} wide />
               </div>
               {description ? <p className={styles.textBlock}>{description}</p> : null}
+            </section>
+          ) : null}
+
+          {hasDetails ? (
+            <section>
+              <h3 className={styles.sectionTitle}>Détails</h3>
+              <div className={styles.fieldGrid}>
+                <FieldCard label="Voie suivie" value={voieSuivieValue} wide />
+                <FieldCard label="Distance" value={distance} wide />
+                <FieldCard label="Côté" value={cote} />
+                <FieldCard label="Support" value={support} />
+                <FieldCard label="Partie support" value={supportPart} wide />
+                <FieldCard label="Repèrements" value={reperements} wide />
+              </div>
             </section>
           ) : null}
         </>

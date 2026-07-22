@@ -67,6 +67,29 @@ export function MapPointNivellementFicheBody({ action, snapIndex }: MapPointNive
   // TODO: brancher l’URL logo quand disponible (ex. table partenaires / champ WFS dédié).
   const partenaireLogoUrl = readProperty(action, 'proprio_logo');
 
+  const voieSuivie = readProperty(action, 'voie_suivie');
+  const voieDe = readProperty(action, 'voie_de');
+  const voieVers = readProperty(action, 'voie_vers');
+  const voieSuivieValue = [voieSuivie, voieDe && voieVers ? `De ${voieDe} à ${voieVers}` : null]
+    .filter(Boolean)
+    .join(', ') || null;
+
+  const voisinDistance = readProperty(action, 'voisin_distance');
+  const voisin = readProperty(action, 'voisin');
+  const distance = voisinDistance ? `${voisinDistance} Km${voisin ? ` du repère ${voisin}` : ''}` : null;
+
+  const cote = readProperty(action, 'voie_cote');
+  const support = readProperty(action, 'support');
+  const localisation = readProperty(action, 'localisation');
+  const supportPart = readProperty(action, 'support_part');
+
+  const repHori = readProperty(action, 'rep_hori');
+  const repVert = readProperty(action, 'rep_vert');
+  const reperements = [repHori, repVert].filter(Boolean).join('; ') || null;
+
+  const hasDetails =
+    voieSuivieValue || distance || cote || support || localisation || supportPart || reperements;
+
   return (
     <>
       {snapIndex >= 1 ? (
@@ -82,6 +105,21 @@ export function MapPointNivellementFicheBody({ action, snapIndex }: MapPointNive
               <FieldCard label="Type" value={repereType} />
             </div>
           </section>
+
+          {hasDetails ? (
+            <section>
+              <h3 className={styles.sectionTitle}>Détails</h3>
+              <div className={styles.fieldGrid}>
+                <FieldCard label="Voie suivie" value={voieSuivieValue} wide />
+                <FieldCard label="Distance" value={distance} wide />
+                <FieldCard label="Côté" value={cote} />
+                <FieldCard label="Support" value={support} />
+                <FieldCard label="Localisation" value={localisation} wide />
+                <FieldCard label="Partie support" value={supportPart} wide />
+                <FieldCard label="Repèrements" value={reperements} wide />
+              </div>
+            </section>
+          ) : null}
         </>
       ) : null}
 
