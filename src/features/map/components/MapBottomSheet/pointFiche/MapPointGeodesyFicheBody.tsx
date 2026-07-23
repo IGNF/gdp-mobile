@@ -60,7 +60,7 @@ export function MapPointGeodesyFicheBody({ action, snapIndex }: MapPointGeodesyF
   const repereType = readProperty(action, 'type');
   const commune = readProperty(action, 'commune');
   const pdfUrl = readProperty(action, 'url_pdf');
-  const majDate = readProperty(action, 'maj_date');
+  const actDate = readProperty(action, 'action_date');
   const remark = action.point.comment.trim() || null;
 
   const voieSuivie = readProperty(action, 'voie_suivie');
@@ -90,7 +90,7 @@ export function MapPointGeodesyFicheBody({ action, snapIndex }: MapPointGeodesyF
         <>
           <PointImageCarousel items={carouselItems} />
 
-          {majDate ? <p className={styles.carouselCaption}>Determiné en {majDate}</p> : null}
+          {actDate ? <p className={styles.carouselCaption}>Determiné en {actDate}</p> : null}
 
           <section>
             <h3 className={styles.sectionTitle}>Point géodésique</h3>
