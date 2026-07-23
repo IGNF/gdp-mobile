@@ -1,5 +1,6 @@
 import type { MapGeodesyClickAction } from '@/features/map/hooks/useMapGeodesyClick';
 import type { useBottomSheetSnap } from '@/features/map/hooks/useBottomSheetSnap';
+import IconClose from '@/shared/assets/icons/icon-close.svg?react';
 
 import { MapPointGeodesyFicheBody } from './MapPointGeodesyFicheBody';
 import { MapPointNivellementFicheBody } from './MapPointNivellementFicheBody';
@@ -34,14 +35,22 @@ export function MapPointSheet({
   const isMiniSnap = snapIndex === 0;
 
   const handleArea = (
-    <div className={styles.handleArea} aria-hidden>
-      <span className={styles.handle} />
+    <div className={styles.handleArea}>
+      <span className={styles.handleSpacer} aria-hidden />
+      <span className={styles.handle} aria-hidden />
+      <button
+        type="button"
+        className={styles.closeButton}
+        onClick={onClose}
+        onPointerDown={(event) => event.stopPropagation()}
+        aria-label="Fermer la fiche"
+      >
+        <IconClose className={styles.closeIcon} aria-hidden />
+      </button>
     </div>
   );
 
-  const header = (
-    <MapPointSheetHeader action={action} referencePosition={referencePosition} onClose={onClose} />
-  );
+  const header = <MapPointSheetHeader action={action} referencePosition={referencePosition} />;
 
   const footer = (
     <MapPointSheetFooter canReport={canReport} onNavigate={onNavigate} onReport={onReport} />

@@ -1,0 +1,9 @@
+<svg id="icon-pdf" xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30">
+  <rect id="Rectangle_pdf" data-name="Rectangle pdf" width="30" height="30" fill="none"/>
+  <path
+    id="Document"
+    fill-rule="evenodd"
+    d="M4,2 L20,2 L26,8 L26,28 L4,28 Z M20,2 L26,8 L20,8 Z M9,15 L21,15 L21,17 L9,17 Z M9,19 L21,19 L21,21 L9,21 Z M9,23 L17,23 L17,25 L9,25 Z"
+    fill="#091625"
+  />
+</svg>

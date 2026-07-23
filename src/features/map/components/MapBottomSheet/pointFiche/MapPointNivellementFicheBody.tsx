@@ -11,6 +11,7 @@ import {
   stripAltitudeSystemLabel,
 } from './pointFicheUtils';
 import { getDisplayedFieldIds } from './getDisplayedFieldIds';
+import { PointCoordinatesSection } from './PointCoordinatesSection';
 import { PointImageCarousel } from './PointImageCarousel';
 import { PartenaireSection } from './PartenaireSection';
 import { UnmappedFieldsDebug } from './UnmappedFieldsDebug';
@@ -61,6 +62,7 @@ export function MapPointNivellementFicheBody({ action, snapIndex }: MapPointNive
 
   const repereTypeComplement = readProperty(action, 'complement');
   const repereType = readProperty(action, 'type');
+  const actDate = readProperty(action, 'action_date');
   const remark = readProperty(action, 'remarque') ;
   const altitudeType = formatSentenceCase(readProperty(action, 'cp1_altitude_type') ?? '');
   const partenaire = readProperty(action, 'proprio');
@@ -96,6 +98,8 @@ export function MapPointNivellementFicheBody({ action, snapIndex }: MapPointNive
         <>
           <PointImageCarousel items={carouselItems} />
 
+          {actDate ? <p className={styles.carouselCaption}>Determiné en {actDate}</p> : null}
+
           <section>
             <h3 className={styles.sectionTitle}>Repère de nivellement</h3>
             <div className={styles.fieldGrid}>
@@ -125,6 +129,8 @@ export function MapPointNivellementFicheBody({ action, snapIndex }: MapPointNive
 
       {snapIndex >= 2 ? (
         <>
+          <PointCoordinatesSection action={action} />
+
           {/* Partenaire avant remarques */}
           {partenaire ? (
             <PartenaireSection name={partenaire} logoUrl={partenaireLogoUrl} />
@@ -138,10 +144,6 @@ export function MapPointNivellementFicheBody({ action, snapIndex }: MapPointNive
             </section>
           ) : null}
         </>
-      ) : null}
-
-      {snapIndex >= 3 ? (
-        <p className={styles.placeholderBlock}>Vue complète — à remplir.</p>
       ) : null}
 
       <UnmappedFieldsDebug fields={unmappedFields} />

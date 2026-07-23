@@ -1,9 +1,37 @@
 .debug {
   margin-top: 0.5rem;
+}
+
+.debugExpanded {
   padding: 0.75rem;
   border-radius: 0.75rem;
   border: 1px dashed var(--color-medium-tint);
   background: var(--color-light-light);
+}
+
+.toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 0.25rem;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.toggleIcon {
+  width: 1rem;
+  height: 1rem;
+  transition: transform 0.15s ease;
+}
+
+.toggleIcon path {
+  fill: var(--color-medium-tint);
+}
+
+.toggleIconOpen {
+  transform: rotate(180deg);
 }
 
 .title {

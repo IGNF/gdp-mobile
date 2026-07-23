@@ -6,10 +6,12 @@ import {
   buildPointCarouselItems,
   collectAllPointFields,
   filterUnmappedPointFields,
+  normalizeLabel,
   readProperty,
 } from './pointFicheUtils';
 import { getDisplayedFieldIds } from './getDisplayedFieldIds';
 import { resolveGpsExploitabilityVariant } from './gpsExploitabilityBadge';
+import { PartenaireSection } from './PartenaireSection';
 import { PointCoordinatesSection } from './PointCoordinatesSection';
 import { PointImageCarousel } from './PointImageCarousel';
 import { UnmappedFieldsDebug } from './UnmappedFieldsDebug';
@@ -20,6 +22,15 @@ import styles from './MapPointSheet.module.css';
 export interface MapPointGeodesyFicheBodyProps {
   action: MapGeodesyClickAction;
   snapIndex: number;
+}
+
+function deriveDepartementFromInsee(insee: string | null): string | null {
+  if (!insee) {
+    return null;
+  }
+
+  const paddedInsee = insee.padStart(5, '0');
+  return Number(insee) >= 97000 ? paddedInsee.slice(0, 3) : paddedInsee.slice(0, 2);
 }
 
 function FieldCard({
@@ -52,37 +63,25 @@ export function MapPointGeodesyFicheBody({ action, snapIndex }: MapPointGeodesyF
 
   const pointNumber = [readProperty(action, 'nom'), readProperty(action, 'no')].filter(Boolean).join(' — ');
   const sketchId = readProperty(action, 'id') ?? action.reportContext.geodesyId ?? null;
-  const description = readProperty(action, 'localisation');
   const explGps = readProperty(action, 'expl_gps');
   const explGpsCode = readProperty(action, 'expl_gpscode');
   const explGpsVariant = explGps ? resolveGpsExploitabilityVariant(explGps, explGpsCode) : null;
   const explGpsLabel = explGpsVariant === 'inexploitable' ? 'Inexploitable' : 'Exploitable par GPS';
   const repereType = readProperty(action, 'type');
-  const commune = readProperty(action, 'commune');
-  const pdfUrl = readProperty(action, 'url_pdf');
   const actDate = readProperty(action, 'action_date');
-  const remark = action.point.comment.trim() || null;
+  const remark = readProperty(action, 'remarque');
+  const partenaire = readProperty(action, 'proprio');
+  const partenaireLogoUrl = readProperty(action, 'proprio_logo');
 
-  const voieSuivie = readProperty(action, 'voie_suivie');
-  const voieDe = readProperty(action, 'voie_de');
-  const voieVers = readProperty(action, 'voie_vers');
-  const voieSuivieValue = [voieSuivie, voieDe && voieVers ? `De ${voieDe} à ${voieVers}` : null]
-    .filter(Boolean)
-    .join(', ') || null;
-
-  const voisinDistance = readProperty(action, 'voisin_distance');
-  const voisin = readProperty(action, 'voisin');
-  const distance = voisinDistance ? `${voisinDistance} Km${voisin ? ` du repère ${voisin}` : ''}` : null;
-
-  const cote = readProperty(action, 'voie_cote');
-  const support = readProperty(action, 'support');
-  const supportPart = readProperty(action, 'support_part');
-
-  const repHori = readProperty(action, 'rep_hori');
-  const repVert = readProperty(action, 'rep_vert');
-  const reperements = [repHori, repVert].filter(Boolean).join('; ') || null;
-
-  const hasDetails = voieSuivieValue || distance || cote || support || supportPart || reperements;
+  const insee = readProperty(action, 'insee');
+  const entiteNature = readProperty(action, 'entite_nature');
+  const entiteNo = readProperty(action, 'entite_no');
+  const entiteIsDepartement = entiteNature ? normalizeLabel(entiteNature).includes('DEPARTEMENT') : false;
+  const departement = (entiteIsDepartement ? entiteNo : null) ?? deriveDepartementFromInsee(insee);
+  const commune = readProperty(action, 'commune');
+  const siteType = readProperty(action, 'groupe_type');
+  const localisation = readProperty(action, 'localisation');
+  const hasGeodesyDetails = departement || insee || commune || siteType || localisation;
 
   return (
     <>
@@ -100,7 +99,7 @@ export function MapPointGeodesyFicheBody({ action, snapIndex }: MapPointGeodesyF
             </div>
           </section>
 
-          {description || explGps || repereType ? (
+          {localisation || explGps || repereType ? (
             <section>
               <div className={styles.descriptionHeader}>
                 <h3 className={styles.sectionTitle}>Description</h3>
@@ -112,22 +111,21 @@ export function MapPointGeodesyFicheBody({ action, snapIndex }: MapPointGeodesyF
                 ) : null}
               </div>
               <div className={styles.fieldGrid}>
-                <FieldCard label="Localisation" value={description} wide />
+                <FieldCard label="Localisation" value={localisation} wide />
                 <FieldCard label="Type" value={repereType} wide />
               </div>
             </section>
           ) : null}
 
-          {hasDetails ? (
+          {hasGeodesyDetails ? (
             <section>
               <h3 className={styles.sectionTitle}>Détails</h3>
               <div className={styles.fieldGrid}>
-                <FieldCard label="Voie suivie" value={voieSuivieValue} wide />
-                <FieldCard label="Distance" value={distance} wide />
-                <FieldCard label="Côté" value={cote} />
-                <FieldCard label="Support" value={support} />
-                <FieldCard label="Partie support" value={supportPart} wide />
-                <FieldCard label="Repèrements" value={reperements} wide />
+                <FieldCard label="Département" value={departement} />
+                <FieldCard label="Numéro Insee" value={insee} />
+                <FieldCard label="Commune" value={commune} />
+                <FieldCard label="Type du site" value={siteType} />
+                <FieldCard label="Localisation" value={localisation} wide />
               </div>
             </section>
           ) : null}
@@ -138,15 +136,6 @@ export function MapPointGeodesyFicheBody({ action, snapIndex }: MapPointGeodesyF
         <>
           <PointCoordinatesSection action={action} />
 
-          {commune || pdfUrl ? (
-            <section>
-              <div className={styles.fieldGrid}>
-                <FieldCard label="Commune" value={commune} wide />
-                <FieldCard label="Fiche PDF" value={pdfUrl} wide />
-              </div>
-            </section>
-          ) : null}
-
           {remark ? (
             <section>
               <h3 className={styles.sectionTitle}>Remarques</h3>
@@ -154,15 +143,10 @@ export function MapPointGeodesyFicheBody({ action, snapIndex }: MapPointGeodesyF
             </section>
           ) : null}
 
-          <section>
-            <h3 className={styles.sectionTitle}>Partenaire</h3>
-            <p className={styles.placeholderBlock}>Informations partenaire — à remplir.</p>
-          </section>
+          {partenaire ? (
+            <PartenaireSection name={partenaire} logoUrl={partenaireLogoUrl} />
+          ) : null}
         </>
-      ) : null}
-
-      {snapIndex >= 3 ? (
-        <p className={styles.placeholderBlock}>Vue complète — à remplir.</p>
       ) : null}
 
       <UnmappedFieldsDebug fields={unmappedFields} />

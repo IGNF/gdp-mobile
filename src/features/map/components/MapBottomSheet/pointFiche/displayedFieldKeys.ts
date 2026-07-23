@@ -1,5 +1,5 @@
 /** Champs consommés par l'en-tête commun (hors corps de fiche). */
-export const POINT_FICHE_HEADER_FIELD_KEYS = ['etat', 'ETAT', 'vis_date', 'VIS_DATE'] as const;
+export const POINT_FICHE_HEADER_FIELD_KEYS = ['etat', 'ETAT', 'vis_date', 'VIS_DATE', 'url_pdf'] as const;
 
 export const GEODESY_FICHE_SNAP1_FIELD_KEYS = [
   'img1_url',
@@ -13,23 +13,15 @@ export const GEODESY_FICHE_SNAP1_FIELD_KEYS = [
   'expl_gps',
   'EXPL_GPS',
   'expl_gpscode',
-  'voie_suivie',
-  'voie_de',
-  'voie_vers',
-  'voie_cote',
-  'voisin_distance',
-  'voisin',
-  'support',
-  'support_part',
-  'rep_hori',
-  'rep_vert',
+  'type',
+  'insee',
+  'entite_no',
+  'entite_nature',
+  'commune',
+  'groupe_type',
 ] as const;
 
 export const GEODESY_FICHE_SNAP2_FIELD_KEYS = [
-  'commune',
-  'groupe_type',
-  'type',
-  'url_pdf',
   'maj_date',
   'comment',
   'proprio',
@@ -77,4 +69,20 @@ export const NIVELLEMENT_FICHE_SNAP1_FIELD_KEYS = [
   'rep_vert',
 ] as const;
 
-export const NIVELLEMENT_FICHE_SNAP2_FIELD_KEYS = ['comment', 'url_pdf', 'maj_date'] as const;
+export const NIVELLEMENT_FICHE_SNAP2_FIELD_KEYS = [
+  'comment',
+  'maj_date',
+  'cg1_coord1',
+  'cg1_coord1_dms',
+  'cg1_coord2',
+  'cg1_coord2_dms',
+  'cg1_coord3',
+  'cg1_srt',
+  'cp1_coord1',
+  'cp1_coord2',
+  'cp1_coord3',
+  'cp1_srt',
+  'cp1_prec',
+  'cp1_srv',
+  'cp1_precv',
+] as const;

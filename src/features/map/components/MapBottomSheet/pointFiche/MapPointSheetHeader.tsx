@@ -5,9 +5,9 @@ import type { MapGeodesyClickAction } from '@/features/map/hooks/useMapGeodesyCl
 import { formatDistanceFromMapCenter, distanceKm } from '@/shared/utils/geo';
 import { joinCSSClassNames } from '@/shared/utils/join';
 import IconCheck from '@/shared/assets/icons/icon-check.svg?react';
-import IconClose from '@/shared/assets/icons/icon-close.svg?react';
 import IconCopy from '@/shared/assets/icons/icon-copy.svg?react';
 import IconHeart from '@/shared/assets/icons/icon-heart.svg?react';
+import IconPdf from '@/shared/assets/icons/icon-pdf.svg?react';
 
 import { findEtatLabel, findVisitYear, isBonEtatLabel, readProperty } from './pointFicheUtils';
 
@@ -18,10 +18,9 @@ const COPY_FEEDBACK_DURATION_MS = 1500;
 export interface MapPointSheetHeaderProps {
   action: MapGeodesyClickAction;
   referencePosition: { longitude: number; latitude: number } | null;
-  onClose: () => void;
 }
 
-export function MapPointSheetHeader({ action, referencePosition, onClose }: MapPointSheetHeaderProps) {
+export function MapPointSheetHeader({ action, referencePosition }: MapPointSheetHeaderProps) {
   const { point } = action;
   const [isCopied, setIsCopied] = useState(false);
 
@@ -39,6 +38,7 @@ export function MapPointSheetHeader({ action, referencePosition, onClose }: MapP
   const pointId = action.reportContext.geodesyId ?? readProperty(action, 'id');
   const etatLabel = findEtatLabel(action);
   const visitYear = findVisitYear(action);
+  const pdfUrl = readProperty(action, 'url_pdf');
 
   const distanceLabel = referencePosition
     ? formatDistanceFromMapCenter(
@@ -69,21 +69,22 @@ export function MapPointSheetHeader({ action, referencePosition, onClose }: MapP
               <IconCopy className={styles.copyIcon} aria-hidden />
             )}
           </button>
+          {pdfUrl ? (
+            <a
+              href={pdfUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.copyButton}
+              onPointerDown={(event) => event.stopPropagation()}
+              aria-label="Ouvrir la fiche PDF"
+            >
+              <IconPdf className={styles.copyIcon} aria-hidden />
+            </a>
+          ) : null}
         </div>
-        <div className={styles.headerActions}>
-          <button type="button" className={styles.favoriteButton} aria-label="Favori (à venir)" disabled>
-            <IconHeart className={styles.favoriteIcon} aria-hidden />
-          </button>
-          <button
-            type="button"
-            className={styles.closeButton}
-            onClick={onClose}
-            onPointerDown={(event) => event.stopPropagation()}
-            aria-label="Fermer la fiche"
-          >
-            <IconClose className={styles.closeIcon} aria-hidden />
-          </button>
-        </div>
+        <button type="button" className={styles.favoriteButton} aria-label="Favori (à venir)" disabled>
+          <IconHeart className={styles.favoriteIcon} aria-hidden />
+        </button>
       </div>
       {/* TODO: supprimer — debug id repère */}
       {pointId ? <p className="debug-banner">DEBUG — id : {pointId}</p> : null}
@@ -101,7 +102,7 @@ export function MapPointSheetHeader({ action, referencePosition, onClose }: MapP
             </span>
           ) : null}
 
-          {metaParts.length > 0 ? <p className={styles.meta}>{metaParts.join(' • ')}</p> : null}
+          {metaParts.length > 0 ? <p className={styles.meta}>{metaParts.join('  •  ')}</p> : null}
         </div>
       ) : null}
     </header>

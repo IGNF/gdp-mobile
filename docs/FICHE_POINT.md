@@ -88,7 +88,7 @@ Affiché uniquement si `snapIndex >= 1`. Variante résolue par `resolvePointFich
 
 ### Contenu par snap (état actuel)
 
-**Géodésie — snap 1** : carrousel photo/croquis, n° point, ID croquis, exploitabilité GPS, description.
+**Géodésie — snap 1** : carrousel photo/croquis, n° point, ID croquis, exploitabilité GPS, description (type), détails (département, n° Insee, commune, type du site, localisation).
 
 **Géodésie — snap 2** : coordonnées, commune, dernière MAJ, lien PDF, remarques, partenaire (placeholder).
 

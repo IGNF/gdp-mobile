@@ -98,7 +98,8 @@ export function parseProjectedProjection(cp1Srt: string): string {
   return trimmed;
 }
 
-export function normalizeEtatLabel(value: string): string {
+/** Normalise un libellé pour comparaison tolérante à la casse et aux accents. */
+export function normalizeLabel(value: string): string {
   return value
     .normalize('NFD')
     .replace(/\p{M}/gu, '')
@@ -107,7 +108,7 @@ export function normalizeEtatLabel(value: string): string {
 }
 
 export function isBonEtatLabel(etatLabel: string): boolean {
-  return normalizeEtatLabel(etatLabel) === 'BON ETAT';
+  return normalizeLabel(etatLabel) === 'BON ETAT';
 }
 
 function isScalarPropertyValue(value: unknown): value is string | number | boolean {
