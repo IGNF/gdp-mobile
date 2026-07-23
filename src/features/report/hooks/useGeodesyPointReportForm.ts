@@ -125,8 +125,7 @@ export function useGeodesyPointReportForm(options: UseGeodesyPointReportFormOpti
     });
   }, []);
 
-  const validate = useCallback((): boolean => {
-    const nextErrors: GeodesyPointReportFormErrors = {};
+  const validateThemeAttributes = useCallback((): boolean => {
     const themeAttributeErrors: Record<string, string | undefined> = {};
 
     for (const attribute of themeFieldDefinitions) {
@@ -137,17 +136,28 @@ export function useGeodesyPointReportForm(options: UseGeodesyPointReportFormOpti
       }
     }
 
-    if (Object.values(themeAttributeErrors).some(Boolean)) {
-      nextErrors.themeAttributes = themeAttributeErrors;
-    }
+    const hasError = Object.values(themeAttributeErrors).some(Boolean);
+    setErrors((current) => ({
+      ...current,
+      themeAttributes: hasError ? themeAttributeErrors : undefined,
+    }));
+    return !hasError;
+  }, [themeAttributes, themeFieldDefinitions]);
 
-    if (mandatoryPhotoSlot?.role === 'photo1' && !photo1) {
-      nextErrors.photo1 = `${mandatoryPhotoSlot.label} est obligatoire.`;
-    }
+  const validatePhoto = useCallback((): boolean => {
+    const hasError = mandatoryPhotoSlot?.role === 'photo1' && !photo1;
+    setErrors((current) => ({
+      ...current,
+      photo1: hasError ? `${mandatoryPhotoSlot.label} est obligatoire.` : undefined,
+    }));
+    return !hasError;
+  }, [mandatoryPhotoSlot, photo1]);
 
-    setErrors(nextErrors);
-    return Object.keys(nextErrors).length === 0;
-  }, [mandatoryPhotoSlot, photo1, themeAttributes, themeFieldDefinitions]);
+  const validate = useCallback((): boolean => {
+    const isThemeValid = validateThemeAttributes();
+    const isPhotoValid = validatePhoto();
+    return isThemeValid && isPhotoValid;
+  }, [validatePhoto, validateThemeAttributes]);
 
   const photos = useMemo(
     () => [photo1, photo2].filter((photo): photo is ReportPhoto => photo !== null),
@@ -182,6 +192,8 @@ export function useGeodesyPointReportForm(options: UseGeodesyPointReportFormOpti
     normalizedThemeAttributes,
     errors,
     validate,
+    validateThemeAttributes,
+    validatePhoto,
     isThemeConfigured: isThemeLoaded,
     theme,
   };

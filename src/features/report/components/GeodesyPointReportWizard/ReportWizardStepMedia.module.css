@@ -1,0 +1,238 @@
+.step {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-bottom: 8px;
+}
+
+.intro {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.title {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--color-dark);
+}
+
+.uploadZone {
+  position: relative;
+  border: 1.5px dashed color-mix(in srgb, var(--color-primary) 45%, transparent);
+  border-radius: 12px;
+  min-height: 110px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.fileInput {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.previewWrap {
+  position: absolute;
+  inset: 0;
+}
+
+.previewImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+.removePhoto {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 999px;
+  background: rgba(9, 22, 37, 0.55);
+  color: white;
+  cursor: pointer;
+  z-index: 1;
+}
+
+.removePhoto svg {
+  width: 14px;
+  height: 14px;
+}
+
+.removePhoto svg path {
+  fill: currentColor;
+}
+
+.uploadLabel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 22px 0;
+  font-size: 13px;
+  color: var(--color-primary-shade);
+  cursor: pointer;
+  pointer-events: none;
+}
+
+.uploadIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-primary) 14%, transparent);
+}
+
+.uploadIcon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.uploadIcon svg path {
+  fill: var(--color-primary);
+}
+
+.error {
+  margin: -8px 0 0;
+  font-size: 12px;
+  color: var(--color-danger);
+}
+
+.tipsCard {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--color-primary) 10%, transparent);
+}
+
+.tipsTitle {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-dark);
+}
+
+.tipsList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tipsItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--color-medium);
+}
+
+.tipsIcon {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+}
+
+.tipsIcon path {
+  fill: var(--color-primary);
+}
+
+.textareaCard {
+  border-radius: 12px;
+  background: var(--color-surface);
+}
+
+.textarea {
+  width: 100%;
+  min-height: 64px;
+  padding: 12px 14px;
+  border: none;
+  border-radius: 12px;
+  background: transparent;
+  font: inherit;
+  font-size: 13px;
+  color: var(--color-dark);
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+.textarea:focus {
+  outline: none;
+}
+
+.textarea::placeholder {
+  color: var(--color-medium);
+}
+
+.positionCard {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border-radius: 12px;
+  background: var(--color-surface);
+  padding: 8px;
+}
+
+.positionRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 8px;
+}
+
+.positionIconWrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-primary) 14%, transparent);
+  flex-shrink: 0;
+}
+
+.positionIconWrap svg {
+  width: 16px;
+  height: 16px;
+}
+
+.positionIconWrap svg path {
+  fill: var(--color-primary);
+}
+
+.positionLabel {
+  flex: 1;
+  min-width: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-primary-shade);
+}
+
+.positionChevron {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.positionChevron path {
+  fill: var(--color-medium);
+}

@@ -1,0 +1,122 @@
+.step {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding-bottom: 8px;
+}
+
+.intro {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.title {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--color-dark);
+}
+
+.subtitle {
+  margin: 0;
+  font-size: 13px;
+  color: var(--color-medium);
+}
+
+.choices {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.choiceCard {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  padding: 18px 16px;
+  border: none;
+  border-radius: 10px;
+  background: var(--color-surface);
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  transition: box-shadow 0.15s ease-out;
+}
+
+.choiceCard:hover {
+  box-shadow: 0 0 0 1px var(--color-light-shade);
+}
+
+.choiceCardSelected {
+  box-shadow: 0 0 0 1.5px var(--color-primary);
+}
+
+.choiceIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+
+.choiceIcon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.choiceIcon svg path {
+  fill: currentColor;
+}
+
+.choiceIconPositive {
+  background: color-mix(in srgb, var(--color-primary) 16%, transparent);
+  color: var(--color-primary);
+}
+
+.choiceIconNegative {
+  background: color-mix(in srgb, var(--color-danger) 12%, transparent);
+  color: var(--color-danger);
+}
+
+.choiceText {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1;
+  min-width: 0;
+}
+
+.choiceLabel {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.choiceLabelPositive {
+  color: var(--color-primary-shade);
+}
+
+.choiceLabelNegative {
+  color: var(--color-danger);
+}
+
+.choiceDescription {
+  font-size: 13px;
+  color: var(--color-medium);
+}
+
+.choiceRadio {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  border-radius: 999px;
+  border: 2px solid var(--color-light-shade);
+}
+
+.choiceRadioSelected {
+  border-color: var(--color-primary);
+  background: color-mix(in srgb, var(--color-primary) 18%, transparent);
+}

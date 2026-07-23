@@ -13,9 +13,11 @@ import { HelpPage } from '@/features/help/pages/HelpPage';
 import { SettingsPage } from '@/features/settings/pages/SettingsPage';
 import { LegendPage } from '@/features/legend/pages/LegendPage';
 import { MapBottomSheet } from '@/features/map/components/MapBottomSheet';
+import { GeodesyPointReportWizard } from '@/features/map/components/GeodesyPointReportWizard';
 import { MapLayersPanelFlow } from '@/features/map/components/MapLayersPanelFlow';
 import { countActiveMapGeodesyFilters } from '@/features/map/components/MapGeodesyFiltersPanel';
 import type { MapLayerGroupId } from '@/features/map/types/mapLayerGroups';
+import type { GeodesyPointReportMapContext } from '@/domain/report/geodesyPointMapContext';
 import type { GroupReport } from '@/domain/report/groupReportModels';
 import { useMap } from '@/features/map/hooks/useMap';
 import { useMapGeodesyClick } from '@/features/map/hooks/useMapGeodesyClick';
@@ -107,7 +109,11 @@ export function MapPage() {
   const [fabSheetOffset, setFabSheetOffset] = useState(88);
   const [isTabbarHiddenByPoint, setIsTabbarHiddenByPoint] = useState(false);
   const [isTabbarHiddenByFilters, setIsTabbarHiddenByFilters] = useState(false);
-  const isTabbarVisible = !isTabbarHiddenByPoint && !isTabbarHiddenByFilters;
+  const [reportWizardContext, setReportWizardContext] = useState<GeodesyPointReportMapContext | null>(
+    null,
+  );
+  const isTabbarVisible =
+    !isTabbarHiddenByPoint && !isTabbarHiddenByFilters && reportWizardContext === null;
 
   useEffect(() => {
     const tabbarHeight = isTabbarVisible ? '5.5rem' : '0px';
@@ -302,12 +308,13 @@ export function MapPage() {
   );
 
   const handleReportPoint = useCallback(() => {
-    if (!isGeodesyReportable) {
+    if (!isGeodesyReportable || !pendingAction) {
       return;
     }
 
-    mapClick.reportOnExistingPoint();
-  }, [isGeodesyReportable, mapClick]);
+    setReportWizardContext({ source: 'map', reportContext: pendingAction.reportContext });
+    mapClick.closeActionSheet();
+  }, [isGeodesyReportable, mapClick, pendingAction]);
 
   const hasActiveFilters =
     geodesyMode === 'expert' &&
@@ -462,6 +469,12 @@ export function MapPage() {
         onReportMapLayersChange={setReportMapLayers}
         isAuthenticated={isAuthenticated}
         onFiltersPanelOpenChange={setIsTabbarHiddenByFilters}
+      />
+
+      <GeodesyPointReportWizard
+        isOpen={reportWizardContext !== null}
+        context={reportWizardContext}
+        onClose={() => setReportWizardContext(null)}
       />
 
       <LegendPage isOpen={isLegendOpen} onClose={() => setIsLegendOpen(false)} />

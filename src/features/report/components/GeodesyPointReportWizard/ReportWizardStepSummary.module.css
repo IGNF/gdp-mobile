@@ -1,0 +1,241 @@
+.step {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-bottom: 8px;
+}
+
+.intro {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.title {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--color-dark);
+}
+
+.subtitle {
+  margin: 0;
+  font-size: 13px;
+  color: var(--color-medium);
+}
+
+.hero {
+  position: relative;
+  height: 132px;
+  border-radius: 14px;
+  overflow: hidden;
+  background: linear-gradient(160deg, var(--color-primary) 0%, var(--color-primary-shade) 100%);
+}
+
+.heroImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.heroFallback {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.heroFallbackIcon {
+  width: 48px;
+  height: 48px;
+  opacity: 0.55;
+}
+
+.heroFallbackIcon path {
+  fill: var(--color-primary-contrast);
+}
+
+.heroEditButton {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+}
+
+.heroEditButton svg {
+  width: 16px;
+  height: 16px;
+}
+
+.heroEditButton svg path {
+  fill: var(--color-primary-shade);
+}
+
+.heroCaption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 20px 16px 12px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.55), transparent);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: white;
+}
+
+.infoGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.infoCard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 16px;
+  border-radius: 10px;
+  background: var(--color-surface);
+  border: 1px solid color-mix(in srgb, var(--color-primary) 14%, transparent);
+}
+
+.infoIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  margin-bottom: 8px;
+  color: var(--color-primary);
+}
+
+.infoIcon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.infoIcon svg path {
+  fill: currentColor;
+}
+
+.infoEditButton {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.infoEditButton svg {
+  width: 12px;
+  height: 12px;
+}
+
+.infoEditButton svg path {
+  fill: var(--color-primary);
+}
+
+.infoLabel {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--color-medium);
+}
+
+.infoValue {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-dark);
+}
+
+.infoSubvalue {
+  font-size: 11px;
+  color: var(--color-medium);
+}
+
+.commentCard {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 10px;
+  background: var(--color-surface);
+  border: 1px solid color-mix(in srgb, var(--color-primary) 14%, transparent);
+}
+
+.commentHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.commentHeaderLeft {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.commentIcon {
+  width: 18px;
+  height: 18px;
+}
+
+.commentIcon path {
+  fill: var(--color-medium);
+}
+
+.commentLabel {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--color-medium);
+}
+
+.commentEditButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-primary);
+  cursor: pointer;
+}
+
+.commentEditIcon {
+  width: 12px;
+  height: 12px;
+}
+
+.commentEditIcon path {
+  fill: currentColor;
+}
+
+.commentText {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--color-dark);
+}

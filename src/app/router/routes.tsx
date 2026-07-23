@@ -6,7 +6,6 @@ import { AuthCallbackPage } from '@/features/auth/pages/AuthCallback/AuthCallbac
 import { LoginPage } from '@/features/auth/pages/Login/LoginPage';
 import { WelcomePage } from '@/features/welcome/pages/WelcomePage';
 import { MapPage } from '@/pages/map/MapPage';
-import { CreateGeodesyPointReportPage } from '@/pages/report/CreateGeodesyPointReportPage';
 import { MyReportsPage } from '@/pages/report/MyReportsPage';
 
 function routerBasename(): string | undefined {
@@ -38,14 +37,6 @@ export const router = createBrowserRouter(
     {
       path: '/map',
       element: <MapPage />,
-    },
-    {
-      path: '/report/geodesy/new',
-      element: <CreateGeodesyPointReportPage />,
-    },
-    {
-      path: '/report/:id/edit',
-      element: <CreateGeodesyPointReportPage />,
     },
     {
       path: '/reports',

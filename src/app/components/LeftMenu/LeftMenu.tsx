@@ -44,7 +44,6 @@ const menuGroups: MenuGroup[] = [
     icon: IconLocation,
     items: [
       { id: 'mesSignalements', label: 'Mes signalements', route: '/reports' },
-      { id: 'nouveauSignalement', label: 'Nouveau signalement repère', route: '/report/geodesy/new' },
     ],
   },
   {

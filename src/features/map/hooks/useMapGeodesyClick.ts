@@ -2,9 +2,7 @@ import type { BuildGeodesyPointDisplayOptions, GeodesyPointReportContext } from 
 import { useGeodesyMapClick } from '@ign/gdp-tools/react';
 import type Map from 'ol/Map';
 import { useCallback, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
 
-import type { GeodesyPointReportMapContext } from '@/domain/report/geodesyPointMapContext';
 import type { GeodesyPointDisplay } from '@/features/map/utils/geodesyReportContext';
 import { GDP_GEODESY_POINT_DISPLAY_OPTIONS } from '@/features/map/utils/geodesyReportContext';
 
@@ -21,7 +19,6 @@ export interface UseMapGeodesyClickOptions extends BuildGeodesyPointDisplayOptio
 
 export function useMapGeodesyClick(map: Map | null, options: UseMapGeodesyClickOptions) {
   const { enabled = true, isMapReady = false, attributeCatalog, pictoUrlMaps } = options;
-  const navigate = useNavigate();
 
   const { pendingClick, clearPendingClick } = useGeodesyMapClick(map, {
     enabled,
@@ -47,23 +44,8 @@ export function useMapGeodesyClick(map: Map | null, options: UseMapGeodesyClickO
     clearPendingClick();
   }, [clearPendingClick]);
 
-  const reportOnExistingPoint = useCallback(() => {
-    if (!pendingAction) {
-      return;
-    }
-
-    const state: GeodesyPointReportMapContext = {
-      source: 'map',
-      reportContext: pendingAction.reportContext,
-    };
-
-    navigate('/report/geodesy/new', { state });
-    clearPendingClick();
-  }, [clearPendingClick, navigate, pendingAction]);
-
   return {
     pendingAction,
     closeActionSheet,
-    reportOnExistingPoint,
   };
 }
