@@ -112,9 +112,9 @@ export function MapPointGeodesyFicheBody({ action, snapIndex }: MapPointGeodesyF
                 ) : null}
               </div>
               <div className={styles.fieldGrid}>
+                <FieldCard label="Localisation" value={description} wide />
                 <FieldCard label="Type" value={repereType} wide />
               </div>
-              {description ? <p className={styles.textBlock}>{description}</p> : null}
             </section>
           ) : null}
 
