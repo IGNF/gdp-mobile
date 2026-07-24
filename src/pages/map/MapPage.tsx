@@ -103,8 +103,8 @@ export function MapPage() {
   const [layersPanelFocus, setLayersPanelFocus] = useState<MapLayerGroupId | null>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLegendOpen, setIsLegendOpen] = useState(false);
-  const [sheetHeight, setSheetHeight] = useState(88);
-  const [fabSheetOffset, setFabSheetOffset] = useState(88);
+  const [sheetHeight, setSheetHeight] = useState(0);
+  const [fabSheetOffset, setFabSheetOffset] = useState(0);
   const [isTabbarHiddenByPoint, setIsTabbarHiddenByPoint] = useState(false);
   const [isTabbarHiddenByFilters, setIsTabbarHiddenByFilters] = useState(false);
   const isTabbarVisible = !isTabbarHiddenByPoint && !isTabbarHiddenByFilters;
@@ -317,6 +317,7 @@ export function MapPage() {
     ) > 0;
 
   const showExpertFiltersButton = geodesyMode === 'expert';
+  const isSearchFabVisible = sheetHeight === 0 && !isTabbarHiddenByFilters;
 
   return (
     <div
@@ -398,7 +399,14 @@ export function MapPage() {
 
           <button
             type="button"
-            className={`${styles.mapFab} ${styles.geolocationFab} ${isLockedUserLocation ? styles.mapFabActive : ''}`}
+            className={[
+              styles.mapFab,
+              styles.geolocationFab,
+              isSearchFabVisible ? styles.geolocationFabAboveSearch : '',
+              isLockedUserLocation ? styles.mapFabActive : '',
+            ]
+              .filter(Boolean)
+              .join(' ')}
             aria-label={
               isLockedUserLocation
                 ? 'Désactiver le verrouillage de position'

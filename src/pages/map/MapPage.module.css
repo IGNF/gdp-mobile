@@ -105,6 +105,10 @@
   bottom: calc(var(--map-fab-sheet-offset) + var(--map-tabbar-height) + 0.75rem);
 }
 
+.geolocationFabAboveSearch {
+  bottom: calc(var(--map-fab-sheet-offset) + var(--map-tabbar-height) + 4.6rem);
+}
+
 .geolocationIcon {
   width: 1.75rem;
   height: 1.75rem;
