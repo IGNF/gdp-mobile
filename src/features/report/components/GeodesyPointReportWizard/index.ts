@@ -1,5 +1,4 @@
 export { WizardStepHeader } from './WizardStepHeader';
-export { ReportWizardStepPoint } from './ReportWizardStepPoint';
-export { ReportWizardStepMedia } from './ReportWizardStepMedia';
-export { ReportWizardStepSummary } from './ReportWizardStepSummary';
-export { ReportWizardStepConfirmation } from './ReportWizardStepConfirmation';
+export type { WizardStepHeaderProps } from './WizardStepHeader';
+export { ReportWizardStepConformity } from './ReportWizardStepConformity';
+export type { ReportWizardStepConformityProps } from './ReportWizardStepConformity';

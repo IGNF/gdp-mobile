@@ -1,1 +1,0 @@
-export { ReportPhotoSlot } from './ReportPhotoSlot';

@@ -182,7 +182,17 @@ export function MapPage() {
   const geolocationTapTimeoutRef = useRef<number | null>(null);
 
   useUserLocationMarker({ map, isMapReady });
-  useMapClickSelectionMarker({ map, isMapReady, pendingAction: mapClick.pendingAction });
+  useMapClickSelectionMarker({
+    map,
+    isMapReady,
+    pendingAction: mapClick.pendingAction,
+    reportingPosition: reportWizardContext
+      ? {
+          longitude: reportWizardContext.reportContext.longitude,
+          latitude: reportWizardContext.reportContext.latitude,
+        }
+      : null,
+  });
 
   const handleReportMapSelect = useCallback(
     (report: GroupReport) => {

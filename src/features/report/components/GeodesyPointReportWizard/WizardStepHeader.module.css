@@ -1,51 +1,48 @@
-.header {
+.headerBlock {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 0.25rem;
+  padding: 0 1.25rem 0.75rem;
 }
 
-.row {
+.titleRow {
   display: flex;
-  align-items: flex-start;
+  align-items: baseline;
   justify-content: space-between;
-  gap: 12px;
-}
-
-.titleBlock {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+  gap: 0.75rem;
 }
 
 .title {
   margin: 0;
-  font-size: 16px;
+  font-size: 1.0625rem;
   font-weight: 700;
   color: var(--color-dark);
 }
 
-.pointId {
-  margin: 0;
-  font-size: 13px;
+.stepCounter {
+  flex-shrink: 0;
+  font-size: 0.8125rem;
+  font-weight: 500;
   color: var(--color-medium);
 }
 
-.counter {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--color-dark);
-  white-space: nowrap;
+.pointId {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--color-medium);
 }
 
-.separator {
+.divider {
   height: 1px;
-  background: var(--color-light-shade);
+  margin-top: 0.5rem;
+  background: var(--color-light);
 }
 
 .progressTrack {
-  height: 8px;
+  height: 0.375rem;
+  margin-top: 0.75rem;
   border-radius: 999px;
-  background: #e5e7eb;
+  background: var(--color-light);
   overflow: hidden;
 }
 
@@ -53,5 +50,5 @@
   height: 100%;
   border-radius: 999px;
   background: var(--color-primary);
-  transition: width 0.25s ease-out;
+  transition: width 0.2s ease-out;
 }

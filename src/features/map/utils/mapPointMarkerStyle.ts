@@ -40,6 +40,7 @@ export type MapPointMarkerVariant = 'filled' | 'ring';
 export function createMapPointMarkerStyle(
   color: string,
   variant: MapPointMarkerVariant = 'filled',
+  scale = 1,
 ): Style {
   return new Style({
     image: new Icon({
@@ -49,6 +50,7 @@ export function createMapPointMarkerStyle(
           : createFilledMapMarkerIconSrc(color),
       anchor: [0.5, 0.5],
       rotateWithView: false,
+      scale,
     }),
   });
 }
