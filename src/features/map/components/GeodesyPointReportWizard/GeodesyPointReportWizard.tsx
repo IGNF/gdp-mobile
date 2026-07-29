@@ -5,8 +5,10 @@ import type { GeodesyPointReportMapContext } from '@/domain/report/geodesyPointM
 import { useBottomSheetSnap } from '@/features/map/hooks/useBottomSheetSnap';
 import {
   ReportWizardStepConformity,
+  ReportWizardStepMedia,
   WizardStepHeader,
 } from '@/features/report/components/GeodesyPointReportWizard';
+import { useGeodesyPointReportForm } from '@/features/report/hooks/useGeodesyPointReportForm';
 import { Button } from '@/shared/ui/Button';
 import IconClose from '@/shared/assets/icons/icon-close.svg?react';
 
@@ -26,7 +28,11 @@ function getSafeAreaTopPx(): number {
 function getWizardSnapHeights(viewportHeight: number, safeAreaTop: number): readonly number[] {
   const maxHeight = Math.max(360, viewportHeight - Math.max(12, safeAreaTop));
 
-  return [Math.min(Math.round(viewportHeight * 0.62), maxHeight), maxHeight];
+  return [
+    Math.min(Math.round(viewportHeight * 0.62), maxHeight),
+    Math.min(Math.round(viewportHeight * 0.8), maxHeight),
+    maxHeight,
+  ];
 }
 
 export interface GeodesyPointReportWizardProps {
@@ -46,6 +52,10 @@ function GeodesyPointReportWizardContent({ isOpen, context, onClose }: GeodesyPo
   const [step, setStep] = useState(0);
   const [isConform, setIsConform] = useState(true);
   const totalSteps = isConform ? 3 : 4;
+  const form = useGeodesyPointReportForm({
+    reportContext,
+    initialComment: '',
+  });
 
   const [viewportHeight, setViewportHeight] = useState(() => window.innerHeight);
   const [safeAreaTop, setSafeAreaTop] = useState(() => getSafeAreaTopPx());
@@ -143,6 +153,8 @@ function GeodesyPointReportWizardContent({ isOpen, context, onClose }: GeodesyPo
         <div className={styles.body} data-scroll-root="true">
           {step === 0 ? (
             <ReportWizardStepConformity isConform={isConform} onChange={setIsConform} />
+          ) : step === 1 ? (
+            <ReportWizardStepMedia form={form} />
           ) : (
             <p className="debug-banner">DOING — Écran en cours de reconstruction</p>
           )}
@@ -153,6 +165,23 @@ function GeodesyPointReportWizardContent({ isOpen, context, onClose }: GeodesyPo
             <Button type="button" fullWidth onClick={() => setStep(1)}>
               Suivant
             </Button>
+          ) : step === 1 ? (
+            <div className={styles.footerRow}>
+              <Button type="button" variant="outline" fullWidth onClick={() => setStep(0)}>
+                Retour
+              </Button>
+              <Button
+                type="button"
+                fullWidth
+                onClick={() => {
+                  if (form.validatePhoto()) {
+                    setStep(2);
+                  }
+                }}
+              >
+                Suivant
+              </Button>
+            </div>
           ) : null}
         </div>
       </section>
