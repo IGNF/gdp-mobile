@@ -38,6 +38,8 @@ export interface ReportPositionMapProps {
   isLocating?: boolean;
   onPositionChange: (position: { longitude: number; latitude: number }) => void;
   onResetPosition?: () => void;
+  /** Preview-only rendering (recap step): no drag/tap-to-move interaction, no hint/coordinates text. */
+  readOnly?: boolean;
 }
 
 function createReportMarkerIconSrc(color: string): string {
@@ -71,6 +73,7 @@ export function ReportPositionMap({
   isLocating = false,
   onPositionChange,
   onResetPosition,
+  readOnly = false,
 }: ReportPositionMapProps) {
   const mapElementRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<Map | null>(null);
@@ -78,6 +81,8 @@ export function ReportPositionMap({
   const hasCenteredOnPositionRef = useRef(false);
   const onPositionChangeRef = useRef(onPositionChange);
   onPositionChangeRef.current = onPositionChange;
+  const readOnlyRef = useRef(readOnly);
+  readOnlyRef.current = readOnly;
 
   useEffect(() => {
     if (!mapElementRef.current || mapRef.current) {
@@ -147,27 +152,29 @@ export function ReportPositionMap({
         markerFeature.setGeometry(new Point(fromLonLat([longitude, latitude])));
       }
 
-      const translate = new Translate({
-        features: new Collection([markerFeature]),
-      });
+      if (!readOnlyRef.current) {
+        const translate = new Translate({
+          features: new Collection([markerFeature]),
+        });
 
-      translate.on('translateend', () => {
-        const geometry = markerFeature.getGeometry();
-        if (!geometry) {
-          return;
-        }
+        translate.on('translateend', () => {
+          const geometry = markerFeature.getGeometry();
+          if (!geometry) {
+            return;
+          }
 
-        const [nextLongitude, nextLatitude] = toLonLat(geometry.getCoordinates());
-        onPositionChangeRef.current({ longitude: nextLongitude, latitude: nextLatitude });
-      });
+          const [nextLongitude, nextLatitude] = toLonLat(geometry.getCoordinates());
+          onPositionChangeRef.current({ longitude: nextLongitude, latitude: nextLatitude });
+        });
 
-      map.addInteraction(translate);
+        map.addInteraction(translate);
 
-      map.on('singleclick', (event) => {
-        markerFeature.setGeometry(new Point(event.coordinate));
-        const [nextLongitude, nextLatitude] = toLonLat(event.coordinate);
-        onPositionChangeRef.current({ longitude: nextLongitude, latitude: nextLatitude });
-      });
+        map.on('singleclick', (event) => {
+          markerFeature.setGeometry(new Point(event.coordinate));
+          const [nextLongitude, nextLatitude] = toLonLat(event.coordinate);
+          onPositionChangeRef.current({ longitude: nextLongitude, latitude: nextLatitude });
+        });
+      }
 
       mapRef.current = map;
     })();
@@ -229,7 +236,7 @@ export function ReportPositionMap({
       <div className={styles.mapShell}>
         <div ref={mapElementRef} className={styles.mapTarget} aria-label="Carte de position du signalement" />
 
-        {canResetPosition && onResetPosition ? (
+        {!readOnly && canResetPosition && onResetPosition ? (
           <button
             type="button"
             className={styles.resetButton}
@@ -246,8 +253,12 @@ export function ReportPositionMap({
         )}
       </div>
 
-      <p className={styles.hint}>Déplacez le repère ou touchez la carte pour ajuster la position.</p>
-      <p className={styles.coordinates}>{coordinateLabel}</p>
+      {!readOnly ? (
+        <>
+          <p className={styles.hint}>Déplacez le repère ou touchez la carte pour ajuster la position.</p>
+          <p className={styles.coordinates}>{coordinateLabel}</p>
+        </>
+      ) : null}
     </div>
   );
 }

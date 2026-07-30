@@ -6,6 +6,7 @@ import { useBottomSheetSnap } from '@/features/map/hooks/useBottomSheetSnap';
 import {
   ReportWizardStepConformity,
   ReportWizardStepMedia,
+  ReportWizardStepSummary,
   WizardStepHeader,
 } from '@/features/report/components/GeodesyPointReportWizard';
 import { useGeodesyPointReportForm } from '@/features/report/hooks/useGeodesyPointReportForm';
@@ -155,6 +156,12 @@ function GeodesyPointReportWizardContent({ isOpen, context, onClose }: GeodesyPo
             <ReportWizardStepConformity isConform={isConform} onChange={setIsConform} />
           ) : step === 1 ? (
             <ReportWizardStepMedia form={form} />
+          ) : step === 2 ? (
+            <ReportWizardStepSummary
+              isConform={isConform}
+              form={form}
+              onEditStep={(targetStep) => setStep(targetStep)}
+            />
           ) : (
             <p className="debug-banner">DOING — Écran en cours de reconstruction</p>
           )}
@@ -179,6 +186,15 @@ function GeodesyPointReportWizardContent({ isOpen, context, onClose }: GeodesyPo
                   }
                 }}
               >
+                Suivant
+              </Button>
+            </div>
+          ) : step === 2 ? (
+            <div className={styles.footerRow}>
+              <Button type="button" variant="outline" fullWidth onClick={() => setStep(1)}>
+                Retour
+              </Button>
+              <Button type="button" fullWidth onClick={() => setStep(3)}>
                 Suivant
               </Button>
             </div>
