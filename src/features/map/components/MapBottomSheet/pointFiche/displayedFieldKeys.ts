@@ -26,6 +26,7 @@ export const GEODESY_FICHE_SNAP2_FIELD_KEYS = [
   'comment',
   'proprio',
   'proprio_logo',
+  'proprio_id',
   'cg1_coord1',
   'cg1_coord1_dms',
   'cg1_coord2',
@@ -85,4 +86,7 @@ export const NIVELLEMENT_FICHE_SNAP2_FIELD_KEYS = [
   'cp1_prec',
   'cp1_srv',
   'cp1_precv',
+  'proprio',
+  'proprio_logo',
+  'proprio_id',
 ] as const;

@@ -71,7 +71,8 @@ export function MapPointGeodesyFicheBody({ action, snapIndex }: MapPointGeodesyF
   const actDate = readProperty(action, 'action_date');
   const remark = readProperty(action, 'remarque');
   const partenaire = readProperty(action, 'proprio');
-  const partenaireLogoUrl = readProperty(action, 'proprio_logo');
+  const partenaireId = readProperty(action, 'proprio_id');
+  const partenaireLogoUrl = partenaireId ? `https://data.geopf.fr/annexes/geodesie/gdp/logos/logo_${partenaireId}.jpg` : null;
 
   const insee = readProperty(action, 'insee');
   const entiteNature = readProperty(action, 'entite_nature');
