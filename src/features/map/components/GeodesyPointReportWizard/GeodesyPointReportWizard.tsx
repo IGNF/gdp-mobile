@@ -170,6 +170,8 @@ function GeodesyPointReportWizardContent({ isOpen, context, onClose }: GeodesyPo
           ) : step === summaryStep ? (
             <ReportWizardStepSummary
               isConform={isConform}
+              nonConformReason={nonConformReason}
+              mediaStep={mediaStep}
               form={form}
               onEditStep={(targetStep) => setStep(targetStep)}
             />

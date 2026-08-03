@@ -1,5 +1,6 @@
 import { ReportPositionMap } from '@/features/report/components/ReportPositionMap';
 import type { UseGeodesyPointReportFormReturn } from '@/features/report/hooks/useGeodesyPointReportForm';
+import { NON_CONFORM_REASON_LABELS, type NonConformReason } from '@/features/report/components/GeodesyPointReportWizard/ReportWizardStepNonConformReason';
 import { joinCSSClassNames } from '@/shared/utils/join';
 import IconArticle from '@/shared/assets/icons/icon-article.svg?react';
 import IconCamera from '@/shared/assets/icons/icon-camera.svg?react';
@@ -12,12 +13,25 @@ import styles from './ReportWizardStepSummary.module.css';
 
 export interface ReportWizardStepSummaryProps {
   isConform: boolean;
+  nonConformReason: NonConformReason | null;
+  mediaStep: number;
   form: UseGeodesyPointReportFormReturn;
   onEditStep: (step: number) => void;
 }
 
-export function ReportWizardStepSummary({ isConform, form, onEditStep }: ReportWizardStepSummaryProps) {
-  const stateLabel = isConform ? 'Conforme' : 'Non Conforme';
+export function ReportWizardStepSummary({
+  isConform,
+  nonConformReason,
+  mediaStep,
+  form,
+  onEditStep,
+}: ReportWizardStepSummaryProps) {
+  const stateLabel = isConform ? 'Conforme' : 'Non conforme';
+  const stateDetail = isConform
+    ? stateLabel
+    : nonConformReason
+      ? NON_CONFORM_REASON_LABELS[nonConformReason]
+      : '—';
   const positionLabel = form.canResetPosition ? 'Modifiée' : 'Confirmée';
   const coordinateLabel =
     form.latitude !== null ? `${form.latitude.toFixed(4)}° N` : '—';
@@ -38,7 +52,7 @@ export function ReportWizardStepSummary({ isConform, form, onEditStep }: ReportW
         <button
           type="button"
           className={styles.editButton}
-          onClick={() => onEditStep(1)}
+          onClick={() => onEditStep(mediaStep)}
           aria-label="Modifier la photo"
         >
           <IconPencil className={styles.editIcon} aria-hidden />
@@ -69,14 +83,14 @@ export function ReportWizardStepSummary({ isConform, form, onEditStep }: ReportW
           </span>
           <p className={styles.cardLabel}>État</p>
           <p className={styles.cardValue}>{stateLabel}</p>
-          <p className={styles.cardDetail}>{stateLabel}</p>
+          <p className={styles.cardDetail}>{stateDetail}</p>
         </div>
 
         <div className={styles.card}>
           <button
             type="button"
             className={styles.cardEditButton}
-            onClick={() => onEditStep(1)}
+            onClick={() => onEditStep(mediaStep)}
             aria-label="Modifier la position"
           >
             <IconPencil className={styles.cardEditIcon} aria-hidden />
@@ -100,7 +114,7 @@ export function ReportWizardStepSummary({ isConform, form, onEditStep }: ReportW
         <button
           type="button"
           className={styles.editButton}
-          onClick={() => onEditStep(1)}
+          onClick={() => onEditStep(mediaStep)}
           aria-label="Modifier la position sur la carte"
         >
           <IconPencil className={styles.editIcon} aria-hidden />
@@ -116,7 +130,7 @@ export function ReportWizardStepSummary({ isConform, form, onEditStep }: ReportW
           <button
             type="button"
             className={styles.commentEditButton}
-            onClick={() => onEditStep(1)}
+            onClick={() => onEditStep(mediaStep)}
           >
             <IconPencil className={styles.commentEditIcon} aria-hidden />
             modifier

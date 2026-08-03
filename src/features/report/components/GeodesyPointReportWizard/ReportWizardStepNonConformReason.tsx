@@ -27,6 +27,10 @@ const NON_CONFORM_REASONS: Array<{
   { value: 'malPositionne', label: 'Mal positionné', description: 'Lorem ipsum dolor sit amet', Icon: IconLocation },
 ];
 
+export const NON_CONFORM_REASON_LABELS: Record<NonConformReason, string> = Object.fromEntries(
+  NON_CONFORM_REASONS.map(({ value, label }) => [value, label]),
+) as Record<NonConformReason, string>;
+
 export interface ReportWizardStepNonConformReasonProps {
   reason: NonConformReason | null;
   onChange: (reason: NonConformReason) => void;

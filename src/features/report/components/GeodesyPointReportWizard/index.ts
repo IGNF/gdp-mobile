@@ -2,7 +2,10 @@ export { WizardStepHeader } from './WizardStepHeader';
 export type { WizardStepHeaderProps } from './WizardStepHeader';
 export { ReportWizardStepConformity } from './ReportWizardStepConformity';
 export type { ReportWizardStepConformityProps } from './ReportWizardStepConformity';
-export { ReportWizardStepNonConformReason } from './ReportWizardStepNonConformReason';
+export {
+  ReportWizardStepNonConformReason,
+  NON_CONFORM_REASON_LABELS,
+} from './ReportWizardStepNonConformReason';
 export type {
   ReportWizardStepNonConformReasonProps,
   NonConformReason,
