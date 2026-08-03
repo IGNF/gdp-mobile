@@ -5,9 +5,11 @@ import type { GeodesyPointReportMapContext } from '@/domain/report/geodesyPointM
 import { useBottomSheetSnap } from '@/features/map/hooks/useBottomSheetSnap';
 import {
   ReportWizardStepConformity,
+  ReportWizardStepNonConformReason,
   ReportWizardStepMedia,
   ReportWizardStepSummary,
   WizardStepHeader,
+  type NonConformReason,
 } from '@/features/report/components/GeodesyPointReportWizard';
 import { useGeodesyPointReportForm } from '@/features/report/hooks/useGeodesyPointReportForm';
 import { Button } from '@/shared/ui/Button';
@@ -52,7 +54,10 @@ function GeodesyPointReportWizardContent({ isOpen, context, onClose }: GeodesyPo
   const { reportContext } = context;
   const [step, setStep] = useState(0);
   const [isConform, setIsConform] = useState(true);
+  const [nonConformReason, setNonConformReason] = useState<NonConformReason | null>(null);
   const totalSteps = isConform ? 3 : 4;
+  const mediaStep = isConform ? 1 : 2;
+  const summaryStep = isConform ? 2 : 3;
   const form = useGeodesyPointReportForm({
     reportContext,
     initialComment: '',
@@ -105,6 +110,7 @@ function GeodesyPointReportWizardContent({ isOpen, context, onClose }: GeodesyPo
     if (isOpen) {
       setStep(0);
       setIsConform(true);
+      setNonConformReason(null);
     }
   }, [isOpen]);
 
@@ -154,9 +160,14 @@ function GeodesyPointReportWizardContent({ isOpen, context, onClose }: GeodesyPo
         <div className={styles.body} data-scroll-root="true">
           {step === 0 ? (
             <ReportWizardStepConformity isConform={isConform} onChange={setIsConform} />
-          ) : step === 1 ? (
+          ) : !isConform && step === 1 ? (
+            <ReportWizardStepNonConformReason
+              reason={nonConformReason}
+              onChange={setNonConformReason}
+            />
+          ) : step === mediaStep ? (
             <ReportWizardStepMedia form={form} />
-          ) : step === 2 ? (
+          ) : step === summaryStep ? (
             <ReportWizardStepSummary
               isConform={isConform}
               form={form}
@@ -172,7 +183,7 @@ function GeodesyPointReportWizardContent({ isOpen, context, onClose }: GeodesyPo
             <Button type="button" fullWidth onClick={() => setStep(1)}>
               Suivant
             </Button>
-          ) : step === 1 ? (
+          ) : !isConform && step === 1 ? (
             <div className={styles.footerRow}>
               <Button type="button" variant="outline" fullWidth onClick={() => setStep(0)}>
                 Retour
@@ -180,21 +191,40 @@ function GeodesyPointReportWizardContent({ isOpen, context, onClose }: GeodesyPo
               <Button
                 type="button"
                 fullWidth
+                disabled={!nonConformReason}
+                onClick={() => setStep(mediaStep)}
+              >
+                Suivant
+              </Button>
+            </div>
+          ) : step === mediaStep ? (
+            <div className={styles.footerRow}>
+              <Button
+                type="button"
+                variant="outline"
+                fullWidth
+                onClick={() => setStep(isConform ? 0 : 1)}
+              >
+                Retour
+              </Button>
+              <Button
+                type="button"
+                fullWidth
                 onClick={() => {
                   if (form.validatePhoto()) {
-                    setStep(2);
+                    setStep(summaryStep);
                   }
                 }}
               >
                 Suivant
               </Button>
             </div>
-          ) : step === 2 ? (
+          ) : step === summaryStep ? (
             <div className={styles.footerRow}>
-              <Button type="button" variant="outline" fullWidth onClick={() => setStep(1)}>
+              <Button type="button" variant="outline" fullWidth onClick={() => setStep(mediaStep)}>
                 Retour
               </Button>
-              <Button type="button" fullWidth onClick={() => setStep(3)}>
+              <Button type="button" fullWidth onClick={() => setStep(summaryStep + 1)}>
                 Suivant
               </Button>
             </div>
