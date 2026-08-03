@@ -68,7 +68,6 @@ export function MapPointNivellementFicheBody({ action, snapIndex }: MapPointNive
   const altitudeType = formatSentenceCase(readProperty(action, 'cp1_altitude_type') ?? '');
   const partenaire = readProperty(action, 'proprio');
   const partenaireId = readProperty(action, 'proprio_id');
-  const partenaireLogoUrl = partenaireId ? `https://data.geopf.fr/annexes/geodesie/gdp/logos/logo_${partenaireId}.jpg` : null;
 
   const voieSuivie = readProperty(action, 'voie_suivie');
   const voieDe = readProperty(action, 'voie_de');
@@ -134,7 +133,7 @@ export function MapPointNivellementFicheBody({ action, snapIndex }: MapPointNive
 
           {/* Partenaire avant remarques */}
           {partenaire ? (
-            <PartenaireSection name={partenaire} logoUrl={partenaireLogoUrl} />
+            <PartenaireSection name={partenaire} partnerId={partenaireId} />
           ) : null}
 
 

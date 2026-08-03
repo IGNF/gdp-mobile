@@ -1,12 +1,16 @@
+import { usePartnerLogo } from '@/features/map/hooks/usePartnerLogo';
+
 import styles from './MapPointSheet.module.css';
 
 export interface PartenaireSectionProps {
   name: string;
-  /** URL du logo partenaire — zone placeholder si absent. */
-  logoUrl?: string | null;
+  /** Identifiant du partenaire (proprio_id) pour charger le logo depuis le cache. */
+  partnerId?: string | null;
 }
 
-export function PartenaireSection({ name, logoUrl }: PartenaireSectionProps) {
+export function PartenaireSection({ name, partnerId }: PartenaireSectionProps) {
+  const { logoUrl } = usePartnerLogo(partnerId);
+
   return (
     <section>
       <h3 className={styles.sectionTitle}>Partenaire</h3>
