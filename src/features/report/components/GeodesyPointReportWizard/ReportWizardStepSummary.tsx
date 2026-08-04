@@ -37,7 +37,9 @@ export function ReportWizardStepSummary({
       : '—';
   const positionLabel = form.canResetPosition ? 'Modifiée' : 'Confirmée';
   const coordinateLabel =
-    form.latitude !== null ? `${form.latitude.toFixed(4)}° N` : '—';
+    form.latitude !== null && form.longitude !== null
+      ? `${form.latitude.toFixed(4)}° N, ${form.longitude.toFixed(4)}° E`
+      : '—';
 
   return (
     <div className={styles.step}>
