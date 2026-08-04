@@ -67,6 +67,19 @@
   background: var(--color-primary-light);
   color: var(--color-primary-shade);
   font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+}
+
+.segment[data-active='true']::before {
+  content: '';
+  width: 0.375rem;
+  height: 0.375rem;
+  border-radius: 50%;
+  background: var(--color-primary);
+  flex-shrink: 0;
 }
 
 .dateRangeRow {
