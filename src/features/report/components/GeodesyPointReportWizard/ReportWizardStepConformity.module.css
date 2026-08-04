@@ -2,6 +2,8 @@
   display: flex;
   flex-direction: column;
   padding: 1rem 0 0;
+  --color-non-conform: #e5342f;
+  --color-non-conform-shade: #c62828;
 }
 
 .question {
@@ -41,7 +43,7 @@
 }
 
 .cardSelectedNonConform {
-  border-color: var(--color-danger);
+  border-color: var(--color-non-conform);
 }
 
 .cardRow {
@@ -66,7 +68,7 @@
 }
 
 .stateIconNonConform {
-  color: var(--color-danger);
+  color: var(--color-non-conform);
 }
 
 .stateIconSvg {
@@ -96,7 +98,7 @@
 }
 
 .cardLabelNonConform {
-  color: var(--color-danger-shade);
+  color: var(--color-non-conform-shade);
 }
 
 .cardDescription {
@@ -131,7 +133,7 @@
 }
 
 .radioNonConform {
-  color: var(--color-danger);
+  color: var(--color-non-conform);
 }
 
 .criteria {
