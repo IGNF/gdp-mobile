@@ -1,4 +1,5 @@
-import { useRef } from 'react';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 import {
   getGeodesyWfsMultiChoiceSelectedValues,
   type GeodesyWfsAttributeFilterDefinition,
@@ -17,24 +18,6 @@ function formatIsoDateForDisplay(isoDate: string): string {
   }
 
   return `${day}/${month}/${year}`;
-}
-
-function openDatePicker(input: HTMLInputElement | null) {
-  if (!input) {
-    return;
-  }
-
-  if (typeof input.showPicker === 'function') {
-    try {
-      input.showPicker();
-      return;
-    } catch {
-      // showPicker peut échouer hors interaction utilisateur directe.
-    }
-  }
-
-  input.focus();
-  input.click();
 }
 
 function updateValue(
@@ -170,42 +153,62 @@ function DateFilterField({
   label,
   value,
   onChange,
+  align = 'left',
 }: {
   label: string;
   value: string | null;
   onChange: (value: string | null) => void;
+  align?: 'left' | 'right';
 }) {
-  const inputRef = useRef<HTMLInputElement>(null);
   const hasValue = value !== null && value.length > 0;
   const labelId = `filter-date-${label.toLowerCase()}-label`;
+
+  // Convertir ISO string vers Date
+  const dateValue = hasValue ? new Date(value) : null;
+
+  // Convertir Date vers ISO string (YYYY-MM-DD)
+  const handleDateChange = (date: Date | null) => {
+    if (!date) {
+      onChange(null);
+      return;
+    }
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    onChange(`${year}-${month}-${day}`);
+  };
 
   return (
     <div className={styles.dateField}>
       <span className={styles.dateFieldLabel} id={labelId}>
         {label}
       </span>
-      <div className={styles.dateInputWrap}>
-        <button
-          type="button"
-          className={styles.datePickerTrigger}
-          onClick={() => openDatePicker(inputRef.current)}
-          aria-labelledby={labelId}
-        >
-          <IconCalendar className={styles.dateIcon} aria-hidden />
-          <span className={hasValue ? styles.dateDisplayValue : styles.datePlaceholder}>
-            {hasValue ? formatIsoDateForDisplay(value) : 'jj/mm/aaaa'}
-          </span>
-        </button>
-        <input
-          ref={inputRef}
-          type="date"
-          className={styles.dateInputNative}
-          value={hasValue ? value : ''}
-          tabIndex={-1}
-          aria-hidden
-          onChange={(event) => {
-            onChange(event.target.value || null);
-          }}
+      <div className={styles.dateInputWrap} data-align={align}>
+        <DatePicker
+          selected={dateValue}
+          onChange={handleDateChange}
+          dateFormat="dd/MM/yyyy"
+          placeholderText="jj/mm/aaaa"
+          showMonthDropdown
+          showYearDropdown
+          dropdownMode="select"
+          yearDropdownItemNumber={100}
+          scrollableYearDropdown
+          customInput={
+            <button
+              type="button"
+              className={styles.datePickerTrigger}
+              aria-labelledby={labelId}
+            >
+              <IconCalendar className={styles.dateIcon} aria-hidden />
+              <span className={hasValue ? styles.dateDisplayValue : styles.datePlaceholder}>
+                {hasValue ? formatIsoDateForDisplay(value) : 'jj/mm/aaaa'}
+              </span>
+            </button>
+          }
+          popperClassName={styles.datePickerPopper}
+          calendarClassName={styles.datePickerCalendar}
+          popperPlacement="bottom-start"
         />
         {hasValue ? (
           <button
@@ -247,6 +250,7 @@ function ObservationDateRow({
         label="Au"
         value={toValue}
         onChange={(next) => onChange(updateValue(values, toId, next))}
+        align="right"
       />
     </div>
   );
