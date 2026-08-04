@@ -92,7 +92,7 @@
   );
 
   /* ── Primaire (vert Figma) ── */
-  --color-primary: var(--figma-green);
+  --color-primary: var(--figma-green-dark);
   --color-primary-rgb: 38, 165, 129;
   --color-primary-contrast: var(--color-white);
   --color-primary-contrast-rgb: 255, 255, 255;

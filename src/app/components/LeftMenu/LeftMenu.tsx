@@ -6,8 +6,10 @@ import IconAngleDown from '@/shared/assets/icons/icon-angle-down.svg?react';
 import IconConfiguration from '@/shared/assets/icons/icon-configuration.svg?react';
 import IconHelp from '@/shared/assets/icons/icon-help.svg?react';
 import IconInfo from '@/shared/assets/icons/icon-info.svg?react';
-import IconLocation from '@/shared/assets/icons/icon-location.svg?react';
 import IconUser from '@/shared/assets/icons/icon-user.svg?react';
+import IconStar from '@/shared/assets/icons/icon-star.svg?react';
+import IconUsers from '@/shared/assets/icons/icon-user2.svg?react';
+import IconDisconnect from '@/shared/assets/icons/icon-deconnect.svg?react';
 
 import screen from '@/shared/styles/screen.module.css';
 
@@ -21,13 +23,16 @@ export interface LeftMenuProps {
   onNavigate: (route: string) => void;
 }
 
-type MenuGroupId = 'signalements' | 'monCompte';
+/** `always` = visible pour tous ; `authenticated` = connecté ; `guest` = non connecté */
+type AuthVisibility = 'always' | 'authenticated' | 'guest';
+
+type MenuGroupId = 'monCompte' | 'mesFavoris' | 'parametres' | 'communaute' | 'aide' | 'aPropos';
 
 interface MenuItem {
   id: string;
   label: string;
   route: string;
-  hidden?: boolean;
+  authVisibility?: AuthVisibility;
 }
 
 interface MenuGroup {
@@ -35,45 +40,87 @@ interface MenuGroup {
   title: string;
   icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
   items: MenuItem[];
+  authVisibility?: AuthVisibility;
+}
+
+interface StandaloneItem {
+  id: string;
+  label: string;
+  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+  route: string;
+  authVisibility?: AuthVisibility;
 }
 
 const menuGroups: MenuGroup[] = [
   {
-    id: 'signalements',
-    title: 'Signalements',
-    icon: IconLocation,
-    items: [
-      { id: 'mesSignalements', label: 'Mes signalements', route: '/reports' },
-      { id: 'nouveauSignalement', label: 'Nouveau signalement repère', route: '/report/geodesy/new' },
-    ],
-  },
-  {
     id: 'monCompte',
     title: 'Mon compte',
     icon: IconUser,
+    authVisibility: 'authenticated',
     items: [
       { id: 'monCompte', label: 'Mon compte', route: '/my-account' },
-      {
-        id: 'deconnexion',
-        label: 'Déconnexion',
-        route: '/logout',
-        hidden: false,
-      },
-      {
-        id: 'connexion',
-        label: 'Se connecter',
-        route: '/login',
-        hidden: false,
-      },
+      { id: 'deconnexion', label: 'Déconnexion', route: '/logout' },
     ],
+  },
+  {
+    id: 'mesFavoris',
+    title: 'Mes favoris',
+    icon: IconStar,
+    authVisibility: 'authenticated',
+    items: [{ id: 'mesFavoris', label: 'Mes favoris', route: '/favorites' }],
+  },
+  {
+    id: 'parametres',
+    title: 'Paramètres',
+    icon: IconConfiguration,
+    items: [{ id: 'parametres', label: 'Paramètres', route: '/settings' }],
+  },
+  {
+    id: 'communaute',
+    title: 'Communauté',
+    icon: IconUsers,
+    items: [{ id: 'communaute', label: 'Communauté', route: '/community' }],
+  },
+  {
+    id: 'aide',
+    title: 'Aide',
+    icon: IconHelp,
+    items: [{ id: 'aide', label: 'Aide', route: '/help' }],
+  },
+  {
+    id: 'aPropos',
+    title: 'À propos',
+    icon: IconInfo,
+    items: [{ id: 'aPropos', label: 'À propos', route: '/about' }],
   },
 ];
 
-const standaloneItems = [
-  { id: 'parametres', label: 'Paramètres', icon: IconConfiguration, route: '/settings' },
-  { id: 'aide', label: 'Aide', icon: IconHelp, route: '/help' },
-  { id: 'aPropos', label: 'À propos', icon: IconInfo, route: '/about' },
-] as const;
+const standaloneItems: StandaloneItem[] = [
+  {
+    id: 'connexion',
+    label: 'Se connecter',
+    icon: IconUser,
+    route: '/login',
+    authVisibility: 'guest',
+  },
+  {
+    id: 'deconnexion',
+    label: 'Déconnexion',
+    icon: IconDisconnect,
+    route: '/logout',
+    authVisibility: 'authenticated',
+  },
+];
+
+function isAuthVisible(visibility: AuthVisibility = 'always', isAuthenticated: boolean): boolean {
+  if (visibility === 'authenticated') {
+    return isAuthenticated;
+  }
+  if (visibility === 'guest') {
+    return !isAuthenticated;
+  }
+  return true;
+}
 
 function getUserInitial(user: AppUser | null | undefined): string {
   if (!user?.username) {
@@ -90,6 +137,20 @@ export function LeftMenu({
   onNavigate,
 }: LeftMenuProps) {
   const [expandedGroups, setExpandedGroups] = useState<Set<MenuGroupId>>(new Set());
+
+  const visibleGroups = menuGroups
+    .filter((group) => isAuthVisible(group.authVisibility, isAuthenticated))
+    .map((group) => ({
+      ...group,
+      items: group.items.filter((item) =>
+        isAuthVisible(item.authVisibility, isAuthenticated),
+      ),
+    }))
+    .filter((group) => group.items.length > 0);
+
+  const visibleStandaloneItems = standaloneItems.filter((item) =>
+    isAuthVisible(item.authVisibility, isAuthenticated),
+  );
 
   const toggleGroup = (groupId: MenuGroupId) => {
     setExpandedGroups((previous) => {
@@ -110,22 +171,6 @@ export function LeftMenu({
     }, 300);
   };
 
-  const getGroupItems = (group: MenuGroup): MenuItem[] => {
-    if (group.id !== 'monCompte') {
-      return group.items;
-    }
-
-    return group.items.filter((item) => {
-      if (item.id === 'deconnexion') {
-        return isAuthenticated;
-      }
-      if (item.id === 'connexion') {
-        return !isAuthenticated;
-      }
-      return true;
-    });
-  };
-
   return (
     <>
       <div
@@ -138,28 +183,32 @@ export function LeftMenu({
         aria-label="Menu principal"
         aria-hidden={!isOpen}
       >
-        <p className="debug-banner">TODO — Écran pas encore développé</p>
         <div className={styles.userSection}>
           <div className={styles.avatar}>
             <div className={styles.avatarPlaceholder}>{getUserInitial(user)}</div>
           </div>
           <div className={styles.userInfo}>
             <span className={styles.userName}>
-              {isAuthenticated && user?.username ? user.username : 'Non connecté'}
+              {isAuthenticated && user?.username ? user.username : 'Bonjour'}
             </span>
-            <span className={styles.userSubtitle}>
-              {isAuthenticated && user?.email
-                ? user.email
-                : 'Connectez-vous pour consulter vos signalements envoyés'}
-            </span>
+            {isAuthenticated && user?.email ? (
+              <span className={styles.userSubtitle}>{user.email}</span>
+            ) : (
+              <button
+                type="button"
+                className={styles.userSubtitleLink}
+                onClick={() => handleItemClick('/login')}
+              >
+                Pas encore connecté ?
+              </button>
+            )}
           </div>
         </div>
 
         <div className={styles.menuContent}>
-          {menuGroups.map((group) => {
+          {visibleGroups.map((group) => {
             const IconComponent = group.icon;
             const isExpanded = expandedGroups.has(group.id);
-            const items = getGroupItems(group);
 
             return (
               <div key={group.id} className={styles.menuGroup}>
@@ -179,7 +228,7 @@ export function LeftMenu({
                 <div
                   className={`${styles.groupItems} ${isExpanded ? styles.groupItemsExpanded : ''}`}
                 >
-                  {items.map((item) => (
+                  {group.items.map((item) => (
                     <button
                       key={item.id}
                       type="button"
@@ -194,22 +243,25 @@ export function LeftMenu({
             );
           })}
 
-          <div className={styles.standaloneItems}>
-            {standaloneItems.map((item) => {
-              const IconComponent = item.icon;
-              return (
-                <button
-                  key={item.id}
-                  type="button"
-                  className={styles.standaloneItem}
-                  onClick={() => handleItemClick(item.route)}
-                >
-                  <IconComponent className={styles.standaloneIcon} aria-hidden />
-                  <span>{item.label}</span>
-                </button>
-              );
-            })}
-          </div>
+          {visibleStandaloneItems.length > 0 ? (
+            <div className={styles.standaloneItems}>
+              {visibleStandaloneItems.map((item) => {
+                const IconComponent = item.icon;
+                const isPrimaryButton = item.id === 'connexion';
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    className={`${styles.standaloneItem} ${isPrimaryButton ? styles.standaloneItemPrimary : ''}`}
+                    onClick={() => handleItemClick(item.route)}
+                  >
+                    <span>{item.label}</span>
+                    {!isPrimaryButton && <IconComponent className={styles.standaloneIcon} aria-hidden />}
+                  </button>
+                );
+              })}
+            </div>
+          ) : null}
         </div>
       </nav>
     </>
