@@ -12,12 +12,14 @@ import {
   mapApiBoundaryReportResponse,
   type ApiBoundaryReportResponse,
 } from '@/domain/report/mappers';
-import { GDP_REPORT_COMMUNITY_ID } from '@/features/report/constants/reportApi';
+import {
+  GDP_REPORT_COMMUNITY_ID,
+  GDP_REPORT_SUBMISSION_THEME,
+} from '@/features/report/constants/reportApi';
 import {
   buildGeodesyPointReportThemeAttributesForSubmit,
   buildGeodesyReportSubmissionComment,
   extractGeodesyReportThemeFromConfigs,
-  resolveGeodesyReportThemeNameFromConfigs,
 } from '@/features/report/utils/geodesyReportTheme';
 import { collabApiClient, ensureCollabApiSession } from '@/infra/api';
 import { fetchGdpCommunityThemeConfigs } from '@/infra/community/gdpCommunityThemes';
@@ -104,7 +106,7 @@ export function useSubmitGeodesyPointReport() {
 
         const themeConfigs = await fetchGdpCommunityThemeConfigs();
         const theme = extractGeodesyReportThemeFromConfigs(themeConfigs);
-        const themeName = resolveGeodesyReportThemeNameFromConfigs(themeConfigs);
+        const themeName = GDP_REPORT_SUBMISSION_THEME;
         const deviceInfo = await getReportSubmissionDeviceInfo();
         const body = mapGeodesyPointReportToApiBody(reportContext, {
           communityId: GDP_REPORT_COMMUNITY_ID,

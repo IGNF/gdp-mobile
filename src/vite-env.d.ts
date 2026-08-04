@@ -14,7 +14,8 @@ interface ImportMetaEnv {
   readonly VITE_GEODESY_WFS_API_KEY?: string;
   readonly VITE_GEOPORTAIL_SCAN_API_KEY?: string;
   readonly VITE_GDP_REPORT_COMMUNITY_ID?: string;
-  readonly VITE_GDP_REPORT_THEME?: string;
+  readonly VITE_GDP_REPORT_DISPLAY_THEMES?: string;
+  readonly VITE_GDP_REPORT_SUBMISSION_THEME?: string;
 }
 
 interface ImportMeta {

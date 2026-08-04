@@ -2,10 +2,12 @@ import { useEffect, useRef } from 'react';
 
 import Feature from 'ol/Feature';
 import type { FeatureLike } from 'ol/Feature';
+import { createEmpty, extend, getCenter, isEmpty } from 'ol/extent';
 import LayerGroup from 'ol/layer/Group';
 import VectorLayer from 'ol/layer/Vector';
 import type OlMap from 'ol/Map';
 import { transformExtent } from 'ol/proj';
+import Cluster from 'ol/source/Cluster';
 import VectorSource from 'ol/source/Vector';
 
 import type { GroupReport } from '@/domain/report/groupReportModels';
@@ -17,10 +19,12 @@ import { loadReportsInMapBbox } from '@/features/map/utils/loadReportsInMapBbox'
 import { styleReportMapFeature } from '@/features/map/utils/reportStatusMapMarkerStyle';
 import {
   MY_REPORTS_MAP_LAYER_NAME,
+  REPORT_MAP_CLUSTER_DISTANCE,
   REPORT_MAP_LAYER_GROUP_NAME,
   REPORT_MAP_LAYER_Z_INDEX,
   type ReportMapLayerVisibility,
 } from '@/shared/constants/reportMapLayers';
+import { GROUP_REPORT_MAP_FOCUS_ZOOM } from '@/shared/constants/map';
 
 interface UseReportMapLayersOptions {
   map: OlMap | null;
@@ -85,8 +89,13 @@ export function useReportMapLayers({
     }
 
     const myReportsSource = new VectorSource<Feature>();
-    const myReportsLayer = new VectorLayer({
+    const myReportsClusterSource = new Cluster({
       source: myReportsSource,
+      distance: REPORT_MAP_CLUSTER_DISTANCE,
+    });
+
+    const myReportsLayer = new VectorLayer({
+      source: myReportsClusterSource,
       style: (feature) => styleReportMapFeature(feature as Feature),
       properties: {
         name: MY_REPORTS_MAP_LAYER_NAME,
@@ -129,7 +138,11 @@ export function useReportMapLayers({
     reportLayerGroup.setVisible(visibility.myReports);
 
     if (!visibility.myReports) {
-      myReportsLayer.getSource()?.clear(true);
+      const clusterSource = myReportsLayer.getSource();
+      if (clusterSource instanceof Cluster) {
+        const innerSource = clusterSource.getSource();
+        innerSource?.clear(true);
+      }
     }
   }, [isMapReady, map, visibility.myReports]);
 
@@ -139,7 +152,12 @@ export function useReportMapLayers({
     }
 
     const myReportsLayer = getReportLayerByName(map, MY_REPORTS_MAP_LAYER_NAME);
-    const source = myReportsLayer?.getSource();
+    const clusterSource = myReportsLayer?.getSource();
+    if (!(clusterSource instanceof Cluster)) {
+      return;
+    }
+
+    const source = clusterSource.getSource();
     if (!source) {
       return;
     }
@@ -191,7 +209,7 @@ export function useReportMapLayers({
       return;
     }
 
-    const handleMapClick = (event: { pixel: number[] }) => {
+    const handleMapClick = (event: { pixel: number[]; coordinate: number[] }) => {
       if (!visibility.myReports) {
         return;
       }
@@ -201,7 +219,7 @@ export function useReportMapLayers({
         return;
       }
 
-      let selectedFeature: Feature | null = null;
+      const hit = { feature: null as Feature | null };
 
       map.forEachFeatureAtPixel(
         event.pixel,
@@ -214,7 +232,7 @@ export function useReportMapLayers({
             return undefined;
           }
 
-          selectedFeature = featureLike as Feature;
+          hit.feature = featureLike as Feature;
           return true;
         },
         {
@@ -223,11 +241,37 @@ export function useReportMapLayers({
         },
       );
 
-      if (!selectedFeature) {
+      if (!hit.feature) {
         return;
       }
 
-      const report = getGroupReportFromMapFeature(selectedFeature);
+      const selectedFeature = hit.feature;
+      const clusteredFeatures = selectedFeature.get('features') as Feature[] | undefined;
+      if (Array.isArray(clusteredFeatures) && clusteredFeatures.length > 1) {
+        const clusterExtent = createEmpty();
+        for (const clusterFeature of clusteredFeatures) {
+          const geometry = clusterFeature.getGeometry();
+          if (geometry) {
+            extend(clusterExtent, geometry.getExtent());
+          }
+        }
+
+        if (!isEmpty(clusterExtent)) {
+          const view = map.getView();
+          const currentZoom = view.getZoom() ?? GROUP_REPORT_MAP_FOCUS_ZOOM;
+          const center = getCenter(clusterExtent);
+
+          view.animate({
+            center,
+            zoom: Math.min(currentZoom + 2, GROUP_REPORT_MAP_FOCUS_ZOOM),
+            duration: 300,
+          });
+        }
+        return;
+      }
+
+      const targetFeature = clusteredFeatures?.[0] ?? selectedFeature;
+      const report = getGroupReportFromMapFeature(targetFeature);
       if (report) {
         onReportSelectRef.current(report);
       }

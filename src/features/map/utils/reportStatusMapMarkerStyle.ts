@@ -1,24 +1,25 @@
 import { ReportStatus } from '@ign/mobile-core';
 import Feature from 'ol/Feature';
 import type { Style } from 'ol/style';
-import { Icon, Style as OlStyle } from 'ol/style';
+import { Icon, Style as OlStyle, Text, Fill, Stroke } from 'ol/style';
 
 import { getColorCode } from '@/shared/utils/color';
 import { getStatusColorToken } from '@/shared/utils/reportStatus';
 
-type StatusIconKind = 'check' | 'clock' | 'close' | 'pencil' | 'send' | 'tag';
+type StatusIconKind = 'check' | 'clock' | 'close' | 'pencil' | 'send';
 
+/** Pictogrammes 24×24 simplifiés, lisibles dans l'épingle. */
 const STATUS_ICON_PATHS: Record<StatusIconKind, string> = {
   check:
-    'M6.75 15.625 L0.375 9 a1.208 1.208 0 0 1 0-1.75 1.208 1.208 0 0 1 1.75 0 L6.75 12 L17.875 0.375 a1.208 1.208 0 0 1 1.75 0 1.208 1.208 0 0 1 0 1.75 Z',
+    'M9.12 17.66 L3.7 12.24 l1.41-1.41 4.01 4.01 8.48-8.49 1.41 1.42 Z',
   clock:
-    'M11.25 22.5 A11.25 11.25 0 1 1 22.5 11.25 11.263 11.263 0 0 1 11.25 22.5 Z M11.25 1.646 A9.6 9.6 0 1 0 20.85 11.246 9.615 9.615 0 0 0 11.25 1.646 Z M16.723 15.64 a0.773 0.773 0 0 1-0.385-0.1 l-5.551-3.2 a0.771 0.771 0 0 1-0.385-0.665 V4.747 a0.769 0.769 0 1 1 1.538 0 v6.48 l5.167 2.98 a0.766 0.766 0 0 1 0.28 1.048 0.768 0.768 0 0 1-0.665 0.385 Z',
+    'M12 2 a10 10 0 1 0 0.01 0 Z M12 4 a8 8 0 1 1-0.01 0 Z M12.75 7 v5.05 l3.6 2.15 -0.75 1.25 -4.35-2.6 V7 Z',
   close:
-    'M11.25 22.5 A11.25 11.25 0 1 1 22.5 11.25 11.263 11.263 0 0 1 11.25 22.5 Z M11.25 1.646 A9.6 9.6 0 1 0 20.85 11.246 9.615 9.615 0 0 0 11.25 1.646 Z M8.4 8.4 l5.7 5.7 m0-5.7 l-5.7 5.7',
+    'M6.1 7.5 L7.5 6.1 17.9 16.5 16.5 17.9 Z M16.5 6.1 L17.9 7.5 7.5 17.9 6.1 16.5 Z',
   pencil:
-    'M20.625 3.375 a2.25 2.25 0 0 0-3.182 0 L4.5 16.318 V22.5 h6.182 L20.625 12.557 a2.25 2.25 0 0 0 0-3.182 Z M7.5 19.5 H6 v-1.5 l9.75-9.75 1.5 1.5 Z',
-  send: 'M0 11.25 L22.5 0 11.25 22.5 9 13.5 Z',
-  tag: 'M22.5 11.25 L11.25 0 H0 v11.25 L11.25 22.5 Z M6.75 6.75 a1.125 1.125 0 1 0 0 2.25 1.125 1.125 0 0 0 0-2.25 Z',
+    'M14.06 2.94 a1.5 1.5 0 0 1 2.12 0 l4.88 4.88 a1.5 1.5 0 0 1 0 2.12 L9.5 21.5 H4.5 v-5 L14.06 2.94 Z M6.5 18 v2 h2 l8.9-8.9 -2-2 L6.5 18 Z',
+  send:
+    'M3.2 11.2 L20.5 3.4 a0.9 0.9 0 0 1 1.15 1.15 L13.8 21.8 a0.9 0.9 0 0 1-1.65 0.05 L9.9 14.1 3.15 12.55 A0.9 0.9 0 0 1 3.2 11.2 Z M10.7 13.85 L18.4 6.1 11.55 14.55 Z',
 };
 
 function resolveStatusIconKind(status: ReportStatus | string): StatusIconKind {
@@ -33,47 +34,67 @@ function resolveStatusIconKind(status: ReportStatus | string): StatusIconKind {
       return 'send';
     case ReportStatus.Draft:
       return 'pencil';
-    case ReportStatus.Cluster:
-      return 'tag';
     case ReportStatus.Pending:
     case ReportStatus.Pending_Qualification:
     case ReportStatus.Pending_Entry:
     case ReportStatus.Pending_Validation:
+    case ReportStatus.Cluster:
     default:
       return 'clock';
   }
 }
 
 function resolveStatusHexColor(status: ReportStatus | string): string {
-  return getColorCode(getStatusColorToken(status)) || getColorCode('medium');
+  return getColorCode(getStatusColorToken(status)) || '#888888';
 }
 
 function encodeMarkerSvg(svg: string): string {
   return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
 }
 
-function createStatusMarkerSvg(color: string, iconKind: StatusIconKind): string {
-  const contrast = getColorCode('white');
+/**
+ * Épingle colorée + disque blanc + picto.
+ * Ancrage en bas de la pointe pour pointer la coordonnée exacte.
+ */
+function createPinMarkerSvg(color: string, iconKind: StatusIconKind): string {
   const iconPath = STATUS_ICON_PATHS[iconKind];
-  const iconTransform =
-    iconKind === 'check'
-      ? 'translate(5 7.375)'
-      : iconKind === 'clock' || iconKind === 'close'
-        ? 'translate(3.75 3.75)'
-        : iconKind === 'send'
-          ? 'translate(3.75 3.75) scale(0.9)'
-          : iconKind === 'tag'
-            ? 'translate(3.75 3.75) scale(0.85)'
-            : 'translate(3.75 3.75) scale(0.85)';
 
   return `
-    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
-      <circle cx="20" cy="20" r="18" fill="${color}" fill-opacity="0.18"/>
-      <circle cx="20" cy="20" r="15" fill="${contrast}" stroke="${color}" stroke-width="2.5"/>
-      <g transform="translate(20 20)">
-        <g transform="translate(-11.25 -11.25)">
-          <path d="${iconPath}" transform="${iconTransform}" fill="${color}"/>
+    <svg xmlns="http://www.w3.org/2000/svg" width="36" height="48" viewBox="0 0 36 48">
+      <defs>
+        <filter id="pinShadow" x="-25%" y="-10%" width="150%" height="150%">
+          <feDropShadow dx="0" dy="1.2" stdDeviation="1.4" flood-opacity="0.35"/>
+        </filter>
+      </defs>
+      <g filter="url(#pinShadow)">
+        <path
+          d="M18 46 C18 46 4 30.5 4 18 A14 14 0 1 1 32 18 C32 30.5 18 46 18 46 Z"
+          fill="${color}"
+        />
+        <circle cx="18" cy="17.5" r="9.5" fill="#ffffff"/>
+      </g>
+      <g transform="translate(18 17.5)">
+        <g transform="translate(-8 -8) scale(0.67)">
+          <path d="${iconPath}" fill="${color}"/>
         </g>
+      </g>
+    </svg>
+  `;
+}
+
+/** Pastille de cluster (nombre) — cercle plein, distinct des épingles unitaires. */
+function createClusterMarkerSvg(color: string): string {
+  return `
+    <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 44 44">
+      <defs>
+        <filter id="clusterShadow" x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="0" dy="1" stdDeviation="1.2" flood-opacity="0.3"/>
+        </filter>
+      </defs>
+      <g filter="url(#clusterShadow)">
+        <circle cx="22" cy="22" r="18" fill="${color}" fill-opacity="0.22"/>
+        <circle cx="22" cy="22" r="14" fill="${color}"/>
+        <circle cx="22" cy="22" r="14" fill="none" stroke="#ffffff" stroke-width="2.5"/>
       </g>
     </svg>
   `;
@@ -92,8 +113,8 @@ export function createReportStatusMapMarkerStyle(status: ReportStatus | string):
   const iconKind = resolveStatusIconKind(status);
   const style = new OlStyle({
     image: new Icon({
-      src: encodeMarkerSvg(createStatusMarkerSvg(color, iconKind)),
-      anchor: [0.5, 0.5],
+      src: encodeMarkerSvg(createPinMarkerSvg(color, iconKind)),
+      anchor: [0.5, 1],
       rotateWithView: false,
     }),
   });
@@ -102,7 +123,41 @@ export function createReportStatusMapMarkerStyle(status: ReportStatus | string):
   return style;
 }
 
+const clusterStyleCache = new Map<number, OlStyle>();
+
+export function createReportClusterMapMarkerStyle(count: number): OlStyle {
+  const cached = clusterStyleCache.get(count);
+  if (cached) {
+    return cached;
+  }
+
+  const color = getColorCode('secondary') || getColorCode('medium') || '#4A7FB5';
+  const style = new OlStyle({
+    image: new Icon({
+      src: encodeMarkerSvg(createClusterMarkerSvg(color)),
+      anchor: [0.5, 0.5],
+      rotateWithView: false,
+    }),
+    text: new Text({
+      text: String(count),
+      font: 'bold 12px system-ui, sans-serif',
+      fill: new Fill({ color: '#ffffff' }),
+      stroke: new Stroke({ color: 'rgba(0,0,0,0.15)', width: 2 }),
+      offsetY: 1,
+    }),
+  });
+
+  clusterStyleCache.set(count, style);
+  return style;
+}
+
 export function styleReportMapFeature(feature: Feature): Style {
-  const status = feature.get('status') ?? ReportStatus.Pending;
+  const clusteredFeatures = feature.get('features') as Feature[] | undefined;
+  if (Array.isArray(clusteredFeatures) && clusteredFeatures.length > 1) {
+    return createReportClusterMapMarkerStyle(clusteredFeatures.length);
+  }
+
+  const targetFeature = clusteredFeatures?.[0] ?? feature;
+  const status = targetFeature.get('status') ?? ReportStatus.Pending;
   return createReportStatusMapMarkerStyle(status);
 }

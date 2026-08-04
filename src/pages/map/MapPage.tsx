@@ -28,6 +28,7 @@ import { Loading } from '@/shared/ui/Loading';
 import {
   GEOLOCATION_DOUBLE_TAP_DELAY_MS,
   GEOPORTAIL_LAYERS,
+  GROUP_REPORT_MAP_FOCUS_ZOOM,
 } from '@/shared/constants/map';
 import {
   createGdpGeodesyCatalog,
@@ -184,7 +185,7 @@ export function MapPage() {
         return;
       }
 
-      void focusOnCoordinate(report.longitude, report.latitude);
+      void focusOnCoordinate(report.longitude, report.latitude, GROUP_REPORT_MAP_FOCUS_ZOOM);
     },
     [focusOnCoordinate],
   );
@@ -230,7 +231,7 @@ export function MapPage() {
       return;
     }
 
-    void focusOnCoordinate(focusReport.longitude, focusReport.latitude);
+    void focusOnCoordinate(focusReport.longitude, focusReport.latitude, GROUP_REPORT_MAP_FOCUS_ZOOM);
     navigate('/map', { replace: true, state: null });
   }, [focusOnCoordinate, isMapReady, location.state, navigate]);
 

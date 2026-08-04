@@ -23,7 +23,8 @@ interface Config {
   };
   report: {
     communityId: string;
-    theme: string;
+    displayThemes: string[];
+    submissionTheme: string;
   };
 }
 
@@ -66,6 +67,10 @@ export const config: Config = {
   },
   report: {
     communityId: trimEnv(env.VITE_GDP_REPORT_COMMUNITY_ID),
-    theme: trimEnv(env.VITE_GDP_REPORT_THEME) || 'gdp-tools',
+    displayThemes: trimEnv(env.VITE_GDP_REPORT_DISPLAY_THEMES)
+      .split(',')
+      .map((t) => t.trim())
+      .filter((t) => t.length > 0) || ['gdp-tools'],
+    submissionTheme: trimEnv(env.VITE_GDP_REPORT_SUBMISSION_THEME) || 'gdp-tools',
   },
 };
