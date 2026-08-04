@@ -278,6 +278,8 @@ export function MapPage() {
   const isGeodesyReportable =
     pendingAction !== null &&
     isGeodesyLayerReportingEnabled(geodesy.catalog, pendingAction.reportContext.layerId);
+  const canReportPoint = isGeodesyReportable && isAuthenticated;
+  const reportAuthRequired = isGeodesyReportable && !isAuthenticated;
 
   const handleOpenLayers = () => {
     mapClick.closeActionSheet();
@@ -318,13 +320,13 @@ export function MapPage() {
   );
 
   const handleReportPoint = useCallback(() => {
-    if (!isGeodesyReportable || !pendingAction) {
+    if (!canReportPoint || !pendingAction) {
       return;
     }
 
     setReportWizardContext({ source: 'map', reportContext: pendingAction.reportContext });
     mapClick.closeActionSheet();
-  }, [isGeodesyReportable, mapClick, pendingAction]);
+  }, [canReportPoint, mapClick, pendingAction]);
 
   const hasActiveFilters =
     geodesyMode === 'expert' &&
@@ -437,7 +439,8 @@ export function MapPage() {
             map={map}
             isMapReady={isMapReady}
             selectedPoint={pendingAction}
-            canReportPoint={isGeodesyReportable}
+            canReportPoint={canReportPoint}
+            reportAuthRequired={reportAuthRequired}
             onClosePoint={mapClick.closeActionSheet}
             onReportPoint={handleReportPoint}
             onFocusCoordinate={handleFocusCoordinate}

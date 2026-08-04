@@ -52,6 +52,7 @@ export interface MapBottomSheetProps {
   isMapReady: boolean;
   selectedPoint: MapGeodesyClickAction | null;
   canReportPoint: boolean;
+  reportAuthRequired?: boolean;
   onClosePoint: () => void;
   onReportPoint: () => void;
   onFocusCoordinate: (longitude: number, latitude: number) => void;
@@ -69,6 +70,7 @@ export function MapBottomSheet({
   isMapReady,
   selectedPoint,
   canReportPoint,
+  reportAuthRequired = false,
   onClosePoint,
   onReportPoint,
   onFocusCoordinate,
@@ -303,6 +305,7 @@ export function MapBottomSheet({
             snapIndex={snapIndex}
             referencePosition={referencePosition}
             canReport={canReportPoint}
+            reportAuthRequired={reportAuthRequired}
             dragHandleProps={dragHandleProps}
             onClose={onClosePoint}
             onReport={onReportPoint}

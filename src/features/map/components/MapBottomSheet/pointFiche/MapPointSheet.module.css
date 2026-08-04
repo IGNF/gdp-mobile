@@ -195,6 +195,80 @@
   background: var(--color-fiche-canvas);
 }
 
+.reportCell {
+  position: relative;
+}
+
+.authInfoTrigger {
+  position: absolute;
+  top: -0.5rem;
+  right: -0.5rem;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  padding: 0;
+  border: 1px solid var(--color-light-shade);
+  border-radius: 50%;
+  background: var(--color-fiche-surface);
+  cursor: pointer;
+}
+
+.authInfoIcon {
+  width: 1rem;
+  height: 1rem;
+  color: var(--color-medium);
+}
+
+.authInfoIcon path {
+  fill: currentColor;
+}
+
+.authInfoBubble {
+  position: absolute;
+  z-index: 3;
+  bottom: calc(100% + 0.625rem);
+  right: 0;
+  width: 13.5rem;
+  padding: 0.75rem 0.875rem;
+  border-radius: 0.75rem;
+  background: var(--color-dark);
+  box-shadow: 0 4px 16px rgba(9, 22, 37, 0.24);
+}
+
+.authInfoBubble::after {
+  content: '';
+  position: absolute;
+  bottom: -0.375rem;
+  right: 0.875rem;
+  width: 0.75rem;
+  height: 0.75rem;
+  background: var(--color-dark);
+  transform: rotate(45deg);
+}
+
+.authInfoText {
+  margin: 0;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  color: var(--color-white);
+}
+
+.authInfoLink {
+  display: inline-block;
+  margin-top: 0.5rem;
+  padding: 0;
+  border: none;
+  background: none;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-primary-tint);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
 .sectionTitle {
   margin: 0 0 0.5rem;
   font-size: 0.8125rem;
