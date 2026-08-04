@@ -6,7 +6,7 @@
 
 .question {
   margin: 0;
-  font-size: 1.0625rem;
+  font-size: 1.25rem;
   font-weight: 700;
   color: var(--color-dark);
 }
@@ -87,7 +87,7 @@
 }
 
 .cardLabel {
-  font-size: 0.9375rem;
+  font-size: 1.1875rem;
   font-weight: 700;
 }
 

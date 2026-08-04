@@ -12,6 +12,8 @@ import {
   getGeodesyThemeFormAttributes,
 } from '@/features/report/utils/geodesyReportTheme';
 import { validateThemeAttributeValue } from '@/features/report/utils/communityReportTheme';
+import { compressPhotoFile } from '@/features/report/utils/compressPhoto';
+import { validatePhotoLandscape } from '@/features/report/utils/validatePhotoLandscape';
 
 function revokePhotoPreview(photo: ReportPhoto | undefined): void {
   if (photo?.previewUrl) {
@@ -67,6 +69,7 @@ export function useGeodesyPointReportForm(options: UseGeodesyPointReportFormOpti
   const [themeAttributes, setThemeAttributesState] = useState(prefilledThemeAttributes);
   const [photo1, setPhoto1] = useState<ReportPhoto | null>(null);
   const [photo2, setPhoto2] = useState<ReportPhoto | null>(null);
+  const [isPhotoProcessing, setIsPhotoProcessing] = useState(false);
   const [errors, setErrors] = useState<GeodesyPointReportFormErrors>({});
 
   const photo1Ref = useRef(photo1);
@@ -114,15 +117,38 @@ export function useGeodesyPointReportForm(options: UseGeodesyPointReportFormOpti
     if (!file) {
       revokePhotoPreview(current ?? undefined);
       setter(null);
+      if (role === 'photo1') {
+        setErrors((currentErrors) => ({ ...currentErrors, photo1: undefined }));
+      }
       return;
     }
 
-    revokePhotoPreview(current ?? undefined);
-    setter({
-      role,
-      file,
-      previewUrl: URL.createObjectURL(file),
-    });
+    setIsPhotoProcessing(true);
+
+    void (async () => {
+      try {
+        const landscapeResult = await validatePhotoLandscape(file);
+        if (!landscapeResult.valid) {
+          if (role === 'photo1') {
+            setErrors((currentErrors) => ({ ...currentErrors, photo1: landscapeResult.message }));
+          }
+          return;
+        }
+
+        const compressedFile = await compressPhotoFile(file);
+        revokePhotoPreview(current ?? undefined);
+        setter({
+          role,
+          file: compressedFile,
+          previewUrl: URL.createObjectURL(compressedFile),
+        });
+        if (role === 'photo1') {
+          setErrors((currentErrors) => ({ ...currentErrors, photo1: undefined }));
+        }
+      } finally {
+        setIsPhotoProcessing(false);
+      }
+    })();
   }, []);
 
   const validateThemeAttributes = useCallback((): boolean => {
@@ -148,7 +174,7 @@ export function useGeodesyPointReportForm(options: UseGeodesyPointReportFormOpti
     const hasError = mandatoryPhotoSlot?.role === 'photo1' && !photo1;
     setErrors((current) => ({
       ...current,
-      photo1: hasError ? `${mandatoryPhotoSlot.label} est obligatoire.` : undefined,
+      photo1: hasError ? 'Photo obligatoire.' : undefined,
     }));
     return !hasError;
   }, [mandatoryPhotoSlot, photo1]);
@@ -188,6 +214,7 @@ export function useGeodesyPointReportForm(options: UseGeodesyPointReportFormOpti
     photo1,
     photo2,
     setPhotoForRole,
+    isPhotoProcessing,
     photos,
     normalizedThemeAttributes,
     errors,

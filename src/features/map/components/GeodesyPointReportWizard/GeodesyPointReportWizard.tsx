@@ -8,6 +8,7 @@ import {
   ReportWizardStepNonConformReason,
   ReportWizardStepMedia,
   ReportWizardStepSummary,
+  ReportWizardStepConfirmation,
   WizardStepHeader,
   type NonConformReason,
 } from '@/features/report/components/GeodesyPointReportWizard';
@@ -58,6 +59,7 @@ function GeodesyPointReportWizardContent({ isOpen, context, onClose }: GeodesyPo
   const totalSteps = isConform ? 3 : 4;
   const mediaStep = isConform ? 1 : 2;
   const summaryStep = isConform ? 2 : 3;
+  const confirmationStep = summaryStep + 1;
   const form = useGeodesyPointReportForm({
     reportContext,
     initialComment: '',
@@ -150,11 +152,13 @@ function GeodesyPointReportWizardContent({ isOpen, context, onClose }: GeodesyPo
               <IconClose className={styles.closeIcon} aria-hidden />
             </button>
           </div>
-          <WizardStepHeader
-            pointId={reportContext.geodesyId ?? reportContext.title}
-            step={step + 1}
-            totalSteps={totalSteps}
-          />
+          {step === confirmationStep ? null : (
+            <WizardStepHeader
+              pointId={reportContext.geodesyId ?? reportContext.title}
+              step={step + 1}
+              totalSteps={totalSteps}
+            />
+          )}
         </div>
 
         <div className={styles.body} data-scroll-root="true">
@@ -175,12 +179,14 @@ function GeodesyPointReportWizardContent({ isOpen, context, onClose }: GeodesyPo
               form={form}
               onEditStep={(targetStep) => setStep(targetStep)}
             />
+          ) : step === confirmationStep ? (
+            <ReportWizardStepConfirmation />
           ) : (
             <p className="debug-banner">DOING — Écran en cours de reconstruction</p>
           )}
         </div>
 
-        <div className={styles.footer}>
+        <div className={styles.footer} hidden={step === confirmationStep}>
           {step === 0 ? (
             <Button type="button" fullWidth onClick={() => setStep(1)}>
               Suivant
@@ -226,7 +232,7 @@ function GeodesyPointReportWizardContent({ isOpen, context, onClose }: GeodesyPo
               <Button type="button" variant="outline" fullWidth onClick={() => setStep(mediaStep)}>
                 Retour
               </Button>
-              <Button type="button" fullWidth onClick={() => setStep(summaryStep + 1)}>
+              <Button type="button" fullWidth onClick={() => setStep(confirmationStep)}>
                 Suivant
               </Button>
             </div>

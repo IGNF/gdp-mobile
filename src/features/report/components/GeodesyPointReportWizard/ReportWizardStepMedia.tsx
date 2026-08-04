@@ -1,12 +1,11 @@
 import { useState, type ChangeEvent } from 'react';
 
-import { ReportPositionMap } from '@/features/report/components/ReportPositionMap';
+import { ReportPositionEditorSection } from '@/features/report/components/ReportPositionEditorSection';
 import type { UseGeodesyPointReportFormReturn } from '@/features/report/hooks/useGeodesyPointReportForm';
-import IconAngleRight from '@/shared/assets/icons/icon-angle-right.svg?react';
+import { Loading } from '@/shared/ui/Loading';
 import IconCamera from '@/shared/assets/icons/icon-camera.svg?react';
 import IconCheck from '@/shared/assets/icons/icon-check.svg?react';
 import IconClose from '@/shared/assets/icons/icon-close.svg?react';
-import IconLocation from '@/shared/assets/icons/icon-location.svg?react';
 
 import styles from './ReportWizardStepMedia.module.css';
 
@@ -46,7 +45,11 @@ export function ReportWizardStepMedia({ form }: ReportWizardStepMediaProps) {
           className={styles.photoInput}
           onChange={handlePhotoChange}
         />
-        {form.photo1 ? (
+        {form.isPhotoProcessing ? (
+          <span className={styles.photoPlaceholder}>
+            <Loading size="small" label="Compression de la photo…" />
+          </span>
+        ) : form.photo1 ? (
           <span className={styles.photoPreviewWrap}>
             <img src={form.photo1.previewUrl} alt="" className={styles.photoPreview} />
             <button
@@ -92,36 +95,11 @@ export function ReportWizardStepMedia({ form }: ReportWizardStepMediaProps) {
         rows={3}
       />
 
-      {form.canEditPosition ? (
-        <div className={styles.positionSection}>
-          <button
-            type="button"
-            className={styles.positionRow}
-            onClick={() => setIsPositionMapOpen((current) => !current)}
-            aria-expanded={isPositionMapOpen}
-          >
-            <span className={styles.positionIconWrap} aria-hidden>
-              <IconLocation className={styles.positionIcon} />
-            </span>
-            <span className={styles.positionLabel}>Modifier la position du point</span>
-            <IconAngleRight className={styles.positionChevron} aria-hidden />
-          </button>
-
-          {isPositionMapOpen ? (
-            <div className={styles.positionMapWrap}>
-              <ReportPositionMap
-                longitude={form.longitude}
-                latitude={form.latitude}
-                initialLongitude={form.initialPosition.longitude}
-                initialLatitude={form.initialPosition.latitude}
-                canResetPosition={form.canResetPosition}
-                onPositionChange={form.setPosition}
-                onResetPosition={form.resetPositionToInitial}
-              />
-            </div>
-          ) : null}
-        </div>
-      ) : null}
+      <ReportPositionEditorSection
+        form={form}
+        isOpen={isPositionMapOpen}
+        onToggle={() => setIsPositionMapOpen((current) => !current)}
+      />
     </div>
   );
 }

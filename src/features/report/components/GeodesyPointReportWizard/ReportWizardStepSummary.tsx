@@ -1,4 +1,6 @@
-import { ReportPositionMap } from '@/features/report/components/ReportPositionMap';
+import { useState } from 'react';
+
+import { ReportPositionEditorSection } from '@/features/report/components/ReportPositionEditorSection';
 import type { UseGeodesyPointReportFormReturn } from '@/features/report/hooks/useGeodesyPointReportForm';
 import { NON_CONFORM_REASON_LABELS, type NonConformReason } from '@/features/report/components/GeodesyPointReportWizard/ReportWizardStepNonConformReason';
 import { joinCSSClassNames } from '@/shared/utils/join';
@@ -26,6 +28,7 @@ export function ReportWizardStepSummary({
   form,
   onEditStep,
 }: ReportWizardStepSummaryProps) {
+  const [isPositionEditorOpen, setIsPositionEditorOpen] = useState(false);
   const stateLabel = isConform ? 'Conforme' : 'Non conforme';
   const stateDetail = isConform
     ? stateLabel
@@ -87,14 +90,16 @@ export function ReportWizardStepSummary({
         </div>
 
         <div className={styles.card}>
-          <button
-            type="button"
-            className={styles.cardEditButton}
-            onClick={() => onEditStep(mediaStep)}
-            aria-label="Modifier la position"
-          >
-            <IconPencil className={styles.cardEditIcon} aria-hidden />
-          </button>
+          {form.canEditPosition ? (
+            <button
+              type="button"
+              className={styles.cardEditButton}
+              onClick={() => setIsPositionEditorOpen((current) => !current)}
+              aria-label="Modifier la position"
+            >
+              <IconPencil className={styles.cardEditIcon} aria-hidden />
+            </button>
+          ) : null}
           <span className={joinCSSClassNames(styles.cardIcon, styles.cardIconConform)}>
             <IconLocation className={styles.cardIconSvg} aria-hidden />
           </span>
@@ -104,22 +109,11 @@ export function ReportWizardStepSummary({
         </div>
       </div>
 
-      <div className={styles.mapPreview}>
-        <ReportPositionMap
-          longitude={form.longitude}
-          latitude={form.latitude}
-          onPositionChange={form.setPosition}
-          readOnly
-        />
-        <button
-          type="button"
-          className={styles.editButton}
-          onClick={() => onEditStep(mediaStep)}
-          aria-label="Modifier la position sur la carte"
-        >
-          <IconPencil className={styles.editIcon} aria-hidden />
-        </button>
-      </div>
+      <ReportPositionEditorSection
+        form={form}
+        isOpen={isPositionEditorOpen}
+        onToggle={() => setIsPositionEditorOpen((current) => !current)}
+      />
 
       <div className={styles.commentCard}>
         <div className={styles.commentHeader}>

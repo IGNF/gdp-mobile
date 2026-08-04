@@ -167,12 +167,6 @@
   color: var(--color-medium);
 }
 
-.mapPreview {
-  position: relative;
-  border-radius: 0.75rem;
-  overflow: hidden;
-}
-
 .commentCard {
   display: flex;
   flex-direction: column;
