@@ -356,7 +356,7 @@ export function MapPage() {
               <button
                 type="button"
                 className={`${styles.mapFab} ${isTabbarHiddenByFilters || hasActiveFilters ? styles.mapFabActive : ''}`}
-                aria-label="Filtres d'affichage des repères"
+                aria-label="Filtres d'affichage des points"
                 disabled={!isMapReady}
                 onClick={handleOpenFilters}
               >
