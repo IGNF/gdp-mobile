@@ -1,5 +1,6 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { useNavigate } from 'react-router-dom';
 
 import type { GeodesyPointReportMapContext } from '@/domain/report/geodesyPointMapContext';
 import { useBottomSheetSnap } from '@/features/map/hooks/useBottomSheetSnap';
@@ -13,6 +14,8 @@ import {
   type NonConformReason,
 } from '@/features/report/components/GeodesyPointReportWizard';
 import { useGeodesyPointReportForm } from '@/features/report/hooks/useGeodesyPointReportForm';
+import { buildLocalReportDraft } from '@/features/report/utils/localReportDraft';
+import { saveLocalReportDraft } from '@/infra/storage/localReportDraftsStore';
 import { Button } from '@/shared/ui/Button';
 import IconClose from '@/shared/assets/icons/icon-close.svg?react';
 
@@ -53,9 +56,11 @@ interface GeodesyPointReportWizardContentProps {
 
 function GeodesyPointReportWizardContent({ isOpen, context, onClose }: GeodesyPointReportWizardContentProps) {
   const { reportContext } = context;
+  const navigate = useNavigate();
   const [step, setStep] = useState(0);
   const [isConform, setIsConform] = useState(true);
   const [nonConformReason, setNonConformReason] = useState<NonConformReason | null>(null);
+  const [isSavingDraft, setIsSavingDraft] = useState(false);
   const totalSteps = isConform ? 3 : 4;
   const mediaStep = isConform ? 1 : 2;
   const summaryStep = isConform ? 2 : 3;
@@ -64,6 +69,46 @@ function GeodesyPointReportWizardContent({ isOpen, context, onClose }: GeodesyPo
     reportContext,
     initialComment: '',
   });
+
+  const handleSaveDraftAndContinue = useCallback(async () => {
+    if (isSavingDraft) {
+      return;
+    }
+
+    setIsSavingDraft(true);
+    try {
+      const draft = await buildLocalReportDraft({
+        reportContext,
+        isConform,
+        nonConformReason,
+        comment: form.comment,
+        longitude: form.longitude,
+        latitude: form.latitude,
+        positionModified: form.canResetPosition,
+        photos: form.photos,
+      });
+      await saveLocalReportDraft(draft);
+      setStep(confirmationStep);
+    } finally {
+      setIsSavingDraft(false);
+    }
+  }, [
+    confirmationStep,
+    form.canResetPosition,
+    form.comment,
+    form.latitude,
+    form.longitude,
+    form.photos,
+    isConform,
+    isSavingDraft,
+    nonConformReason,
+    reportContext,
+  ]);
+
+  const handleCloseAndViewReports = useCallback(() => {
+    onClose();
+    navigate('/reports');
+  }, [navigate, onClose]);
 
   const [viewportHeight, setViewportHeight] = useState(() => window.innerHeight);
   const [safeAreaTop, setSafeAreaTop] = useState(() => getSafeAreaTopPx());
@@ -180,7 +225,10 @@ function GeodesyPointReportWizardContent({ isOpen, context, onClose }: GeodesyPo
               onEditStep={(targetStep) => setStep(targetStep)}
             />
           ) : step === confirmationStep ? (
-            <ReportWizardStepConfirmation />
+            <ReportWizardStepConfirmation
+              onSendLater={handleCloseAndViewReports}
+              onSendNow={handleCloseAndViewReports}
+            />
           ) : (
             <p className="debug-banner">DOING — Écran en cours de reconstruction</p>
           )}
@@ -232,7 +280,14 @@ function GeodesyPointReportWizardContent({ isOpen, context, onClose }: GeodesyPo
               <Button type="button" variant="outline" fullWidth onClick={() => setStep(mediaStep)}>
                 Retour
               </Button>
-              <Button type="button" fullWidth onClick={() => setStep(confirmationStep)}>
+              <Button
+                type="button"
+                fullWidth
+                loading={isSavingDraft}
+                onClick={() => {
+                  void handleSaveDraftAndContinue();
+                }}
+              >
                 Suivant
               </Button>
             </div>

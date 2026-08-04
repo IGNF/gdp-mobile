@@ -7,6 +7,7 @@ import { LoginPage } from '@/features/auth/pages/Login/LoginPage';
 import { WelcomePage } from '@/features/welcome/pages/WelcomePage';
 import { MapPage } from '@/pages/map/MapPage';
 import { MyReportsPage } from '@/pages/report/MyReportsPage';
+import { ReportDetailPage } from '@/pages/report/ReportDetailPage';
 
 function routerBasename(): string | undefined {
   const base = import.meta.env.BASE_URL;
@@ -41,6 +42,10 @@ export const router = createBrowserRouter(
     {
       path: '/reports',
       element: <MyReportsPage />,
+    },
+    {
+      path: '/reports/:id',
+      element: <ReportDetailPage />,
     },
   ],
   { basename: routerBasename() },

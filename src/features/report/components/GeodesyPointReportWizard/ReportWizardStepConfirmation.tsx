@@ -6,7 +6,15 @@ import styles from './ReportWizardStepConfirmation.module.css';
 
 const RAY_ANGLES = [0, 45, 90, 135, 180, 225, 270, 315];
 
-export function ReportWizardStepConfirmation() {
+export interface ReportWizardStepConfirmationProps {
+  onSendLater: () => void;
+  onSendNow: () => void;
+}
+
+export function ReportWizardStepConfirmation({
+  onSendLater,
+  onSendNow,
+}: ReportWizardStepConfirmationProps) {
   return (
     <div className={styles.step}>
       <div className={styles.iconWrap}>
@@ -30,10 +38,10 @@ export function ReportWizardStepConfirmation() {
       </p>
 
       <div className={styles.actions}>
-        <Button type="button" variant="outline" fullWidth onClick={() => {}}>
+        <Button type="button" variant="outline" fullWidth onClick={onSendLater}>
           Envoyer plus tard
         </Button>
-        <Button type="button" fullWidth onClick={() => {}}>
+        <Button type="button" fullWidth onClick={onSendNow}>
           Envoyer maintenant
         </Button>
       </div>

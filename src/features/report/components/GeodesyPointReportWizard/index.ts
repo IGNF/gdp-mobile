@@ -15,3 +15,4 @@ export type { ReportWizardStepMediaProps } from './ReportWizardStepMedia';
 export { ReportWizardStepSummary } from './ReportWizardStepSummary';
 export type { ReportWizardStepSummaryProps } from './ReportWizardStepSummary';
 export { ReportWizardStepConfirmation } from './ReportWizardStepConfirmation';
+export type { ReportWizardStepConfirmationProps } from './ReportWizardStepConfirmation';
