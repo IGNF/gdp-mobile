@@ -37,6 +37,8 @@
   gap: 1rem;
   padding: 1.5rem 1rem;
   border-bottom: 1px solid var(--color-light);
+  background-color: var(--color-primary);
+
 }
 
 .avatar {
@@ -45,13 +47,14 @@
   border-radius: 50%;
   overflow: hidden;
   flex-shrink: 0;
+  /* color:var(--color-white); */
 }
 
 .avatarPlaceholder {
   width: 100%;
   height: 100%;
-  background-color: var(--color-secondary);
-  color: var(--color-dark-contrast);
+  background-color: var(--color-white);
+  color: var(--color-dark);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -69,15 +72,30 @@
 .userName {
   font-size: 1rem;
   font-weight: 600;
-  color: var(--color-dark);
+  color: var(--color-white);
 }
 
 .userSubtitle {
   font-size: 0.875rem;
-  color: var(--color-medium);
+  color: var(--color-white);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.userSubtitleLink {
+  font-size: 0.875rem;
+  color: var(--color-white);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+}
+
+.userSubtitleLink:hover {
+  opacity: 0.85;
 }
 
 .menuContent {
@@ -105,11 +123,14 @@
 .groupIcon {
   width: 24px;
   height: 24px;
+  padding: 8px;
+  border-radius: 50%;
+  background-color: var(--figma-neutral-light-active);
   flex-shrink: 0;
 }
 
 .groupIcon path {
-  fill: var(--color-secondary);
+  fill: var(--color-dark);
 }
 
 .groupTitle {
@@ -126,7 +147,7 @@
 }
 
 .chevron path {
-  fill: var(--color-secondary);
+  fill: var(--color-primary);
 }
 
 .chevronExpanded {
@@ -166,11 +187,13 @@
 
 .standaloneItems {
   margin-top: auto;
+  padding: 1rem;
 }
 
 .standaloneItem {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 0.75rem;
   width: 100%;
   padding: 1rem;
@@ -178,9 +201,9 @@
   border: none;
   border-top: 1px solid var(--color-light);
   cursor: pointer;
-  text-align: left;
   font-size: 1rem;
-  color: var(--color-dark);
+  font-weight: 500;
+  color: var(--figma-green-dark-active);
 }
 
 .standaloneItem:hover {
@@ -191,12 +214,33 @@
   background-color: var(--color-light);
 }
 
+.standaloneItemPrimary {
+  background: var(--color-primary);
+  border: none;
+  border-radius: 5rem;
+  color: var(--color-white);
+  font-weight: 600;
+  padding: 0.875rem 1.5rem;
+  margin-top: 1rem;
+}
+
+.standaloneItemPrimary:hover {
+  background-color: var(--color-primary-hover);
+}
+
+.standaloneItemPrimary:active {
+  background-color: var(--color-primary-active);
+}
+
 .standaloneIcon {
   width: 24px;
   height: 24px;
+  padding: 8px;
+  border-radius: 50%;
+  background-color: var(--figma-neutral-light-active);
   flex-shrink: 0;
 }
 
 .standaloneIcon path {
-  fill: var(--color-secondary);
+  fill: var(--color-primary);
 }
