@@ -51,6 +51,7 @@ export function MapPointNivellementFicheBody({ action, snapIndex }: MapPointNive
     return filterUnmappedPointFields(collectAllPointFields(action), displayedIds);
   }, [action, snapIndex]);
 
+  console.log('action', action);  
   const altitudeSystemRaw =
     readProperty(action, 'cp1_srv') ??
     readProperty(action, 'systeme_altitude');
@@ -66,8 +67,7 @@ export function MapPointNivellementFicheBody({ action, snapIndex }: MapPointNive
   const remark = readProperty(action, 'remarque') ;
   const altitudeType = formatSentenceCase(readProperty(action, 'cp1_altitude_type') ?? '');
   const partenaire = readProperty(action, 'proprio');
-  // TODO: brancher l’URL logo quand disponible (ex. table partenaires / champ WFS dédié).
-  const partenaireLogoUrl = readProperty(action, 'proprio_logo');
+  const partenaireId = readProperty(action, 'proprio_id');
 
   const voieSuivie = readProperty(action, 'voie_suivie');
   const voieDe = readProperty(action, 'voie_de');
@@ -133,7 +133,7 @@ export function MapPointNivellementFicheBody({ action, snapIndex }: MapPointNive
 
           {/* Partenaire avant remarques */}
           {partenaire ? (
-            <PartenaireSection name={partenaire} logoUrl={partenaireLogoUrl} />
+            <PartenaireSection name={partenaire} partnerId={partenaireId} />
           ) : null}
 
 

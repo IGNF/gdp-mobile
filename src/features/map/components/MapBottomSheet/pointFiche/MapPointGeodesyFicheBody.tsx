@@ -71,7 +71,7 @@ export function MapPointGeodesyFicheBody({ action, snapIndex }: MapPointGeodesyF
   const actDate = readProperty(action, 'action_date');
   const remark = readProperty(action, 'remarque');
   const partenaire = readProperty(action, 'proprio');
-  const partenaireLogoUrl = readProperty(action, 'proprio_logo');
+  const partenaireId = readProperty(action, 'proprio_id');
 
   const insee = readProperty(action, 'insee');
   const entiteNature = readProperty(action, 'entite_nature');
@@ -144,7 +144,7 @@ export function MapPointGeodesyFicheBody({ action, snapIndex }: MapPointGeodesyF
           ) : null}
 
           {partenaire ? (
-            <PartenaireSection name={partenaire} logoUrl={partenaireLogoUrl} />
+            <PartenaireSection name={partenaire} partnerId={partenaireId} />
           ) : null}
         </>
       ) : null}
