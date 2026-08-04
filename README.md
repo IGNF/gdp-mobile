@@ -162,6 +162,7 @@ Branding (icône lanceur) : voir [scripts/GDP/readme.md](./scripts/GDP/readme.md
 - [Architecture](./docs/ARCHITECTURE.md)
 - [Fiche point (carte)](./docs/FICHE_POINT.md)
 - [Mode d'emploi](./docs/MODE_EMPLOI.md)
+- [Configuration des thèmes de signalement](./docs/CONFIGURATION_THEMES.md)
 
 ## Références
 
