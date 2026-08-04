@@ -8,7 +8,6 @@ import IconArticle from '@/shared/assets/icons/icon-article.svg?react';
 import IconCamera from '@/shared/assets/icons/icon-camera.svg?react';
 import IconCheck from '@/shared/assets/icons/icon-check.svg?react';
 import IconClose from '@/shared/assets/icons/icon-close.svg?react';
-import IconLocation from '@/shared/assets/icons/icon-location.svg?react';
 import IconPencil from '@/shared/assets/icons/icon-pencil.svg?react';
 
 import styles from './ReportWizardStepSummary.module.css';
@@ -74,20 +73,22 @@ export function ReportWizardStepSummary({
           >
             <IconPencil className={styles.cardEditIcon} aria-hidden />
           </button>
-          <span
-            className={joinCSSClassNames(
-              styles.cardIcon,
-              isConform ? styles.cardIconConform : styles.cardIconNonConform,
-            )}
-          >
-            {isConform ? (
-              <IconCheck className={styles.cardIconSvg} aria-hidden />
-            ) : (
-              <IconClose className={styles.cardIconSvg} aria-hidden />
-            )}
-          </span>
           <p className={styles.cardLabel}>État</p>
-          <p className={styles.cardValue}>{stateLabel}</p>
+          <p className={styles.cardValue}>
+            <span
+              className={joinCSSClassNames(
+                styles.cardValueIcon,
+                isConform ? styles.cardValueIconConform : styles.cardValueIconNonConform,
+              )}
+            >
+              {isConform ? (
+                <IconCheck className={styles.cardValueIconSvg} aria-hidden />
+              ) : (
+                <IconClose className={styles.cardValueIconSvg} aria-hidden />
+              )}
+            </span>
+            {stateLabel}
+          </p>
           <p className={styles.cardDetail}>{stateDetail}</p>
         </div>
 
@@ -102,11 +103,17 @@ export function ReportWizardStepSummary({
               <IconPencil className={styles.cardEditIcon} aria-hidden />
             </button>
           ) : null}
-          <span className={joinCSSClassNames(styles.cardIcon, styles.cardIconConform)}>
-            <IconLocation className={styles.cardIconSvg} aria-hidden />
-          </span>
           <p className={styles.cardLabel}>Position</p>
-          <p className={styles.cardValue}>{positionLabel}</p>
+          <p className={styles.cardValue}>
+            <span className={joinCSSClassNames(styles.cardValueIcon, styles.cardValueIconConform)}>
+              {form.canResetPosition ? (
+                <IconPencil className={styles.cardValueIconSvg} aria-hidden />
+              ) : (
+                <IconCheck className={styles.cardValueIconSvg} aria-hidden />
+              )}
+            </span>
+            {positionLabel}
+          </p>
           <p className={styles.cardDetail}>{coordinateLabel}</p>
         </div>
       </div>
