@@ -16,6 +16,13 @@
   cursor: pointer;
   text-align: left;
   font: inherit;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.positionRow:hover,
+.positionRow:focus-visible {
+  border-color: var(--color-primary);
+  box-shadow: 0 2px 10px rgba(var(--color-primary-rgb), 0.18);
 }
 
 .positionIconWrap {

@@ -107,6 +107,13 @@
   background: var(--color-fiche-surface);
   text-align: left;
   cursor: pointer;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.reportCard:hover,
+.reportCard:focus-visible {
+  border-color: var(--report-card-hover-color, var(--color-primary));
+  box-shadow: 0 2px 10px rgba(var(--report-card-hover-rgb, var(--color-primary-rgb)), 0.18);
 }
 
 .reportCardHeader {

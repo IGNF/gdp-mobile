@@ -4,6 +4,7 @@
   padding: 1rem 0 0;
   --color-non-conform: #e5342f;
   --color-non-conform-shade: #c62828;
+  --color-non-conform-rgb: 229, 52, 47;
 }
 
 .question {
@@ -36,6 +37,7 @@
   background: var(--color-fiche-surface);
   text-align: left;
   cursor: pointer;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .cardSelectedConform {
@@ -44,6 +46,18 @@
 
 .cardSelectedNonConform {
   border-color: var(--color-non-conform);
+}
+
+.cardConform:hover,
+.cardConform:focus-visible {
+  border-color: var(--color-primary);
+  box-shadow: 0 2px 10px rgba(var(--color-primary-rgb), 0.18);
+}
+
+.cardNonConform:hover,
+.cardNonConform:focus-visible {
+  border-color: var(--color-non-conform);
+  box-shadow: 0 2px 10px rgba(var(--color-non-conform-rgb), 0.18);
 }
 
 .cardRow {

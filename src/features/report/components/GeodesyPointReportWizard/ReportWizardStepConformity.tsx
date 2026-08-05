@@ -27,7 +27,11 @@ export function ReportWizardStepConformity({ isConform, onChange }: ReportWizard
           type="button"
           role="radio"
           aria-checked={isConform}
-          className={joinCSSClassNames(styles.card, isConform && styles.cardSelectedConform)}
+          className={joinCSSClassNames(
+            styles.card,
+            styles.cardConform,
+            isConform && styles.cardSelectedConform,
+          )}
           onClick={() => onChange(true)}
         >
           <div className={styles.cardRow}>
@@ -65,7 +69,11 @@ export function ReportWizardStepConformity({ isConform, onChange }: ReportWizard
           type="button"
           role="radio"
           aria-checked={!isConform}
-          className={joinCSSClassNames(styles.card, !isConform && styles.cardSelectedNonConform)}
+          className={joinCSSClassNames(
+            styles.card,
+            styles.cardNonConform,
+            !isConform && styles.cardSelectedNonConform,
+          )}
           onClick={() => onChange(false)}
         >
           <div className={styles.cardRow}>

@@ -19,6 +19,13 @@
   border-radius: 0.75rem;
   background: var(--color-fiche-surface);
   cursor: pointer;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.photoDropzone:hover,
+.photoDropzone:focus-within {
+  border-color: var(--color-primary-shade);
+  box-shadow: 0 2px 10px rgba(var(--color-primary-rgb), 0.18);
 }
 
 .photoInput {
@@ -163,6 +170,14 @@
   color: var(--color-dark);
   resize: vertical;
   box-sizing: border-box;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.commentInput:hover,
+.commentInput:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 2px 10px rgba(var(--color-primary-rgb), 0.18);
+  outline: none;
 }
 
 .commentInput::placeholder {

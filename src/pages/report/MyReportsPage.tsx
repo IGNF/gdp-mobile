@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, type CSSProperties } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { BottomTabbar } from '@/app/components/BottomTabbar';
@@ -9,6 +9,7 @@ import {
 } from '@/features/report/components/GeodesyPointReportWizard';
 import { useLocalReportDrafts } from '@/features/report/hooks/useLocalReportDrafts';
 import {
+  getLocalReportDraftStatusAccentRgb,
   getLocalReportDraftStatusColors,
   getLocalReportDraftStatusLabel,
 } from '@/features/report/utils/localReportDraftStatus';
@@ -113,6 +114,10 @@ export function MyReportsPage() {
                   <button
                     type="button"
                     className={styles.reportCard}
+                    style={{
+                      '--report-card-hover-color': statusColors.color,
+                      '--report-card-hover-rgb': getLocalReportDraftStatusAccentRgb(draft.status),
+                    } as CSSProperties}
                     onClick={() => navigate(`/reports/${draft.id}`)}
                   >
                     <div className={styles.reportCardHeader}>

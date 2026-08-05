@@ -12,6 +12,12 @@ const STATUS_COLORS: Record<LocalReportDraftStatus, { color: string; background:
   rejected: { color: 'var(--color-danger-shade)', background: 'rgba(var(--color-danger-rgb), 0.14)' },
 };
 
+const STATUS_ACCENT_RGB: Record<LocalReportDraftStatus, string> = {
+  not_sent: 'var(--color-secondary-rgb)',
+  taken_into_account: 'var(--color-primary-rgb)',
+  rejected: 'var(--color-danger-rgb)',
+};
+
 export function getLocalReportDraftStatusLabel(status: LocalReportDraftStatus): string {
   return STATUS_LABELS[status];
 }
@@ -21,4 +27,8 @@ export function getLocalReportDraftStatusColors(status: LocalReportDraftStatus):
   background: string;
 } {
   return STATUS_COLORS[status];
+}
+
+export function getLocalReportDraftStatusAccentRgb(status: LocalReportDraftStatus): string {
+  return STATUS_ACCENT_RGB[status];
 }
