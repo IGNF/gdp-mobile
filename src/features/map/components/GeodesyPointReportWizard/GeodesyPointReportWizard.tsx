@@ -59,7 +59,7 @@ function GeodesyPointReportWizardContent({ isOpen, context, onClose }: GeodesyPo
   const navigate = useNavigate();
   const [step, setStep] = useState(0);
   const [isConform, setIsConform] = useState(true);
-  const [nonConformReason, setNonConformReason] = useState<NonConformReason | null>(null);
+  const [nonConformReasons, setNonConformReasons] = useState<NonConformReason[]>([]);
   const [isSavingDraft, setIsSavingDraft] = useState(false);
   const totalSteps = isConform ? 3 : 4;
   const mediaStep = isConform ? 1 : 2;
@@ -80,7 +80,7 @@ function GeodesyPointReportWizardContent({ isOpen, context, onClose }: GeodesyPo
       const draft = await buildLocalReportDraft({
         reportContext,
         isConform,
-        nonConformReason,
+        nonConformReasons,
         comment: form.comment,
         longitude: form.longitude,
         latitude: form.latitude,
@@ -101,7 +101,7 @@ function GeodesyPointReportWizardContent({ isOpen, context, onClose }: GeodesyPo
     form.photos,
     isConform,
     isSavingDraft,
-    nonConformReason,
+    nonConformReasons,
     reportContext,
   ]);
 
@@ -157,7 +157,7 @@ function GeodesyPointReportWizardContent({ isOpen, context, onClose }: GeodesyPo
     if (isOpen) {
       setStep(0);
       setIsConform(true);
-      setNonConformReason(null);
+      setNonConformReasons([]);
     }
   }, [isOpen]);
 
@@ -211,15 +211,15 @@ function GeodesyPointReportWizardContent({ isOpen, context, onClose }: GeodesyPo
             <ReportWizardStepConformity isConform={isConform} onChange={setIsConform} />
           ) : !isConform && step === 1 ? (
             <ReportWizardStepNonConformReason
-              reason={nonConformReason}
-              onChange={setNonConformReason}
+              reasons={nonConformReasons}
+              onChange={setNonConformReasons}
             />
           ) : step === mediaStep ? (
             <ReportWizardStepMedia form={form} />
           ) : step === summaryStep ? (
             <ReportWizardStepSummary
               isConform={isConform}
-              nonConformReason={nonConformReason}
+              nonConformReasons={nonConformReasons}
               mediaStep={mediaStep}
               form={form}
               onEditStep={(targetStep) => setStep(targetStep)}
@@ -247,7 +247,7 @@ function GeodesyPointReportWizardContent({ isOpen, context, onClose }: GeodesyPo
               <Button
                 type="button"
                 fullWidth
-                disabled={!nonConformReason}
+                disabled={nonConformReasons.length === 0}
                 onClick={() => setStep(mediaStep)}
               >
                 Suivant

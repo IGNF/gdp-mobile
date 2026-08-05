@@ -5,10 +5,17 @@ import IconClose from '@/shared/assets/icons/icon-close.svg?react';
 import styles from './ReportWizardStepConformity.module.css';
 
 const CONFORMITY_CRITERIA = [
-  'Lorem ipsum dolor sit amet',
-  'Lorem ipsum dolor sit amet',
-  'Lorem ipsum dolor sit amet',
-  'Lorem ipsum dolor sit amet',
+  'Le point est au bon endroit',
+  'La photo correspond à la réalité',
+  'Le point est en bon état',
+];
+
+const NON_CONFORMITY_CRITERIA = [
+  "Le point n'est pas retrouvé",
+  "La photo ne correspond pas ou plus à l'environnement",
+  "Le point n'a pas de photo",
+  'Le point est déplacé ou détérioré',
+  "Le point n'est pas placé au bon endroit",
 ];
 
 export interface ReportWizardStepConformityProps {
@@ -95,6 +102,20 @@ export function ReportWizardStepConformity({ isConform, onChange }: ReportWizard
               aria-hidden
             />
           </div>
+
+          {!isConform ? (
+            <div className={styles.criteria}>
+              <p className={styles.criteriaTitle}>Motifs de non-conformité</p>
+              <ul className={styles.criteriaList}>
+                {NON_CONFORMITY_CRITERIA.map((criterion, index) => (
+                  <li key={index} className={styles.criteriaItem}>
+                    <IconClose className={joinCSSClassNames(styles.criteriaIcon, styles.criteriaIconNonConform)} aria-hidden />
+                    {criterion}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
         </button>
       </div>
     </div>

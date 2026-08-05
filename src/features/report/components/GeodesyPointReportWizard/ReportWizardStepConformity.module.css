@@ -190,6 +190,10 @@
   color: var(--color-primary);
 }
 
+.criteriaIconNonConform {
+  color: var(--color-non-conform);
+}
+
 .criteriaIcon path {
   fill: currentColor;
 }

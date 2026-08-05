@@ -14,7 +14,7 @@ import styles from './ReportWizardStepSummary.module.css';
 
 export interface ReportWizardStepSummaryProps {
   isConform: boolean;
-  nonConformReason: NonConformReason | null;
+  nonConformReasons: NonConformReason[];
   mediaStep: number;
   form: UseGeodesyPointReportFormReturn;
   onEditStep: (step: number) => void;
@@ -22,7 +22,7 @@ export interface ReportWizardStepSummaryProps {
 
 export function ReportWizardStepSummary({
   isConform,
-  nonConformReason,
+  nonConformReasons,
   mediaStep,
   form,
   onEditStep,
@@ -31,8 +31,8 @@ export function ReportWizardStepSummary({
   const stateLabel = isConform ? 'Conforme' : 'Non conforme';
   const stateDetail = isConform
     ? stateLabel
-    : nonConformReason
-      ? NON_CONFORM_REASON_LABELS[nonConformReason]
+    : nonConformReasons.length > 0
+      ? nonConformReasons.map((reason) => NON_CONFORM_REASON_LABELS[reason]).join(', ')
       : '—';
   const positionLabel = form.canResetPosition ? 'Modifiée' : 'Confirmée';
   const coordinateLabel =

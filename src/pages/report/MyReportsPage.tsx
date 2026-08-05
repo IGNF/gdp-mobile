@@ -104,9 +104,9 @@ export function MyReportsPage() {
               const statusColors = getLocalReportDraftStatusColors(draft.status);
               const reasonLabel = draft.isConform
                 ? 'Conforme'
-                : (draft.nonConformReason &&
-                    NON_CONFORM_REASON_LABELS[draft.nonConformReason as NonConformReason]) ||
-                  'Non conforme';
+                : (draft.nonConformReasons ?? [])
+                    .map((reason) => NON_CONFORM_REASON_LABELS[reason as NonConformReason])
+                    .join(', ') || 'Non conforme';
               const createdAt = new Date(draft.createdAt);
 
               return (

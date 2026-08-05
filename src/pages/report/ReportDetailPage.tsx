@@ -116,9 +116,9 @@ export function ReportDetailPage() {
                 <p className={styles.cardDetail}>
                   {draft.isConform
                     ? 'Conforme'
-                    : (draft.nonConformReason &&
-                        NON_CONFORM_REASON_LABELS[draft.nonConformReason as NonConformReason]) ||
-                      '—'}
+                    : (draft.nonConformReasons ?? [])
+                        .map((reason) => NON_CONFORM_REASON_LABELS[reason as NonConformReason])
+                        .join(', ') || '—'}
                 </p>
               </div>
 

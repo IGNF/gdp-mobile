@@ -24,7 +24,7 @@ function fileToDataUrl(file: File): Promise<string> {
 export interface BuildLocalReportDraftParams {
   reportContext: GeodesyPointReportContext;
   isConform: boolean;
-  nonConformReason: NonConformReason | null;
+  nonConformReasons: NonConformReason[];
   comment: string;
   longitude: number;
   latitude: number;
@@ -51,7 +51,7 @@ export async function buildLocalReportDraft(
     latitude: params.latitude,
     positionModified: params.positionModified,
     isConform: params.isConform,
-    nonConformReason: params.nonConformReason,
+    nonConformReasons: params.nonConformReasons,
     comment: params.comment,
     photos,
     status: 'not_sent',

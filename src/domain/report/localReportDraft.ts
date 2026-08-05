@@ -16,7 +16,7 @@ export interface LocalReportDraft {
   latitude: number;
   positionModified: boolean;
   isConform: boolean;
-  nonConformReason: string | null;
+  nonConformReasons: string[];
   comment: string;
   photos: LocalReportDraftPhoto[];
   status: LocalReportDraftStatus;

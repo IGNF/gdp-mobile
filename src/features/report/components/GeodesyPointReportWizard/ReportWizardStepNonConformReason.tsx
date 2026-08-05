@@ -14,64 +14,102 @@ export type NonConformReason =
   | 'nonRetrouve'
   | 'malPositionne';
 
-const NON_CONFORM_REASONS: Array<{
+interface NonConformReasonOption {
   value: NonConformReason;
   label: string;
-  description: string;
   Icon: typeof IconCamera;
-}> = [
-  { value: 'photoNonConforme', label: 'Photo non conforme', description: 'Lorem ipsum dolor sit amet', Icon: IconCamera },
-  { value: 'mauvaisEtat', label: 'Mauvais état', description: 'Lorem ipsum dolor sit amet', Icon: IconAlertCircle },
-  { value: 'detruit', label: 'Détruit', description: 'Lorem ipsum dolor sit amet', Icon: IconDelete },
-  { value: 'nonRetrouve', label: 'Non retrouvé', description: 'Lorem ipsum dolor sit amet', Icon: IconSearch },
-  { value: 'malPositionne', label: 'Mal positionné', description: 'Lorem ipsum dolor sit amet', Icon: IconLocation },
+}
+
+interface NonConformReasonGroup {
+  title: string;
+  exclusive: boolean;
+  options: NonConformReasonOption[];
+}
+
+const NON_CONFORM_REASON_GROUPS: NonConformReasonGroup[] = [
+  {
+    title: 'Des informations sur le point sont-elles incorrectes ?',
+    exclusive: false,
+    options: [
+      { value: 'photoNonConforme', label: 'Photo non conforme ou absente', Icon: IconCamera },
+      { value: 'malPositionne', label: 'Mal positionné', Icon: IconLocation },
+    ],
+  },
+  {
+    title: "Quel est l'état du point ?",
+    exclusive: true,
+    options: [
+      { value: 'mauvaisEtat', label: 'Mauvais état', Icon: IconAlertCircle },
+      { value: 'detruit', label: 'Détruit', Icon: IconDelete },
+      { value: 'nonRetrouve', label: 'Non retrouvé', Icon: IconSearch },
+    ],
+  },
 ];
 
 export const NON_CONFORM_REASON_LABELS: Record<NonConformReason, string> = Object.fromEntries(
-  NON_CONFORM_REASONS.map(({ value, label }) => [value, label]),
+  NON_CONFORM_REASON_GROUPS.flatMap((group) => group.options).map(({ value, label }) => [value, label]),
 ) as Record<NonConformReason, string>;
 
 export interface ReportWizardStepNonConformReasonProps {
-  reason: NonConformReason | null;
-  onChange: (reason: NonConformReason) => void;
+  reasons: NonConformReason[];
+  onChange: (reasons: NonConformReason[]) => void;
 }
 
 export function ReportWizardStepNonConformReason({
-  reason,
+  reasons,
   onChange,
 }: ReportWizardStepNonConformReasonProps) {
+  const toggleReason = (group: NonConformReasonGroup, value: NonConformReason) => {
+    const isSelected = reasons.includes(value);
+
+    if (!group.exclusive) {
+      onChange(isSelected ? reasons.filter((reason) => reason !== value) : [...reasons, value]);
+      return;
+    }
+
+    const groupValues = group.options.map((option) => option.value);
+    const withoutGroup = reasons.filter((reason) => !groupValues.includes(reason));
+    onChange(isSelected ? withoutGroup : [...withoutGroup, value]);
+  };
+
   return (
     <div className={styles.step}>
-      <h2 className={styles.question}>Quel est l&apos;état du point ?</h2>
-      <p className={styles.subtitle}>Sélectionnez l&apos;état constaté sur le terrain</p>
-
-      <div className={styles.options} role="radiogroup" aria-label="Motif de non-conformité">
-        {NON_CONFORM_REASONS.map(({ value, label, description, Icon }) => {
-          const isSelected = reason === value;
-          return (
-            <button
-              key={value}
-              type="button"
-              role="radio"
-              aria-checked={isSelected}
-              className={joinCSSClassNames(styles.card, isSelected && styles.cardSelected)}
-              onClick={() => onChange(value)}
-            >
-              <span className={styles.stateIcon}>
-                <Icon className={styles.stateIconSvg} aria-hidden />
-              </span>
-              <span className={styles.cardText}>
-                <span className={styles.cardLabel}>{label}</span>
-                <span className={styles.cardDescription}>{description}</span>
-              </span>
-              <span
-                className={joinCSSClassNames(styles.radio, isSelected && styles.radioChecked)}
-                aria-hidden
-              />
-            </button>
-          );
-        })}
-      </div>
+      {NON_CONFORM_REASON_GROUPS.map((group) => (
+        <div key={group.title} className={styles.group}>
+          <p className={styles.groupTitle}>{group.title}</p>
+          <div
+            className={styles.options}
+            role={group.exclusive ? 'radiogroup' : 'group'}
+            aria-label={group.title}
+          >
+            {group.options.map(({ value, label, Icon }) => {
+              const isSelected = reasons.includes(value);
+              return (
+                <button
+                  key={value}
+                  type="button"
+                  role={group.exclusive ? 'radio' : 'checkbox'}
+                  aria-checked={isSelected}
+                  className={joinCSSClassNames(styles.card, isSelected && styles.cardSelected)}
+                  onClick={() => toggleReason(group, value)}
+                >
+                  <span className={styles.stateIcon}>
+                    <Icon className={styles.stateIconSvg} aria-hidden />
+                  </span>
+                  <span className={styles.cardLabel}>{label}</span>
+                  <span
+                    className={joinCSSClassNames(
+                      group.exclusive ? styles.radio : styles.checkbox,
+                      isSelected && (group.exclusive ? styles.radioChecked : styles.checkboxChecked),
+                    )}
+                    aria-hidden
+                  />
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      ))}
     </div>
   );
 }
