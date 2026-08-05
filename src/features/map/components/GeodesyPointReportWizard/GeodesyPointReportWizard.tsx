@@ -58,12 +58,12 @@ function GeodesyPointReportWizardContent({ isOpen, context, onClose }: GeodesyPo
   const { reportContext } = context;
   const navigate = useNavigate();
   const [step, setStep] = useState(0);
-  const [isConform, setIsConform] = useState(true);
+  const [isConform, setIsConform] = useState<boolean | null>(null);
   const [nonConformReasons, setNonConformReasons] = useState<NonConformReason[]>([]);
   const [isSavingDraft, setIsSavingDraft] = useState(false);
-  const totalSteps = isConform ? 3 : 4;
-  const mediaStep = isConform ? 1 : 2;
-  const summaryStep = isConform ? 2 : 3;
+  const totalSteps = isConform === false ? 4 : 3;
+  const mediaStep = isConform === false ? 2 : 1;
+  const summaryStep = isConform === false ? 3 : 2;
   const confirmationStep = summaryStep + 1;
   const form = useGeodesyPointReportForm({
     reportContext,
@@ -79,7 +79,7 @@ function GeodesyPointReportWizardContent({ isOpen, context, onClose }: GeodesyPo
     try {
       const draft = await buildLocalReportDraft({
         reportContext,
-        isConform,
+        isConform: isConform === true,
         nonConformReasons,
         comment: form.comment,
         longitude: form.longitude,
@@ -156,7 +156,7 @@ function GeodesyPointReportWizardContent({ isOpen, context, onClose }: GeodesyPo
   useEffect(() => {
     if (isOpen) {
       setStep(0);
-      setIsConform(true);
+      setIsConform(null);
       setNonConformReasons([]);
     }
   }, [isOpen]);
@@ -209,7 +209,7 @@ function GeodesyPointReportWizardContent({ isOpen, context, onClose }: GeodesyPo
         <div className={styles.body} data-scroll-root="true">
           {step === 0 ? (
             <ReportWizardStepConformity isConform={isConform} onChange={setIsConform} />
-          ) : !isConform && step === 1 ? (
+          ) : isConform === false && step === 1 ? (
             <ReportWizardStepNonConformReason
               reasons={nonConformReasons}
               onChange={setNonConformReasons}
@@ -218,7 +218,7 @@ function GeodesyPointReportWizardContent({ isOpen, context, onClose }: GeodesyPo
             <ReportWizardStepMedia form={form} />
           ) : step === summaryStep ? (
             <ReportWizardStepSummary
-              isConform={isConform}
+              isConform={isConform === true}
               nonConformReasons={nonConformReasons}
               mediaStep={mediaStep}
               form={form}
@@ -236,10 +236,10 @@ function GeodesyPointReportWizardContent({ isOpen, context, onClose }: GeodesyPo
 
         <div className={styles.footer} hidden={step === confirmationStep}>
           {step === 0 ? (
-            <Button type="button" fullWidth onClick={() => setStep(1)}>
+            <Button type="button" fullWidth disabled={isConform === null} onClick={() => setStep(1)}>
               Suivant
             </Button>
-          ) : !isConform && step === 1 ? (
+          ) : isConform === false && step === 1 ? (
             <div className={styles.footerRow}>
               <Button type="button" variant="outline" fullWidth onClick={() => setStep(0)}>
                 Retour
@@ -259,7 +259,7 @@ function GeodesyPointReportWizardContent({ isOpen, context, onClose }: GeodesyPo
                 type="button"
                 variant="outline"
                 fullWidth
-                onClick={() => setStep(isConform ? 0 : 1)}
+                onClick={() => setStep(isConform === false ? 1 : 0)}
               >
                 Retour
               </Button>

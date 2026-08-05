@@ -19,7 +19,7 @@ const NON_CONFORMITY_CRITERIA = [
 ];
 
 export interface ReportWizardStepConformityProps {
-  isConform: boolean;
+  isConform: boolean | null;
   onChange: (isConform: boolean) => void;
 }
 
@@ -33,11 +33,11 @@ export function ReportWizardStepConformity({ isConform, onChange }: ReportWizard
         <button
           type="button"
           role="radio"
-          aria-checked={isConform}
+          aria-checked={isConform === true}
           className={joinCSSClassNames(
             styles.card,
             styles.cardConform,
-            isConform && styles.cardSelectedConform,
+            isConform === true && styles.cardSelectedConform,
           )}
           onClick={() => onChange(true)}
         >
@@ -52,12 +52,12 @@ export function ReportWizardStepConformity({ isConform, onChange }: ReportWizard
               <span className={styles.cardDescription}>Lorem ipsum dolor sit amet</span>
             </span>
             <span
-              className={joinCSSClassNames(styles.radio, styles.radioConform, isConform && styles.radioChecked)}
+              className={joinCSSClassNames(styles.radio, styles.radioConform, isConform === true && styles.radioChecked)}
               aria-hidden
             />
           </div>
 
-          {isConform ? (
+          {isConform === true ? (
             <div className={styles.criteria}>
               <p className={styles.criteriaTitle}>Critères de conformité</p>
               <ul className={styles.criteriaList}>
@@ -75,11 +75,11 @@ export function ReportWizardStepConformity({ isConform, onChange }: ReportWizard
         <button
           type="button"
           role="radio"
-          aria-checked={!isConform}
+          aria-checked={isConform === false}
           className={joinCSSClassNames(
             styles.card,
             styles.cardNonConform,
-            !isConform && styles.cardSelectedNonConform,
+            isConform === false && styles.cardSelectedNonConform,
           )}
           onClick={() => onChange(false)}
         >
@@ -97,13 +97,13 @@ export function ReportWizardStepConformity({ isConform, onChange }: ReportWizard
               className={joinCSSClassNames(
                 styles.radio,
                 styles.radioNonConform,
-                !isConform && styles.radioChecked,
+                isConform === false && styles.radioChecked,
               )}
               aria-hidden
             />
           </div>
 
-          {!isConform ? (
+          {isConform === false ? (
             <div className={styles.criteria}>
               <p className={styles.criteriaTitle}>Motifs de non-conformité</p>
               <ul className={styles.criteriaList}>
