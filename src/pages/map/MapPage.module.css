@@ -4,7 +4,7 @@
   height: 100dvh;
   margin-top: calc(-1 * var(--safe-top));
   background: var(--color-dark);
-  --map-tabbar-height: 5.5rem;
+  --map-tabbar-height: 6.5rem;
   --map-sheet-height: 5.5rem;
   --map-fab-sheet-offset: 5.5rem;
 }
@@ -18,8 +18,8 @@
 
 .mapChrome {
   position: absolute;
-  left: 0;
-  right: 0;
+  left: 1rem;
+  right: 1rem;
   bottom: 0;
   z-index: 2;
   display: flex;
@@ -106,7 +106,7 @@
 }
 
 .geolocationFabAboveSearch {
-  bottom: calc(var(--map-fab-sheet-offset) + var(--map-tabbar-height) + 4.6rem);
+  bottom: calc(var(--map-fab-sheet-offset) + var(--map-tabbar-height) + 0.75rem);
 }
 
 .geolocationIcon {

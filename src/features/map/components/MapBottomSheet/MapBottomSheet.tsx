@@ -10,15 +10,18 @@ import { useSearchGeoportail } from '@/features/search/hooks/useSearchGeoportail
 
 import { BrowseRgpStationsList } from './BrowseRgpStationsList';
 import { BrowseSearchHome } from './BrowseSearchHome';
+import { BrowseReportsPanel } from './BrowseReportsPanel';
 import { MapPointSheet } from './pointFiche/MapPointSheet';
 import styles from './MapBottomSheet.module.css';
 import IconSearch from '@/shared/assets/icons/icon-search.svg?react';
 
-type BrowsePanelView = 'search' | 'rgp';
+type BrowsePanelView = 'search' | 'rgp' | 'reports';
 
 function getBrowseSnapHeights(viewportHeight: number): readonly number[] {
-  // Snap 0 = bouton recherche seul (pas de panneau) ; snap 1 = menu ouvert.
-  return [0, Math.min(Math.round(viewportHeight * 0.58), 560)];
+  // Snap 0 = fermé ; snap 1 = taille normale ; snap 2 = étiré au maximum
+  const normalHeight = Math.min(Math.round(viewportHeight * 0.58), 560);
+  const maxHeight = Math.round(viewportHeight * 0.85);
+  return [0, normalHeight, maxHeight];
 }
 
 // 3 boutons de 3rem + 2 espaces de 0.5rem + 0.75rem de marge = 10.75rem (172px),
@@ -63,6 +66,18 @@ export interface MapBottomSheetProps {
   hideBrowseSheet?: boolean;
   /** Replie la recherche (snap 0) quand un panneau latéral (couches, filtres) s’ouvre. */
   collapseBrowseSearch?: boolean;
+  /** Force l'ouverture du panneau de recherche depuis l'extérieur. */
+  forceExpandSearch?: boolean;
+  /** Force la fermeture du panneau de recherche depuis l'extérieur. */
+  /** Force l'ouverture du panneau de signalements depuis l'extérieur. */
+  forceExpandReports?: boolean;
+  /** Force la fermeture du panneau de signalements depuis l'extérieur. */
+  forceCloseReports?: boolean;
+  /** Callback appelé quand le panneau de signalements change d'état (ouvert/fermé). */
+  onReportsPanelStateChange?: (isOpen: boolean) => void;
+  forceCloseSearch?: boolean;
+  /** Callback appelé quand le panneau de recherche change d'état (ouvert/fermé). */
+  onSearchPanelStateChange?: (isOpen: boolean) => void;
 }
 
 export function MapBottomSheet({
@@ -78,6 +93,12 @@ export function MapBottomSheet({
   onTabbarVisibleChange,
   hideBrowseSheet = false,
   collapseBrowseSearch = false,
+  forceExpandSearch = false,
+  forceCloseSearch = false,
+  forceExpandReports = false,
+  forceCloseReports = false,
+  onSearchPanelStateChange,
+  onReportsPanelStateChange,
 }: MapBottomSheetProps) {
   const searchContainerRef = useRef<HTMLDivElement>(null);
   const sheetRef = useRef<HTMLElement>(null);
@@ -154,6 +175,39 @@ export function MapBottomSheet({
 
     collapseBrowseSheet();
   }, [collapseBrowseSearch, collapseBrowseSheet, isPointMode]);
+
+  useEffect(() => {
+    if (forceExpandSearch && !isPointMode) {
+      expandBrowseSheet();
+      setBrowseView('search');
+    }
+  }, [forceExpandSearch, isPointMode, expandBrowseSheet]);
+
+  useEffect(() => {
+    if (forceCloseSearch && !isPointMode) {
+      collapseBrowseSheet();
+    }
+  }, [forceCloseSearch, isPointMode, collapseBrowseSheet]);
+
+  useEffect(() => {
+    if (forceExpandReports && !isPointMode) {
+      expandBrowseSheet();
+      setBrowseView('reports');
+    }
+  }, [forceExpandReports, isPointMode, expandBrowseSheet]);
+
+  useEffect(() => {
+    if (forceCloseReports && !isPointMode) {
+      collapseBrowseSheet();
+    }
+  }, [forceCloseReports, isPointMode, collapseBrowseSheet]);
+
+  useEffect(() => {
+    const isSearchOpen = isBrowseExpanded && (browseView === 'search' || browseView === 'rgp');
+    const isReportsOpen = isBrowseExpanded && browseView === 'reports';
+    onSearchPanelStateChange?.(isSearchOpen);
+    onReportsPanelStateChange?.(isReportsOpen);
+  }, [isBrowseExpanded, browseView, onSearchPanelStateChange, onReportsPanelStateChange]);
 
   useEffect(() => {
     if (!map || !isMapReady || isPointMode) {
@@ -318,32 +372,25 @@ export function MapBottomSheet({
             onNavigate={handleNavigateToPoint}
           />
         </div>
-      ) : isBrowseCollapsed ? (
-        <button
-          type="button"
-          className={styles.searchFab}
-          onClick={handleSearchActivate}
-          aria-label="Ouvrir la recherche"
-        >
-          <IconSearch className={styles.searchFabIcon} aria-hidden />
-        </button>
-      ) : (
+      ) : isBrowseCollapsed ? null : (
         <div className={styles.contentExpanded}>
-          <div className={styles.searchArea}>
-            <div
-              className={styles.searchField}
-              onPointerDown={(event) => {
-                if (event.target instanceof HTMLInputElement) {
-                  return;
-                }
+          {browseView === 'search' ? (
+            <div className={styles.searchArea}>
+              <div
+                className={styles.searchField}
+                onPointerDown={(event) => {
+                  if (event.target instanceof HTMLInputElement) {
+                    return;
+                  }
 
-                handleSearchActivate();
-              }}
-            >
-              <IconSearch className={styles.searchIcon} aria-hidden />
-              <div ref={searchContainerRef} className={styles.searchContainer} />
+                  handleSearchActivate();
+                }}
+              >
+                <IconSearch className={styles.searchIcon} aria-hidden />
+                <div ref={searchContainerRef} className={styles.searchContainer} />
+              </div>
             </div>
-          </div>
+          ) : null}
 
           <div className={styles.browsePanel} data-scroll-root="true">
             {browseView === 'search' ? (
@@ -352,7 +399,7 @@ export function MapBottomSheet({
                 onOpenRgpList={() => setBrowseView('rgp')}
                 onSelectHistoryEntry={selectHistoryEntry}
               />
-            ) : (
+            ) : browseView === 'rgp' ? (
               <BrowseRgpStationsList
                 stations={stations}
                 isLoading={isRgpLoading}
@@ -365,6 +412,8 @@ export function MapBottomSheet({
                 }}
                 onSelectStation={handleRgpSelect}
               />
+            ) : (
+              <BrowseReportsPanel onReportSelect={onFocusCoordinate} />
             )}
           </div>
         </div>

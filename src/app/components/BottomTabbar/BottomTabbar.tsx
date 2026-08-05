@@ -2,24 +2,42 @@ import { useNavigate } from 'react-router-dom';
 
 import IconArticle from '@/shared/assets/icons/icon-article.svg?react';
 import IconMap from '@/shared/assets/icons/icon-map.svg?react';
-
+import IconSearch from '@/shared/assets/icons/icon-search.svg?react';
 import styles from './BottomTabbar.module.css';
 
-export type AppTabId = 'carte' | 'signalements';
+export type AppTabId = 'carte' | 'signalements' | 'recherche';
 
 export interface BottomTabbarProps {
   activeTab: AppTabId;
+  onCloseSearch?: () => void;
+  onCloseReports?: () => void;
 }
 
-export function BottomTabbar({ activeTab }: BottomTabbarProps) {
+export function BottomTabbar({ activeTab, onCloseSearch, onCloseReports }: BottomTabbarProps) {
   const navigate = useNavigate();
 
   const handleTabClick = (tab: AppTabId) => {
+    if (tab === 'carte' && activeTab === 'recherche') {
+      onCloseSearch?.();
+      return;
+    }
+
+    if (tab === 'carte' && activeTab === 'signalements') {
+      onCloseReports?.();
+      return;
+    }
+
     if (tab === activeTab) {
       return;
     }
 
-    navigate(tab === 'carte' ? '/map' : '/reports');
+    if (tab === 'recherche') {
+      navigate('/map', { state: { openSearch: true } });
+    } else if (tab === 'signalements') {
+      navigate('/map', { state: { openReports: true } });
+    } else {
+      navigate('/map');
+    }
   };
 
   return (
@@ -30,9 +48,7 @@ export function BottomTabbar({ activeTab }: BottomTabbarProps) {
         onClick={() => handleTabClick('carte')}
         aria-current={activeTab === 'carte' ? 'page' : undefined}
       >
-        <span className={`${styles.iconCircle} ${activeTab === 'carte' ? styles.iconCircleActive : ''}`}>
-          <IconMap className={styles.tabIcon} aria-hidden />
-        </span>
+        <IconMap className={styles.tabIcon} aria-hidden />
         <span className={styles.tabLabel}>Carte</span>
       </button>
       <button
@@ -41,12 +57,18 @@ export function BottomTabbar({ activeTab }: BottomTabbarProps) {
         onClick={() => handleTabClick('signalements')}
         aria-current={activeTab === 'signalements' ? 'page' : undefined}
       >
-        <span
-          className={`${styles.iconCircle} ${activeTab === 'signalements' ? styles.iconCircleActive : ''}`}
-        >
-          <IconArticle className={styles.tabIcon} aria-hidden />
-        </span>
+        <IconArticle className={styles.tabIcon} aria-hidden />
         <span className={styles.tabLabel}>Signalements</span>
+      </button>
+
+      <button
+        type="button"
+        className={`${styles.tab} ${activeTab === 'recherche' ? styles.active : ''}`}
+        onClick={() => handleTabClick('recherche')}
+        aria-current={activeTab === 'recherche' ? 'page' : undefined}
+      >
+        <IconSearch className={styles.tabIcon} aria-hidden />
+        <span className={styles.tabLabel}>Recherche</span>
       </button>
     </nav>
   );
