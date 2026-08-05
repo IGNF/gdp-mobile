@@ -1,10 +1,10 @@
 import type Map from 'ol/Map';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { toLonLat } from 'ol/proj';
 
 import type { MapGeodesyClickAction } from '@/features/map/hooks/useMapGeodesyClick';
 import { useBottomSheetSnap } from '@/features/map/hooks/useBottomSheetSnap';
 import { useNearestRgpStations } from '@/features/map/hooks/useNearestRgpStations';
+import { useUserLocation } from '@/features/map/hooks/useUserLocation';
 import { useAddressSearchHistory } from '@/features/search/hooks/useAddressSearchHistory';
 import { useSearchGeoportail } from '@/features/search/hooks/useSearchGeoportail';
 
@@ -249,13 +249,7 @@ export function MapBottomSheet({
     onSheetHeightChange,
   ]);
 
-  const center = map?.getView().getCenter();
-  const referencePosition = center
-    ? (() => {
-        const [longitude, latitude] = toLonLat(center);
-        return { longitude, latitude };
-      })()
-    : null;
+  const referencePosition = useUserLocation();
 
   const handleNavigateToPoint = () => {
     if (!selectedPoint) {

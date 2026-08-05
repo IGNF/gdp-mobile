@@ -86,9 +86,6 @@ export function MapPointSheetHeader({ action, referencePosition }: MapPointSheet
           <IconHeart className={styles.favoriteIcon} aria-hidden />
         </button>
       </div>
-      {/* TODO: supprimer — debug id repère */}
-      {pointId ? <p className="debug-banner">DEBUG — id : {pointId}</p> : null}
-
       {etatLabel || metaParts.length > 0 ? (
         <div className={styles.statusMetaRow}>
           {etatLabel ? (
