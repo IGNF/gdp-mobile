@@ -73,6 +73,20 @@
   background-color: var(--color-primary);
 }
 
+.mapFabLocked {
+  background-color: var(--color-primary);
+  animation: pulse-locked 2s ease-in-out infinite;
+}
+
+@keyframes pulse-locked {
+  0%, 100% {
+    box-shadow: 0 2px 12px rgba(9, 22, 37, 0.16), 0 0 0 0 rgba(38, 165, 129, 0.4);
+  }
+  50% {
+    box-shadow: 0 2px 12px rgba(9, 22, 37, 0.16), 0 0 0 16px rgba(38, 165, 129, 0);
+  }
+}
+
 .mapFabIcon {
   width: 1.5rem;
   height: 1.5rem;
