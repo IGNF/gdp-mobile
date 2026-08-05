@@ -7,6 +7,7 @@ import { useNearestRgpStations } from '@/features/map/hooks/useNearestRgpStation
 import { useUserLocation } from '@/features/map/hooks/useUserLocation';
 import { useAddressSearchHistory } from '@/features/search/hooks/useAddressSearchHistory';
 import { useSearchGeoportail } from '@/features/search/hooks/useSearchGeoportail';
+import type { UserFollowingMode } from '@/features/map/hooks/useMap';
 
 import { BrowseRgpStationsList } from './BrowseRgpStationsList';
 import { BrowseSearchHome } from './BrowseSearchHome';
@@ -53,6 +54,7 @@ export interface MapBottomSheetProps {
   isMapReady: boolean;
   selectedPoint: MapGeodesyClickAction | null;
   canReportPoint: boolean;
+  userFollowingMode: UserFollowingMode;
   onClosePoint: () => void;
   onReportPoint: () => void;
   onFocusCoordinate: (longitude: number, latitude: number) => void;
@@ -70,6 +72,7 @@ export function MapBottomSheet({
   isMapReady,
   selectedPoint,
   canReportPoint,
+  userFollowingMode,
   onClosePoint,
   onReportPoint,
   onFocusCoordinate,
@@ -249,7 +252,7 @@ export function MapBottomSheet({
     onSheetHeightChange,
   ]);
 
-  const referencePosition = useUserLocation();
+  const referencePosition = useUserLocation({ enabled: userFollowingMode !== 'none' });
 
   const handleNavigateToPoint = () => {
     if (!selectedPoint) {

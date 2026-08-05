@@ -7,14 +7,24 @@ export interface UserLocation {
   latitude: number;
 }
 
+export interface UseUserLocationOptions {
+  enabled?: boolean;
+}
+
 /**
  * Hook pour suivre la position GPS de l'utilisateur.
- * Retourne null si la géolocalisation n'est pas disponible ou désactivée.
+ * Retourne null si la géolocalisation n'est pas disponible, désactivée, ou si enabled=false.
  */
-export function useUserLocation(): UserLocation | null {
+export function useUserLocation(options: UseUserLocationOptions = {}): UserLocation | null {
+  const { enabled = true } = options;
   const [userLocation, setUserLocation] = useState<UserLocation | null>(null);
 
   useEffect(() => {
+    if (!enabled) {
+      setUserLocation(null);
+      return;
+    }
+
     let watchId: CallbackID | null = null;
     let cancelled = false;
 
@@ -49,7 +59,7 @@ export function useUserLocation(): UserLocation | null {
 
       setUserLocation(null);
     };
-  }, []);
+  }, [enabled]);
 
   return userLocation;
 }
