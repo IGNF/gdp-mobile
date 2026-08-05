@@ -6,6 +6,7 @@ import type { MapGeodesyClickAction } from '@/features/map/hooks/useMapGeodesyCl
 import { useBottomSheetSnap } from '@/features/map/hooks/useBottomSheetSnap';
 import { useNearestRgpStations } from '@/features/map/hooks/useNearestRgpStations';
 import { useAddressSearchHistory } from '@/features/search/hooks/useAddressSearchHistory';
+import type { AddressSearchHistoryEntry } from '@/features/search/utils/addressSearchHistory';
 import { useSearchGeoportail } from '@/features/search/hooks/useSearchGeoportail';
 
 import { BrowseRgpStationsList } from './BrowseRgpStationsList';
@@ -246,8 +247,19 @@ export function MapBottomSheet({
     isOpen: isMapReady && !isPointMode && isBrowseExpanded,
     placeholder: 'Rechercher un point, une adresse…',
     onFocus: expandBrowseSheet,
-    onSelect: refreshSearchHistory,
+    onSelect: () => {
+      refreshSearchHistory();
+      collapseBrowseSheet();
+    },
   });
+
+  const handleSelectHistoryEntry = useCallback(
+    (entry: AddressSearchHistoryEntry) => {
+      selectHistoryEntry(entry);
+      collapseBrowseSheet();
+    },
+    [selectHistoryEntry, collapseBrowseSheet],
+  );
 
   useEffect(() => {
     onTabbarVisibleChange?.(!isPointMode);
@@ -321,7 +333,16 @@ export function MapBottomSheet({
 
   const handleRgpSelect = (longitude: number, latitude: number) => {
     onFocusCoordinate(longitude, latitude);
+    collapseBrowseSheet();
   };
+
+  const handleReportSelect = useCallback(
+    (longitude: number, latitude: number) => {
+      onFocusCoordinate(longitude, latitude);
+      collapseBrowseSheet();
+    },
+    [onFocusCoordinate, collapseBrowseSheet],
+  );
 
   if (!isPointMode && hideBrowseSheet) {
     return null;
@@ -397,7 +418,7 @@ export function MapBottomSheet({
               <BrowseSearchHome
                 historyEntries={historyEntries}
                 onOpenRgpList={() => setBrowseView('rgp')}
-                onSelectHistoryEntry={selectHistoryEntry}
+                onSelectHistoryEntry={handleSelectHistoryEntry}
               />
             ) : browseView === 'rgp' ? (
               <BrowseRgpStationsList
@@ -413,7 +434,7 @@ export function MapBottomSheet({
                 onSelectStation={handleRgpSelect}
               />
             ) : (
-              <BrowseReportsPanel onReportSelect={onFocusCoordinate} />
+              <BrowseReportsPanel onReportSelect={handleReportSelect} />
             )}
           </div>
         </div>

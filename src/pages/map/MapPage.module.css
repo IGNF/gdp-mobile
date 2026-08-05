@@ -102,12 +102,9 @@
 
 .geolocationFab {
   right: 1rem;
-  bottom: calc(var(--map-fab-sheet-offset) + var(--map-tabbar-height) + 0.75rem);
+  bottom: calc(var(--map-fab-sheet-offset) + var(--map-tabbar-height) + 0.5rem);
 }
 
-.geolocationFabAboveSearch {
-  bottom: calc(var(--map-fab-sheet-offset) + var(--map-tabbar-height) + 0.75rem);
-}
 
 .geolocationIcon {
   width: 1.75rem;
