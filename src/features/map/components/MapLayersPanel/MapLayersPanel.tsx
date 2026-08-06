@@ -1,10 +1,9 @@
 import { MapOverlaySheet } from '@/features/map/components/MapOverlaySheet';
 import type { MapLayerSheetItem } from '@/features/map/types/mapLayerSheet';
-import { Slider } from '@/shared/ui/Slider';
 
-import IconDrag from '@/shared/assets/icons/icon-drag\'n-drop.svg?react';
 import IconInfo from '@/shared/assets/icons/icon-info.svg?react';
 import IconReset from '@/shared/assets/icons/icon-reset.svg?react';
+import IconCheck from '@/shared/assets/icons/icon-check.svg?react';
 
 import styles from './MapLayersPanel.module.css';
 
@@ -27,74 +26,61 @@ export function MapLayersPanel({
 }: MapLayersPanelProps) {
   return (
     <MapOverlaySheet isOpen={isOpen} onClose={onClose} ariaLabel="Couches de la carte">
-      {/* TODO: panneau couches — en cours de développement, à remplir. */}
-      <p className="debug-banner">DOING — en cours de développement</p>
-      <ul className={styles.layerList}>
+      <div className={styles.layerGrid}>
         {items.map((item) => (
-          <li
+          <div
             key={item.id}
-            className={item.toggleDisabled ? `${styles.layerRow} ${styles.layerRowDisabled}` : styles.layerRow}
+            className={`${styles.layerCard} ${item.toggleDisabled ? styles.layerCardDisabled : ''}`}
           >
-            <span className={styles.dragHandle} aria-hidden>
-              <IconDrag className={styles.dragIcon} />
-            </span>
-
-            <div className={styles.thumbnail} aria-hidden />
-
-            <div className={styles.layerBody}>
-              <div className={styles.layerTitleRow}>
-                <div className={styles.layerTitleBlock}>
-                  <span className={styles.layerTitle}>{item.title}</span>
-                  {item.subtitle ? <span className={styles.layerSubtitle}>{item.subtitle}</span> : null}
-                </div>
-                <div className={styles.layerActions}>
-                  {item.showRefresh && onRefresh ? (
-                    <button
-                      type="button"
-                      className={styles.iconButton}
-                      onClick={() => onRefresh(item.id)}
-                      aria-label={`Rafraîchir ${item.title}`}
-                    >
-                      <IconReset className={styles.actionIcon} aria-hidden />
-                    </button>
-                  ) : null}
-                  {item.showInfo !== false ? (
-                    <button
-                      type="button"
-                      className={styles.iconButton}
-                      onClick={() => onInfo(item.id)}
-                      aria-label={`Informations sur ${item.title}`}
-                    >
-                      <IconInfo className={styles.actionIcon} aria-hidden />
-                    </button>
-                  ) : null}
-                </div>
+            <button
+              type="button"
+              className={`${styles.cardThumbnail} ${item.visible ? styles.cardThumbnailActive : ''}`}
+              onClick={() => onOpacityChange(item.id, item.visible ? 0 : 100)}
+              disabled={item.toggleDisabled}
+              aria-label={item.visible ? `Masquer ${item.title}` : `Afficher ${item.title}`}
+            >
+              {item.thumbnail ? <img src={item.thumbnail} alt="" className={styles.cardThumbnailImage} /> : null}
+              {item.visible ? (
+                <span className={styles.cardCheck}>
+                  <IconCheck className={styles.cardCheckIcon} aria-hidden />
+                </span>
+              ) : null}
+              <div className={styles.cardActions}>
+                {item.showRefresh && onRefresh ? (
+                  <button
+                    type="button"
+                    className={styles.cardActionButton}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onRefresh(item.id);
+                    }}
+                    aria-label={`Rafraîchir ${item.title}`}
+                  >
+                    <IconReset className={styles.cardActionIcon} aria-hidden />
+                  </button>
+                ) : null}
+                {item.showInfo !== false ? (
+                  <button
+                    type="button"
+                    className={styles.cardActionButton}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onInfo(item.id);
+                    }}
+                    aria-label={`Informations sur ${item.title}`}
+                  >
+                    <IconInfo className={styles.cardActionIcon} aria-hidden />
+                  </button>
+                ) : null}
               </div>
+            </button>
 
-              <div className={styles.sliderRow}>
-                <span className={styles.sliderLabel}>0</span>
-                <Slider
-                  className={styles.slider}
-                  binary
-                  min={0}
-                  max={100}
-                  value={item.visible ? 100 : 0}
-                  disabled={item.toggleDisabled}
-                  ariaLabel={
-                    item.toggleDisabled
-                      ? `${item.title} indisponible`
-                      : item.visible
-                        ? `Masquer ${item.title}`
-                        : `Afficher ${item.title}`
-                  }
-                  onChange={(value) => onOpacityChange(item.id, value)}
-                />
-                <span className={styles.sliderLabel}>100%</span>
-              </div>
+            <div className={styles.cardContent}>
+              <p className={styles.cardTitle}>{item.title}</p>
             </div>
-          </li>
+          </div>
         ))}
-      </ul>
+      </div>
     </MapOverlaySheet>
   );
 }

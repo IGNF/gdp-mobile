@@ -6,6 +6,8 @@ export interface MapLayerInfoPanelProps {
   isOpen: boolean;
   title: string;
   description: string;
+  legend?: string;
+  thumbnail?: string;
   onClose: () => void;
   onBack: () => void;
 }
@@ -14,6 +16,8 @@ export function MapLayerInfoPanel({
   isOpen,
   title,
   description,
+  legend,
+  thumbnail,
   onClose,
   onBack,
 }: MapLayerInfoPanelProps) {
@@ -26,8 +30,18 @@ export function MapLayerInfoPanel({
       ariaLabel={title}
     >
       <h3 className={styles.title}>{title}</h3>
-      <div className={styles.preview} aria-hidden />
+      {thumbnail ? (
+        <div className={styles.preview}>
+          <img src={thumbnail} alt="" className={styles.previewImage} />
+        </div>
+      ) : null}
       <p className={styles.description}>{description}</p>
+      {legend ? (
+        <div className={styles.legend}>
+          <h3 className={styles.legendTitle}>Légende</h3>
+          <img src={legend} alt="Légende" className={styles.previewImage} />
+        </div>
+      ) : null}
     </MapOverlaySheet>
   );
 }
