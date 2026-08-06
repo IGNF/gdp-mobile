@@ -1,126 +1,134 @@
-.layerList {
-  list-style: none;
-  margin: 0;
+.layerGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
   padding: 0;
+}
+
+.layerCard {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
 }
 
-.layerRow {
-  display: grid;
-  grid-template-columns: auto auto 1fr;
-  gap: 0.75rem;
-  align-items: start;
-}
-
-.layerRowDisabled {
+.layerCardDisabled {
   opacity: 0.5;
 }
 
-.dragHandle {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 1.5rem;
-  padding-top: 0.375rem;
-  opacity: 0.45;
-}
-
-.dragIcon {
-  width: 1.125rem;
-  height: 1.125rem;
-}
-
-.dragIcon path {
-  fill: var(--color-medium);
-}
-
-.thumbnail {
-  width: 3.5rem;
-  height: 3.5rem;
-  border-radius: 0.5rem;
+.cardThumbnail {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  border-radius: 0.75rem;
   background: var(--gradient-geodesy-layer-preview);
-  border: 1px solid var(--color-light-shade);
-  flex-shrink: 0;
+  border: 2px solid var(--color-light-shade);
+  overflow: hidden;
+  position: relative;
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.2s;
 }
 
-.layerBody {
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+.cardThumbnail:hover:not(:disabled) {
+  border-color: var(--color-medium);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-.layerTitleRow {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 0.5rem;
+.cardThumbnail:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
 }
 
-.layerTitleBlock {
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.125rem;
+.cardThumbnailActive {
+  border-color: var(--color-primary);
+  border-width: 2px;
 }
 
-.layerTitle {
-  font-size: 0.9375rem;
-  font-weight: 600;
-  color: var(--color-dark);
-  line-height: 1.3;
+.cardThumbnailImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
-.layerSubtitle {
-  font-size: 0.75rem;
-  color: var(--color-medium);
-  line-height: 1.3;
-}
-
-.layerActions {
-  display: flex;
-  align-items: center;
-  /* gap: 0.25rem; */
-  flex-shrink: 0;
-}
-
-.iconButton {
+.cardCheck {
+  position: absolute;
+  bottom: 0.5rem;
+  right: 0.5rem;
+  width: 0.75rem;
+  height: 0.75rem;
+  background: var(--color-primary);
+  border: 1px solid var(--color-white);
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 1.75rem;
-  height: 1.75rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.cardCheckIcon {
+  width: 0.5rem;
+  height: 0.5rem;
+}
+
+.cardCheckIcon path {
+  fill: var(--color-white);
+}
+
+.cardActions {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  display: flex;
+  gap: 0.25rem;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.cardThumbnail:hover .cardActions,
+.cardThumbnail:focus-within .cardActions {
+  opacity: 1;
+}
+
+.cardActionButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
   padding: 0;
   border: none;
   border-radius: 50%;
-  background: transparent;
+  background: rgba(255, 255, 255, 0.95);
   cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transition: transform 0.2s;
 }
 
-.actionIcon {
+.cardActionButton:hover {
+  transform: scale(1.1);
+  background: var(--color-white);
+}
+
+.cardActionIcon {
   width: 1.125rem;
   height: 1.125rem;
 }
 
-.actionIcon path {
-  fill: var(--color-medium);
+.cardActionIcon path {
+  fill: var(--color-dark);
 }
 
-.sliderRow {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  align-items: center;
-  gap: 0.5rem;
+.cardContent {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
 }
 
-.sliderLabel {
+.cardTitle {
   font-size: 0.75rem;
-  color: var(--color-medium);
-  flex-shrink: 0;
-}
-
-.slider {
-  width: 100%;
+  font-weight: 600;
+  color: var(--color-dark);
+  line-height: 1.3;
+  margin: 0;
 }
