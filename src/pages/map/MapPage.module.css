@@ -4,9 +4,9 @@
   height: 100dvh;
   margin-top: calc(-1 * var(--safe-top));
   background: var(--color-dark);
-  --map-tabbar-height: 6.5rem;
-  --map-sheet-height: 5.5rem;
-  --map-fab-sheet-offset: 5.5rem;
+  --map-tabbar-height: 5rem;
+  --map-sheet-height: 4.5rem;
+  --map-fab-sheet-offset: 4.5rem;
 }
 
 .mapContainer {
@@ -71,11 +71,23 @@
 
 .mapFabActive {
   background-color: var(--color-primary);
+  color: var(--color-white);
+}
+
+.mapFabActive .mapFabIcon path,
+.mapFabActive .geolocationIcon path {
+  fill: var(--color-white);
 }
 
 .mapFabLocked {
   background-color: var(--color-primary);
+  color: var(--color-white);
   animation: pulse-locked 2s ease-in-out infinite;
+}
+
+.mapFabLocked .mapFabIcon path,
+.mapFabLocked .geolocationIcon path {
+  fill: var(--color-white);
 }
 
 @keyframes pulse-locked {
@@ -116,7 +128,7 @@
 
 .geolocationFab {
   right: 1rem;
-  bottom: calc(var(--map-fab-sheet-offset) + var(--map-tabbar-height) + 0.5rem);
+  bottom: calc(var(--map-fab-sheet-offset) + var(--map-tabbar-height) - 0.5rem);
 }
 
 
@@ -139,8 +151,8 @@
 }
 
 .mapTarget :global(.ol-scale-line) {
-  bottom: calc(var(--map-fab-sheet-offset) + var(--map-tabbar-height) + 0.5rem);
-  left: 8px;
+  bottom: calc(var(--map-fab-sheet-offset) + var(--map-tabbar-height) - 0.5rem);
+  left: 1rem;
 }
 
 .mapTarget :global(.ol-attribution) {

@@ -309,7 +309,7 @@ export function GdpGeodesyFiltersForm({ filters, values, onChange }: GdpGeodesyF
 
       {hasObservationDates ? (
         <section className={styles.section}>
-          <h3 className={styles.sectionTitle}>Date d&apos;observation</h3>
+          <h3 className={styles.sectionTitle}>Date de détermination</h3>
           <ObservationDateRow
             values={values}
             fromId="OBS_DATE_FROM"

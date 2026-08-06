@@ -1,13 +1,16 @@
 import type Map from 'ol/Map';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { toLonLat } from 'ol/proj';
 
 import type { MapGeodesyClickAction } from '@/features/map/hooks/useMapGeodesyClick';
 import { useBottomSheetSnap } from '@/features/map/hooks/useBottomSheetSnap';
 import { useNearestRgpStations } from '@/features/map/hooks/useNearestRgpStations';
+import { useUserLocation } from '@/features/map/hooks/useUserLocation';
 import { useAddressSearchHistory } from '@/features/search/hooks/useAddressSearchHistory';
 import type { AddressSearchHistoryEntry } from '@/features/search/utils/addressSearchHistory';
 import { useSearchGeoportail } from '@/features/search/hooks/useSearchGeoportail';
+import type { UserFollowingMode } from '@/features/map/hooks/useMap';
+
+import sheetChrome from '@/features/map/styles/mapSheet.module.css';
 
 import { BrowseRgpStationsList } from './BrowseRgpStationsList';
 import { BrowseSearchHome } from './BrowseSearchHome';
@@ -17,6 +20,8 @@ import styles from './MapBottomSheet.module.css';
 import IconSearch from '@/shared/assets/icons/icon-search.svg?react';
 
 type BrowsePanelView = 'search' | 'rgp' | 'reports';
+
+const BROWSE_SHEET_SLIDE_MS = 300;
 
 function getBrowseSnapHeights(viewportHeight: number): readonly number[] {
   // Snap 0 = fermé ; snap 1 = taille normale ; snap 2 = étiré au maximum
@@ -57,6 +62,7 @@ export interface MapBottomSheetProps {
   isMapReady: boolean;
   selectedPoint: MapGeodesyClickAction | null;
   canReportPoint: boolean;
+  userFollowingMode: UserFollowingMode;
   onClosePoint: () => void;
   onReportPoint: () => void;
   onFocusCoordinate: (longitude: number, latitude: number) => void;
@@ -86,6 +92,7 @@ export function MapBottomSheet({
   isMapReady,
   selectedPoint,
   canReportPoint,
+  userFollowingMode,
   onClosePoint,
   onReportPoint,
   onFocusCoordinate,
@@ -104,10 +111,14 @@ export function MapBottomSheet({
   const searchContainerRef = useRef<HTMLDivElement>(null);
   const sheetRef = useRef<HTMLElement>(null);
   const browseSnapIndexRef = useRef(0);
+  const browseViewRef = useRef<BrowsePanelView>('search');
+  const pendingBrowseViewRef = useRef<BrowsePanelView | null>(null);
+  const browseSwitchTimeoutRef = useRef<number | null>(null);
   const isPointMode = selectedPoint !== null;
   const [viewportHeight, setViewportHeight] = useState(() => window.innerHeight);
   const [safeAreaTop, setSafeAreaTop] = useState(() => getSafeAreaTopPx());
   const [browseView, setBrowseView] = useState<BrowsePanelView>('search');
+  browseViewRef.current = browseView;
 
   useEffect(() => {
     const handleResize = () => {
@@ -148,10 +159,18 @@ export function MapBottomSheet({
   browseSnapIndexRef.current = isPointMode ? 0 : browseSnap.snapIndex;
 
   useEffect(() => {
-    if (isBrowseCollapsed) {
+    if (isBrowseCollapsed && !pendingBrowseViewRef.current) {
       setBrowseView('search');
     }
   }, [isBrowseCollapsed]);
+
+  useEffect(() => {
+    return () => {
+      if (browseSwitchTimeoutRef.current !== null) {
+        window.clearTimeout(browseSwitchTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const expandBrowseSheet = useCallback(() => {
     if (!isPointMode) {
@@ -164,10 +183,47 @@ export function MapBottomSheet({
   }, [expandBrowseSheet]);
 
   const collapseBrowseSheet = useCallback(() => {
+    if (browseSwitchTimeoutRef.current !== null) {
+      window.clearTimeout(browseSwitchTimeoutRef.current);
+      browseSwitchTimeoutRef.current = null;
+    }
+    pendingBrowseViewRef.current = null;
     setSnapIndex(0);
     setBrowseView('search');
     searchContainerRef.current?.querySelector<HTMLInputElement>('input.search')?.blur();
   }, [setSnapIndex]);
+
+  /** Ouvre une vue browse ; si une autre vue est déjà ouverte, rejoue le glissé haut. */
+  const openBrowseView = useCallback(
+    (view: BrowsePanelView) => {
+      if (isPointMode) {
+        return;
+      }
+
+      const isExpanded = browseSnapIndexRef.current > 0;
+      const currentView = browseViewRef.current;
+
+      if (isExpanded && currentView !== view && view !== 'rgp' && currentView !== 'rgp') {
+        if (browseSwitchTimeoutRef.current !== null) {
+          window.clearTimeout(browseSwitchTimeoutRef.current);
+        }
+
+        pendingBrowseViewRef.current = view;
+        setSnapIndex(0);
+        browseSwitchTimeoutRef.current = window.setTimeout(() => {
+          setBrowseView(view);
+          setSnapIndex(1);
+          pendingBrowseViewRef.current = null;
+          browseSwitchTimeoutRef.current = null;
+        }, BROWSE_SHEET_SLIDE_MS);
+        return;
+      }
+
+      setBrowseView(view);
+      expandBrowseSheet();
+    },
+    [expandBrowseSheet, isPointMode, setSnapIndex],
+  );
 
   useEffect(() => {
     if (!collapseBrowseSearch || isPointMode) {
@@ -179,10 +235,9 @@ export function MapBottomSheet({
 
   useEffect(() => {
     if (forceExpandSearch && !isPointMode) {
-      expandBrowseSheet();
-      setBrowseView('search');
+      openBrowseView('search');
     }
-  }, [forceExpandSearch, isPointMode, expandBrowseSheet]);
+  }, [forceExpandSearch, isPointMode, openBrowseView]);
 
   useEffect(() => {
     if (forceCloseSearch && !isPointMode) {
@@ -192,10 +247,9 @@ export function MapBottomSheet({
 
   useEffect(() => {
     if (forceExpandReports && !isPointMode) {
-      expandBrowseSheet();
-      setBrowseView('reports');
+      openBrowseView('reports');
     }
-  }, [forceExpandReports, isPointMode, expandBrowseSheet]);
+  }, [forceExpandReports, isPointMode, openBrowseView]);
 
   useEffect(() => {
     if (forceCloseReports && !isPointMode) {
@@ -315,13 +369,7 @@ export function MapBottomSheet({
     onSheetHeightChange,
   ]);
 
-  const center = map?.getView().getCenter();
-  const referencePosition = center
-    ? (() => {
-        const [longitude, latitude] = toLonLat(center);
-        return { longitude, latitude };
-      })()
-    : null;
+  const referencePosition = useUserLocation({ enabled: userFollowingMode !== 'none' });
 
   const handleNavigateToPoint = () => {
     if (!selectedPoint) {
@@ -352,7 +400,9 @@ export function MapBottomSheet({
     <section
       ref={sheetRef}
       className={[
+        sheetChrome.surface,
         styles.sheet,
+        dragOffset !== 0 ? styles.sheetDragging : '',
         isSheetAuto ? styles.sheetAuto : '',
         isPointMode ? styles.sheetPointFiche : '',
         isBrowseCollapsed ? styles.sheetCollapsed : '',
@@ -361,7 +411,7 @@ export function MapBottomSheet({
         .join(' ')}
       style={
         isBrowseCollapsed
-          ? undefined
+          ? { height: 0, ['--map-sheet-height' as string]: '0px' }
           : isSheetAuto
             ? undefined
             : { height: `${currentHeight}px`, ['--map-sheet-height' as string]: `${currentHeight}px` }
@@ -370,17 +420,17 @@ export function MapBottomSheet({
     >
       {!isPointMode && isBrowseExpanded ? (
         <div
-          className={styles.handleArea}
+          className={`${sheetChrome.handleArea} ${styles.handleAreaDraggable}`}
           {...dragHandleProps}
           aria-hidden={browseSnapHeights.length < 2}
         >
-          <span className={styles.handle} />
+          <span className={sheetChrome.handle} />
         </div>
       ) : null}
 
       {isPointMode && selectedPoint ? (
         <div
-          className={`${styles.content} ${isPointMiniFiche ? styles.contentPointMini : styles.contentPointSheet}`}
+          className={`${sheetChrome.body} ${isPointMiniFiche ? styles.contentPointMini : styles.contentPointSheet}`}
         >
           <MapPointSheet
             action={selectedPoint}

@@ -1,0 +1,31 @@
+/* Chrome partagé des panneaux carte (recherche, signalements, couches, infos). */
+
+.surface {
+  display: flex;
+  flex-direction: column;
+  background: var(--color-dark-contrast);
+  border-radius: 1.25rem;
+  box-shadow: 0 -4px 24px rgba(9, 22, 37, 0.12);
+}
+
+.handleArea {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 2.75rem;
+  flex-shrink: 0;
+}
+
+.handle {
+  width: 2.5rem;
+  height: 0.25rem;
+  border-radius: 999px;
+  background: var(--color-light-shade);
+}
+
+.body {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 0 1rem 1rem;
+}

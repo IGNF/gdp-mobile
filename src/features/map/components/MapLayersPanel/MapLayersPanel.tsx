@@ -26,34 +26,33 @@ export function MapLayersPanel({
 }: MapLayersPanelProps) {
   return (
     <MapOverlaySheet isOpen={isOpen} onClose={onClose} ariaLabel="Couches de la carte">
-      <div className={styles.layerGrid}>
+      <div className={styles.layerGrid}> 
         {items.map((item) => (
           <div
             key={item.id}
             className={`${styles.layerCard} ${item.toggleDisabled ? styles.layerCardDisabled : ''}`}
           >
-            <button
-              type="button"
-              className={`${styles.cardThumbnail} ${item.visible ? styles.cardThumbnailActive : ''}`}
-              onClick={() => onOpacityChange(item.id, item.visible ? 0 : 100)}
-              disabled={item.toggleDisabled}
-              aria-label={item.visible ? `Masquer ${item.title}` : `Afficher ${item.title}`}
-            >
-              {item.thumbnail ? <img src={item.thumbnail} alt="" className={styles.cardThumbnailImage} /> : null}
-              {item.visible ? (
-                <span className={styles.cardCheck}>
-                  <IconCheck className={styles.cardCheckIcon} aria-hidden />
-                </span>
-              ) : null}
+            <div className={`${styles.cardThumbnail} ${item.visible ? styles.cardThumbnailActive : ''}`}>
+              <button
+                type="button"
+                className={styles.cardThumbnailButton}
+                onClick={() => onOpacityChange(item.id, item.visible ? 0 : 100)}
+                disabled={item.toggleDisabled}
+                aria-label={item.visible ? `Masquer ${item.title}` : `Afficher ${item.title}`}
+              >
+                {item.thumbnail ? <img src={item.thumbnail} alt="" className={styles.cardThumbnailImage} /> : null}
+                {item.visible ? (
+                  <span className={styles.cardCheck}>
+                    <IconCheck className={styles.cardCheckIcon} aria-hidden />
+                  </span>
+                ) : null}
+              </button>
               <div className={styles.cardActions}>
                 {item.showRefresh && onRefresh ? (
                   <button
                     type="button"
                     className={styles.cardActionButton}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onRefresh(item.id);
-                    }}
+                    onClick={() => onRefresh(item.id)}
                     aria-label={`Rafraîchir ${item.title}`}
                   >
                     <IconReset className={styles.cardActionIcon} aria-hidden />
@@ -63,17 +62,14 @@ export function MapLayersPanel({
                   <button
                     type="button"
                     className={styles.cardActionButton}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onInfo(item.id);
-                    }}
+                    onClick={() => onInfo(item.id)}
                     aria-label={`Informations sur ${item.title}`}
                   >
                     <IconInfo className={styles.cardActionIcon} aria-hidden />
                   </button>
                 ) : null}
               </div>
-            </button>
+            </div>
 
             <div className={styles.cardContent}>
               <p className={styles.cardTitle}>{item.title}</p>

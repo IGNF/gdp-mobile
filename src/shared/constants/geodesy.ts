@@ -79,14 +79,14 @@ export const GDP_GEODESY_EXPERT_WFS_ATTRIBUTE_FILTERS: readonly GeodesyWfsAttrib
     {
       id: 'OBS_DATE_FROM',
       type: 'date',
-      title: "Date d'observation",
+      title: "Date de détermination",
       property: 'obs_date',
       operator: 'after',
     },
     {
       id: 'OBS_DATE_TO',
       type: 'date',
-      title: "Date d'observation",
+      title: "Date de détermination",
       property: 'obs_date',
       operator: 'before',
     },

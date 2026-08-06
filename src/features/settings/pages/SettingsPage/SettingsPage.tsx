@@ -72,7 +72,7 @@ export function SettingsPage({
         <section className={styles.section}>
           <h2 className={styles.sectionTitle}>Carte</h2>
           <p className={typography.paragraph}>
-            La position, le zoom, les calques visibles et les filtres repères sont mémorisés
+            La position, le zoom, les calques visibles et les filtres des points sont mémorisés
             automatiquement entre les sessions.
           </p>
           <Toggle

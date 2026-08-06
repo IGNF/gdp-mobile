@@ -2,6 +2,7 @@ import { useEffect, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 
 import IconClose from '@/shared/assets/icons/icon-close.svg?react';
+import sheetChrome from '@/features/map/styles/mapSheet.module.css';
 
 import styles from './MapOverlaySheet.module.css';
 
@@ -37,19 +38,16 @@ export function MapOverlaySheet({
   const [isVisible, setIsVisible] = useState(false);
   const [shouldRender, setShouldRender] = useState(isOpen);
 
-  if (isOpen && !shouldRender) {
-    setShouldRender(true);
-  }
-  if (!isOpen && isVisible) {
-    setIsVisible(false);
-  }
-
   useEffect(() => {
     if (isOpen) {
+      setShouldRender(true);
+      // Repart toujours de translateY(110%) pour rejouer le glissé vers le haut.
+      setIsVisible(false);
       const timer = window.setTimeout(() => setIsVisible(true), 20);
       return () => window.clearTimeout(timer);
     }
 
+    setIsVisible(false);
     const timer = window.setTimeout(() => setShouldRender(false), ANIMATION_DURATION_MS);
     return () => window.clearTimeout(timer);
   }, [isOpen]);
@@ -75,13 +73,13 @@ export function MapOverlaySheet({
         aria-label="Fermer"
       />
       <section
-        className={`${styles.sheet} ${sheetClassName ?? ''} ${isVisible ? styles.sheetVisible : ''}`}
+        className={`${sheetChrome.surface} ${styles.sheet} ${sheetClassName ?? ''} ${isVisible ? styles.sheetVisible : ''}`}
         role="dialog"
         aria-modal="true"
         aria-label={ariaLabel ?? title ?? 'Panneau carte'}
       >
-        <div className={styles.handleArea} aria-hidden>
-          <span className={styles.handle} />
+        <div className={sheetChrome.handleArea} aria-hidden>
+          <span className={sheetChrome.handle} />
         </div>
 
         {(title || showBackButton) && (
@@ -119,7 +117,7 @@ export function MapOverlaySheet({
           </div>
         ) : null}
 
-        <div className={styles.content} data-scroll-root="true">
+        <div className={sheetChrome.body} data-scroll-root="true">
           {children}
         </div>
         {footer ? <div className={styles.footer}>{footer}</div> : null}

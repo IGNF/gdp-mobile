@@ -175,17 +175,21 @@ export function MapLayersPanelFlow({
   }, [geodesyCatalog, isOpen, refreshRgpLastLoadedAt]);
 
   useEffect(() => {
-    if (isOpen && focusGroupId === 'geodesy-filters') {
+    if (!isOpen) {
+      setActiveInfoLayerId(null);
+      setShowFilters(false);
+      setIsRgpReloadConfirmOpen(false);
+      return;
+    }
+
+    if (focusGroupId === 'geodesy-filters') {
       setShowFilters(true);
       setActiveInfoLayerId(null);
       return;
     }
 
-    if (!isOpen) {
-      setActiveInfoLayerId(null);
-      setShowFilters(false);
-      setIsRgpReloadConfirmOpen(false);
-    }
+    // Retour liste couches (ex. clic FAB couches depuis les filtres).
+    setShowFilters(false);
   }, [focusGroupId, isOpen]);
 
   const wfsLayerIds = useMemo(
@@ -291,9 +295,8 @@ export function MapLayersPanelFlow({
 
   const handleCloseFilters = () => {
     setShowFilters(false);
-    if (focusGroupId === 'geodesy-filters') {
-      onClose();
-    }
+    setActiveInfoLayerId(null);
+    onClose();
   };
 
   const setWfsVisibility = (visible: boolean) => {

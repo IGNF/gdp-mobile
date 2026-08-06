@@ -42,11 +42,11 @@
 .segment {
   flex: 1;
   min-width: 0;
-  padding: 0.625rem 0.5rem;
+  padding: 0.425rem 0.5rem;
   border: 1.5px solid var(--color-light);
   border-radius: 0.625rem;
   background: var(--color-dark-contrast);
-  font-size: 0.8125rem;
+  font-size: 0.75rem;
   line-height: 1.25;
   color: var(--color-dark);
   cursor: pointer;
@@ -116,7 +116,7 @@
   display: flex;
   align-items: center;
   gap: 0.375rem;
-  min-height: 2.75rem;
+  min-height: 1.75rem;
   padding: 0.375rem 0.5rem 0.375rem 0.75rem;
   border: 1.5px solid var(--color-light);
   border-radius: 0.625rem;
@@ -393,9 +393,9 @@
   flex-direction: column;
   min-height: 0;
   flex: 1;
-  padding: 0 1rem;
 }
 
 .sheetLarge {
-  max-height: min(78vh, 40rem);
+  /* Plus haut que les autres panneaux, mais même chrome (marges + coins arrondis). */
+  max-height: min(78vh, 38rem);
 }
