@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type MouseEvent } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { defaultGeodesyLayerVisibility, isGeodesyLayerReportingEnabled } from '@ign/gdp-tools';
 import { useGeodesyOnMap, useGeodesyWfsLoading } from '@ign/gdp-tools/react';
@@ -26,6 +26,7 @@ import { useUserLocationMarker } from '@/features/map/hooks/useUserLocationMarke
 import { Gdp_Geolocation } from '@/platform/device/geolocation';
 import { Loading } from '@/shared/ui/Loading';
 import {
+  GEOLOCATION_DOUBLE_TAP_DELAY_MS,
   GEOPORTAIL_LAYERS,
   GROUP_REPORT_MAP_FOCUS_ZOOM,
 } from '@/shared/constants/map';
@@ -91,10 +92,11 @@ export function MapPage() {
     map,
     centerOnUserLocation,
     focusOnCoordinate,
+    lockUserLocationOnMap,
     isLocating,
+    isLockedUserLocation,
     isMapReady,
     userFollowingMode,
-    setUserFollowingMode,
   } = useMap();
   const [activeBasemap, setActiveBasemap] = useState<string>(GEOPORTAIL_LAYERS.PLAN_IGN);
   const [geoservicesVisible, setGeoservicesVisible] = useState(true);
@@ -177,6 +179,8 @@ export function MapPage() {
     attributeCatalog: geodesy.catalog.attributes,
     pictoUrlMaps: geodesy.catalog.wfsPictoUrlMaps,
   });
+  const geolocationLastTapRef = useRef(0);
+  const geolocationTapTimeoutRef = useRef<number | null>(null);
 
   useUserLocationMarker({ map, isMapReady });
   useMapClickSelectionMarker({ map, isMapReady, pendingAction: mapClick.pendingAction });
@@ -201,21 +205,26 @@ export function MapPage() {
     onReportSelect: handleReportMapSelect,
   });
 
-  const handleGeolocationButtonClick = () => {
+  const handleGeolocationButtonClick = (event: MouseEvent<HTMLButtonElement>) => {
+    const now = event.timeStamp;
+
     void Gdp_Geolocation.ensurePermissions();
 
-    // Cycle à 3 clics : none → following → locked → none
-    if (userFollowingMode === 'none') {
-      // Clic 1 : centrer et activer le suivi (sans recentrage automatique)
-      void centerOnUserLocation();
-      setUserFollowingMode('following');
-    } else if (userFollowingMode === 'following') {
-      // Clic 2 : activer le verrouillage (recentrage périodique automatique)
-      setUserFollowingMode('locked');
-    } else {
-      // Clic 3 : désactiver
-      setUserFollowingMode('none');
+    if (
+      geolocationTapTimeoutRef.current !== null &&
+      now - geolocationLastTapRef.current <= GEOLOCATION_DOUBLE_TAP_DELAY_MS
+    ) {
+      window.clearTimeout(geolocationTapTimeoutRef.current);
+      geolocationTapTimeoutRef.current = null;
+      lockUserLocationOnMap();
+      return;
     }
+
+    geolocationLastTapRef.current = now;
+    geolocationTapTimeoutRef.current = window.setTimeout(() => {
+      geolocationTapTimeoutRef.current = null;
+      void centerOnUserLocation();
+    }, GEOLOCATION_DOUBLE_TAP_DELAY_MS);
   };
 
   useEffect(() => {
@@ -425,16 +434,14 @@ export function MapPage() {
             className={[
               styles.mapFab,
               styles.geolocationFab,
-              isLockedUserLocation ? styles.mapFabActive : '',
+              userFollowingMode === 'locked' ? styles.mapFabActive : '',
             ]
               .filter(Boolean)
               .join(' ')}
             aria-label={
               userFollowingMode === 'locked'
-                ? 'Géolocalisation verrouillée avec recentrage (clic pour désactiver)'
-                : userFollowingMode === 'following'
-                  ? 'Suivi de position actif (clic pour verrouiller avec recentrage)'
-                  : 'Activer la géolocalisation'
+                ? 'Désactiver le verrouillage de position'
+                : 'Centrer sur ma position (double-tap pour verrouiller)'
             }
             disabled={!isMapReady || (isLocating && userFollowingMode === 'none')}
             onClick={handleGeolocationButtonClick}
@@ -453,7 +460,6 @@ export function MapPage() {
             isMapReady={isMapReady}
             selectedPoint={pendingAction}
             canReportPoint={isGeodesyReportable}
-            userFollowingMode={userFollowingMode}
             onClosePoint={mapClick.closeActionSheet}
             onReportPoint={handleReportPoint}
             onFocusCoordinate={handleFocusCoordinate}
