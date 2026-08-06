@@ -46,10 +46,10 @@ interface UseMapOptions {
 }
 
 /**
- * tracking : suivi GPS continu (watchPosition).
- * locked : double-tap sur le bouton géoloc — recentrage périodique animé.
+ * following : suivi GPS pour afficher la distance (pas de recentrage automatique).
+ * locked : suivi GPS avec recentrage périodique animé.
  */
-export type UserFollowingMode = 'none' | 'tracking' | 'locked';
+export type UserFollowingMode = 'none' | 'following' | 'locked';
 
 type UserLocationViewportStatus = 'inside' | 'border' | 'outside';
 
@@ -92,6 +92,7 @@ export function useMap(options: UseMapOptions = {}): UseMapReturn {
   const userViewportChangeTimeoutRef = useRef<number | null>(null);
   const latestPositionRef = useRef<Position | null>(null);
   const isAutoRecenterActiveRef = useRef(false);
+  const userFollowingModeRef = useRef<UserFollowingMode>('none');
   const [map, setMap] = useState<Map | null>(null);
   const [userFollowingMode, setUserFollowingMode] = useState<UserFollowingMode>('none');
   const [isFeatureGeolocationRecenterActive, setIsGeolocationRecenterActive] = useState(false);
@@ -102,8 +103,7 @@ export function useMap(options: UseMapOptions = {}): UseMapReturn {
   );
 
   const isLockedUserLocation = userFollowingMode === 'locked';
-  const isAutoRecenterActive =
-    isFeatureGeolocationRecenterActive || userFollowingMode === 'tracking';
+  const isAutoRecenterActive = isFeatureGeolocationRecenterActive || userFollowingMode === 'locked';
 
   const markProgrammaticViewportChange = useCallback(() => {
     programmaticViewportChangeCountRef.current += 1;
@@ -296,20 +296,31 @@ export function useMap(options: UseMapOptions = {}): UseMapReturn {
   }, [animateViewToPosition, getLatestPosition, getPositionViewportStatus]);
 
   const onUserViewportChange = useCallback(() => {
-    if (!isAutoRecenterActiveRef.current || programmaticViewportChangeCountRef.current > 0) {
+    if (programmaticViewportChangeCountRef.current > 0) {
       return;
     }
 
-    hasManualViewportOverrideRef.current = true;
-    isUserViewportChangePendingRef.current = true;
+    const currentMode = userFollowingModeRef.current;
 
-    if (userViewportChangeTimeoutRef.current !== null) {
-      window.clearTimeout(userViewportChangeTimeoutRef.current);
+    // En mode following : désactiver immédiatement le suivi
+    if (currentMode === 'following') {
+      setUserFollowingMode('none');
+      return;
     }
 
-    userViewportChangeTimeoutRef.current = window.setTimeout(() => {
-      void restoreViewportAfterUserChange();
-    }, GEOLOCATION_RECENTER_AFTER_MOVEMENT_MS);
+    // En mode locked : recentrer après un délai
+    if (currentMode === 'locked' || isAutoRecenterActiveRef.current) {
+      hasManualViewportOverrideRef.current = true;
+      isUserViewportChangePendingRef.current = true;
+
+      if (userViewportChangeTimeoutRef.current !== null) {
+        window.clearTimeout(userViewportChangeTimeoutRef.current);
+      }
+
+      userViewportChangeTimeoutRef.current = window.setTimeout(() => {
+        void restoreViewportAfterUserChange();
+      }, GEOLOCATION_RECENTER_AFTER_MOVEMENT_MS);
+    }
   }, [restoreViewportAfterUserChange]);
 
   const centerOnUserLocation = useCallback(async (animationDuration: number = 500) => {
@@ -338,6 +349,10 @@ export function useMap(options: UseMapOptions = {}): UseMapReturn {
       setIsLocating(false);
     }
   }, [animateTo, animateToPosition]);
+
+  useEffect(() => {
+    userFollowingModeRef.current = userFollowingMode;
+  }, [userFollowingMode]);
 
   useEffect(() => {
     isAutoRecenterActiveRef.current = isAutoRecenterActive;

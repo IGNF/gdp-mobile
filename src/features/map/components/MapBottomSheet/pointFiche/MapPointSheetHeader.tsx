@@ -34,8 +34,6 @@ export function MapPointSheetHeader({ action, referencePosition }: MapPointSheet
     }
   };
 
-  // TODO: supprimer l'affichage debug de l'id repère (pointId + bloc JSX + .debug-banner dans global.css).
-  const pointId = action.reportContext.geodesyId ?? readProperty(action, 'id');
   const etatLabel = findEtatLabel(action);
   const visitYear = findVisitYear(action);
   const pdfUrl = readProperty(action, 'url_pdf');
@@ -86,9 +84,6 @@ export function MapPointSheetHeader({ action, referencePosition }: MapPointSheet
           <IconHeart className={styles.favoriteIcon} aria-hidden />
         </button>
       </div>
-      {/* TODO: supprimer — debug id repère */}
-      {pointId ? <p className="debug-banner">DEBUG — id : {pointId}</p> : null}
-
       {etatLabel || metaParts.length > 0 ? (
         <div className={styles.statusMetaRow}>
           {etatLabel ? (
