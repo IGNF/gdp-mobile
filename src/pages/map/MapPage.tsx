@@ -106,10 +106,16 @@ export function MapPage() {
   const [fabSheetOffset, setFabSheetOffset] = useState(0);
   const [isTabbarHiddenByPoint, setIsTabbarHiddenByPoint] = useState(false);
   const [isTabbarHiddenByFilters, setIsTabbarHiddenByFilters] = useState(false);
+  const [forceExpandSearch, setForceExpandSearch] = useState(false);
+  const [forceCloseSearch, setForceCloseSearch] = useState(false);
+  const [forceExpandReports, setForceExpandReports] = useState(false);
+  const [forceCloseReports, setForceCloseReports] = useState(false);
+  const [isSearchPanelOpen, setIsSearchPanelOpen] = useState(false);
+  const [isReportsPanelOpen, setIsReportsPanelOpen] = useState(false);
   const isTabbarVisible = !isTabbarHiddenByPoint && !isTabbarHiddenByFilters;
 
   useEffect(() => {
-    const tabbarHeight = isTabbarVisible ? '5.5rem' : '0px';
+    const tabbarHeight = isTabbarVisible ? '6.5rem' : '0px';
     document.documentElement.style.setProperty('--map-tabbar-height', tabbarHeight);
 
     return () => {
@@ -227,6 +233,30 @@ export function MapPage() {
   }, [focusOnCoordinate, isMapReady, location.state, navigate]);
 
   useEffect(() => {
+    if (location.state?.openSearch) {
+      setForceExpandSearch(true);
+      navigate('/map', { replace: true, state: null });
+      setTimeout(() => setForceExpandSearch(false), 100);
+    }
+  }, [location.state, navigate]);
+
+  useEffect(() => {
+    if (location.state?.openReports) {
+      setForceExpandReports(true);
+      navigate('/map', { replace: true, state: null });
+      setTimeout(() => setForceExpandReports(false), 100);
+    }
+  }, [location.state, navigate]);
+
+  useEffect(() => {
+    return () => {
+      if (geolocationTapTimeoutRef.current !== null) {
+        window.clearTimeout(geolocationTapTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
     if (!map) {
       return;
     }
@@ -293,6 +323,16 @@ export function MapPage() {
     mapClick.reportOnExistingPoint();
   }, [isGeodesyReportable, mapClick]);
 
+  const handleCloseSearch = useCallback(() => {
+    setForceCloseSearch(true);
+    setTimeout(() => setForceCloseSearch(false), 100);
+  }, []);
+
+  const handleCloseReports = useCallback(() => {
+    setForceCloseReports(true);
+    setTimeout(() => setForceCloseReports(false), 100);
+  }, []);
+
   const hasActiveFilters =
     geodesyMode === 'expert' &&
     countActiveMapGeodesyFilters(
@@ -301,7 +341,6 @@ export function MapPage() {
     ) > 0;
 
   const showExpertFiltersButton = geodesyMode === 'expert';
-  const isSearchFabVisible = sheetHeight === 0 && !isTabbarHiddenByFilters;
 
   return (
     <div
@@ -309,7 +348,7 @@ export function MapPage() {
       style={{
         ['--map-sheet-height' as string]: `${sheetHeight}px`,
         ['--map-fab-sheet-offset' as string]: `${fabSheetOffset}px`,
-        ['--map-tabbar-height' as string]: isTabbarVisible ? '5.5rem' : '0px',
+        ['--map-tabbar-height' as string]: isTabbarVisible ? '6.5rem' : '0px',
       }}
     >
       <LeftMenu
@@ -386,9 +425,7 @@ export function MapPage() {
             className={[
               styles.mapFab,
               styles.geolocationFab,
-              isSearchFabVisible ? styles.geolocationFabAboveSearch : '',
-              userFollowingMode === 'locked' ? styles.mapFabLocked : '',
-              userFollowingMode === 'following' ? styles.mapFabActive : '',
+              isLockedUserLocation ? styles.mapFabActive : '',
             ]
               .filter(Boolean)
               .join(' ')}
@@ -425,9 +462,21 @@ export function MapPage() {
             onTabbarVisibleChange={(visible) => setIsTabbarHiddenByPoint(!visible)}
             hideBrowseSheet={isTabbarHiddenByFilters}
             collapseBrowseSearch={isLayersPanelOpen || isTabbarHiddenByFilters}
+            forceExpandSearch={forceExpandSearch}
+            forceCloseSearch={forceCloseSearch}
+            forceExpandReports={forceExpandReports}
+            forceCloseReports={forceCloseReports}
+            onSearchPanelStateChange={setIsSearchPanelOpen}
+            onReportsPanelStateChange={setIsReportsPanelOpen}
           />
 
-          {isTabbarVisible ? <BottomTabbar activeTab="carte" /> : null}
+          {isTabbarVisible ? (
+            <BottomTabbar
+              activeTab={isSearchPanelOpen ? 'recherche' : isReportsPanelOpen ? 'signalements' : 'carte'}
+              onCloseSearch={handleCloseSearch}
+              onCloseReports={handleCloseReports}
+            />
+          ) : null}
         </div>
       </div>
 
