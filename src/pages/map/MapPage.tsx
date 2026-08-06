@@ -301,6 +301,16 @@ export function MapPage() {
     }, 100);
   }, []);
 
+  const handleOpenMenu = useCallback(() => {
+    mapClick.closeActionSheet();
+    setIsLayersPanelOpen(false);
+    setLayersPanelFocus(null);
+    setIsLegendOpen(false);
+    setActiveOverlay(null);
+    closeBrowsePanels();
+    setIsMenuOpen(true);
+  }, [closeBrowsePanels, mapClick]);
+
   const handleOpenLayers = () => {
     mapClick.closeActionSheet();
     setIsLegendOpen(false);
@@ -415,7 +425,7 @@ export function MapPage() {
             type="button"
             className={styles.mapFab}
             style={{ top: 'max(0.75rem, var(--safe-top))', left: '1rem' }}
-            onClick={() => setIsMenuOpen(true)}
+            onClick={handleOpenMenu}
             aria-label="Menu"
           >
             <IconBurger className={styles.mapFabIcon} aria-hidden />

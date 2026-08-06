@@ -2,13 +2,13 @@ import { useState } from 'react';
 
 import type { AppUser } from '@/domain/user/models';
 
-import IconAngleDown from '@/shared/assets/icons/icon-angle-down.svg?react';
+import IconAngleRight from '@/shared/assets/icons/icon-angle-right.svg?react';
 import IconConfiguration from '@/shared/assets/icons/icon-configuration.svg?react';
 import IconHelp from '@/shared/assets/icons/icon-help.svg?react';
 import IconInfo from '@/shared/assets/icons/icon-info.svg?react';
 import IconUser from '@/shared/assets/icons/icon-user.svg?react';
-import IconStar from '@/shared/assets/icons/icon-star.svg?react';
-import IconUsers from '@/shared/assets/icons/icon-user2.svg?react';
+import IconStar from '@/shared/assets/icons/icon-heart.svg?react';
+import IconTeam from '@/shared/assets/icons/icon-team.svg?react';
 import IconDisconnect from '@/shared/assets/icons/icon-deconnect.svg?react';
 
 import screen from '@/shared/styles/screen.module.css';
@@ -78,7 +78,7 @@ const menuGroups: MenuGroup[] = [
   {
     id: 'communaute',
     title: 'Communauté',
-    icon: IconUsers,
+    icon: IconTeam,
     items: [{ id: 'communaute', label: 'Communauté', route: '/community' }],
   },
   {
@@ -220,7 +220,7 @@ export function LeftMenu({
                 >
                   <IconComponent className={styles.groupIcon} aria-hidden />
                   <span className={styles.groupTitle}>{group.title}</span>
-                  <IconAngleDown
+                  <IconAngleRight
                     className={`${styles.chevron} ${isExpanded ? styles.chevronExpanded : ''}`}
                     aria-hidden
                   />
