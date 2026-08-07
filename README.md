@@ -33,19 +33,28 @@ Scripts utiles :
 
 Build dédié lorsque l’app est servie sous un **sous-chemin** (ex. `/qlf-gdp/`) : Vite préfixe les assets (`/qlf-gdp/assets/…`).
 
+### En local
 ```bash
-cp gdp-mobile/.env.qualif.dist gdp-mobile/.env.qualif   # renseigner VITE_OAUTH_WEB_REDIRECT_URI
+# si ce n'est pas encore fait, renseigner VITE_OAUTH_WEB_REDIRECT_URI et VITE_GDP_*
+cp gdp-mobile/.env.qualif.dist gdp-mobile/.env.qualif 
+# ensuite
 npm run build:qualif
 ```
 
+### Sur le serveur de qualification
 Déployer le contenu de `gdp-mobile/dist/` sur le serveur de qualification.
+Avec le compte user, déposer sur sftp://cadillac2.ign.fr/var/www/intranet/qlf-gdp/ le contenu de gdp-mobile/dist
 
+### Variables d'environnement
 
 | Variable (`.env.qualif`)      | Rôle                                 |
 | ----------------------------- | ------------------------------------ |
 | `VITE_BASE_PATH`              | Sous-chemin, ex. `/qlf-gdp/`         |
 | `VITE_USE_QUALIF`             | `true`                               |
 | `VITE_OAUTH_WEB_REDIRECT_URI` | `<url-qualif>/qlf-gdp/auth/callback` |
+| `VITE_GDP_REPORT_COMMUNITY_ID` | `l'id de la communauté geodesie` |
+| `VITE_GDP_REPORT_DISPLAY_THEMES` | `les thèmes à afficher` |
+| `VITE_GDP_REPORT_SUBMISSION_THEME` | `le thème pour les signalements` |
 
 
 Keycloak : enregistrer la même URI de redirection web (http et https si les deux sont utilisés). En web, l’URI réelle est aussi dérivée de `window.location`.
