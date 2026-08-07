@@ -46,6 +46,8 @@ npm run build:qualif
 Déployer le contenu de `gdp-mobile/dist/` sur le serveur de qualification.
 Avec le compte user, déposer sur sftp://cadillac2.ign.fr/var/www/intranet/qlf-gdp/ le contenu de gdp-mobile/dist
 
+[Url de consultation](http://sgm.ign.fr/qlf-gdp/map)
+
 ### Variables d'environnement
 
 | Variable (`.env.qualif`)      | Rôle                                 |
