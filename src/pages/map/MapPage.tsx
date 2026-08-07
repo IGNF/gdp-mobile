@@ -116,7 +116,7 @@ export function MapPage() {
   const isTabbarVisible = !isTabbarHiddenByPoint;
 
   useEffect(() => {
-    const tabbarHeight = isTabbarVisible ? '6.5rem' : '0px';
+    const tabbarHeight = isTabbarVisible ? 'calc(6.5rem + var(--safe-bottom))' : '0px';
     document.documentElement.style.setProperty('--map-tabbar-height', tabbarHeight);
 
     return () => {
@@ -406,7 +406,9 @@ export function MapPage() {
       style={{
         ['--map-sheet-height' as string]: `${sheetHeight}px`,
         ['--map-fab-sheet-offset' as string]: `${fabSheetOffset}px`,
-        ['--map-tabbar-height' as string]: isTabbarVisible ? '6.5rem' : '0px',
+        ['--map-tabbar-height' as string]: isTabbarVisible
+          ? 'calc(6.5rem + var(--safe-bottom))'
+          : '0px',
       }}
     >
       <LeftMenu

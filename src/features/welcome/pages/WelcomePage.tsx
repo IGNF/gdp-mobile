@@ -6,8 +6,6 @@ import { useFirstRun } from '@/features/welcome/hooks/useFirstRun';
 import { Button } from '@/shared/ui/Button';
 import { config } from '@/shared/config/env';
 
-import screen from '@/shared/styles/screen.module.css';
-
 import styles from './WelcomePage.module.css';
 
 export function WelcomePage() {
@@ -43,7 +41,7 @@ export function WelcomePage() {
   };
 
   return (
-    <div className={`${styles.container} ${screen.screenContainer}`}>
+    <div className={styles.container}>
       <div className={styles.content}>
         <div className={styles.main} aria-live="polite">
           <img

@@ -4,7 +4,7 @@
   height: 100dvh;
   margin-top: calc(-1 * var(--safe-top));
   background: var(--color-dark);
-  --map-tabbar-height: 5rem;
+  --map-tabbar-height: calc(6.5rem + var(--safe-bottom));
   --map-sheet-height: 4.5rem;
   --map-fab-sheet-offset: 4.5rem;
 }
