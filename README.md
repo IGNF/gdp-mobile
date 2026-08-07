@@ -33,8 +33,9 @@ Scripts utiles :
 
 Build dédié lorsque l’app est servie sous un **sous-chemin** (ex. `/qlf-gdp/`) : Vite préfixe les assets (`/qlf-gdp/assets/…`).
 
-### En local
+### En local, sur la branche main
 ```bash
+git checkout main
 # si ce n'est pas encore fait, renseigner VITE_OAUTH_WEB_REDIRECT_URI et VITE_GDP_*
 cp gdp-mobile/.env.qualif.dist gdp-mobile/.env.qualif 
 # ensuite
