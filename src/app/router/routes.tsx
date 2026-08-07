@@ -1,5 +1,6 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 
+import { isWelcomeSeen } from '@/features/welcome/hooks/useFirstRun';
 import { config } from '@/shared/config/env';
 
 import { AuthCallbackPage } from '@/features/auth/pages/AuthCallback/AuthCallbackPage';
@@ -17,11 +18,22 @@ function routerBasename(): string | undefined {
   return base.replace(/\/$/, '');
 }
 
+function homeRedirectPath(): string {
+  if (!isWelcomeSeen()) {
+    return '/welcome';
+  }
+  return config.authRequired ? '/login' : '/map';
+}
+
+function HomeRedirect() {
+  return <Navigate to={homeRedirectPath()} replace />;
+}
+
 export const router = createBrowserRouter(
   [
     {
       path: '/',
-      element: <Navigate to={config.authRequired ? '/welcome' : '/map'} replace />,
+      element: <HomeRedirect />,
     },
     {
       path: '/welcome',

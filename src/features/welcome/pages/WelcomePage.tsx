@@ -1,19 +1,19 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import { ONBOARDING_STEPS } from '@/features/welcome/constants/onboardingSteps';
 import { useFirstRun } from '@/features/welcome/hooks/useFirstRun';
-import { AppLogo } from '@/shared/ui/AppLogo';
 import { Button } from '@/shared/ui/Button';
 import { config } from '@/shared/config/env';
 
 import screen from '@/shared/styles/screen.module.css';
-import typography from '@/shared/styles/typography.module.css';
 
 import styles from './WelcomePage.module.css';
 
 export function WelcomePage() {
   const navigate = useNavigate();
   const { isFirstRun, markAsSeen } = useFirstRun();
+  const [stepIndex, setStepIndex] = useState(0);
   const nextRoute = config.authRequired ? '/login' : '/map';
 
   useEffect(() => {
@@ -26,27 +26,65 @@ export function WelcomePage() {
     return null;
   }
 
-  const handleContinue = () => {
+  const step = ONBOARDING_STEPS[stepIndex];
+  const isLastStep = stepIndex === ONBOARDING_STEPS.length - 1;
+
+  const finish = () => {
     markAsSeen();
     navigate(nextRoute);
+  };
+
+  const handleNext = () => {
+    if (isLastStep) {
+      finish();
+      return;
+    }
+    setStepIndex((prev) => prev + 1);
   };
 
   return (
     <div className={`${styles.container} ${screen.screenContainer}`}>
       <div className={styles.content}>
-        <AppLogo size="lg" />
-        <h1 className={typography.title}>Bienvenue</h1>
-        <h2 className={typography.subtitle}>Géodésie de poche</h2>
+        <div className={styles.main} aria-live="polite">
+          <img
+            src={step.illustration}
+            alt=""
+            className={styles.illustration}
+          />
+          <h1 className={styles.title}>{step.title}</h1>
+          <p className={styles.description}>{step.description}</p>
+        </div>
 
-        <p className={typography.paragraph}>
-          Consultez les repères géodésiques et signalez leur état
-          <br />
-          sur le terrain.
-        </p>
+        <div className={styles.dots} role="tablist" aria-label="Progression">
+          {ONBOARDING_STEPS.map((_, index) => (
+            <span
+              key={index}
+              className={`${styles.dot} ${index === stepIndex ? styles.dotActive : ''}`}
+              aria-current={index === stepIndex ? 'step' : undefined}
+            />
+          ))}
+        </div>
 
-        <Button onClick={handleContinue} fullWidth>
-          Continuer
-        </Button>
+        <div className={styles.footer}>
+          {isLastStep ? (
+            <Button fullWidth onClick={finish}>
+              Commencer
+            </Button>
+          ) : (
+            <>
+              <Button
+                className={styles.footerButton}
+                variant="outline"
+                onClick={finish}
+              >
+                Ignorer
+              </Button>
+              <Button className={styles.footerButton} onClick={handleNext}>
+                Suivant
+              </Button>
+            </>
+          )}
+        </div>
       </div>
     </div>
   );
