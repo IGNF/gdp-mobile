@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import { useAppCacheMaintenance } from '@/features/settings/hooks/useAppCacheMaintenance';
+import { WELCOME_SEEN_STORAGE_KEY } from '@/features/welcome/hooks/useFirstRun';
 import { getClearableCacheSizeBytes } from '@/infra/cache/appCache';
 import {
   GDP_WFS_CLUSTER_DISTANCE_MAX,
@@ -9,6 +11,7 @@ import {
 } from '@/shared/constants/geodesy';
 import { Alert } from '@/shared/ui/Alert';
 import { Button } from '@/shared/ui/Button';
+import { Checkbox } from '@/shared/ui/Checkbox';
 import { Loading } from '@/shared/ui/Loading';
 import { PageHeader } from '@/shared/ui/PageHeader';
 import { SlideUpPage } from '@/shared/ui/SlideUpPage';
@@ -44,14 +47,32 @@ export function SettingsPage({
   onWfsClusterDistanceChange,
   areMapPreferencesHydrated = true,
 }: SettingsPageProps) {
+  const navigate = useNavigate();
   const { stats, isLoading, isClearing, loadStats, clearCaches } = useAppCacheMaintenance();
   const [isClearConfirmOpen, setIsClearConfirmOpen] = useState(false);
+  const [welcomeSeen, setWelcomeSeen] = useState(
+    () => localStorage.getItem(WELCOME_SEEN_STORAGE_KEY) === 'true',
+  );
 
   useEffect(() => {
     if (isOpen) {
       void loadStats();
+      setWelcomeSeen(localStorage.getItem(WELCOME_SEEN_STORAGE_KEY) === 'true');
     }
   }, [isOpen, loadStats]);
+
+  const handleWelcomeSeenChange = (checked: boolean) => {
+    if (checked) {
+      localStorage.setItem(WELCOME_SEEN_STORAGE_KEY, 'true');
+      setWelcomeSeen(true);
+      return;
+    }
+
+    localStorage.removeItem(WELCOME_SEEN_STORAGE_KEY);
+    setWelcomeSeen(false);
+    onClose();
+    navigate('/welcome');
+  };
 
   const clearableSizeBytes = stats ? getClearableCacheSizeBytes(stats) : 0;
   const isExpertMode = geodesyMode === 'expert';
@@ -114,6 +135,18 @@ export function SettingsPage({
               <span className={styles.sliderValue}>{wfsClusterDistance} px</span>
             </div>
           )}
+        </section>
+
+        <section className={styles.section}>
+          <h2 className={styles.sectionTitle}>Onboarding</h2>
+          <Checkbox
+            label="Onboarding déjà vu"
+            checked={welcomeSeen}
+            onChange={handleWelcomeSeenChange}
+          />
+          <p className={styles.modeHint}>
+            Décochez pour rouvrir l’onboarding immédiatement.
+          </p>
         </section>
 
         <section className={styles.section}>

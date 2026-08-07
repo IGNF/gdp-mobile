@@ -2,16 +2,17 @@ import { useState } from 'react';
 
 import { storageKey } from '@/shared/constants/storage';
 
-const STORAGE_KEY = storageKey('welcome_seen');
+export const WELCOME_SEEN_STORAGE_KEY = storageKey('welcome_seen');
+
+export function isWelcomeSeen(): boolean {
+  return localStorage.getItem(WELCOME_SEEN_STORAGE_KEY) === 'true';
+}
 
 export function useFirstRun() {
-  const [isFirstRun, setIsFirstRun] = useState<boolean>(() => {
-    const seen = localStorage.getItem(STORAGE_KEY);
-    return seen !== 'true';
-  });
+  const [isFirstRun, setIsFirstRun] = useState<boolean>(() => !isWelcomeSeen());
 
   const markAsSeen = () => {
-    localStorage.setItem(STORAGE_KEY, 'true');
+    localStorage.setItem(WELCOME_SEEN_STORAGE_KEY, 'true');
     setIsFirstRun(false);
   };
 
