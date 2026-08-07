@@ -6,16 +6,21 @@ import IconHelp from '@/shared/assets/icons/icon-help.svg?react';
 
 import styles from './MapPointSheet.module.css';
 
+const REPORT_DISABLED_MESSAGES: Record<'auth' | 'canevas', string> = {
+  auth: 'Vous devez être connecté pour effectuer des signalements',
+  canevas: 'Le signalement n’est pas disponible pour les points de canevas',
+};
+
 export interface MapPointSheetFooterProps {
   canReport: boolean;
-  reportAuthRequired?: boolean;
+  reportDisabledReason?: 'auth' | 'canevas' | null;
   onNavigate: () => void;
   onReport: () => void;
 }
 
 export function MapPointSheetFooter({
   canReport,
-  reportAuthRequired = false,
+  reportDisabledReason = null,
   onNavigate,
   onReport,
 }: MapPointSheetFooterProps) {
@@ -59,7 +64,7 @@ export function MapPointSheetFooter({
           Signaler
         </Button>
 
-        {reportAuthRequired ? (
+        {reportDisabledReason ? (
           <>
             <button
               type="button"
@@ -74,19 +79,19 @@ export function MapPointSheetFooter({
 
             {isAuthInfoOpen ? (
               <div className={styles.authInfoBubble} role="dialog" onPointerDown={stopDrag}>
-                <p className={styles.authInfoText}>
-                  Vous devez être connecté pour effectuer des signalements
-                </p>
-                <button
-                  type="button"
-                  className={styles.authInfoLink}
-                  onClick={() => {
-                    setIsAuthInfoOpen(false);
-                    navigate('/login');
-                  }}
-                >
-                  Se connecter
-                </button>
+                <p className={styles.authInfoText}>{REPORT_DISABLED_MESSAGES[reportDisabledReason]}</p>
+                {reportDisabledReason === 'auth' ? (
+                  <button
+                    type="button"
+                    className={styles.authInfoLink}
+                    onClick={() => {
+                      setIsAuthInfoOpen(false);
+                      navigate('/login');
+                    }}
+                  >
+                    Se connecter
+                  </button>
+                ) : null}
               </div>
             ) : null}
           </>

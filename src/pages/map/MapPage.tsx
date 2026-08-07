@@ -1,6 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type MouseEvent } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { defaultGeodesyLayerVisibility, isGeodesyLayerReportingEnabled } from '@ign/gdp-tools';
+import {
+  defaultGeodesyLayerVisibility,
+  isGeodesyLayerReportingEnabled,
+  isGeodesyPointReportAllowed,
+} from '@ign/gdp-tools';
 import { useGeodesyOnMap, useGeodesyWfsLoading } from '@ign/gdp-tools/react';
 
 import { BottomTabbar } from '@/app/components/BottomTabbar';
@@ -275,11 +279,20 @@ export function MapPage() {
   }, [activeBasemap, geoservicesVisible, map]);
 
   const pendingAction = mapClick.pendingAction;
-  const isGeodesyReportable =
+  const isLayerReportable =
     pendingAction !== null &&
     isGeodesyLayerReportingEnabled(geodesy.catalog, pendingAction.reportContext.layerId);
+  const isCanevasPoint =
+    pendingAction !== null && !isGeodesyPointReportAllowed(pendingAction.reportContext);
+  const isGeodesyReportable = isLayerReportable && !isCanevasPoint;
   const canReportPoint = isGeodesyReportable && isAuthenticated;
-  const reportAuthRequired = isGeodesyReportable && !isAuthenticated;
+  const reportDisabledReason: 'auth' | 'canevas' | null = !isLayerReportable
+    ? null
+    : isCanevasPoint
+      ? 'canevas'
+      : !isAuthenticated
+        ? 'auth'
+        : null;
 
   const handleOpenLayers = () => {
     mapClick.closeActionSheet();
@@ -440,7 +453,7 @@ export function MapPage() {
             isMapReady={isMapReady}
             selectedPoint={pendingAction}
             canReportPoint={canReportPoint}
-            reportAuthRequired={reportAuthRequired}
+            reportDisabledReason={reportDisabledReason}
             onClosePoint={mapClick.closeActionSheet}
             onReportPoint={handleReportPoint}
             onFocusCoordinate={handleFocusCoordinate}

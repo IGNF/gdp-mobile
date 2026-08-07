@@ -14,7 +14,7 @@ export interface MapPointSheetProps {
   snapIndex: number;
   referencePosition: { longitude: number; latitude: number } | null;
   canReport: boolean;
-  reportAuthRequired?: boolean;
+  reportDisabledReason?: 'auth' | 'canevas' | null;
   dragHandleProps: ReturnType<typeof useBottomSheetSnap>['dragHandleProps'];
   onClose: () => void;
   onReport: () => void;
@@ -26,7 +26,7 @@ export function MapPointSheet({
   snapIndex,
   referencePosition,
   canReport,
-  reportAuthRequired = false,
+  reportDisabledReason = null,
   dragHandleProps,
   onClose,
   onReport,
@@ -48,7 +48,7 @@ export function MapPointSheet({
   const footer = (
     <MapPointSheetFooter
       canReport={canReport}
-      reportAuthRequired={reportAuthRequired}
+      reportDisabledReason={reportDisabledReason}
       onNavigate={onNavigate}
       onReport={onReport}
     />
