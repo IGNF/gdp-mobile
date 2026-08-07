@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 import { joinCSSClassNames } from '@/shared/utils/join';
 import IconCheck from '@/shared/assets/icons/icon-check.svg?react';
 import IconClose from '@/shared/assets/icons/icon-close.svg?react';
@@ -24,6 +26,11 @@ export interface ReportWizardStepConformityProps {
 }
 
 export function ReportWizardStepConformity({ isConform, onChange }: ReportWizardStepConformityProps) {
+  const [hoveredCard, setHoveredCard] = useState<'conform' | 'nonConform' | null>(null);
+
+  const isConformExpanded = isConform === true || hoveredCard === 'conform';
+  const isNonConformExpanded = isConform === false || hoveredCard === 'nonConform';
+
   return (
     <div className={styles.step}>
       <h2 className={styles.question}>Quel est l&apos;état du point ?</h2>
@@ -40,6 +47,10 @@ export function ReportWizardStepConformity({ isConform, onChange }: ReportWizard
             isConform === true && styles.cardSelectedConform,
           )}
           onClick={() => onChange(true)}
+          onMouseEnter={() => setHoveredCard('conform')}
+          onMouseLeave={() => setHoveredCard((current) => (current === 'conform' ? null : current))}
+          onFocus={() => setHoveredCard('conform')}
+          onBlur={() => setHoveredCard((current) => (current === 'conform' ? null : current))}
         >
           <div className={styles.cardRow}>
             <span className={joinCSSClassNames(styles.stateIcon, styles.stateIconConform)}>
@@ -57,7 +68,9 @@ export function ReportWizardStepConformity({ isConform, onChange }: ReportWizard
             />
           </div>
 
-          {isConform === true ? (
+          <div
+            className={joinCSSClassNames(styles.criteriaWrapper, isConformExpanded && styles.criteriaWrapperExpanded)}
+          >
             <div className={styles.criteria}>
               <p className={styles.criteriaTitle}>Critères de conformité</p>
               <ul className={styles.criteriaList}>
@@ -69,7 +82,7 @@ export function ReportWizardStepConformity({ isConform, onChange }: ReportWizard
                 ))}
               </ul>
             </div>
-          ) : null}
+          </div>
         </button>
 
         <button
@@ -82,6 +95,10 @@ export function ReportWizardStepConformity({ isConform, onChange }: ReportWizard
             isConform === false && styles.cardSelectedNonConform,
           )}
           onClick={() => onChange(false)}
+          onMouseEnter={() => setHoveredCard('nonConform')}
+          onMouseLeave={() => setHoveredCard((current) => (current === 'nonConform' ? null : current))}
+          onFocus={() => setHoveredCard('nonConform')}
+          onBlur={() => setHoveredCard((current) => (current === 'nonConform' ? null : current))}
         >
           <div className={styles.cardRow}>
             <span className={joinCSSClassNames(styles.stateIcon, styles.stateIconNonConform)}>
@@ -103,7 +120,12 @@ export function ReportWizardStepConformity({ isConform, onChange }: ReportWizard
             />
           </div>
 
-          {isConform === false ? (
+          <div
+            className={joinCSSClassNames(
+              styles.criteriaWrapper,
+              isNonConformExpanded && styles.criteriaWrapperExpanded,
+            )}
+          >
             <div className={styles.criteria}>
               <p className={styles.criteriaTitle}>Motifs de non-conformité</p>
               <ul className={styles.criteriaList}>
@@ -115,7 +137,7 @@ export function ReportWizardStepConformity({ isConform, onChange }: ReportWizard
                 ))}
               </ul>
             </div>
-          ) : null}
+          </div>
         </button>
       </div>
     </div>
