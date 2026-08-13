@@ -15,16 +15,30 @@ import {
 } from '@/shared/constants/map';
 import { getColorCode } from '@/shared/utils/color';
 
+const REPORTING_MARKER_SCALE = 1.4;
+
+export interface MapClickSelectionMarkerPosition {
+  longitude: number;
+  latitude: number;
+}
+
 interface UseMapClickSelectionMarkerOptions {
   map: Map | null;
   isMapReady: boolean;
   pendingAction: MapGeodesyClickAction | null;
+  /**
+   * When set (report wizard open), pins the marker at this position — independently of
+   * `pendingAction`, which gets cleared as soon as the point action sheet closes — and
+   * enlarges it to keep the reported point visible behind the wizard sheet.
+   */
+  reportingPosition?: MapClickSelectionMarkerPosition | null;
 }
 
 export function useMapClickSelectionMarker({
   map,
   isMapReady,
   pendingAction,
+  reportingPosition = null,
 }: UseMapClickSelectionMarkerOptions): void {
   useEffect(() => {
     if (!map || !isMapReady) {
@@ -44,15 +58,19 @@ export function useMapClickSelectionMarker({
 
     map.addLayer(markerLayer);
 
-    if (pendingAction) {
-      const { longitude, latitude } = pendingAction.point;
+    const position = reportingPosition ?? pendingAction?.point ?? null;
+
+    if (position) {
+      const { longitude, latitude } = position;
 
       if (Number.isFinite(longitude) && Number.isFinite(latitude)) {
         const feature = new Feature<Point>(new Point(fromLonLat([longitude, latitude])));
         const markerColor = getColorCode('primary');
 
         if (markerColor) {
-          feature.setStyle(createMapPointMarkerStyle(markerColor, 'ring'));
+          feature.setStyle(
+            createMapPointMarkerStyle(markerColor, 'ring', reportingPosition ? REPORTING_MARKER_SCALE : 1),
+          );
           source.addFeature(feature);
         }
       }
@@ -61,5 +79,5 @@ export function useMapClickSelectionMarker({
     return () => {
       map.removeLayer(markerLayer);
     };
-  }, [isMapReady, map, pendingAction]);
+  }, [isMapReady, map, pendingAction, reportingPosition]);
 }

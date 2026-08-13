@@ -19,6 +19,14 @@ export function useBottomSheetSnap({
   const isDraggingRef = useRef(false);
   const captureTargetRef = useRef<HTMLElement | null>(null);
   const capturedPointerIdRef = useRef<number | null>(null);
+  const rafIdRef = useRef<number | null>(null);
+
+  const cancelPendingFrame = useCallback(() => {
+    if (rafIdRef.current !== null) {
+      cancelAnimationFrame(rafIdRef.current);
+      rafIdRef.current = null;
+    }
+  }, []);
 
   const snapHeightsKey = snapHeights.join(',');
 
@@ -27,6 +35,8 @@ export function useBottomSheetSnap({
     setDragOffset(0);
     dragOffsetRef.current = 0;
   }, [initialIndex, snapHeightsKey]);
+
+  useEffect(() => cancelPendingFrame, [cancelPendingFrame]);
 
   const currentHeight = Math.max(
     snapHeights[0] ?? 0,
@@ -77,6 +87,7 @@ export function useBottomSheetSnap({
 
   const endDrag = useCallback(() => {
     releasePointerCaptureSafe();
+    cancelPendingFrame();
 
     if (!isDraggingRef.current) {
       return;
@@ -85,7 +96,7 @@ export function useBottomSheetSnap({
     isDraggingRef.current = false;
     const targetHeight = dragStartHeightRef.current - dragOffsetRef.current;
     snapToNearest(targetHeight);
-  }, [releasePointerCaptureSafe, snapToNearest]);
+  }, [cancelPendingFrame, releasePointerCaptureSafe, snapToNearest]);
 
   const handlePointerDown = useCallback(
     (event: React.PointerEvent<HTMLElement>) => {
@@ -93,6 +104,7 @@ export function useBottomSheetSnap({
         return;
       }
 
+      cancelPendingFrame();
       isDraggingRef.current = true;
       dragStartYRef.current = event.clientY;
       dragStartHeightRef.current = snapHeights[snapIndex] ?? 0;
@@ -108,7 +120,7 @@ export function useBottomSheetSnap({
         capturedPointerIdRef.current = null;
       }
     },
-    [enabled, snapHeights, snapIndex],
+    [cancelPendingFrame, enabled, snapHeights, snapIndex],
   );
 
   const handlePointerMove = useCallback(
@@ -117,9 +129,22 @@ export function useBottomSheetSnap({
         return;
       }
 
+      // preventDefault (touch-action: none already suppresses native scroll/rubber-band on
+      // the drag zone) so a stray browser gesture never fights the JS-driven height.
+      event.preventDefault();
+
       const deltaY = event.clientY - dragStartYRef.current;
       dragOffsetRef.current = deltaY;
-      setDragOffset(deltaY);
+
+      // Coalesce bursts of pointermove events (can fire well above 60Hz) into at most one
+      // state update per animation frame — otherwise React re-renders faster than the
+      // browser can paint, and the sheet visibly lags/judders behind the pointer.
+      if (rafIdRef.current === null) {
+        rafIdRef.current = requestAnimationFrame(() => {
+          rafIdRef.current = null;
+          setDragOffset(dragOffsetRef.current);
+        });
+      }
     },
     [],
   );

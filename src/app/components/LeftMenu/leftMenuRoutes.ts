@@ -8,7 +8,7 @@ export const leftMenuOverlayRoutes = [
 
 export type LeftMenuOverlayRoute = (typeof leftMenuOverlayRoutes)[number];
 
-export const leftMenuNavigateRoutes = ['/reports', '/report/geodesy/new', '/login'] as const;
+export const leftMenuNavigateRoutes = ['/login'] as const;
 
 export type LeftMenuNavigateRoute = (typeof leftMenuNavigateRoutes)[number];
 

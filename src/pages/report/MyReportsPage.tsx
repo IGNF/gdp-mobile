@@ -1,164 +1,152 @@
-import { useCallback, useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useMemo, useState, type CSSProperties } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import { BottomTabbar } from '@/app/components/BottomTabbar';
-import type { GroupReport } from '@/domain/report/groupReportModels';
-import { GroupReportRow } from '@/features/report/components/GroupReportRow';
-import { useAuth } from '@/features/auth/hooks/useAuth';
-import { useMyReports } from '@/features/report/hooks/useMyReports';
-import { Button } from '@/shared/ui/Button';
-import { Loading } from '@/shared/ui/Loading';
+import type { LocalReportDraftStatus } from '@/domain/report/localReportDraft';
+import {
+  NON_CONFORM_REASON_LABELS,
+  type NonConformReason,
+} from '@/features/report/components/GeodesyPointReportWizard';
+import { useLocalReportDrafts } from '@/features/report/hooks/useLocalReportDrafts';
+import {
+  getLocalReportDraftStatusAccentRgb,
+  getLocalReportDraftStatusColors,
+  getLocalReportDraftStatusLabel,
+} from '@/features/report/utils/localReportDraftStatus';
+import { formatRelativeDayLabel, formatTime } from '@/shared/utils/date';
+import { joinCSSClassNames } from '@/shared/utils/join';
 import { PageHeader } from '@/shared/ui/PageHeader';
-
-import screen from '@/shared/styles/screen.module.css';
-import typography from '@/shared/styles/typography.module.css';
+import IconAngleRight from '@/shared/assets/icons/icon-angle-right.svg?react';
+import IconCalendar from '@/shared/assets/icons/icon-calendar.svg?react';
+import IconLocation from '@/shared/assets/icons/icon-location.svg?react';
+import IconSearch from '@/shared/assets/icons/icon-search.svg?react';
 
 import styles from './MyReportsPage.module.css';
 
-interface ReportsLocationState {
-  sentReportId?: number;
-}
+type StatusFilter = 'all' | LocalReportDraftStatus;
 
-function isReportsLocationState(value: unknown): value is ReportsLocationState {
-  if (!value || typeof value !== 'object') {
-    return false;
-  }
-
-  const candidate = value as ReportsLocationState;
-  return candidate.sentReportId === undefined || typeof candidate.sentReportId === 'number';
-}
+const FILTERS: Array<{ value: StatusFilter; label: string }> = [
+  { value: 'all', label: 'Tous' },
+  { value: 'not_sent', label: 'Pas envoyés' },
+  { value: 'taken_into_account', label: 'Pris en compte' },
+  { value: 'rejected', label: 'Rejeté' },
+];
 
 export function MyReportsPage() {
   const navigate = useNavigate();
-  const location = useLocation();
-  const locationState = isReportsLocationState(location.state) ? location.state : null;
-  const { isAuthenticated } = useAuth();
-  const {
-    serverReports,
-    isLoading,
-    isLoadingMore,
-    error,
-    hasMore,
-    loadMore,
-  } = useMyReports();
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const { drafts, isLoading } = useLocalReportDrafts();
+  const [search, setSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
 
-  useEffect(() => {
-    if (locationState?.sentReportId) {
-      setSuccessMessage(`Signalement n°${locationState.sentReportId} envoyé avec succès.`);
-      navigate(location.pathname, { replace: true, state: null });
-    }
-  }, [location.pathname, locationState?.sentReportId, navigate]);
+  const filteredDrafts = useMemo(() => {
+    const query = search.trim().toLowerCase();
 
-  const handleReportSelect = useCallback(
-    (report: GroupReport) => {
-      if (report.longitude === null || report.latitude === null) {
-        return;
+    return drafts.filter((draft) => {
+      if (statusFilter !== 'all' && draft.status !== statusFilter) {
+        return false;
       }
 
-      navigate('/map', {
-        state: {
-          focusReport: {
-            id: report.id,
-            longitude: report.longitude,
-            latitude: report.latitude,
-          },
-        },
-      });
-    },
-    [navigate],
-  );
+      if (query) {
+        const idLabel = `ID_${draft.geodesyId ?? draft.title}`.toLowerCase();
+        if (!idLabel.includes(query)) {
+          return false;
+        }
+      }
 
-  const renderContent = () => {
-    if (!isAuthenticated) {
-      return (
-        <div className={styles.empty}>
-          <p>Connectez-vous pour consulter vos signalements envoyés.</p>
-          <Button type="button" onClick={() => navigate('/login')}>
-            Se connecter
-          </Button>
-        </div>
-      );
-    }
-
-    if (isLoading) {
-      return (
-        <div className={styles.loading}>
-          <Loading label="Chargement de vos signalements…" />
-        </div>
-      );
-    }
-
-    if (error && serverReports.length === 0) {
-      return <p className={styles.error}>{error}</p>;
-    }
-
-    if (serverReports.length === 0) {
-      return (
-        <p className={styles.empty}>
-          Aucun signalement repère pour le moment. Touchez un repère sur la carte pour en créer
-          un.
-        </p>
-      );
-    }
-
-    return (
-      <section className={styles.section}>
-        {error ? <p className={styles.error}>{error}</p> : null}
-        <p className={styles.count}>
-          <strong>
-            {serverReports.length} signalement{serverReports.length > 1 ? 's' : ''}
-          </strong>
-          {!hasMore ? ' (liste complète)' : null}
-        </p>
-        <div className={styles.reportList}>
-          {serverReports.map((report) => (
-            <GroupReportRow
-              key={report.id}
-              report={report}
-              onSelect={handleReportSelect}
-            />
-          ))}
-        </div>
-        {hasMore ? (
-          <Button
-            type="button"
-            variant="outline"
-            fullWidth
-            loading={isLoadingMore}
-            onClick={() => void loadMore()}
-          >
-            Charger plus
-          </Button>
-        ) : (
-          <p className={styles.endOfList}>Fin de la liste</p>
-        )}
-      </section>
-    );
-  };
+      return true;
+    });
+  }, [drafts, search, statusFilter]);
 
   return (
     <div className={styles.page}>
-      <p className="debug-banner">DOING — Écran en cours de dev</p>
       <PageHeader
         title="Signalements"
-        subtitle="Mes signalements"
         showBackButton
         showCloseButton={false}
         onBack={() => navigate('/map')}
       />
 
-      <main className={`${styles.main} ${screen.screenContainer}`}>
-        <div className={styles.titleSection}>
-          <h1 className={typography.title}>Mes signalements</h1>
-          <p className={typography.subtitle}>
-            Signalements repère géodésique envoyés vers l&apos;Espace collaboratif.
-          </p>
+      <main className={styles.main}>
+        <div className={styles.searchWrap}>
+          <IconSearch className={styles.searchIcon} aria-hidden />
+          <input
+            type="text"
+            className={styles.searchInput}
+            placeholder="Rechercher par ID"
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+          />
         </div>
 
-        {successMessage ? <p className={styles.successMessage}>{successMessage}</p> : null}
+        <div className={styles.filterRow}>
+          {FILTERS.map((filter) => (
+            <button
+              key={filter.value}
+              type="button"
+              className={joinCSSClassNames(
+                styles.filterChip,
+                statusFilter === filter.value && styles.filterChipActive,
+              )}
+              onClick={() => setStatusFilter(filter.value)}
+            >
+              {filter.label}
+            </button>
+          ))}
+        </div>
 
-        {renderContent()}
+        {isLoading ? (
+          <p className={styles.empty}>Chargement…</p>
+        ) : filteredDrafts.length === 0 ? (
+          <p className={styles.empty}>Aucun signalement.</p>
+        ) : (
+          <ul className={styles.reportList}>
+            {filteredDrafts.map((draft) => {
+              const statusColors = getLocalReportDraftStatusColors(draft.status);
+              const reasonLabel = draft.isConform
+                ? 'Conforme'
+                : (draft.nonConformReasons ?? [])
+                    .map((reason) => NON_CONFORM_REASON_LABELS[reason as NonConformReason])
+                    .join(', ') || 'Non conforme';
+              const createdAt = new Date(draft.createdAt);
+
+              return (
+                <li key={draft.id}>
+                  <button
+                    type="button"
+                    className={styles.reportCard}
+                    style={{
+                      '--report-card-hover-color': statusColors.color,
+                      '--report-card-hover-rgb': getLocalReportDraftStatusAccentRgb(draft.status),
+                    } as CSSProperties}
+                    onClick={() => navigate(`/reports/${draft.id}`)}
+                  >
+                    <div className={styles.reportCardHeader}>
+                      <span className={styles.reportId}>ID_{draft.geodesyId ?? draft.title}</span>
+                      <span
+                        className={styles.statusBadge}
+                        style={{ color: statusColors.color, background: statusColors.background }}
+                      >
+                        {getLocalReportDraftStatusLabel(draft.status)}
+                      </span>
+                    </div>
+                    <p className={styles.reportReason}>{reasonLabel}</p>
+                    <div className={styles.reportMeta}>
+                      <span className={styles.reportMetaItem}>
+                        <IconLocation className={styles.reportMetaIcon} aria-hidden />
+                        {draft.latitude.toFixed(4)}° N
+                      </span>
+                      <span className={styles.reportMetaItem}>
+                        <IconCalendar className={styles.reportMetaIcon} aria-hidden />
+                        {formatRelativeDayLabel(createdAt)} · {formatTime(createdAt)}
+                      </span>
+                    </div>
+                    <IconAngleRight className={styles.reportChevron} aria-hidden />
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        )}
       </main>
 
       <BottomTabbar activeTab="signalements" />

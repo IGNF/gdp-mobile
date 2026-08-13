@@ -63,6 +63,7 @@ export interface MapBottomSheetProps {
   selectedPoint: MapGeodesyClickAction | null;
   canReportPoint: boolean;
   userFollowingMode: UserFollowingMode;
+  reportDisabledReason?: 'auth' | 'canevas' | null;
   onClosePoint: () => void;
   onReportPoint: () => void;
   onFocusCoordinate: (longitude: number, latitude: number) => void;
@@ -93,6 +94,7 @@ export function MapBottomSheet({
   selectedPoint,
   canReportPoint,
   userFollowingMode,
+  reportDisabledReason = null,
   onClosePoint,
   onReportPoint,
   onFocusCoordinate,
@@ -437,6 +439,7 @@ export function MapBottomSheet({
             snapIndex={snapIndex}
             referencePosition={referencePosition}
             canReport={canReportPoint}
+            reportDisabledReason={reportDisabledReason}
             dragHandleProps={dragHandleProps}
             onClose={onClosePoint}
             onReport={onReportPoint}

@@ -7,8 +7,8 @@ import { AuthCallbackPage } from '@/features/auth/pages/AuthCallback/AuthCallbac
 import { LoginPage } from '@/features/auth/pages/Login/LoginPage';
 import { WelcomePage } from '@/features/welcome/pages/WelcomePage';
 import { MapPage } from '@/pages/map/MapPage';
-import { CreateGeodesyPointReportPage } from '@/pages/report/CreateGeodesyPointReportPage';
 import { MyReportsPage } from '@/pages/report/MyReportsPage';
+import { ReportDetailPage } from '@/pages/report/ReportDetailPage';
 
 function routerBasename(): string | undefined {
   const base = import.meta.env.BASE_URL;
@@ -52,16 +52,12 @@ export const router = createBrowserRouter(
       element: <MapPage />,
     },
     {
-      path: '/report/geodesy/new',
-      element: <CreateGeodesyPointReportPage />,
-    },
-    {
-      path: '/report/:id/edit',
-      element: <CreateGeodesyPointReportPage />,
-    },
-    {
       path: '/reports',
       element: <MyReportsPage />,
+    },
+    {
+      path: '/reports/:id',
+      element: <ReportDetailPage />,
     },
   ],
   { basename: routerBasename() },

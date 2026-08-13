@@ -1,0 +1,54 @@
+.headerBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0 1.25rem 0.75rem;
+}
+
+.titleRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.title {
+  margin: 0;
+  font-size: 1.0625rem;
+  font-weight: 700;
+  color: var(--color-dark);
+}
+
+.stepCounter {
+  flex-shrink: 0;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--color-medium);
+}
+
+.pointId {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--color-medium);
+}
+
+.divider {
+  height: 1px;
+  margin-top: 0.5rem;
+  background: var(--color-light);
+}
+
+.progressTrack {
+  height: 0.375rem;
+  margin-top: 0.75rem;
+  border-radius: 999px;
+  background: var(--color-light);
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--color-primary);
+  transition: width 0.2s ease-out;
+}

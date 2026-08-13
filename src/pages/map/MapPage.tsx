@@ -1,6 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { defaultGeodesyLayerVisibility, isGeodesyLayerReportingEnabled } from '@ign/gdp-tools';
+import {
+  defaultGeodesyLayerVisibility,
+  isGeodesyLayerReportingEnabled,
+  isGeodesyPointReportAllowed,
+} from '@ign/gdp-tools';
 import { useGeodesyOnMap, useGeodesyWfsLoading } from '@ign/gdp-tools/react';
 
 import { BottomTabbar } from '@/app/components/BottomTabbar';
@@ -13,9 +17,11 @@ import { HelpPage } from '@/features/help/pages/HelpPage';
 import { SettingsPage } from '@/features/settings/pages/SettingsPage';
 import { LegendPage } from '@/features/legend/pages/LegendPage';
 import { MapBottomSheet } from '@/features/map/components/MapBottomSheet';
+import { GeodesyPointReportWizard } from '@/features/map/components/GeodesyPointReportWizard';
 import { MapLayersPanelFlow } from '@/features/map/components/MapLayersPanelFlow';
 import { countActiveMapGeodesyFilters } from '@/features/map/components/MapGeodesyFiltersPanel';
 import type { MapLayerGroupId } from '@/features/map/types/mapLayerGroups';
+import type { GeodesyPointReportMapContext } from '@/domain/report/geodesyPointMapContext';
 import type { GroupReport } from '@/domain/report/groupReportModels';
 import { useMap } from '@/features/map/hooks/useMap';
 import { useMapGeodesyClick } from '@/features/map/hooks/useMapGeodesyClick';
@@ -112,8 +118,11 @@ export function MapPage() {
   const [forceCloseReports, setForceCloseReports] = useState(false);
   const [isSearchPanelOpen, setIsSearchPanelOpen] = useState(false);
   const [isReportsPanelOpen, setIsReportsPanelOpen] = useState(false);
+  const [reportWizardContext, setReportWizardContext] = useState<GeodesyPointReportMapContext | null>(
+    null,
+  );
   // La tabbar reste visible avec le panneau filtres (comme couches / légende).
-  const isTabbarVisible = !isTabbarHiddenByPoint;
+  const isTabbarVisible = !isTabbarHiddenByPoint && reportWizardContext === null;
 
   useEffect(() => {
     const tabbarHeight = isTabbarVisible ? 'calc(6.5rem + var(--safe-bottom))' : '0px';
@@ -180,7 +189,17 @@ export function MapPage() {
   });
 
   useUserLocationMarker({ map, isMapReady });
-  useMapClickSelectionMarker({ map, isMapReady, pendingAction: mapClick.pendingAction });
+  useMapClickSelectionMarker({
+    map,
+    isMapReady,
+    pendingAction: mapClick.pendingAction,
+    reportingPosition: reportWizardContext
+      ? {
+          longitude: reportWizardContext.reportContext.longitude,
+          latitude: reportWizardContext.reportContext.latitude,
+        }
+      : null,
+  });
 
   const handleReportMapSelect = useCallback(
     (report: GroupReport) => {
@@ -288,9 +307,20 @@ export function MapPage() {
   }, [activeBasemap, geoservicesVisible, map]);
 
   const pendingAction = mapClick.pendingAction;
-  const isGeodesyReportable =
+  const isLayerReportable =
     pendingAction !== null &&
     isGeodesyLayerReportingEnabled(geodesy.catalog, pendingAction.reportContext.layerId);
+  const isCanevasPoint =
+    pendingAction !== null && !isGeodesyPointReportAllowed(pendingAction.reportContext);
+  const isGeodesyReportable = isLayerReportable && !isCanevasPoint;
+  const canReportPoint = isGeodesyReportable && isAuthenticated;
+  const reportDisabledReason: 'auth' | 'canevas' | null = !isLayerReportable
+    ? null
+    : isCanevasPoint
+      ? 'canevas'
+      : !isAuthenticated
+        ? 'auth'
+        : null;
 
   const closeBrowsePanels = useCallback(() => {
     setForceCloseSearch(true);
@@ -374,12 +404,13 @@ export function MapPage() {
   );
 
   const handleReportPoint = useCallback(() => {
-    if (!isGeodesyReportable) {
+    if (!canReportPoint || !pendingAction) {
       return;
     }
 
-    mapClick.reportOnExistingPoint();
-  }, [isGeodesyReportable, mapClick]);
+    setReportWizardContext({ source: 'map', reportContext: pendingAction.reportContext });
+    mapClick.closeActionSheet();
+  }, [canReportPoint, mapClick, pendingAction]);
 
   const handleCloseSearch = useCallback(() => {
     setForceCloseSearch(true);
@@ -513,8 +544,9 @@ export function MapPage() {
             map={map}
             isMapReady={isMapReady}
             selectedPoint={pendingAction}
-            canReportPoint={isGeodesyReportable}
+            canReportPoint={canReportPoint}
             userFollowingMode={userFollowingMode}
+            reportDisabledReason={reportDisabledReason}
             onClosePoint={mapClick.closeActionSheet}
             onReportPoint={handleReportPoint}
             onFocusCoordinate={handleFocusCoordinate}
@@ -579,6 +611,12 @@ export function MapPage() {
         onReportMapLayersChange={setReportMapLayers}
         isAuthenticated={isAuthenticated}
         onFiltersPanelOpenChange={setIsTabbarHiddenByFilters}
+      />
+
+      <GeodesyPointReportWizard
+        isOpen={reportWizardContext !== null}
+        context={reportWizardContext}
+        onClose={() => setReportWizardContext(null)}
       />
 
       <LegendPage isOpen={isLegendOpen} onClose={() => setIsLegendOpen(false)} />
