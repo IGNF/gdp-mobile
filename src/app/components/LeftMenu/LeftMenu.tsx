@@ -6,7 +6,6 @@ import IconAngleDown from '@/shared/assets/icons/icon-angle-down.svg?react';
 import IconConfiguration from '@/shared/assets/icons/icon-configuration.svg?react';
 import IconHelp from '@/shared/assets/icons/icon-help.svg?react';
 import IconInfo from '@/shared/assets/icons/icon-info.svg?react';
-import IconLocation from '@/shared/assets/icons/icon-location.svg?react';
 import IconUser from '@/shared/assets/icons/icon-user.svg?react';
 
 import screen from '@/shared/styles/screen.module.css';
@@ -21,7 +20,7 @@ export interface LeftMenuProps {
   onNavigate: (route: string) => void;
 }
 
-type MenuGroupId = 'signalements' | 'monCompte';
+type MenuGroupId = 'monCompte';
 
 interface MenuItem {
   id: string;
@@ -38,14 +37,6 @@ interface MenuGroup {
 }
 
 const menuGroups: MenuGroup[] = [
-  {
-    id: 'signalements',
-    title: 'Signalements',
-    icon: IconLocation,
-    items: [
-      { id: 'mesSignalements', label: 'Mes signalements', route: '/reports' },
-    ],
-  },
   {
     id: 'monCompte',
     title: 'Mon compte',
