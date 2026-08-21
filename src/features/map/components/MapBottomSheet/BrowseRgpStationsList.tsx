@@ -6,6 +6,7 @@ import IconArrowLeft from '@/shared/assets/icons/icon-arrow-left.svg?react';
 import IconCheck from '@/shared/assets/icons/icon-check.svg?react';
 import IconClose from '@/shared/assets/icons/icon-close.svg?react';
 import IconReset from '@/shared/assets/icons/icon-reset.svg?react';
+import IconSearch from '@/shared/assets/icons/icon-search.svg?react';
 import { formatDateTime } from '@/shared/utils/date';
 import { formatDistanceKm } from '@/shared/utils/geo';
 
@@ -13,6 +14,8 @@ import styles from './MapBottomSheet.module.css';
 
 export interface BrowseRgpStationsListProps {
   stations: readonly NearestRgpStation[];
+  searchQuery: string;
+  onSearchQueryChange: (query: string) => void;
   isLoading: boolean;
   isReloading: boolean;
   lastLoadedAt: Date | null;
@@ -45,6 +48,8 @@ function RgpDispoIndicators({ states }: { states: readonly GdpRgp2DispoState[] }
 
 export function BrowseRgpStationsList({
   stations,
+  searchQuery,
+  onSearchQueryChange,
   isLoading,
   isReloading,
   lastLoadedAt,
@@ -53,6 +58,8 @@ export function BrowseRgpStationsList({
   onRefresh,
   onSelectStation,
 }: BrowseRgpStationsListProps) {
+  const isSearching = searchQuery.trim().length > 0;
+
   return (
     <div className={styles.browseRgpPanel}>
       <header className={styles.browseRgpHeader}>
@@ -61,6 +68,23 @@ export function BrowseRgpStationsList({
         </button>
         <h2 className={styles.browseRgpTitle}>Stations RGP</h2>
       </header>
+
+      <div className={styles.searchField}>
+        <IconSearch className={styles.searchIcon} aria-hidden />
+        <input
+          type="text"
+          inputMode="text"
+          autoCapitalize="characters"
+          autoComplete="off"
+          autoCorrect="off"
+          spellCheck={false}
+          className={styles.rgpSearchInput}
+          placeholder="Rechercher une station (ex. OP71)"
+          value={searchQuery}
+          onChange={(event) => onSearchQueryChange(event.target.value)}
+          aria-label="Rechercher une station RGP par nom"
+        />
+      </div>
 
       <div className={styles.rgpUpdateRow}>
         <p className={styles.rgpUpdateText}>
@@ -88,7 +112,11 @@ export function BrowseRgpStationsList({
       {error ? <p className={styles.rgpError}>{error}</p> : null}
 
       {!isLoading && !error && stations.length === 0 ? (
-        <p className={styles.rgpEmpty}>Aucune station RGP à proximité.</p>
+        <p className={styles.rgpEmpty}>
+          {isSearching
+            ? `Aucune station ne correspond à « ${searchQuery.trim()} ».`
+            : 'Aucune station RGP à proximité.'}
+        </p>
       ) : null}
 
       <ul className={styles.rgpList}>

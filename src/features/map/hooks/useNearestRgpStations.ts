@@ -11,13 +11,14 @@ import {
 import type Map from 'ol/Map';
 import Point from 'ol/geom/Point';
 import { toLonLat } from 'ol/proj';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { distanceKm } from '@/shared/utils/geo';
 
 const RGP_LAYER = GEODESY_ANNEX_LAYERS.find((layer) => layer.id === 'GDP_RGP2');
 const NEAREST_RGP_COUNT = 10;
 const MAX_RGP_DISTANCE_KM = 100;
+const RGP_SEARCH_RESULT_COUNT = 30;
 
 export interface NearestRgpStation {
   id: string;
@@ -45,7 +46,8 @@ export function useNearestRgpStations({
   isMapReady,
   limit = NEAREST_RGP_COUNT,
 }: UseNearestRgpStationsOptions) {
-  const [stations, setStations] = useState<NearestRgpStation[]>([]);
+  const [allStations, setAllStations] = useState<NearestRgpStation[]>([]);
+  const [query, setQuery] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isReloading, setIsReloading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -79,7 +81,7 @@ export function useNearestRgpStations({
 
     try {
       const features = await loadGeodesyAnnexFeatures({ definition: RGP_LAYER });
-      const ranked = features
+      const mapped = features
         .map((feature) => {
           const geometry = feature.getGeometry();
           if (!(geometry instanceof Point)) {
@@ -102,22 +104,19 @@ export function useNearestRgpStations({
             dispoStates: parseGdpRgp2DispoStates(dispo),
           } satisfies NearestRgpStation;
         })
-        .filter((station): station is NearestRgpStation => station !== null)
-        .filter((station) => station.distanceKm <= MAX_RGP_DISTANCE_KM)
-        .sort((left, right) => left.distanceKm - right.distanceKm)
-        .slice(0, limit);
+        .filter((station): station is NearestRgpStation => station !== null);
 
-      setStations(ranked);
+      setAllStations(mapped);
       syncLastLoadedAt();
     } catch {
       setError('Impossible de charger les stations RGP.');
-      setStations([]);
+      setAllStations([]);
     } finally {
       if (!options?.silent) {
         setIsLoading(false);
       }
     }
-  }, [isMapReady, limit, map, syncLastLoadedAt]);
+  }, [isMapReady, map, syncLastLoadedAt]);
 
   const reloadFromServer = useCallback(async () => {
     if (!RGP_LAYER || isReloading) {
@@ -165,5 +164,21 @@ export function useNearestRgpStations({
     };
   }, [isMapReady, map, refresh]);
 
-  return { stations, isLoading, isReloading, error, lastLoadedAt, refresh, reloadFromServer };
+  const stations = useMemo(() => {
+    const normalizedQuery = query.trim().toLowerCase();
+
+    if (normalizedQuery) {
+      return allStations
+        .filter((station) => station.name.toLowerCase().includes(normalizedQuery))
+        .sort((left, right) => left.distanceKm - right.distanceKm)
+        .slice(0, RGP_SEARCH_RESULT_COUNT);
+    }
+
+    return allStations
+      .filter((station) => station.distanceKm <= MAX_RGP_DISTANCE_KM)
+      .sort((left, right) => left.distanceKm - right.distanceKm)
+      .slice(0, limit);
+  }, [allStations, limit, query]);
+
+  return { stations, query, setQuery, isLoading, isReloading, error, lastLoadedAt, refresh, reloadFromServer };
 }

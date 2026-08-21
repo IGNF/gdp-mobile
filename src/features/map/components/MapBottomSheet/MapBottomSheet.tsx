@@ -287,6 +287,8 @@ export function MapBottomSheet({
 
   const {
     stations,
+    query: rgpSearchQuery,
+    setQuery: setRgpSearchQuery,
     isLoading: isRgpLoading,
     isReloading: isRgpReloading,
     lastLoadedAt: rgpLastLoadedAt,
@@ -476,11 +478,16 @@ export function MapBottomSheet({
             ) : browseView === 'rgp' ? (
               <BrowseRgpStationsList
                 stations={stations}
+                searchQuery={rgpSearchQuery}
+                onSearchQueryChange={setRgpSearchQuery}
                 isLoading={isRgpLoading}
                 isReloading={isRgpReloading}
                 lastLoadedAt={rgpLastLoadedAt}
                 error={rgpError}
-                onBack={() => setBrowseView('search')}
+                onBack={() => {
+                  setBrowseView('search');
+                  setRgpSearchQuery('');
+                }}
                 onRefresh={() => {
                   void reloadFromServer();
                 }}

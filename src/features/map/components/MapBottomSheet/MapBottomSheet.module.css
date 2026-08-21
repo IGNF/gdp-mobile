@@ -308,6 +308,28 @@
   color: var(--color-dark);
 }
 
+.rgpSearchInput {
+  width: 100%;
+  padding: 0;
+  border: none;
+  font-size: 1rem;
+  line-height: 1.25rem;
+  font-family: inherit;
+  background: transparent;
+  box-sizing: border-box;
+  color: var(--color-dark);
+  text-transform: uppercase;
+}
+
+.rgpSearchInput:focus {
+  outline: none;
+}
+
+.rgpSearchInput::placeholder {
+  color: var(--color-medium);
+  text-transform: none;
+}
+
 .rgpUpdateRow {
   display: flex;
   align-items: center;
