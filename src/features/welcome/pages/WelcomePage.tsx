@@ -49,8 +49,8 @@ export function WelcomePage() {
             alt=""
             className={styles.illustration}
           />
-          <h1 className={styles.title}>{step.title}</h1>
-          <p className={styles.description}>{step.description}</p>
+          <div className={styles.title}>{step.title}</div>
+          <div className={styles.description}>{step.description}</div>
         </div>
 
         <div className={styles.dots} role="tablist" aria-label="Progression">
