@@ -47,31 +47,33 @@ export function WelcomePage() {
           <img
             src={step.illustration}
             alt=""
+            width={230}
+            height={230}
             className={styles.illustration}
           />
-          <div className={styles.title}>{step.title}</div>
-          <div className={styles.description}>{step.description}</div>
-        </div>
+          <h1 className={styles.title}>{step.title}</h1>
+          <p className={styles.description}>{step.description}</p>
 
-        <div className={styles.dots} role="tablist" aria-label="Progression">
-          {ONBOARDING_STEPS.map((_, index) => (
-            <span
-              key={index}
-              className={`${styles.dot} ${index === stepIndex ? styles.dotActive : ''}`}
-              aria-current={index === stepIndex ? 'step' : undefined}
-            />
-          ))}
+          <div className={styles.dots} role="tablist" aria-label="Progression">
+            {ONBOARDING_STEPS.map((_, index) => (
+              <span
+                key={index}
+                className={`${styles.dot} ${index === stepIndex ? styles.dotActive : ''}`}
+                aria-current={index === stepIndex ? 'step' : undefined}
+              />
+            ))}
+          </div>
         </div>
 
         <div className={styles.footer}>
           {isLastStep ? (
-            <Button fullWidth onClick={finish}>
+            <Button fullWidth className={styles.startButton} onClick={finish}>
               Commencer
             </Button>
           ) : (
             <>
               <Button
-                className={styles.footerButton}
+                className={`${styles.footerButton} ${styles.footerOutline}`}
                 variant="outline"
                 onClick={finish}
               >
