@@ -1,43 +1,141 @@
 .container {
-  margin-top: 1.75rem;
-  min-height: 100dvh;
+  margin-top: calc(-1 * var(--safe-top));
+  height: 100svh;
+  max-height: 100svh;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background-color: #f7f7f7;
+  padding-top: max(0.75rem, var(--safe-top));
+  padding-right: 1.5rem;
+  padding-bottom: max(1.25rem, calc(var(--safe-bottom) + 0.75rem));
+  padding-left: 1.5rem;
+  font-family:"Open Sans";
 }
 
 .content {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
   max-width: 600px;
   margin: 0 auto;
-  padding: 0 1rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3rem;
   text-align: center;
 }
 
 .loadingContent {
-  min-height: 70dvh;
-  display: flex;
-  align-items: center;
   justify-content: center;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.7rem;
+  width: 100%;
+  max-width: 17rem;
+}
+
+.title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1.2;
+  color: #2a2826;
+  font-family:"Fira Sans";
+}
+
+.subtitle {
+  margin: 0;
+  font-size: 1.0625rem;
+  font-weight: 400;
+  line-height: 1.35;
+  color: #2a2826;
 }
 
 .form {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  align-items: stretch;
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 18.625rem;
 }
 
-.forgotPasswordLinkContainer {
-  margin-bottom: 2rem;
+.actionButton {
+  width: 100% !important;
+  margin: 0 !important;
+  min-height: 44px;
+  font-size: 0.875rem;
+  font-weight: 600;
 }
 
-.submitButton {
-  width: 80%;
-  margin: auto;
-}
-
-.register {
-  margin-top: 2rem;
-  margin-bottom: 2rem;
-}
-
-.registerLink,
-.forgotPasswordLink {
+.outlineButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 44px;
+  padding: 11px 10px;
+  border: 1px solid rgba(42, 40, 38, 0.2);
+  border-radius: 100px;
+  background: transparent;
   color: var(--color-primary);
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+.outlineButton:hover {
+  background-color: var(--color-primary-light);
+}
+
+.buttonIcon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.buttonIcon path {
+  fill: currentColor;
+}
+
+.forgotPasswordLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  margin-top: 0.5rem;
+  color: #2a2826;
+  font-size: 0.8125rem;
+  font-weight: 400;
+  text-decoration: underline;
+  text-underline-offset: 0.2rem;
+  text-decoration-thickness: from-font;
+}
+
+.forgotPasswordIcon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.forgotPasswordIcon path {
+  fill: currentColor;
+}
+
+.error {
+  margin: 0;
+  color: var(--color-danger);
+  font-size: 0.9rem;
+  text-align: center;
 }

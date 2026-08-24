@@ -2,14 +2,11 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { useAuth } from '@/features/auth/hooks/useAuth';
-import { AppLogo } from '@/shared/ui/AppLogo';
+import { EXTERNAL_LINKS } from '@/shared/constants/externalLinks';
+import IconExternalLink from '@/shared/assets/icons/icon-external-link.svg?react';
 import { Button } from '@/shared/ui/Button';
 import { ExternalLink } from '@/shared/ui/ExternalLink';
 import { Loading } from '@/shared/ui/Loading';
-import { EXTERNAL_LINKS } from '@/shared/constants/externalLinks';
-
-import screen from '@/shared/styles/screen.module.css';
-import typography from '@/shared/styles/typography.module.css';
 
 import styles from './LoginPage.module.css';
 
@@ -36,7 +33,7 @@ export function LoginPage() {
 
   if (!hasInitialAuthCheckCompleted || isAuthenticated) {
     return (
-      <div className={`${styles.container} ${screen.screenContainer}`}>
+      <div className={styles.container}>
         <div className={`${styles.content} ${styles.loadingContent}`}>
           <Loading size="large" label="Restauration de la session…" />
         </div>
@@ -64,34 +61,42 @@ export function LoginPage() {
   };
 
   return (
-    <div className={`${styles.container} ${screen.screenContainer}`}>
+    <div className={styles.container}>
       <div className={styles.content}>
-        <AppLogo size="md" />
-        <h1 className={typography.title}>Connexion</h1>
-        <h2 className={typography.subtitle}>Accédez à votre espace collaboratif</h2>
-
-        <p className={`${typography.paragraph} ${typography.italic} ${styles.register}`}>
-          Pas encore de compte ?{' '}
-          <ExternalLink href={EXTERNAL_LINKS.ESPACE_COLLABORATIF} className={styles.registerLink}>
-            Créer un compte
-          </ExternalLink>
-        </p>
+        <header className={styles.header}>
+          <h1 className={styles.title}>Bienvenue</h1>
+          <p className={styles.subtitle}>
+            Connectez vous pour accéder à votre espace personnel
+          </p>
+        </header>
 
         <form className={styles.form} onSubmit={handleLogin}>
-          <div className={styles.forgotPasswordLinkContainer}>
-            <ExternalLink
-              href={EXTERNAL_LINKS.GEOPF_SSO_RESET_CREDENTIALS}
-              className={styles.forgotPasswordLink}
-            >
-              Mot de passe oublié ?
-            </ExternalLink>
-          </div>
+          {error && <p className={styles.error}>{error}</p>}
 
-          {error && <p className={typography.error}>{error}</p>}
-
-          <Button type="submit" className={styles.submitButton} loading={isSubmitting}>
-            Se connecter avec mon compte IGN
+          <Button type="submit" fullWidth loading={isSubmitting} className={styles.actionButton}>
+            Se connecter
+            {!isSubmitting && (
+              <IconExternalLink className={styles.buttonIcon} aria-hidden />
+            )}
           </Button>
+
+          <ExternalLink
+            href={EXTERNAL_LINKS.ESPACE_COLLABORATIF}
+            className={styles.outlineButton}
+            showIcon={false}
+          >
+            Créer un compte
+            <IconExternalLink className={styles.buttonIcon} aria-hidden />
+          </ExternalLink>
+
+          <ExternalLink
+            href={EXTERNAL_LINKS.GEOPF_SSO_RESET_CREDENTIALS}
+            className={styles.forgotPasswordLink}
+            showIcon={false}
+          >
+            Mot de passe oublié ?
+            <IconExternalLink className={styles.forgotPasswordIcon} aria-hidden />
+          </ExternalLink>
         </form>
       </div>
     </div>
