@@ -97,11 +97,28 @@ export default defineConfig(({ mode }) => {
           target: oauthSsoTarget,
           changeOrigin: true,
           secure: true,
+          timeout: 30_000,
+          proxyTimeout: 30_000,
           rewrite: (requestPath) =>
             requestPath.replace(
               new RegExp(`^${oauthProxyMount.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`),
               '',
             ),
+          configure: (proxy) => {
+            proxy.on('error', (err, _req, res) => {
+              console.error('[vite oauth proxy]', err.message);
+              const socket = res as { writeHead?: Function; end?: Function; headersSent?: boolean };
+              if (socket && typeof socket.writeHead === 'function' && !socket.headersSent) {
+                socket.writeHead(502, { 'Content-Type': 'application/json' });
+                socket.end?.(
+                  JSON.stringify({
+                    error: 'bad_gateway',
+                    error_description: `Proxy OAuth indisponible: ${err.message}`,
+                  }),
+                );
+              }
+            });
+          },
         },
       },
     },

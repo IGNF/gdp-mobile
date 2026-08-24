@@ -12,16 +12,18 @@ import styles from './LogoutPage.module.css';
 export interface LogoutPageProps {
   isOpen: boolean;
   onClose: () => void;
-  onLogout: () => Promise<void>;
+  onLogout: () => Promise<{ redirectedToSso: boolean }>;
 }
 
 export function LogoutPage({ isOpen, onClose, onLogout }: LogoutPageProps) {
   const navigate = useNavigate();
 
   const handleLogout = async () => {
-    await onLogout();
+    const result = await onLogout();
     onClose();
-    navigate('/login', { replace: true });
+    if (!result.redirectedToSso) {
+      navigate('/login', { replace: true });
+    }
   };
 
   return (
