@@ -1,6 +1,6 @@
-import onboarding1 from '@/shared/assets/onboarding/onboarding_1.png';
-import onboarding2 from '@/shared/assets/onboarding/onboarding_2.png';
-import onboarding3 from '@/shared/assets/onboarding/onboarding_3.png';
+import onboarding1 from '@/shared/assets/onboarding/onboarding_1.svg';
+import onboarding2 from '@/shared/assets/onboarding/onboarding_2.svg';
+import onboarding3 from '@/shared/assets/onboarding/onboarding_3.svg';
 
 export interface OnboardingStep {
   illustration: string;
