@@ -403,6 +403,10 @@ export function MapPage() {
     [focusOnCoordinate],
   );
 
+  const handleDisableUserFollowing = useCallback(() => {
+    setUserFollowingMode('none');
+  }, [setUserFollowingMode]);
+
   const handleReportPoint = useCallback(() => {
     if (!canReportPoint || !pendingAction) {
       return;
@@ -550,6 +554,7 @@ export function MapPage() {
             onClosePoint={mapClick.closeActionSheet}
             onReportPoint={handleReportPoint}
             onFocusCoordinate={handleFocusCoordinate}
+            onDisableUserFollowing={handleDisableUserFollowing}
             onSheetHeightChange={setSheetHeight}
             onFabSheetOffsetChange={setFabSheetOffset}
             onTabbarVisibleChange={(visible) => setIsTabbarHiddenByPoint(!visible)}
