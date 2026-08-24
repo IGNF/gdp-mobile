@@ -67,6 +67,8 @@ export interface MapBottomSheetProps {
   onClosePoint: () => void;
   onReportPoint: () => void;
   onFocusCoordinate: (longitude: number, latitude: number) => void;
+  /** Désactive le suivi GPS (following / locked) après une recherche d’adresse ou de commune. */
+  onDisableUserFollowing?: () => void;
   onSheetHeightChange?: (height: number) => void;
   /** Offset carte pour GPS / échelle — suit la hauteur de la sheet, y compris en mini-fiche. */
   onFabSheetOffsetChange?: (offset: number) => void;
@@ -98,6 +100,7 @@ export function MapBottomSheet({
   onClosePoint,
   onReportPoint,
   onFocusCoordinate,
+  onDisableUserFollowing,
   onSheetHeightChange,
   onFabSheetOffsetChange,
   onTabbarVisibleChange,
@@ -285,6 +288,12 @@ export function MapBottomSheet({
 
   const { entries: historyEntries, refresh: refreshSearchHistory } = useAddressSearchHistory(isBrowseExpanded);
 
+  const handleSearchSelect = useCallback(() => {
+    onDisableUserFollowing?.();
+    refreshSearchHistory();
+    collapseBrowseSheet();
+  }, [collapseBrowseSheet, onDisableUserFollowing, refreshSearchHistory]);
+
   const {
     stations,
     isLoading: isRgpLoading,
@@ -303,10 +312,7 @@ export function MapBottomSheet({
     isOpen: isMapReady && !isPointMode && isBrowseExpanded,
     placeholder: 'Rechercher un point, une adresse…',
     onFocus: expandBrowseSheet,
-    onSelect: () => {
-      refreshSearchHistory();
-      collapseBrowseSheet();
-    },
+    onSelect: handleSearchSelect,
   });
 
   const handleSelectHistoryEntry = useCallback(
