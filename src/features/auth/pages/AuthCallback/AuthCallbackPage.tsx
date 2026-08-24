@@ -24,6 +24,8 @@ export function AuthCallbackPage() {
   const isProcessingRef = useRef(false);
 
   useEffect(() => {
+    let cancelled = false;
+
     async function processCallback() {
       const code = searchParams.get('code');
       const errorParam = searchParams.get('error');
@@ -35,6 +37,14 @@ export function AuthCallbackPage() {
 
       if (!code) {
         setError('Code d’autorisation absent dans l’URL de retour.');
+        return;
+      }
+
+      if (!localStorage.getItem('temp_code_verifier')) {
+        setError(
+          'Session OAuth expirée ou incomplète (code verifier absent). ' +
+            'Revenez à la page de connexion et réessayez.',
+        );
         return;
       }
 
@@ -53,6 +63,9 @@ export function AuthCallbackPage() {
 
       try {
         const result = await handleOAuthCallback(code);
+        if (cancelled) {
+          return;
+        }
 
         if (result.success && result.user) {
           sessionStorage.setItem(exchangeKey, 'done');
@@ -63,14 +76,20 @@ export function AuthCallbackPage() {
           setError(result.error?.message ?? 'Échec de la finalisation de la connexion.');
         }
       } catch {
-        sessionStorage.removeItem(exchangeKey);
-        setError('Échec de la finalisation de la connexion.');
+        if (!cancelled) {
+          sessionStorage.removeItem(exchangeKey);
+          setError('Échec de la finalisation de la connexion.');
+        }
       } finally {
         isProcessingRef.current = false;
       }
     }
 
     void processCallback();
+
+    return () => {
+      cancelled = true;
+    };
   }, [navigate, searchParams, setUserFromOAuthCallback]);
 
   if (error) {

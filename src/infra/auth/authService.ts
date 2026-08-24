@@ -23,6 +23,9 @@ export type { AuthResult, RefreshResult } from '@/domain/auth/models';
 /** Préfixe proxy OAuth web same-origin (Vite en dev, reverse proxy nginx en prod). */
 const OAUTH_WEB_PROXY_PREFIX = '/__sso';
 const OAUTH_CODE_VERIFIER_KEY = 'temp_code_verifier';
+/** Après une déconnexion explicite, force une saisie SSO (évite un SSO « fantôme »). */
+const OAUTH_FORCE_LOGIN_KEY = 'gdp_oauth_force_login';
+const REVOKE_TIMEOUT_MS = 2500;
 
 let authManagerInstance: AuthManager | null = null;
 let authManagerTokenBaseUrl: string | null = null;
@@ -30,6 +33,11 @@ let authManagerTokenBaseUrl: string | null = null;
 function oauthWebProxyPath(): string {
   const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
   return `${basePath}${OAUTH_WEB_PROXY_PREFIX}`;
+}
+
+function webAppUrl(path: string): string {
+  const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
+  return `${window.location.origin}${basePath}${path}`;
 }
 
 /** Base URL pour /token et /revoke — proxy same-origin en web (évite CORS Keycloak). */
@@ -63,18 +71,56 @@ async function redirectWebOAuthLogin(redirectUri: string): Promise<void> {
   const codeChallenge = await generateCodeChallengeFromVerifier(codeVerifier);
   localStorage.setItem(OAUTH_CODE_VERIFIER_KEY, codeVerifier);
 
-  const authUrl =
-    `${config.oAuth.ssoBaseUrl}/auth?` +
-    new URLSearchParams({
-      client_id: config.oAuth.clientId,
-      redirect_uri: redirectUri,
-      response_type: 'code',
-      scope: 'openid profile email',
-      code_challenge: codeChallenge,
-      code_challenge_method: 'S256',
-    }).toString();
+  const params = new URLSearchParams({
+    client_id: config.oAuth.clientId,
+    redirect_uri: redirectUri,
+    response_type: 'code',
+    scope: 'openid profile email',
+    code_challenge: codeChallenge,
+    code_challenge_method: 'S256',
+  });
 
-  window.location.href = authUrl;
+  // localStorage : survit mieux que sessionStorage aux allers-retours SSO.
+  if (localStorage.getItem(OAUTH_FORCE_LOGIN_KEY) === '1') {
+    params.set('prompt', 'login');
+    params.set('max_age', '0');
+    localStorage.removeItem(OAUTH_FORCE_LOGIN_KEY);
+  }
+
+  window.location.href = `${config.oAuth.ssoBaseUrl}/auth?${params.toString()}`;
+}
+
+async function revokeOAuthToken(token: string | null): Promise<void> {
+  if (!token) {
+    return;
+  }
+
+  try {
+    await CapacitorHttp.post({
+      url: `${resolveOAuthTokenBaseUrl()}/revoke`,
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      data: new URLSearchParams({
+        client_id: config.oAuth.clientId,
+        token,
+      }).toString(),
+    });
+  } catch {
+    // Révocation best-effort : ne bloque pas la déconnexion locale.
+  }
+}
+
+async function revokeOAuthTokensWithTimeout(
+  accessToken: string | null,
+  refreshToken: string | null,
+): Promise<void> {
+  await Promise.race([
+    Promise.allSettled([revokeOAuthToken(accessToken), revokeOAuthToken(refreshToken)]),
+    new Promise<void>((resolve) => {
+      window.setTimeout(resolve, REVOKE_TIMEOUT_MS);
+    }),
+  ]);
 }
 
 export interface FetchCurrentUserOptions {
@@ -179,27 +225,6 @@ function authError(message: string, cause?: unknown): Error {
   return error;
 }
 
-function parseOAuthTokenError(data: unknown): string | null {
-  if (!data || typeof data !== 'object') {
-    return null;
-  }
-
-  const payload = data as { error?: string; error_description?: string };
-  if (payload.error_description) {
-    return payload.error_description;
-  }
-
-  if (payload.error === 'invalid_grant') {
-    return 'Code d’autorisation invalide ou déjà utilisé. Relancez la connexion.';
-  }
-
-  if (payload.error === 'invalid_client') {
-    return 'Client OAuth inconnu ou mal configuré (VITE_OAUTH_CLIENT_ID).';
-  }
-
-  return null;
-}
-
 function formatOAuthExchangeFailure(cause?: unknown): string {
   if (!(cause instanceof Error)) {
     return 'Échec de l’échange du code OAuth (Token exchange failed).';
@@ -220,43 +245,11 @@ function formatOAuthExchangeFailure(cause?: unknown): string {
   );
 }
 
-async function diagnoseOAuthTokenExchange(
-  code: string,
-  redirectUri: string,
-): Promise<string | null> {
-  const codeVerifier = localStorage.getItem(OAUTH_CODE_VERIFIER_KEY);
-  if (!codeVerifier) {
-    return null;
-  }
-
-  const tokenUrl = `${resolveOAuthTokenBaseUrl()}/token`;
-  if (!config.oAuth.ssoBaseUrl) {
-    return 'VITE_OAUTH_BASE_URL est absent.';
-  }
-
-  try {
-    const response = await CapacitorHttp.post({
-      url: tokenUrl,
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      data: new URLSearchParams({
-        grant_type: 'authorization_code',
-        client_id: config.oAuth.clientId,
-        code,
-        redirect_uri: redirectUri,
-        code_verifier: codeVerifier,
-      }).toString(),
-    });
-
-    if (response.status < 400) {
-      return null;
-    }
-
-    return parseOAuthTokenError(response.data) ?? `HTTP ${response.status} sur ${tokenUrl}`;
-  } catch {
-    return null;
-  }
+/**
+ * Diagnostic sans rejouer l’échange (le code OAuth est à usage unique).
+ */
+function explainOAuthTokenExchangeFailure(cause?: unknown): string {
+  return formatOAuthExchangeFailure(cause);
 }
 
 export async function loginWithOAuth(): Promise<AuthResult> {
@@ -326,18 +319,10 @@ export async function handleOAuthCallback(code: string): Promise<AuthResult> {
     const result = await getAuthManager().completeOAuthCallback(code, redirectUri);
 
     if (!result.success) {
-      let message = formatOAuthExchangeFailure(result.error);
-      if (result.error?.message === 'Token exchange failed') {
-        const detail = await diagnoseOAuthTokenExchange(code, redirectUri);
-        if (detail) {
-          message = detail;
-        }
-      }
-
       return {
         success: false,
         user: null,
-        error: authError(message, result.error),
+        error: authError(explainOAuthTokenExchangeFailure(result.error), result.error),
       };
     }
 
@@ -427,16 +412,44 @@ export async function isAccessTokenExpired(bufferSeconds: number = 60): Promise<
   }
 }
 
-export async function logout(): Promise<void> {
-  const [accessToken, refreshToken] = await Promise.all([
+export interface LogoutResult {
+  /** true si le navigateur est redirigé vers la déconnexion SSO Keycloak. */
+  redirectedToSso: boolean;
+}
+
+export async function logout(): Promise<LogoutResult> {
+  const [accessToken, refreshToken, idToken] = await Promise.all([
     Storage.get(storageKey('access_token')),
     Storage.get(storageKey('refresh_token')),
+    Storage.get(storageKey('id_token')),
   ]);
 
   await clearStoredAuthState();
   clearCollabApiClientAuth();
   clearCollabApiCache();
+
+  // Attendre (brièvement) la révocation pour éviter une course avec le prochain /token
+  // via le proxy Vite (/__sso) — cause fréquente de HTTP 502 au re-login.
+  await revokeOAuthTokensWithTimeout(accessToken, refreshToken);
+
+  if (!Capacitor.isNativePlatform()) {
+    localStorage.setItem(OAUTH_FORCE_LOGIN_KEY, '1');
+
+    // RP-Initiated Logout : coupe la session SSO Keycloak, sinon le prochain
+    // /auth réémet un code sans page d’identification.
+    const params = new URLSearchParams({
+      client_id: config.oAuth.clientId,
+      post_logout_redirect_uri: webAppUrl('/login'),
+    });
+    if (idToken) {
+      params.set('id_token_hint', idToken);
+    }
+    window.location.href = `${config.oAuth.ssoBaseUrl}/logout?${params.toString()}`;
+    return { redirectedToSso: true };
+  }
+
   await getAuthManager().logout(accessToken ?? '', refreshToken ?? '');
+  return { redirectedToSso: false };
 }
 
 export async function restoreSession(): Promise<boolean> {

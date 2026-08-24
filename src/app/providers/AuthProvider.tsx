@@ -75,11 +75,16 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const logout = useCallback(async () => {
     setIsLoading(true);
     try {
-      await authService.logout();
-    } finally {
+      const result = await authService.logout();
       await userStorage.clearAll();
       setUser(null);
+      if (!result.redirectedToSso) {
+        setIsLoading(false);
+      }
+      return result;
+    } catch (error) {
       setIsLoading(false);
+      throw error;
     }
   }, []);
 
