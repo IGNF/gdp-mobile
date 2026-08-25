@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
+import { AppLogo } from '@/shared/ui/AppLogo';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { EXTERNAL_LINKS } from '@/shared/constants/externalLinks';
 import IconExternalLink from '@/shared/assets/icons/icon-external-link.svg?react';
@@ -63,7 +63,9 @@ export function LoginPage() {
   return (
     <div className={styles.container}>
       <div className={styles.content}>
+        
         <header className={styles.header}>
+          <AppLogo size="sm" />
           <h1 className={styles.title}>Bienvenue</h1>
           <p className={styles.subtitle}>
             Connectez vous pour accéder à votre espace personnel
