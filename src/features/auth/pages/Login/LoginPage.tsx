@@ -63,8 +63,9 @@ export function LoginPage() {
   return (
     <div className={styles.container}>
       <div className={styles.content}>
-        <AppLogo size="md" />
+        
         <header className={styles.header}>
+          <AppLogo size="sm" />
           <h1 className={styles.title}>Bienvenue</h1>
           <p className={styles.subtitle}>
             Connectez vous pour accéder à votre espace personnel
