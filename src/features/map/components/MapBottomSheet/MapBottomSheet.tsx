@@ -9,6 +9,7 @@ import { useAddressSearchHistory } from '@/features/search/hooks/useAddressSearc
 import type { AddressSearchHistoryEntry } from '@/features/search/utils/addressSearchHistory';
 import { useSearchGeoportail } from '@/features/search/hooks/useSearchGeoportail';
 import type { UserFollowingMode } from '@/features/map/hooks/useMap';
+import { openExternalNavigation } from '@/shared/utils/externalNavigation';
 
 import sheetChrome from '@/features/map/styles/mapSheet.module.css';
 
@@ -384,7 +385,11 @@ export function MapBottomSheet({
       return;
     }
 
-    onFocusCoordinate(selectedPoint.point.longitude, selectedPoint.point.latitude);
+    void openExternalNavigation({
+      longitude: selectedPoint.point.longitude,
+      latitude: selectedPoint.point.latitude,
+      label: selectedPoint.point.title,
+    });
   };
 
   const handleRgpSelect = (longitude: number, latitude: number) => {
