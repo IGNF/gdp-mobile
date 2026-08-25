@@ -1,4 +1,4 @@
-import logo from '@/assets/img/logo.png';
+import logo from '@/assets/img/IGN.svg';
 
 import styles from './AppLogo.module.css';
 
