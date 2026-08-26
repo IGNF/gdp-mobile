@@ -269,10 +269,15 @@
 }
 
 .sectionTitle {
-  margin: 0 0 0.5rem;
-  font-size: 0.8125rem;
+  width: 16.9375rem;
+  height: 1.125rem;
+  color: var(--Grey800, #3F4A55);
+  /* Appli - H2 */
+  font-family: "Fira Sans";
+  font-size: 0.9375rem;
+  font-style: normal;
   font-weight: 600;
-  color: var(--color-medium);
+  line-height: normal;
 }
 
 .carouselCaption {

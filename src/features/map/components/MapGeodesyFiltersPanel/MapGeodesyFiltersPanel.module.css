@@ -12,8 +12,8 @@
 }
 
 .section {
-  padding: 1rem 0;
-  border-bottom: 1px solid var(--color-light);
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--gray-5, #EBEAE9);
 }
 
 .section:last-child {
@@ -21,56 +21,47 @@
 }
 
 .sectionTitle {
-  margin: 0 0 0.75rem;
-  font-size: 1rem;
-  font-weight: 700;
-  color: var(--color-dark);
+  color: var(--Grey800, #3F4A55);
+  font-family: "Fira Sans";
+  font-size: 0.9375rem;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
 }
+
 
 .segmentRow {
   display: flex;
-  flex-wrap: nowrap;
-  gap: 0.5rem;
-}
-
-.segmentRowGrid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  flex-wrap: wrap;
   gap: 0.5rem;
 }
 
 .segment {
-  flex: 1;
-  min-width: 0;
-  padding: 0.425rem 0.5rem;
-  border: 1.5px solid var(--color-light);
-  border-radius: 0.625rem;
-  background: var(--color-dark-contrast);
-  font-size: 0.75rem;
-  line-height: 1.25;
-  color: var(--color-dark);
-  cursor: pointer;
+  flex: 0 0 auto;
+  width: auto;
+  color: var(--gray-11, #363331);
   text-align: center;
-  white-space: normal;
-}
-
-.segmentRowGrid .segment {
-  flex: none;
-}
-
-.segmentRow .segment {
-  white-space: nowrap;
+  /* Appli - Btn label */
+  font-family: "Open Sans";
+  font-size: 0.875rem;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+  padding: 0.53125rem 1rem 0.59375rem 1rem;
+  height: 2.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--gray-8, #605A56);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: white;
 }
 
 .segment[data-active='true'] {
-  border-color: var(--color-primary);
-  background: var(--color-primary-light);
-  color: var(--color-primary-shade);
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.375rem;
+  color: var(--green-8, #17634D);
+  border: 1px solid var(--green-8, #17634D);
+  background: rgba(188, 227, 216, 0.60);
 }
 
 .segment[data-active='true']::before {
@@ -78,7 +69,9 @@
   width: 0.375rem;
   height: 0.375rem;
   border-radius: 50%;
-  background: var(--color-primary);
+  background:  var(--green-8, #17634D);
+  color: var(--green-8, #17634D);
+  font-size: 0.875rem;
   flex-shrink: 0;
 }
 
@@ -97,8 +90,13 @@
 }
 
 .dateFieldLabel {
-  font-size: 0.75rem;
-  color: var(--color-medium);
+  color: var(--gray-10, #484441);
+  /* Appli - Txt */
+  font-family: "Open Sans";
+  font-size: 0.8125rem;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
 }
 
 .dateIcon {
@@ -397,5 +395,5 @@
 
 .sheetLarge {
   /* Plus haut que les autres panneaux, mais même chrome (marges + coins arrondis). */
-  max-height: min(78vh, 38rem);
+  max-height: min(92vh, 43.5rem);
 }
