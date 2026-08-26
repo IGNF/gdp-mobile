@@ -1,7 +1,9 @@
 import type { AddressSearchHistoryEntry } from '@/features/search/utils/addressSearchHistory';
 import IconAngleRight from '@/shared/assets/icons/icon-angle-right.svg?react';
 import IconClock from '@/shared/assets/icons/icon-clock.svg?react';
-import IconRGP from '@/shared/assets/icons/icon-rgp.svg?react';
+//import IconRGP from '@/shared/assets/icons/icon-rgp.svg?react';
+
+import {RiBaseStationFill} from 'react-icons/ri';
 
 import styles from './MapBottomSheet.module.css';
 
@@ -20,7 +22,7 @@ export function BrowseSearchHome({
     <div className={styles.browseHome}>
       <button type="button" className={styles.rgpNavigateRow} onClick={onOpenRgpList}>
         <span className={styles.rgpNavigateIconWrap} aria-hidden>
-          <IconRGP className={styles.rgpNavigateIcon} />
+          <RiBaseStationFill className={styles.rgpNavigateIcon} />
         </span>
         <span className={styles.rgpNavigateLabel}>Stations RGP</span>
         <IconAngleRight className={styles.rgpNavigateChevron} aria-hidden />

@@ -384,7 +384,8 @@
 }
 
 .rgpDispoGroup {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(4, 1.125rem);
   align-items: center;
   gap: 0.25rem;
   flex-shrink: 0;
