@@ -128,7 +128,7 @@
 
 .geolocationFab {
   right: 1rem;
-  bottom: calc(var(--map-fab-sheet-offset) + var(--map-tabbar-height) - 0.5rem);
+  bottom: calc(var(--map-tabbar-height) + 0.2rem);
 }
 
 
@@ -151,7 +151,7 @@
 }
 
 .mapTarget :global(.ol-scale-line) {
-  bottom: calc(var(--map-fab-sheet-offset) + var(--map-tabbar-height) - 0.5rem);
+  bottom: calc(var(--map-tabbar-height) + 0.2rem);
   left: 1rem;
 }
 
