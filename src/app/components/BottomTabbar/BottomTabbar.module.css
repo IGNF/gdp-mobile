@@ -5,14 +5,13 @@
   gap: 1rem;
   flex-shrink: 0;
   background-color: var(--color-white);
-  padding: 0.75rem 0;
-  margin: 0 1rem calc(1rem + var(--safe-bottom)) 1rem;
+  margin: 0 0 calc(1rem + var(--safe-bottom)) 0;
   border-radius : 5rem;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  height: 4.5rem;
 }
 
 .tab {
-
   background: none;
   border: none;
   border-radius: 5rem;
@@ -20,13 +19,11 @@
   font: inherit;
   transition: all 0.2s;
   min-width: 2.5rem;
-
   display: flex;
   padding: var(--Spacing-xs, 0.5rem) var(--Spacing-md, 1rem) var(--Spacing-xs, 0.5rem) var(--Spacing-sm, 0.75rem);
   justify-content: center;
   align-items: center;
   gap: var(--Spacing-xs, 0.5rem);
-
   fill: var(--gray-11, #363331);
 }
 

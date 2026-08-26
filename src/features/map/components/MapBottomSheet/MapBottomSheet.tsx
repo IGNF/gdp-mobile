@@ -18,7 +18,7 @@ import { BrowseSearchHome } from './BrowseSearchHome';
 import { BrowseReportsPanel } from './BrowseReportsPanel';
 import { MapPointSheet } from './pointFiche/MapPointSheet';
 import styles from './MapBottomSheet.module.css';
-import IconSearch from '@/shared/assets/icons/icon-search.svg?react';
+import { RiSearchLine } from 'react-icons/ri';
 
 type BrowsePanelView = 'search' | 'rgp' | 'reports';
 
@@ -471,7 +471,7 @@ export function MapBottomSheet({
                   handleSearchActivate();
                 }}
               >
-                <IconSearch className={styles.searchIcon} aria-hidden />
+                <RiSearchLine className={styles.searchIcon} aria-hidden />
                 <div ref={searchContainerRef} className={styles.searchContainer} />
               </div>
             </div>
