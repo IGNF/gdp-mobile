@@ -84,7 +84,12 @@ function MultiChoiceRow({
   };
 
   return (
-    <div className={styles.segmentRowGrid} role="group" aria-label={definition.title}>
+    <div className={styles.segmentRow} role="group" aria-label={definition.title}>
+      <SegmentButton
+        label="Tous"
+        active={value === null || value === undefined}
+        onClick={() => onChange(null)}
+      />
       {definition.options.map((option) => (
         <SegmentButton
           key={option.value}

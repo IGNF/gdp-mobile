@@ -103,9 +103,6 @@ export function MapOverlaySheet({
             ) : (
               <span className={styles.titleSpacer} />
             )}
-            <button type="button" className={styles.closeButton} onClick={onClose} aria-label="Fermer">
-              <IconClose className={styles.closeIcon} aria-hidden />
-            </button>
           </header>
         )}
 

@@ -100,20 +100,55 @@ Produit : `gdp-mobile/android/app/build/outputs/apk/debug/app-debug.apk`
 
 Transférer l’APK sur le téléphone (USB, mail, etc.) puis l’installer. L’APK debug accepte l’installation depuis des sources inconnues si besoin.
 
+### Lancer depuis Android Studio
 
-| Commande                                      | Description                                 |
-| --------------------------------------------- | ------------------------------------------- |
-| `nvm install 22 && nvm use 22`                | Version necessaire (a faire une seule fois) |
-| `npm run setup-android`                       | Configuration initiale Android              |
-| `npm run generate-apk`                        | Build web + sync Capacitor + APK debug      |
-| `npm run capacitor-build -w gdp-mobile`       | Build dist + `cap sync android`             |
-| `npm run capacitor-run-android -w gdp-mobile` | Run sur appareil / émulateur                |
-| `npm run open-android -w gdp-mobile`          | Ouvrir le projet dans Android Studio        |
+C’est le parcours le plus simple pour installer l’app sur un téléphone ou un émulateur, puis l’inspecter dans Chrome.
 
+```bash
+# Depuis la racine du monorepo
+nvm use 22
+npm run capacitor-build -w gdp-mobile   # build dist + copie dans android/
+npm run open-android -w gdp-mobile      # ouvre gdp-mobile/android dans Android Studio
+```
+
+**`Unable to launch Android Studio`** — Capacitor cherche par défaut `studio.sh` ici :
+
+`/usr/local/android-studio/bin/studio.sh`
+
+Si ce fichier n’existe plus (Studio déplacé ou désinstallé), `npx cap open android` échoue même si le SDK (`ANDROID_HOME`) est encore là.
+
+Solutions :
+
+1. Ouvrir le projet à la main dans Android Studio : **File → Open** → `gdp-mobile/android`
+2. Pointer Capacitor vers le vrai binaire (à adapter) :
+
+```bash
+export CAPACITOR_ANDROID_STUDIO_PATH=/chemin/vers/android-studio/bin/studio.sh
+npm run open-android -w gdp-mobile
+```
+
+Pour le rendre permanent, ajouter l’`export` dans `~/.bashrc` (ou équivalent).
+
+3. Réinstaller Android Studio au chemin par défaut Linux (`/usr/local/android-studio`), puis relancer `npm run open-android -w gdp-mobile`.
+
+Dans **Android Studio** :
+
+1. Attendre la sync Gradle (barre de statut en bas). La première ouverture peut prendre plusieurs minutes.
+2. Brancher le téléphone (débogage USB) **ou** démarrer un émulateur (*Device Manager*).
+3. Dans la barre d’outils, choisir l’appareil cible.
+4. Cliquer sur **Run** (triangle vert, `Shift+F10`). L’app s’installe et s’ouvre.
+
+Sans Android Studio, en ligne de commande :
+
+```bash
+npm run capacitor-run-android -w gdp-mobile
+```
+
+Après chaque modification web (React / CSS), refaire `npm run capacitor-build -w gdp-mobile` **avant** de relancer Run : l’APK embarque le bundle `dist/`, pas le serveur Vite.
 
 ### Déboguer l’APK — `chrome://inspect/#devices`
 
-Pour inspecter la WebView Capacitor (console, réseau, éléments) depuis Chrome sur le poste de dev.
+Une fois l’app **ouverte** sur l’appareil (via Android Studio, `capacitor-run-android`, ou APK installé), inspecter la WebView Capacitor (console, réseau, éléments) depuis Chrome sur le poste de dev.
 
 **Prérequis**
 

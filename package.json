@@ -28,6 +28,8 @@
     "@capacitor/filesystem": "^8.0.0",
     "@capacitor/geolocation": "^8.2.0",
     "@capacitor/preferences": "^8.0.0",
+    "@fontsource/fira-sans": "^5.3.0",
+    "@fontsource/open-sans": "^5.3.0",
     "@ign/gdp-tools": "*",
     "@ign/mobile-core": "git+ssh://git@github.com/IGNF/mobile-core.git#main",
     "@ign/mobile-device": "git+ssh://git@github.com/IGNF/mobile-device.git#main",

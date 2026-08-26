@@ -1,17 +1,30 @@
 .button {
-  width: 80%;
-  margin: 0 auto;
+  	width: 80%;
+  	margin: 0 auto;
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
 	gap: 0.5rem;
 	border: 1px solid transparent;
-	border-radius: 100px;
-	padding: 12.5px 25px;
-	font-weight: 500;
-	font-size: 1rem;
 	cursor: pointer;
 	transition: background-color 0.2s, border-color 0.2s, opacity 0.2s;
+
+	display: flex;
+	height: 2.75rem;
+	padding: 0 1.25rem;
+	justify-content: center;
+	align-items: center;
+	flex: 1 0 0;
+	border-radius: 6.25rem;
+	background: var(--PRIMARY, #26A581);
+
+	color: var(--Blanc, #FFF);
+	text-align: center;
+	font-family: "Open Sans";
+	font-size: 0.875rem;
+	font-style: normal;
+	font-weight: 600;
+	line-height: normal;
 }
 
 .button:disabled {
