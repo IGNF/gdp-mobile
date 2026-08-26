@@ -12,11 +12,7 @@
 }
 
 .tab {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  padding: 0.625rem;
+
   background: none;
   border: none;
   border-radius: 5rem;
@@ -24,11 +20,19 @@
   font: inherit;
   transition: all 0.2s;
   min-width: 2.5rem;
+
+  display: flex;
+  padding: var(--Spacing-xs, 0.5rem) var(--Spacing-md, 1rem) var(--Spacing-xs, 0.5rem) var(--Spacing-sm, 0.75rem);
+  justify-content: center;
+  align-items: center;
+  gap: var(--Spacing-xs, 0.5rem);
+
+  fill: var(--gray-11, #363331);
 }
 
 .tab.active {
-  background: var(--color-primary);
-  /*padding: 0.625rem 1.25rem;*/
+  border-radius: var(--Radius-Full, 624.9375rem);
+  background: var(--green-6, #1E8467);
 }
 
 .tabIcon {
@@ -38,7 +42,7 @@
 }
 
 .tabIcon path {
-  fill: var(--color-dark);
+  fill: var(--gray-11, #363331);
   transition: fill 0.2s;
 }
 

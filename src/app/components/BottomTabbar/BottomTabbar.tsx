@@ -1,8 +1,6 @@
 import { useNavigate } from 'react-router-dom';
+import { RiMap2Line, RiFileTextLine, RiSearchLine } from 'react-icons/ri';
 
-import IconArticle from '@/shared/assets/icons/icon-article.svg?react';
-import IconMap from '@/shared/assets/icons/icon-map.svg?react';
-import IconSearch from '@/shared/assets/icons/icon-search.svg?react';
 import styles from './BottomTabbar.module.css';
 
 export type AppTabId = 'carte' | 'signalements' | 'recherche';
@@ -57,7 +55,7 @@ export function BottomTabbar({
         onClick={() => handleTabClick('carte')}
         aria-current={activeTab === 'carte' ? 'page' : undefined}
       >
-        <IconMap className={styles.tabIcon} aria-hidden />
+        <RiMap2Line className={styles.tabIcon} aria-hidden />
         <span className={styles.tabLabel}>Carte</span>
       </button>
       <button
@@ -66,7 +64,7 @@ export function BottomTabbar({
         onClick={() => handleTabClick('signalements')}
         aria-current={activeTab === 'signalements' ? 'page' : undefined}
       >
-        <IconArticle className={styles.tabIcon} aria-hidden />
+        <RiFileTextLine className={styles.tabIcon} aria-hidden />
         <span className={styles.tabLabel}>Signalements</span>
       </button>
 
@@ -76,7 +74,7 @@ export function BottomTabbar({
         onClick={() => handleTabClick('recherche')}
         aria-current={activeTab === 'recherche' ? 'page' : undefined}
       >
-        <IconSearch className={styles.tabIcon} aria-hidden />
+        <RiSearchLine className={styles.tabIcon} aria-hidden />
         <span className={styles.tabLabel}>Recherche</span>
       </button>
     </nav>
