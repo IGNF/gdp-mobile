@@ -7,9 +7,8 @@ import { joinCSSClassNames } from '@/shared/utils/join';
 import IconCheck from '@/shared/assets/icons/icon-check.svg?react';
 import IconCopy from '@/shared/assets/icons/icon-copy.svg?react';
 import IconHeart from '@/shared/assets/icons/icon-heart.svg?react';
-import IconPdf from '@/shared/assets/icons/icon-pdf.svg?react';
 
-import { findEtatLabel, findVisitYear, isBonEtatLabel, readProperty } from './pointFicheUtils';
+import { findEtatLabel, findVisitYear, isBonEtatLabel } from './pointFicheUtils';
 
 import styles from './MapPointSheet.module.css';
 
@@ -36,7 +35,6 @@ export function MapPointSheetHeader({ action, referencePosition }: MapPointSheet
 
   const etatLabel = findEtatLabel(action);
   const visitYear = findVisitYear(action);
-  const pdfUrl = readProperty(action, 'url_pdf');
 
   const distanceLabel = referencePosition
     ? formatDistanceFromMapCenter(
@@ -67,18 +65,6 @@ export function MapPointSheetHeader({ action, referencePosition }: MapPointSheet
               <IconCopy className={styles.copyIcon} aria-hidden />
             )}
           </button>
-          {pdfUrl ? (
-            <a
-              href={pdfUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={styles.copyButton}
-              onPointerDown={(event) => event.stopPropagation()}
-              aria-label="Ouvrir la fiche PDF"
-            >
-              <IconPdf className={styles.copyIcon} aria-hidden />
-            </a>
-          ) : null}
         </div>
         <button type="button" className={styles.favoriteButton} aria-label="Favori (à venir)" disabled>
           <IconHeart className={styles.favoriteIcon} aria-hidden />

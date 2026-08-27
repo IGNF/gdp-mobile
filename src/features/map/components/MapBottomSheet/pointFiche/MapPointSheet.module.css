@@ -467,3 +467,65 @@
   opacity: 0.35;
   cursor: not-allowed;
 }
+
+.pdfDownloadLink {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border-radius: 0.625rem;
+  border: 1px solid var(--figma-neutral-light-active);
+  background: var(--color-fiche-surface);
+  text-decoration: none;
+}
+
+.pdfDownloadIconSlot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--color-primary-light);
+}
+
+.pdfDownloadIcon {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.pdfDownloadIcon path {
+  fill: var(--color-primary);
+}
+
+.pdfDownloadTextGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1875rem;
+  min-width: 0;
+}
+
+.pdfDownloadTitle {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-dark);
+}
+
+.pdfDownloadSubtitle {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.75rem;
+  color: var(--color-medium);
+}
+
+.pdfDownloadExternalIcon {
+  width: 0.75rem;
+  height: 0.75rem;
+  flex-shrink: 0;
+}
+
+.pdfDownloadExternalIcon path {
+  fill: var(--color-medium);
+}

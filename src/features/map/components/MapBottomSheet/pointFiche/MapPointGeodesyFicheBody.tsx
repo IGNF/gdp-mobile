@@ -11,6 +11,7 @@ import {
 } from './pointFicheUtils';
 import { getDisplayedFieldIds } from './getDisplayedFieldIds';
 import { resolveGpsExploitabilityVariant } from './gpsExploitabilityBadge';
+import { MapPointPdfSection } from './MapPointPdfSection';
 import { PartenaireSection } from './PartenaireSection';
 import { PointCoordinatesSection } from './PointCoordinatesSection';
 import { PointImageCarousel } from './PointImageCarousel';
@@ -82,6 +83,7 @@ export function MapPointGeodesyFicheBody({ action, snapIndex }: MapPointGeodesyF
   const siteType = readProperty(action, 'groupe_type');
   const localisation = readProperty(action, 'localisation');
   const hasGeodesyDetails = departement || insee || commune || siteType || localisation;
+  const pdfUrl = readProperty(action, 'url_pdf');
 
   return (
     <>
@@ -148,6 +150,8 @@ export function MapPointGeodesyFicheBody({ action, snapIndex }: MapPointGeodesyF
           ) : null}
         </>
       ) : null}
+
+      <MapPointPdfSection pdfUrl={pdfUrl} />
 
       <UnmappedFieldsDebug fields={unmappedFields} />
     </>
