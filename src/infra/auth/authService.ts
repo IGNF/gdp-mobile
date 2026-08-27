@@ -14,6 +14,7 @@ import {
   generateCodeChallengeFromVerifier,
   generateCodeVerifier,
 } from '@/infra/auth/oauthPkce';
+import { getUser as getStoredUser } from '@/infra/storage/UserStorage';
 import { config } from '@/shared/config/env';
 import { storageKey } from '@/shared/constants/storage';
 import { getRedirectUri } from '@/shared/utils/auth';
@@ -30,14 +31,13 @@ const REVOKE_TIMEOUT_MS = 2500;
 let authManagerInstance: AuthManager | null = null;
 let authManagerTokenBaseUrl: string | null = null;
 
+/** Un code OAuth n’est échangeable qu’une fois (double-mount StrictMode, rechargement). */
+let inflightOAuthCallback: { code: string; promise: Promise<AuthResult> } | null = null;
+let lastOAuthCallback: { code: string; result: AuthResult } | null = null;
+
 function oauthWebProxyPath(): string {
   const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
   return `${basePath}${OAUTH_WEB_PROXY_PREFIX}`;
-}
-
-function webAppUrl(path: string): string {
-  const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
-  return `${window.location.origin}${basePath}${path}`;
 }
 
 /** Base URL pour /token et /revoke — proxy same-origin en web (évite CORS Keycloak). */
@@ -80,7 +80,6 @@ async function redirectWebOAuthLogin(redirectUri: string): Promise<void> {
     code_challenge_method: 'S256',
   });
 
-  // localStorage : survit mieux que sessionStorage aux allers-retours SSO.
   if (localStorage.getItem(OAUTH_FORCE_LOGIN_KEY) === '1') {
     params.set('prompt', 'login');
     params.set('max_age', '0');
@@ -205,6 +204,31 @@ function syncCollabApiClient(tokens: {
   );
 }
 
+async function persistSuccessfulAuth(tokens: CoreAuthTokens, user: AppUser): Promise<AuthResult> {
+  await storeTokens(tokens);
+  syncCollabApiClient(tokens);
+  return { success: true, user };
+}
+
+async function tryRestoreExistingSession(): Promise<AuthResult | null> {
+  const restored = await restoreSession();
+  if (!restored) {
+    return null;
+  }
+
+  const current = await fetchCurrentUser();
+  if (current.success && current.user) {
+    return current;
+  }
+
+  const storedUser = await getStoredUser();
+  if (storedUser) {
+    return { success: true, user: storedUser };
+  }
+
+  return null;
+}
+
 async function clearStoredAuthState(): Promise<void> {
   const keys = [
     'access_token',
@@ -245,13 +269,6 @@ function formatOAuthExchangeFailure(cause?: unknown): string {
   );
 }
 
-/**
- * Diagnostic sans rejouer l’échange (le code OAuth est à usage unique).
- */
-function explainOAuthTokenExchangeFailure(cause?: unknown): string {
-  return formatOAuthExchangeFailure(cause);
-}
-
 export async function loginWithOAuth(): Promise<AuthResult> {
   try {
     const redirectUri = getRedirectUri();
@@ -283,15 +300,7 @@ export async function loginWithOAuth(): Promise<AuthResult> {
       };
     }
 
-    await storeTokens(result.tokens);
-    syncCollabApiClient(result.tokens);
-
-    const user = result.user as AppUser;
-
-    return {
-      success: true,
-      user,
-    };
+    return persistSuccessfulAuth(result.tokens, result.user as AppUser);
   } catch (error) {
     const message =
       error instanceof Error && error.message
@@ -313,16 +322,34 @@ export async function loginWithOAuth(): Promise<AuthResult> {
   }
 }
 
-export async function handleOAuthCallback(code: string): Promise<AuthResult> {
+async function exchangeAuthorizationCode(code: string): Promise<AuthResult> {
   try {
-    const redirectUri = getRedirectUri();
-    const result = await getAuthManager().completeOAuthCallback(code, redirectUri);
+    const verifierMissing = !localStorage.getItem(OAUTH_CODE_VERIFIER_KEY);
+    if (verifierMissing) {
+      const restored = await tryRestoreExistingSession();
+      if (restored) {
+        return restored;
+      }
 
-    if (!result.success) {
       return {
         success: false,
         user: null,
-        error: authError(explainOAuthTokenExchangeFailure(result.error), result.error),
+        error: authError('Session OAuth expirée. Relancez la connexion depuis la page de login.'),
+      };
+    }
+
+    const result = await getAuthManager().completeOAuthCallback(code, getRedirectUri());
+
+    if (!result.success) {
+      const restored = await tryRestoreExistingSession();
+      if (restored) {
+        return restored;
+      }
+
+      return {
+        success: false,
+        user: null,
+        error: authError(formatOAuthExchangeFailure(result.error), result.error),
       };
     }
 
@@ -334,15 +361,7 @@ export async function handleOAuthCallback(code: string): Promise<AuthResult> {
       };
     }
 
-    await storeTokens(result.tokens);
-    syncCollabApiClient(result.tokens);
-
-    const user = result.user as AppUser;
-
-    return {
-      success: true,
-      user,
-    };
+    return persistSuccessfulAuth(result.tokens, result.user as AppUser);
   } catch (error) {
     return {
       success: false,
@@ -350,6 +369,30 @@ export async function handleOAuthCallback(code: string): Promise<AuthResult> {
       error: authError('Échec du callback OAuth', error),
     };
   }
+}
+
+export function handleOAuthCallback(code: string): Promise<AuthResult> {
+  if (inflightOAuthCallback?.code === code) {
+    return inflightOAuthCallback.promise;
+  }
+
+  if (lastOAuthCallback?.code === code) {
+    return Promise.resolve(lastOAuthCallback.result);
+  }
+
+  const promise = exchangeAuthorizationCode(code)
+    .then((result) => {
+      lastOAuthCallback = { code, result };
+      return result;
+    })
+    .finally(() => {
+      if (inflightOAuthCallback?.promise === promise) {
+        inflightOAuthCallback = null;
+      }
+    });
+
+  inflightOAuthCallback = { code, promise };
+  return promise;
 }
 
 export async function refreshAccessToken(): Promise<RefreshResult> {
@@ -418,34 +461,24 @@ export interface LogoutResult {
 }
 
 export async function logout(): Promise<LogoutResult> {
-  const [accessToken, refreshToken, idToken] = await Promise.all([
+  const [accessToken, refreshToken] = await Promise.all([
     Storage.get(storageKey('access_token')),
     Storage.get(storageKey('refresh_token')),
-    Storage.get(storageKey('id_token')),
   ]);
 
   await clearStoredAuthState();
   clearCollabApiClientAuth();
   clearCollabApiCache();
+  lastOAuthCallback = null;
+  inflightOAuthCallback = null;
 
-  // Attendre (brièvement) la révocation pour éviter une course avec le prochain /token
-  // via le proxy Vite (/__sso) — cause fréquente de HTTP 502 au re-login.
+  // Évite une course revoke + prochain /token via le proxy (502).
   await revokeOAuthTokensWithTimeout(accessToken, refreshToken);
 
   if (!Capacitor.isNativePlatform()) {
+    // Logout local uniquement (évite l’écran Keycloak si post_logout_redirect_uri n’est pas enregistrée).
     localStorage.setItem(OAUTH_FORCE_LOGIN_KEY, '1');
-
-    // RP-Initiated Logout : coupe la session SSO Keycloak, sinon le prochain
-    // /auth réémet un code sans page d’identification.
-    const params = new URLSearchParams({
-      client_id: config.oAuth.clientId,
-      post_logout_redirect_uri: webAppUrl('/login'),
-    });
-    if (idToken) {
-      params.set('id_token_hint', idToken);
-    }
-    window.location.href = `${config.oAuth.ssoBaseUrl}/logout?${params.toString()}`;
-    return { redirectedToSso: true };
+    return { redirectedToSso: false };
   }
 
   await getAuthManager().logout(accessToken ?? '', refreshToken ?? '');

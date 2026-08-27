@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import path from 'path'
+import createHttpsProxyAgent from 'https-proxy-agent'
 import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 import svgr from 'vite-plugin-svgr'
@@ -33,6 +34,57 @@ function normalizeOAuthBaseUrl(url: string): string {
   return url.trim().replace(/\/+$/, '')
 }
 
+function getOutboundHttpProxyUrl(): string | undefined {
+  const value =
+    process.env.HTTPS_PROXY ||
+    process.env.https_proxy ||
+    process.env.HTTP_PROXY ||
+    process.env.http_proxy
+  const trimmed = value?.trim()
+  return trimmed ? trimmed : undefined
+}
+
+function hostnameMatchesNoProxy(hostname: string, noProxyRaw: string): boolean {
+  const host = hostname.toLowerCase()
+
+  return noProxyRaw.split(',').some((raw) => {
+    const entry = raw.trim().toLowerCase()
+    if (!entry) {
+      return false
+    }
+    if (entry === '*') {
+      return true
+    }
+    if (entry.startsWith('.')) {
+      return host === entry.slice(1) || host.endsWith(entry)
+    }
+    return host === entry || host.endsWith(`.${entry}`)
+  })
+}
+
+function createOauthProxyAgent(ssoTarget: string): ReturnType<typeof createHttpsProxyAgent> | undefined {
+  const proxyUrl = getOutboundHttpProxyUrl()
+  if (!proxyUrl) {
+    return undefined
+  }
+
+  let hostname = ''
+  try {
+    hostname = new URL(ssoTarget).hostname
+  } catch {
+    return undefined
+  }
+
+  const noProxy = process.env.NO_PROXY || process.env.no_proxy || ''
+  if (hostnameMatchesNoProxy(hostname, noProxy)) {
+    console.info(`[vite oauth proxy] ${hostname} est dans NO_PROXY — connexion directe`)
+    return undefined
+  }
+
+  console.info(`[vite oauth proxy] ${hostname} via ${proxyUrl}`)
+  return createHttpsProxyAgent(proxyUrl)
+}
+
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, __dirname, '')
   const oauthSsoTarget = normalizeOAuthBaseUrl(
@@ -41,6 +93,7 @@ export default defineConfig(({ mode }) => {
 
   const basePath = env.VITE_BASE_PATH || '/'
   const oauthProxyMount = `${basePath.replace(/\/+$/, '')}${oauthDevProxyPrefix}`
+  const oauthProxyAgent = createOauthProxyAgent(oauthSsoTarget)
 
   return {
     base: basePath,
@@ -97,6 +150,7 @@ export default defineConfig(({ mode }) => {
           target: oauthSsoTarget,
           changeOrigin: true,
           secure: true,
+          agent: oauthProxyAgent,
           timeout: 30_000,
           proxyTimeout: 30_000,
           rewrite: (requestPath) =>

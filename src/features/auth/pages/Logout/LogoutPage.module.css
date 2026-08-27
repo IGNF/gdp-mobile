@@ -10,3 +10,16 @@
   gap: 12px;
   margin-top: 8px;
 }
+
+
+.actionButton {
+  display: flex;
+  height: 2.75rem;
+  padding: 0.6875rem 0.625rem;
+  justify-content: center;
+  align-items: center;
+  gap: var(--Spacing-2xs, 0.25rem);
+  align-self: stretch;
+  border-radius: 6.25rem;
+  background: var(--Dark-green, #26A581);
+}

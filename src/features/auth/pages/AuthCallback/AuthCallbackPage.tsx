@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import { useAuth } from '@/features/auth/hooks/useAuth';
@@ -11,8 +11,6 @@ import typography from '@/shared/styles/typography.module.css';
 
 import styles from './AuthCallbackPage.module.css';
 
-const oauthExchangeStorageKey = (code: string): string => `gdp_oauth_exchange_${code}`;
-
 /**
  * Callback OAuth web : lit ?code= dans l’URL et échange le code contre des jetons.
  */
@@ -21,7 +19,6 @@ export function AuthCallbackPage() {
   const [searchParams] = useSearchParams();
   const { setUserFromOAuthCallback } = useAuth();
   const [error, setError] = useState<string | null>(null);
-  const isProcessingRef = useRef(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -40,48 +37,24 @@ export function AuthCallbackPage() {
         return;
       }
 
-      if (!localStorage.getItem('temp_code_verifier')) {
-        setError(
-          'Session OAuth expirée ou incomplète (code verifier absent). ' +
-            'Revenez à la page de connexion et réessayez.',
-        );
-        return;
-      }
-
-      const exchangeKey = oauthExchangeStorageKey(code);
-      if (sessionStorage.getItem(exchangeKey) === 'done') {
-        navigate('/map', { replace: true });
-        return;
-      }
-
-      if (isProcessingRef.current || sessionStorage.getItem(exchangeKey) === 'processing') {
-        return;
-      }
-
-      isProcessingRef.current = true;
-      sessionStorage.setItem(exchangeKey, 'processing');
-
       try {
         const result = await handleOAuthCallback(code);
+
+        if (result.success && result.user) {
+          await setUserFromOAuthCallback(result.user);
+          navigate('/map', { replace: true });
+          return;
+        }
+
         if (cancelled) {
           return;
         }
 
-        if (result.success && result.user) {
-          sessionStorage.setItem(exchangeKey, 'done');
-          await setUserFromOAuthCallback(result.user);
-          navigate('/map', { replace: true });
-        } else {
-          sessionStorage.removeItem(exchangeKey);
-          setError(result.error?.message ?? 'Échec de la finalisation de la connexion.');
-        }
+        setError(result.error?.message ?? 'Échec de la finalisation de la connexion.');
       } catch {
         if (!cancelled) {
-          sessionStorage.removeItem(exchangeKey);
           setError('Échec de la finalisation de la connexion.');
         }
-      } finally {
-        isProcessingRef.current = false;
       }
     }
 

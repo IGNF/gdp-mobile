@@ -73,7 +73,7 @@
 .actionButton {
   display: flex;
   height: 2.75rem;
-  
+  padding: 0.6875rem 0.625rem;
   justify-content: center;
   align-items: center;
   gap: var(--Spacing-2xs, 0.25rem);
@@ -90,7 +90,7 @@
   box-sizing: border-box;
   width: 100%;
   min-height: 44px;
-  padding: 11px 10px;
+  padding: 0.6875rem 0.625rem;
   border: 1px solid rgba(42, 40, 38, 0.2);
   border-radius: 100px;
   background: transparent;
@@ -100,29 +100,6 @@
   text-decoration: none;
   cursor: pointer;
   transition: background-color 0.2s, border-color 0.2s;
-
-
-  /* display: flex;
-  height: 2.75rem;
-  padding: 0.6875rem 0.625rem;
-  justify-content: center;
-  align-items: center;
-  gap: var(--Spacing-2xs, 0.25rem);
-  align-self: stretch;
-  border-radius: 6.25rem;
-  border: 1px solid var(--gray-1, rgba(42, 40, 38, 0.20));
-
-  color: var(--green-5, #229574);
-
-
-  /* Appli - Btn label */
- /* font-family: "Open Sans";
-  font-size: 0.875rem;
-  font-style: normal;
-  font-weight: 600;
-  line-height: normal; */
-
-
 }
 
 .outlineButton:hover {
@@ -140,34 +117,21 @@
 }
 
 .forgotPasswordLink {
-  /* display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.35rem;
-  margin-top: 0.5rem;
-  color: #2a2826;
-  font-size: 0.8125rem;
-  font-weight: 400;
-  text-decoration: underline;
-  text-underline-offset: 0.2rem;
-  text-decoration-thickness: from-font; */
-
   color: var(--Content-Neutral-Primary, var(--gray-12, #2A2826));
-text-align: center;
+  text-align: center;
 
-
-/* Body/Small */
-font-family: "Open Sans";
-font-size: 0.8125rem;
-font-style: normal;
-font-weight: 400;
-line-height: normal;
-text-decoration-line: underline;
-text-decoration-style: solid;
-text-decoration-skip-ink: auto;
-text-decoration-thickness: 4.5%; /* 0.585px */
-text-underline-offset: 21%; /* 2.73px */
-text-underline-position: from-font;
+  /* Body/Small */
+  font-family: "Open Sans";
+  font-size: 0.8125rem;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  text-decoration-line: underline;
+  text-decoration-style: solid;
+  text-decoration-skip-ink: auto;
+  text-decoration-thickness: 4.5%; /* 0.585px */
+  text-underline-offset: 21%; /* 2.73px */
+  text-underline-position: from-font;
 }
 
 .forgotPasswordIcon {
