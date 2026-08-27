@@ -54,6 +54,7 @@ export function MapPointSheetFooter({
         type="button"
         variant="outline"
         fullWidth
+        className={styles.footerButton}
         onClick={onNavigate}
         onPointerDown={stopDrag}
       >
@@ -62,7 +63,14 @@ export function MapPointSheetFooter({
       </Button>
 
       <div className={styles.reportCell} ref={wrapRef}>
-        <Button type="button" fullWidth onClick={onReport} onPointerDown={stopDrag} disabled={!canReport}>
+        <Button
+          type="button"
+          fullWidth
+          className={styles.footerButton}
+          onClick={onReport}
+          onPointerDown={stopDrag}
+          disabled={!canReport}
+        >
           <RiFeedbackLine className={styles.footerButtonIcon} aria-hidden />
           Signaler
         </Button>

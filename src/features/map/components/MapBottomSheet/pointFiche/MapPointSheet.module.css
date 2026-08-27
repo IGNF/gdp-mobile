@@ -92,7 +92,8 @@
 }
 
 .copyIcon path {
-  fill: var(--color-medium);
+  /* Charte : gris-brun foncé dédié aux icônes de la fiche (#363331), hors palette --color-*. */
+  fill: #363331;
 }
 
 .favoriteButton {
@@ -104,10 +105,9 @@
   padding: 0;
   border: none;
   border-radius: 50%;
-  background: var(--color-primary-light);
+  background: var(--figma-green-light-hover);
   cursor: default;
   flex-shrink: 0;
-  opacity: 0.6;
 }
 
 .favoriteIcon {
@@ -116,7 +116,7 @@
 }
 
 .favoriteIcon path {
-  fill: var(--color-primary);
+  fill: var(--color-primary-shade);
 }
 
 .statusMetaRow {
@@ -144,7 +144,7 @@
 .meta {
   margin: 0;
   font-size: 0.875rem;
-  color: var(--color-medium);
+  color: var(--color-medium-shade);
 }
 
 .body {
@@ -171,9 +171,16 @@
 }
 
 .footerButtonIcon {
-  width: 1.125rem;
-  height: 1.125rem;
+  width: 1.5rem;
+  height: 1.5rem;
   flex-shrink: 0;
+}
+
+/* Sélecteur composé pour primer sur .button (Button.module.css) sans dépendre de l'ordre
+   d'import des CSS modules. */
+.footer .footerButton {
+  height: 3.75rem;
+  font-size: 1.125rem;
 }
 
 .authInfoTrigger {
