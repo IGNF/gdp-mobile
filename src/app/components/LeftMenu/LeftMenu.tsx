@@ -1,6 +1,7 @@
 import { useState } from 'react';
 
 import type { AppUser } from '@/domain/user/models';
+import { config } from '@/shared/config/env';
 
 import IconAngleRight from '@/shared/assets/icons/icon-angle-right.svg?react';
 import IconConfiguration from '@/shared/assets/icons/icon-configuration.svg?react';
@@ -122,11 +123,46 @@ function isAuthVisible(visibility: AuthVisibility = 'always', isAuthenticated: b
   return true;
 }
 
-function getUserInitial(user: AppUser | null | undefined): string {
-  if (!user?.username) {
-    return '?';
+function resolveUserAvatarUrl(avatar: string | undefined): string | null {
+  const trimmed = avatar?.trim();
+  if (!trimmed) {
+    return null;
   }
-  return user.username.charAt(0).toUpperCase();
+
+  if (/^https?:\/\//i.test(trimmed) || trimmed.startsWith('data:') || trimmed.startsWith('/')) {
+    return trimmed;
+  }
+
+  try {
+    return new URL(trimmed, config.api.baseUrl).href;
+  } catch {
+    return trimmed;
+  }
+}
+
+function UserAvatar({
+  user,
+  isAuthenticated,
+}: {
+  user: AppUser | null | undefined;
+  isAuthenticated: boolean;
+}) {
+  const [hasImageError, setHasImageError] = useState(false);
+  const avatarUrl = isAuthenticated ? resolveUserAvatarUrl(user?.avatar) : null;
+  const showImage = Boolean(avatarUrl) && !hasImageError;
+
+  if (showImage && avatarUrl) {
+    return (
+      <img
+        src={avatarUrl}
+        alt=""
+        className={styles.avatarImage}
+        onError={() => setHasImageError(true)}
+      />
+    );
+  }
+
+  return <IconUser className={styles.avatarIcon} aria-hidden />;
 }
 
 export function LeftMenu({
@@ -185,7 +221,13 @@ export function LeftMenu({
       >
         <div className={styles.userSection}>
           <div className={styles.avatar}>
-            <div className={styles.avatarPlaceholder}>{getUserInitial(user)}</div>
+            <div className={styles.avatarPlaceholder}>
+              <UserAvatar
+                key={isAuthenticated ? (user?.avatar ?? 'auth') : 'guest'}
+                user={user}
+                isAuthenticated={isAuthenticated}
+              />
+            </div>
           </div>
           <div className={styles.userInfo}>
             <span className={styles.userName}>

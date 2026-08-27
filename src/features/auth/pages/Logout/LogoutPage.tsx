@@ -22,7 +22,7 @@ export function LogoutPage({ isOpen, onClose, onLogout }: LogoutPageProps) {
     const result = await onLogout();
     onClose();
     if (!result.redirectedToSso) {
-      navigate('/login', { replace: true });
+      navigate('/map', { replace: true });
     }
   };
 
@@ -40,10 +40,10 @@ export function LogoutPage({ isOpen, onClose, onLogout }: LogoutPageProps) {
         </p>
 
         <div className={styles.actions}>
-          <Button type="button" fullWidth onClick={() => void handleLogout()}>
+          <Button type="button" className={styles.actionButton} fullWidth onClick={() => void handleLogout()}>
             Confirmer la déconnexion
           </Button>
-          <Button type="button" color="medium" variant="outline" fullWidth onClick={onClose}>
+          <Button type="button" className={styles.actionButton} fullWidth onClick={onClose}>
             Annuler
           </Button>
         </div>

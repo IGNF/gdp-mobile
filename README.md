@@ -17,6 +17,10 @@ npm install
 npm run dev                                 # gdp-tools (watch) + app (5173)
 ```
 
+**Proxy IGN (502 OAuth en dev web)** — le navigateur atteint Keycloak, mais Vite (`/__sso`) parle en Node. Sans proxy, tu as `bad_gateway` / `ECONNREFUSED`.
+
+`HTTPS_PROXY` / `NO_PROXY` (souvent dans `~/.bashrc` : `http://proxy.ign.fr:3128`) sont utilisés par le proxy Vite. Relancer `npm run dev` depuis un terminal où `echo $HTTPS_PROXY` affiche le proxy. `NO_PROXY` doit contenir `localhost`. Si Cursor lance Vite sans ces variables, les exporter dans ce terminal-là.
+
 Scripts utiles :
 
 
