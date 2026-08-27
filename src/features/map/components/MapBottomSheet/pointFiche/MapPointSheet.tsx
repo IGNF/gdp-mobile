@@ -1,6 +1,5 @@
 import type { MapGeodesyClickAction } from '@/features/map/hooks/useMapGeodesyClick';
 import type { useBottomSheetSnap } from '@/features/map/hooks/useBottomSheetSnap';
-import IconClose from '@/shared/assets/icons/icon-close.svg?react';
 
 import { MapPointGeodesyFicheBody } from './MapPointGeodesyFicheBody';
 import { MapPointNivellementFicheBody } from './MapPointNivellementFicheBody';
@@ -17,7 +16,6 @@ export interface MapPointSheetProps {
   canReport: boolean;
   reportDisabledReason?: 'auth' | 'canevas' | null;
   dragHandleProps: ReturnType<typeof useBottomSheetSnap>['dragHandleProps'];
-  onClose: () => void;
   onReport: () => void;
   onNavigate: () => void;
 }
@@ -29,7 +27,6 @@ export function MapPointSheet({
   canReport,
   reportDisabledReason = null,
   dragHandleProps,
-  onClose,
   onReport,
   onNavigate,
 }: MapPointSheetProps) {
@@ -38,17 +35,7 @@ export function MapPointSheet({
 
   const handleArea = (
     <div className={styles.handleArea}>
-      <span className={styles.handleSpacer} aria-hidden />
       <span className={styles.handle} aria-hidden />
-      <button
-        type="button"
-        className={styles.closeButton}
-        onClick={onClose}
-        onPointerDown={(event) => event.stopPropagation()}
-        aria-label="Fermer la fiche"
-      >
-        <IconClose className={styles.closeIcon} aria-hidden />
-      </button>
     </div>
   );
 

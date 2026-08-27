@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type PointerEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { RiCornerUpRightLine, RiFeedbackLine } from 'react-icons/ri';
 
 import { Button } from '@/shared/ui/Button';
 import IconHelp from '@/shared/assets/icons/icon-help.svg?react';
@@ -53,14 +54,24 @@ export function MapPointSheetFooter({
         type="button"
         variant="outline"
         fullWidth
+        className={styles.footerButton}
         onClick={onNavigate}
         onPointerDown={stopDrag}
       >
+        <RiCornerUpRightLine className={styles.footerButtonIcon} aria-hidden />
         S&apos;y rendre
       </Button>
 
       <div className={styles.reportCell} ref={wrapRef}>
-        <Button type="button" fullWidth onClick={onReport} onPointerDown={stopDrag} disabled={!canReport}>
+        <Button
+          type="button"
+          fullWidth
+          className={styles.footerButton}
+          onClick={onReport}
+          onPointerDown={stopDrag}
+          disabled={!canReport}
+        >
+          <RiFeedbackLine className={styles.footerButtonIcon} aria-hidden />
           Signaler
         </Button>
 

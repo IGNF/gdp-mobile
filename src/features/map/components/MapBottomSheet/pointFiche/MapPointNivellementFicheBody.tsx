@@ -11,6 +11,7 @@ import {
   stripAltitudeSystemLabel,
 } from './pointFicheUtils';
 import { getDisplayedFieldIds } from './getDisplayedFieldIds';
+import { MapPointPdfSection } from './MapPointPdfSection';
 import { PointCoordinatesSection } from './PointCoordinatesSection';
 import { PointImageCarousel } from './PointImageCarousel';
 import { PartenaireSection } from './PartenaireSection';
@@ -91,6 +92,7 @@ export function MapPointNivellementFicheBody({ action, snapIndex }: MapPointNive
 
   const hasDetails =
     voieSuivieValue || distance || cote || support || localisation || supportPart || reperements;
+  const pdfUrl = readProperty(action, 'url_pdf');
 
   return (
     <>
@@ -145,6 +147,8 @@ export function MapPointNivellementFicheBody({ action, snapIndex }: MapPointNive
           ) : null}
         </>
       ) : null}
+
+      <MapPointPdfSection pdfUrl={pdfUrl} />
 
       <UnmappedFieldsDebug fields={unmappedFields} />
     </>

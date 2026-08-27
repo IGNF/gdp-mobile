@@ -31,15 +31,9 @@
 .handleArea {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   min-height: 1.75rem;
   padding: 0.375rem 0.5rem 0.25rem 1rem;
-  flex-shrink: 0;
-}
-
-.handleSpacer {
-  width: 2rem;
-  height: 2rem;
   flex-shrink: 0;
 }
 
@@ -98,7 +92,8 @@
 }
 
 .copyIcon path {
-  fill: var(--color-medium);
+  /* Charte : gris-brun foncé dédié aux icônes de la fiche (#363331), hors palette --color-*. */
+  fill: #363331;
 }
 
 .favoriteButton {
@@ -110,10 +105,9 @@
   padding: 0;
   border: none;
   border-radius: 50%;
-  background: var(--color-primary-light);
+  background: var(--figma-green-light-hover);
   cursor: default;
   flex-shrink: 0;
-  opacity: 0.6;
 }
 
 .favoriteIcon {
@@ -122,29 +116,7 @@
 }
 
 .favoriteIcon path {
-  fill: var(--color-primary);
-}
-
-.closeButton {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 2rem;
-  height: 2rem;
-  padding: 0;
-  border: none;
-  background: none;
-  cursor: pointer;
-  flex-shrink: 0;
-}
-
-.closeIcon {
-  width: 1.25rem;
-  height: 1.25rem;
-}
-
-.closeIcon path {
-  fill: var(--color-medium);
+  fill: var(--color-primary-shade);
 }
 
 .statusMetaRow {
@@ -172,7 +144,7 @@
 .meta {
   margin: 0;
   font-size: 0.875rem;
-  color: var(--color-medium);
+  color: var(--color-medium-shade);
 }
 
 .body {
@@ -196,6 +168,19 @@
 
 .reportCell {
   position: relative;
+}
+
+.footerButtonIcon {
+  width: 1.5rem;
+  height: 1.5rem;
+  flex-shrink: 0;
+}
+
+/* Sélecteur composé pour primer sur .button (Button.module.css) sans dépendre de l'ordre
+   d'import des CSS modules. */
+.footer .footerButton {
+  height: 3.75rem;
+  font-size: 1.125rem;
 }
 
 .authInfoTrigger {
@@ -466,4 +451,66 @@
 .coordTab:disabled {
   opacity: 0.35;
   cursor: not-allowed;
+}
+
+.pdfDownloadLink {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border-radius: 0.625rem;
+  border: 1px solid var(--figma-neutral-light-active);
+  background: var(--color-fiche-surface);
+  text-decoration: none;
+}
+
+.pdfDownloadIconSlot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--color-primary-light);
+}
+
+.pdfDownloadIcon {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.pdfDownloadIcon path {
+  fill: var(--color-primary);
+}
+
+.pdfDownloadTextGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1875rem;
+  min-width: 0;
+}
+
+.pdfDownloadTitle {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-dark);
+}
+
+.pdfDownloadSubtitle {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.75rem;
+  color: var(--color-medium);
+}
+
+.pdfDownloadExternalIcon {
+  width: 0.75rem;
+  height: 0.75rem;
+  flex-shrink: 0;
+}
+
+.pdfDownloadExternalIcon path {
+  fill: var(--color-medium);
 }

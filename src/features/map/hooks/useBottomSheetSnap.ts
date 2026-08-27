@@ -1,15 +1,22 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+// Traction supplémentaire, sous la hauteur du snap le plus bas, à partir de laquelle
+// un relâché est interprété comme une demande de fermeture plutôt qu'un simple snap.
+const DISMISS_DRAG_THRESHOLD_PX = 64;
+
 interface UseBottomSheetSnapOptions {
   snapHeights: readonly number[];
   initialIndex?: number;
   enabled?: boolean;
+  /** Appelé quand l'utilisateur abaisse la poignée sous le snap le plus bas pour fermer la fiche. */
+  onDismiss?: () => void;
 }
 
 export function useBottomSheetSnap({
   snapHeights,
   initialIndex = 0,
   enabled = true,
+  onDismiss,
 }: UseBottomSheetSnapOptions) {
   const [snapIndex, setSnapIndex] = useState(initialIndex);
   const [dragOffset, setDragOffset] = useState(0);
@@ -95,8 +102,16 @@ export function useBottomSheetSnap({
 
     isDraggingRef.current = false;
     const targetHeight = dragStartHeightRef.current - dragOffsetRef.current;
+
+    if (onDismiss && targetHeight < (snapHeights[0] ?? 0) - DISMISS_DRAG_THRESHOLD_PX) {
+      dragOffsetRef.current = 0;
+      setDragOffset(0);
+      onDismiss();
+      return;
+    }
+
     snapToNearest(targetHeight);
-  }, [cancelPendingFrame, releasePointerCaptureSafe, snapToNearest]);
+  }, [onDismiss, snapHeights, cancelPendingFrame, releasePointerCaptureSafe, snapToNearest]);
 
   const handlePointerDown = useCallback(
     (event: React.PointerEvent<HTMLElement>) => {

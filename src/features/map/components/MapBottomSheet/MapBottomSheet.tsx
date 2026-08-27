@@ -152,6 +152,7 @@ export function MapBottomSheet({
     snapHeights: pointSnapHeights,
     initialIndex: 0,
     enabled: isPointMode,
+    onDismiss: onClosePoint,
   });
 
   const { currentHeight, dragHandleProps, snapIndex, dragOffset, setSnapIndex } = isPointMode
@@ -452,7 +453,6 @@ export function MapBottomSheet({
             canReport={canReportPoint}
             reportDisabledReason={reportDisabledReason}
             dragHandleProps={dragHandleProps}
-            onClose={onClosePoint}
             onReport={onReportPoint}
             onNavigate={handleNavigateToPoint}
           />
