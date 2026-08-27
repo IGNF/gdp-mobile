@@ -198,6 +198,12 @@
   position: relative;
 }
 
+.footerButtonIcon {
+  width: 1.125rem;
+  height: 1.125rem;
+  flex-shrink: 0;
+}
+
 .authInfoTrigger {
   position: absolute;
   top: -0.5rem;
