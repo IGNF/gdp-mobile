@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { useAuth } from '@/features/auth/hooks/useAuth';
@@ -21,24 +20,9 @@ export interface MyAccountPageProps {
 
 export function MyAccountPage({ isOpen, onClose }: MyAccountPageProps) {
   const navigate = useNavigate();
-  const { user, isAuthenticated, refreshCurrentUser } = useAuth();
-  const [isRefreshing, setIsRefreshing] = useState(false);
-  const [refreshError, setRefreshError] = useState<string | null>(null);
+  const { user, isAuthenticated } = useAuth();
 
   const fullName = joinTruthy([user?.firstName, user?.lastName], ' ') || null;
-
-  const handleRefresh = async () => {
-    setRefreshError(null);
-    setIsRefreshing(true);
-    try {
-      const updatedUser = await refreshCurrentUser();
-      if (!updatedUser) {
-        setRefreshError('Impossible de mettre à jour vos informations. Réessayez plus tard.');
-      }
-    } finally {
-      setIsRefreshing(false);
-    }
-  };
 
   return (
     <SlideUpPage isOpen={isOpen} onClose={onClose}>
@@ -92,20 +76,6 @@ export function MyAccountPage({ isOpen, onClose }: MyAccountPageProps) {
                 <span className={styles.infoLabel}>Identifiant utilisateur</span>
                 <span className={styles.infoValue}>{user?.id ?? '—'}</span>
               </div>
-            </div>
-
-            <div className={styles.actions}>
-              <Button
-                type="button"
-                color="secondary"
-                variant="outline"
-                fullWidth
-                loading={isRefreshing}
-                onClick={() => void handleRefresh()}
-              >
-                Synchroniser mon profil et le formulaire de signalement
-              </Button>
-              {refreshError && <p className={typography.error}>{refreshError}</p>}
             </div>
           </>
         )}

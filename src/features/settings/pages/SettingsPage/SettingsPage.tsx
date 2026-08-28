@@ -4,19 +4,12 @@ import { useNavigate } from 'react-router-dom';
 import { useAppCacheMaintenance } from '@/features/settings/hooks/useAppCacheMaintenance';
 import { WELCOME_SEEN_STORAGE_KEY } from '@/features/welcome/hooks/useFirstRun';
 import { getClearableCacheSizeBytes } from '@/infra/cache/appCache';
-import {
-  GDP_WFS_CLUSTER_DISTANCE_MAX,
-  GDP_WFS_CLUSTER_DISTANCE_MIN,
-  type GdpGeodesyMode,
-} from '@/shared/constants/geodesy';
 import { Alert } from '@/shared/ui/Alert';
 import { Button } from '@/shared/ui/Button';
 import { Checkbox } from '@/shared/ui/Checkbox';
 import { Loading } from '@/shared/ui/Loading';
 import { PageHeader } from '@/shared/ui/PageHeader';
 import { SlideUpPage } from '@/shared/ui/SlideUpPage';
-import { Slider } from '@/shared/ui/Slider';
-import { Toggle } from '@/shared/ui/Toggle';
 import { formatSizeFromBytes } from '@/shared/utils/storageSize';
 
 import screen from '@/shared/styles/screen.module.css';
@@ -27,26 +20,9 @@ import styles from './SettingsPage.module.css';
 export interface SettingsPageProps {
   isOpen: boolean;
   onClose: () => void;
-  geodesyMode: GdpGeodesyMode;
-  onGeodesyModeChange: (mode: GdpGeodesyMode) => void;
-  wfsClusterEnabled: boolean;
-  onWfsClusterEnabledChange: (enabled: boolean) => void;
-  wfsClusterDistance: number;
-  onWfsClusterDistanceChange: (distance: number) => void;
-  areMapPreferencesHydrated?: boolean;
 }
 
-export function SettingsPage({
-  isOpen,
-  onClose,
-  geodesyMode,
-  onGeodesyModeChange,
-  wfsClusterEnabled,
-  onWfsClusterEnabledChange,
-  wfsClusterDistance,
-  onWfsClusterDistanceChange,
-  areMapPreferencesHydrated = true,
-}: SettingsPageProps) {
+export function SettingsPage({ isOpen, onClose }: SettingsPageProps) {
   const navigate = useNavigate();
   const { stats, isLoading, isClearing, loadStats, clearCaches } = useAppCacheMaintenance();
   const [isClearConfirmOpen, setIsClearConfirmOpen] = useState(false);
@@ -75,7 +51,6 @@ export function SettingsPage({
   };
 
   const clearableSizeBytes = stats ? getClearableCacheSizeBytes(stats) : 0;
-  const isExpertMode = geodesyMode === 'expert';
 
   const handleConfirmClear = async () => {
     await clearCaches();
@@ -96,45 +71,6 @@ export function SettingsPage({
             La position, le zoom, les calques visibles et les filtres des points sont mémorisés
             automatiquement entre les sessions.
           </p>
-          <Toggle
-            label="Mode géodésie expert"
-            checked={isExpertMode}
-            disabled={!areMapPreferencesHydrated}
-            onChange={(checked) => onGeodesyModeChange(checked ? 'expert' : 'public')}
-          />
-          <p className={styles.modeHint}>
-            {isExpertMode
-              ? 'Affichage vectoriel WFS (data_geod), symboles repères et fiche complète.'
-              : 'Affichage tuiles WMS (RBF, RDF, RN) — usage grand public.'}
-          </p>
-
-          <Toggle
-            label="Regrouper les repères (clusters)"
-            checked={wfsClusterEnabled}
-            disabled={!areMapPreferencesHydrated || !isExpertMode}
-            onChange={onWfsClusterEnabledChange}
-          />
-          <p className={styles.modeHint}>
-            {isExpertMode
-              ? 'Fusionne les repères proches en clusters animés lors du dézoom.'
-              : 'Disponible uniquement en mode expert (couches WFS).'}
-          </p>
-
-          {isExpertMode && wfsClusterEnabled && (
-            <div className={styles.sliderRow}>
-              <span className={styles.sliderLabel}>Rayon de regroupement</span>
-              <Slider
-                value={wfsClusterDistance}
-                min={GDP_WFS_CLUSTER_DISTANCE_MIN}
-                max={GDP_WFS_CLUSTER_DISTANCE_MAX}
-                step={5}
-                disabled={!areMapPreferencesHydrated}
-                ariaLabel="Rayon de regroupement des clusters en pixels"
-                onChange={onWfsClusterDistanceChange}
-              />
-              <span className={styles.sliderValue}>{wfsClusterDistance} px</span>
-            </div>
-          )}
         </section>
 
         <section className={styles.section}>

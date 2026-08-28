@@ -58,33 +58,3 @@
   font-size: 13px;
   color: var(--color-medium-shade);
 }
-
-.sliderRow {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  grid-template-areas:
-    'label value'
-    'slider slider';
-  gap: 8px 12px;
-  margin-top: 8px;
-  align-items: center;
-}
-
-.sliderLabel {
-  grid-area: label;
-  font-size: 14px;
-  color: var(--color-dark);
-}
-
-.sliderValue {
-  grid-area: value;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--color-dark);
-  text-align: right;
-}
-
-.sliderRow input[type='range'] {
-  grid-area: slider;
-  width: 100%;
-}
