@@ -80,11 +80,23 @@ export function MapGeodesyFiltersPanel({
   );
 }
 
+function isActiveDateFilterValue(value: boolean | string | null | undefined): boolean {
+  return typeof value === 'string' && value.trim() !== '';
+}
+
 export function countActiveMapGeodesyFilters(
   filters: readonly GeodesyWfsAttributeFilterDefinition[],
   values: GeodesyWfsAttributeFilterValues,
 ): number {
-  return countActiveGeodesyWfsAttributeFilters(filters, values);
+  const baseCount = countActiveGeodesyWfsAttributeFilters(filters, values);
+
+  // OBS_DATE_FROM/OBS_DATE_TO forment un seul filtre "Année de détermination" visuellement
+  // (une paire de cellules), mais comptent pour 2 côté gdp-tools (une par id) : on déduit 1
+  // quand les deux bornes sont actives ensemble pour refléter un seul filtre dans le badge.
+  const hasDeterminationRange =
+    isActiveDateFilterValue(values.OBS_DATE_FROM) && isActiveDateFilterValue(values.OBS_DATE_TO);
+
+  return hasDeterminationRange ? baseCount - 1 : baseCount;
 }
 
 export function createDefaultMapGeodesyFilterValues(

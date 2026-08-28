@@ -42,6 +42,12 @@ export const GDP_GEODESY_ATTRIBUTE_KEYS = [
 
 const wfsApiKeyOption = GDP_GEODESY_WFS_API_KEY || undefined;
 
+/**
+ * Année de détermination la plus ancienne du référentiel (mesurée le 28/08/2026 via une
+ * requête WFS ponctuelle sur `GEODESIE:data_geod`, triée par `obs_date` croissant).
+ */
+export const GDP_GEODESY_MIN_DETERMINATION_YEAR = 1823;
+
 /** Filtres expert GDP — ordre et libellés alignés sur la maquette Figma. */
 export const GDP_GEODESY_EXPERT_WFS_ATTRIBUTE_FILTERS: readonly GeodesyWfsAttributeFilterDefinition[] =
   [
@@ -79,14 +85,14 @@ export const GDP_GEODESY_EXPERT_WFS_ATTRIBUTE_FILTERS: readonly GeodesyWfsAttrib
     {
       id: 'OBS_DATE_FROM',
       type: 'date',
-      title: "Date de détermination",
+      title: 'Année de détermination',
       property: 'obs_date',
       operator: 'after',
     },
     {
       id: 'OBS_DATE_TO',
       type: 'date',
-      title: "Date de détermination",
+      title: 'Année de détermination',
       property: 'obs_date',
       operator: 'before',
     },

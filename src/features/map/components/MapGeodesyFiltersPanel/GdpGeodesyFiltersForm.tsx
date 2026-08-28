@@ -1,24 +1,17 @@
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
+import { useEffect, useState } from 'react';
 import {
   getGeodesyWfsMultiChoiceSelectedValues,
   type GeodesyWfsAttributeFilterDefinition,
   type GeodesyWfsAttributeFilterValues,
 } from '@ign/gdp-tools';
 
-import IconCalendar from '@/shared/assets/icons/icon-calendar.svg?react';
+import { GDP_GEODESY_MIN_DETERMINATION_YEAR } from '@/shared/constants/geodesy';
+import { ActionSheet } from '@/shared/ui/ActionSheet';
+import { YearWheelPicker } from '@/shared/ui/YearWheelPicker';
+import { clampNumber } from '@/shared/utils/number';
 import IconClose from '@/shared/assets/icons/icon-close.svg?react';
 
 import styles from './MapGeodesyFiltersPanel.module.css';
-
-function formatIsoDateForDisplay(isoDate: string): string {
-  const [year, month, day] = isoDate.split('-');
-  if (!year || !month || !day) {
-    return isoDate;
-  }
-
-  return `${day}/${month}/${year}`;
-}
 
 function updateValue(
   values: GeodesyWfsAttributeFilterValues,
@@ -154,34 +147,23 @@ function BooleanRow({
   );
 }
 
-function DateFilterField({
+function YearCellField({
   label,
   value,
-  onChange,
+  placeholder,
+  onOpen,
+  onClear,
   align = 'left',
 }: {
   label: string;
-  value: string | null;
-  onChange: (value: string | null) => void;
+  value: number | null;
+  placeholder: string;
+  onOpen: () => void;
+  onClear: () => void;
   align?: 'left' | 'right';
 }) {
-  const hasValue = value !== null && value.length > 0;
-  const labelId = `filter-date-${label.toLowerCase()}-label`;
-
-  // Convertir ISO string vers Date
-  const dateValue = hasValue ? new Date(value) : null;
-
-  // Convertir Date vers ISO string (YYYY-MM-DD)
-  const handleDateChange = (date: Date | null) => {
-    if (!date) {
-      onChange(null);
-      return;
-    }
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    onChange(`${year}-${month}-${day}`);
-  };
+  const hasValue = value !== null;
+  const labelId = `filter-year-${label.toLowerCase()}-label`;
 
   return (
     <div className={styles.dateField}>
@@ -189,38 +171,22 @@ function DateFilterField({
         {label}
       </span>
       <div className={styles.dateInputWrap} data-align={align}>
-        <DatePicker
-          selected={dateValue}
-          onChange={handleDateChange}
-          dateFormat="dd/MM/yyyy"
-          placeholderText="jj/mm/aaaa"
-          showMonthDropdown
-          showYearDropdown
-          dropdownMode="select"
-          yearDropdownItemNumber={100}
-          scrollableYearDropdown
-          customInput={
-            <button
-              type="button"
-              className={styles.datePickerTrigger}
-              aria-labelledby={labelId}
-            >
-              <IconCalendar className={styles.dateIcon} aria-hidden />
-              <span className={hasValue ? styles.dateDisplayValue : styles.datePlaceholder}>
-                {hasValue ? formatIsoDateForDisplay(value) : 'jj/mm/aaaa'}
-              </span>
-            </button>
-          }
-          popperClassName={styles.datePickerPopper}
-          calendarClassName={styles.datePickerCalendar}
-          popperPlacement="bottom-start"
-        />
+        <button
+          type="button"
+          className={styles.datePickerTrigger}
+          aria-labelledby={labelId}
+          onClick={onOpen}
+        >
+          <span className={hasValue ? styles.dateDisplayValue : styles.datePlaceholder}>
+            {hasValue ? value : placeholder}
+          </span>
+        </button>
         {hasValue ? (
           <button
             type="button"
             className={styles.dateClearButton}
-            aria-label={`Effacer la date ${label.toLowerCase()}`}
-            onClick={() => onChange(null)}
+            aria-label={`Effacer l'année ${label.toLowerCase()}`}
+            onClick={onClear}
           >
             <IconClose className={styles.dateClearIcon} aria-hidden />
           </button>
@@ -230,7 +196,60 @@ function DateFilterField({
   );
 }
 
-function ObservationDateRow({
+function YearPickerSheet({
+  isOpen,
+  initialValue,
+  min,
+  max,
+  onCancel,
+  onValidate,
+}: {
+  isOpen: boolean;
+  initialValue: number;
+  min: number;
+  max: number;
+  onCancel: () => void;
+  onValidate: (year: number) => void;
+}) {
+  const [pendingYear, setPendingYear] = useState(initialValue);
+
+  useEffect(() => {
+    if (isOpen) {
+      setPendingYear(initialValue);
+    }
+  }, [isOpen, initialValue]);
+
+  return (
+    <ActionSheet
+      isOpen={isOpen}
+      onClose={onCancel}
+      title="Année de détermination"
+      buttons={[
+        { label: 'Annuler', variant: 'outline', onClick: onCancel },
+        { label: 'Valider', onClick: () => onValidate(pendingYear) },
+      ]}
+    >
+      <YearWheelPicker
+        min={min}
+        max={max}
+        value={pendingYear}
+        onChange={setPendingYear}
+        ariaLabel="Sélection de l'année"
+      />
+    </ActionSheet>
+  );
+}
+
+function parseYearFromIsoDate(raw: boolean | string | null | undefined): number | null {
+  if (typeof raw !== 'string' || raw.length < 4) {
+    return null;
+  }
+
+  const year = Number(raw.slice(0, 4));
+  return Number.isFinite(year) ? year : null;
+}
+
+function DeterminationYearRangeRow({
   values,
   fromId,
   toId,
@@ -241,23 +260,69 @@ function ObservationDateRow({
   toId: string;
   onChange: (values: GeodesyWfsAttributeFilterValues) => void;
 }) {
-  const fromValue = typeof values[fromId] === 'string' && values[fromId] ? values[fromId] : null;
-  const toValue = typeof values[toId] === 'string' && values[toId] ? values[toId] : null;
+  const minYearBound = GDP_GEODESY_MIN_DETERMINATION_YEAR;
+  const maxYearBound = new Date().getFullYear();
+
+  // OBS_DATE_FROM/TO stockent des bornes décalées d'un jour pour contourner la comparaison
+  // stricte (`>`/`<`) de gdp-tools et inclure l'année choisie : voir `commitRange`.
+  const fromYear = parseYearFromIsoDate(values[fromId]);
+  const toYear = parseYearFromIsoDate(values[toId]);
+  const minYear = fromYear !== null ? fromYear + 1 : minYearBound;
+  const maxYear = toYear !== null ? toYear - 1 : maxYearBound;
+
+  const [openCell, setOpenCell] = useState<'from' | 'to' | null>(null);
+
+  const commitRange = (nextMinYear: number, nextMaxYear: number) => {
+    const clampedMin = clampNumber(nextMinYear, minYearBound, maxYearBound);
+    const clampedMax = clampNumber(nextMaxYear, minYearBound, maxYearBound);
+    const finalMin = Math.min(clampedMin, clampedMax);
+    const finalMax = Math.max(clampedMin, clampedMax);
+    const isFullRange = finalMin === minYearBound && finalMax === maxYearBound;
+
+    onChange({
+      ...values,
+      [fromId]: isFullRange ? null : `${finalMin - 1}-12-31`,
+      [toId]: isFullRange ? null : `${finalMax + 1}-01-01`,
+    });
+  };
+
+  const handleValidate = (year: number) => {
+    if (openCell === 'from') {
+      commitRange(year, maxYear);
+    } else if (openCell === 'to') {
+      commitRange(minYear, year);
+    }
+    setOpenCell(null);
+  };
 
   return (
-    <div className={styles.dateRangeRow}>
-      <DateFilterField
-        label="Du"
-        value={fromValue}
-        onChange={(next) => onChange(updateValue(values, fromId, next))}
+    <>
+      <div className={styles.dateRangeRow}>
+        <YearCellField
+          label="Du"
+          value={fromYear !== null ? minYear : null}
+          placeholder={String(minYearBound)}
+          onOpen={() => setOpenCell('from')}
+          onClear={() => commitRange(minYearBound, maxYear)}
+        />
+        <YearCellField
+          label="Au"
+          value={toYear !== null ? maxYear : null}
+          placeholder={String(maxYearBound)}
+          onOpen={() => setOpenCell('to')}
+          onClear={() => commitRange(minYear, maxYearBound)}
+          align="right"
+        />
+      </div>
+      <YearPickerSheet
+        isOpen={openCell !== null}
+        initialValue={openCell === 'to' ? maxYear : minYear}
+        min={minYearBound}
+        max={maxYearBound}
+        onCancel={() => setOpenCell(null)}
+        onValidate={handleValidate}
       />
-      <DateFilterField
-        label="Au"
-        value={toValue}
-        onChange={(next) => onChange(updateValue(values, toId, next))}
-        align="right"
-      />
-    </div>
+    </>
   );
 }
 
@@ -314,8 +379,8 @@ export function GdpGeodesyFiltersForm({ filters, values, onChange }: GdpGeodesyF
 
       {hasObservationDates ? (
         <section className={styles.section}>
-          <h3 className={styles.sectionTitle}>Date de détermination</h3>
-          <ObservationDateRow
+          <h3 className={styles.sectionTitle}>Année de détermination</h3>
+          <DeterminationYearRangeRow
             values={values}
             fromId="OBS_DATE_FROM"
             toId="OBS_DATE_TO"
