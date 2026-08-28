@@ -1,6 +1,8 @@
 export const leftMenuOverlayRoutes = [
   '/my-account',
   '/logout',
+  '/favorites',
+  '/community',
   '/settings',
   '/help',
   '/about',

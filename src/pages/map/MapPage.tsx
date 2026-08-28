@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
-  defaultGeodesyLayerVisibility,
   isGeodesyLayerReportingEnabled,
   isGeodesyPointReportAllowed,
 } from '@ign/gdp-tools';
@@ -13,6 +12,8 @@ import { AboutPage } from '@/features/about/pages/AboutPage';
 import { LogoutPage } from '@/features/auth/pages/Logout';
 import { MyAccountPage } from '@/features/auth/pages/MyAccount';
 import { useAuth } from '@/features/auth/hooks/useAuth';
+import { CommunityPage } from '@/features/community/pages/CommunityPage';
+import { FavoritesPage } from '@/features/favorites/pages/FavoritesPage';
 import { HelpPage } from '@/features/help/pages/HelpPage';
 import { SettingsPage } from '@/features/settings/pages/SettingsPage';
 import { LegendPage } from '@/features/legend/pages/LegendPage';
@@ -156,17 +157,7 @@ export function MapPage() {
     visibility: geodesy.visibility,
     showIndicator: GDP_GEODESY_SHOW_WFS_LOADING_INDICATOR,
   });
-  const handleGeodesyModeChange = useCallback(
-    (mode: GdpGeodesyMode) => {
-      const nextCatalog = createGdpGeodesyCatalog(mode, wfsClusterPreferences);
-      const nextActive = getGdpGeodesyDefaultActive(mode);
-      setGeodesyMode(mode);
-      geodesy.setVisibility(defaultGeodesyLayerVisibility([...nextActive], nextCatalog));
-      geodesy.setWfsAttributeFilterValues(getGdpGeodesyDefaultWfsAttributeFilterValues(mode));
-    },
-    [geodesy.setVisibility, geodesy.setWfsAttributeFilterValues, wfsClusterPreferences],
-  );
-  const { isHydrated: areMapLayersHydrated } = usePersistedMapLayers({
+  usePersistedMapLayers({
     isMapReady,
     activeBasemap,
     geodesyMode,
@@ -638,17 +629,14 @@ export function MapPage() {
       <SettingsPage
         isOpen={activeOverlay === '/settings'}
         onClose={() => setActiveOverlay(null)}
-        geodesyMode={geodesyMode}
-        onGeodesyModeChange={handleGeodesyModeChange}
-        wfsClusterEnabled={wfsClusterPreferences.enabled}
-        onWfsClusterEnabledChange={(enabled) =>
-          setWfsClusterPreferences((current) => ({ ...current, enabled }))
-        }
-        wfsClusterDistance={wfsClusterPreferences.distance}
-        onWfsClusterDistanceChange={(distance) =>
-          setWfsClusterPreferences((current) => ({ ...current, distance }))
-        }
-        areMapPreferencesHydrated={areMapLayersHydrated}
+      />
+      <FavoritesPage
+        isOpen={activeOverlay === '/favorites'}
+        onClose={() => setActiveOverlay(null)}
+      />
+      <CommunityPage
+        isOpen={activeOverlay === '/community'}
+        onClose={() => setActiveOverlay(null)}
       />
       <HelpPage isOpen={activeOverlay === '/help'} onClose={() => setActiveOverlay(null)} />
       <AboutPage isOpen={activeOverlay === '/about'} onClose={() => setActiveOverlay(null)} />

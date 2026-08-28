@@ -60,7 +60,6 @@ const menuGroups: MenuGroup[] = [
     authVisibility: 'authenticated',
     items: [
       { id: 'monCompte', label: 'Mon compte', route: '/my-account' },
-      { id: 'deconnexion', label: 'Déconnexion', route: '/logout' },
     ],
   },
   {
@@ -172,8 +171,6 @@ export function LeftMenu({
   isAuthenticated,
   onNavigate,
 }: LeftMenuProps) {
-  const [expandedGroups, setExpandedGroups] = useState<Set<MenuGroupId>>(new Set());
-
   const visibleGroups = menuGroups
     .filter((group) => isAuthVisible(group.authVisibility, isAuthenticated))
     .map((group) => ({
@@ -188,23 +185,9 @@ export function LeftMenu({
     isAuthVisible(item.authVisibility, isAuthenticated),
   );
 
-  const toggleGroup = (groupId: MenuGroupId) => {
-    setExpandedGroups((previous) => {
-      const next = new Set(previous);
-      if (next.has(groupId)) {
-        next.delete(groupId);
-      } else {
-        next.add(groupId);
-      }
-      return next;
-    });
-  };
-
   const handleItemClick = (route: string) => {
+    onNavigate(route);
     onClose();
-    window.setTimeout(() => {
-      onNavigate(route);
-    }, 300);
   };
 
   return (
@@ -250,37 +233,22 @@ export function LeftMenu({
         <div className={styles.menuContent}>
           {visibleGroups.map((group) => {
             const IconComponent = group.icon;
-            const isExpanded = expandedGroups.has(group.id);
+            const route = group.items[0]?.route;
+            if (!route) {
+              return null;
+            }
 
             return (
               <div key={group.id} className={styles.menuGroup}>
                 <button
                   type="button"
                   className={styles.groupHeader}
-                  onClick={() => toggleGroup(group.id)}
-                  aria-expanded={isExpanded}
+                  onClick={() => handleItemClick(route)}
                 >
                   <IconComponent className={styles.groupIcon} aria-hidden />
                   <span className={styles.groupTitle}>{group.title}</span>
-                  <IconAngleRight
-                    className={`${styles.chevron} ${isExpanded ? styles.chevronExpanded : ''}`}
-                    aria-hidden
-                  />
+                  <IconAngleRight className={styles.chevron} aria-hidden />
                 </button>
-                <div
-                  className={`${styles.groupItems} ${isExpanded ? styles.groupItemsExpanded : ''}`}
-                >
-                  {group.items.map((item) => (
-                    <button
-                      key={item.id}
-                      type="button"
-                      className={styles.menuItem}
-                      onClick={() => handleItemClick(item.route)}
-                    >
-                      {item.label}
-                    </button>
-                  ))}
-                </div>
               </div>
             );
           })}

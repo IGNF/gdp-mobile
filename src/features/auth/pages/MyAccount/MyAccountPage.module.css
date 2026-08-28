@@ -34,9 +34,3 @@
   color: var(--color-dark);
   word-break: break-word;
 }
-
-.actions {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}

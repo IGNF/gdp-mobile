@@ -62,16 +62,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
     setUser(nextUser);
   }, []);
 
-  const refreshCurrentUser = useCallback(async () => {
-    const result = await authService.fetchCurrentUser({ forceRefresh: true });
-    if (result.success && result.user) {
-      await userStorage.saveUser(result.user);
-      setUser(result.user);
-      return result.user;
-    }
-    return null;
-  }, []);
-
   const logout = useCallback(async () => {
     setIsLoading(true);
     try {
@@ -96,7 +86,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
         isLoading,
         loginWithOAuth,
         setUserFromOAuthCallback,
-        refreshCurrentUser,
         logout,
       }}
     >

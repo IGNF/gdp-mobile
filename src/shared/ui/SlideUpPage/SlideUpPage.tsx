@@ -4,7 +4,8 @@ import { joinCSSClassNames } from '@/shared/utils/join';
 import styles from './SlideUpPage.module.css';
 
 const ANIMATION_DURATION = 300; //ms, matches CSS transition duration
-const BASE_Z_INDEX = 100;
+/** Au-dessus du menu gauche (z-index 1000) pour afficher la page dès le clic. */
+const BASE_Z_INDEX = 1100;
 
 export interface SlideUpPageProps {
 	children: ReactNode;
