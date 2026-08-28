@@ -138,8 +138,8 @@
   width: 24px;
   height: 24px;
   padding: 8px;
-  border-radius: 50%;
-  background-color: var(--color-light);
+  border-radius: var(--Radius-Full, 624.9375rem);
+  background: var(--gray-5, #EBEAE9);
   flex-shrink: 0;
 }
 

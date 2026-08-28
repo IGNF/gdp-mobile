@@ -4,7 +4,7 @@ import type { AppUser } from '@/domain/user/models';
 import { config } from '@/shared/config/env';
 
 import IconAngleRight from '@/shared/assets/icons/icon-angle-right.svg?react';
-import IconConfiguration from '@/shared/assets/icons/icon-configuration.svg?react';
+import IconSettings from '@/shared/assets/icons/icon-settings.svg?react';
 import IconHelp from '@/shared/assets/icons/icon-help.svg?react';
 import IconInfo from '@/shared/assets/icons/icon-info.svg?react';
 import IconUser from '@/shared/assets/icons/icon-user.svg?react';
@@ -72,7 +72,7 @@ const menuGroups: MenuGroup[] = [
   {
     id: 'parametres',
     title: 'Paramètres',
-    icon: IconConfiguration,
+    icon: IconSettings,
     items: [{ id: 'parametres', label: 'Paramètres', route: '/settings' }],
   },
   {
