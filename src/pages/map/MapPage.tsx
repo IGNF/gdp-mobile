@@ -115,10 +115,7 @@ export function MapPage() {
   const [isTabbarHiddenByFilters, setIsTabbarHiddenByFilters] = useState(false);
   const [forceExpandSearch, setForceExpandSearch] = useState(false);
   const [forceCloseSearch, setForceCloseSearch] = useState(false);
-  const [forceExpandReports, setForceExpandReports] = useState(false);
-  const [forceCloseReports, setForceCloseReports] = useState(false);
   const [isSearchPanelOpen, setIsSearchPanelOpen] = useState(false);
-  const [isReportsPanelOpen, setIsReportsPanelOpen] = useState(false);
   const [reportWizardContext, setReportWizardContext] = useState<GeodesyPointReportMapContext | null>(
     null,
   );
@@ -272,16 +269,6 @@ export function MapPage() {
   }, [location.state, navigate]);
 
   useEffect(() => {
-    if (location.state?.openReports) {
-      setIsLayersPanelOpen(false);
-      setIsLegendOpen(false);
-      setForceExpandReports(true);
-      navigate('/map', { replace: true, state: null });
-      setTimeout(() => setForceExpandReports(false), 100);
-    }
-  }, [location.state, navigate]);
-
-  useEffect(() => {
     if (!map) {
       return;
     }
@@ -315,11 +302,7 @@ export function MapPage() {
 
   const closeBrowsePanels = useCallback(() => {
     setForceCloseSearch(true);
-    setForceCloseReports(true);
-    window.setTimeout(() => {
-      setForceCloseSearch(false);
-      setForceCloseReports(false);
-    }, 100);
+    window.setTimeout(() => setForceCloseSearch(false), 100);
   }, []);
 
   const handleOpenMenu = useCallback(() => {
@@ -410,11 +393,6 @@ export function MapPage() {
   const handleCloseSearch = useCallback(() => {
     setForceCloseSearch(true);
     setTimeout(() => setForceCloseSearch(false), 100);
-  }, []);
-
-  const handleCloseReports = useCallback(() => {
-    setForceCloseReports(true);
-    setTimeout(() => setForceCloseReports(false), 100);
   }, []);
 
   const hasActiveFilters =
@@ -553,26 +531,19 @@ export function MapPage() {
             collapseBrowseSearch={isLayersPanelOpen || isTabbarHiddenByFilters}
             forceExpandSearch={forceExpandSearch}
             forceCloseSearch={forceCloseSearch}
-            forceExpandReports={forceExpandReports}
-            forceCloseReports={forceCloseReports}
             onSearchPanelStateChange={setIsSearchPanelOpen}
-            onReportsPanelStateChange={setIsReportsPanelOpen}
           />
 
           {isTabbarVisible ? (
             <BottomTabbar
-              activeTab={isSearchPanelOpen ? 'recherche' : isReportsPanelOpen ? 'signalements' : 'carte'}
+              activeTab={isSearchPanelOpen ? 'recherche' : 'carte'}
               onCloseSearch={handleCloseSearch}
-              onCloseReports={handleCloseReports}
               onTabClick={(tab) => {
                 setIsLayersPanelOpen(false);
                 setIsLegendOpen(false);
                 if (tab === 'recherche') {
                   setForceExpandSearch(true);
                   window.setTimeout(() => setForceExpandSearch(false), 100);
-                } else if (tab === 'signalements') {
-                  setForceExpandReports(true);
-                  window.setTimeout(() => setForceExpandReports(false), 100);
                 }
               }}
             />

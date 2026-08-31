@@ -15,12 +15,11 @@ import sheetChrome from '@/features/map/styles/mapSheet.module.css';
 
 import { BrowseRgpStationsList } from './BrowseRgpStationsList';
 import { BrowseSearchHome } from './BrowseSearchHome';
-import { BrowseReportsPanel } from './BrowseReportsPanel';
 import { MapPointSheet } from './pointFiche/MapPointSheet';
 import styles from './MapBottomSheet.module.css';
 import { RiSearchLine } from 'react-icons/ri';
 
-type BrowsePanelView = 'search' | 'rgp' | 'reports';
+type BrowsePanelView = 'search' | 'rgp';
 
 const BROWSE_SHEET_SLIDE_MS = 300;
 
@@ -80,12 +79,6 @@ export interface MapBottomSheetProps {
   /** Force l'ouverture du panneau de recherche depuis l'extérieur. */
   forceExpandSearch?: boolean;
   /** Force la fermeture du panneau de recherche depuis l'extérieur. */
-  /** Force l'ouverture du panneau de signalements depuis l'extérieur. */
-  forceExpandReports?: boolean;
-  /** Force la fermeture du panneau de signalements depuis l'extérieur. */
-  forceCloseReports?: boolean;
-  /** Callback appelé quand le panneau de signalements change d'état (ouvert/fermé). */
-  onReportsPanelStateChange?: (isOpen: boolean) => void;
   forceCloseSearch?: boolean;
   /** Callback appelé quand le panneau de recherche change d'état (ouvert/fermé). */
   onSearchPanelStateChange?: (isOpen: boolean) => void;
@@ -109,10 +102,7 @@ export function MapBottomSheet({
   collapseBrowseSearch = false,
   forceExpandSearch = false,
   forceCloseSearch = false,
-  forceExpandReports = false,
-  forceCloseReports = false,
   onSearchPanelStateChange,
-  onReportsPanelStateChange,
 }: MapBottomSheetProps) {
   const searchContainerRef = useRef<HTMLDivElement>(null);
   const sheetRef = useRef<HTMLElement>(null);
@@ -253,23 +243,9 @@ export function MapBottomSheet({
   }, [forceCloseSearch, isPointMode, collapseBrowseSheet]);
 
   useEffect(() => {
-    if (forceExpandReports && !isPointMode) {
-      openBrowseView('reports');
-    }
-  }, [forceExpandReports, isPointMode, openBrowseView]);
-
-  useEffect(() => {
-    if (forceCloseReports && !isPointMode) {
-      collapseBrowseSheet();
-    }
-  }, [forceCloseReports, isPointMode, collapseBrowseSheet]);
-
-  useEffect(() => {
     const isSearchOpen = isBrowseExpanded && (browseView === 'search' || browseView === 'rgp');
-    const isReportsOpen = isBrowseExpanded && browseView === 'reports';
     onSearchPanelStateChange?.(isSearchOpen);
-    onReportsPanelStateChange?.(isReportsOpen);
-  }, [isBrowseExpanded, browseView, onSearchPanelStateChange, onReportsPanelStateChange]);
+  }, [isBrowseExpanded, browseView, onSearchPanelStateChange]);
 
   useEffect(() => {
     if (!map || !isMapReady || isPointMode) {
@@ -398,14 +374,6 @@ export function MapBottomSheet({
     collapseBrowseSheet();
   };
 
-  const handleReportSelect = useCallback(
-    (longitude: number, latitude: number) => {
-      onFocusCoordinate(longitude, latitude);
-      collapseBrowseSheet();
-    },
-    [onFocusCoordinate, collapseBrowseSheet],
-  );
-
   if (!isPointMode && hideBrowseSheet) {
     return null;
   }
@@ -484,7 +452,7 @@ export function MapBottomSheet({
                 onOpenRgpList={() => setBrowseView('rgp')}
                 onSelectHistoryEntry={handleSelectHistoryEntry}
               />
-            ) : browseView === 'rgp' ? (
+            ) : (
               <BrowseRgpStationsList
                 stations={stations}
                 isLoading={isRgpLoading}
@@ -497,8 +465,6 @@ export function MapBottomSheet({
                 }}
                 onSelectStation={handleRgpSelect}
               />
-            ) : (
-              <BrowseReportsPanel onReportSelect={handleReportSelect} />
             )}
           </div>
         </div>
