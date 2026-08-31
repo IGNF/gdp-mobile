@@ -240,6 +240,10 @@ function YearPickerSheet({
   );
 }
 
+// Valeur affichée par défaut à l'ouverture de la roue quand aucune borne n'a encore été choisie.
+const DEFAULT_FROM_YEAR = 2010;
+const DEFAULT_TO_YEAR = 2020;
+
 function parseYearFromIsoDate(raw: boolean | string | null | undefined): number | null {
   if (typeof raw !== 'string' || raw.length < 4) {
     return null;
@@ -316,7 +320,15 @@ function DeterminationYearRangeRow({
       </div>
       <YearPickerSheet
         isOpen={openCell !== null}
-        initialValue={openCell === 'to' ? maxYear : minYear}
+        initialValue={
+          openCell === 'to'
+            ? toYear !== null
+              ? maxYear
+              : DEFAULT_TO_YEAR
+            : fromYear !== null
+              ? minYear
+              : DEFAULT_FROM_YEAR
+        }
         min={minYearBound}
         max={maxYearBound}
         onCancel={() => setOpenCell(null)}

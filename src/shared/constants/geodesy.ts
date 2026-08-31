@@ -43,8 +43,7 @@ export const GDP_GEODESY_ATTRIBUTE_KEYS = [
 const wfsApiKeyOption = GDP_GEODESY_WFS_API_KEY || undefined;
 
 /**
- * Année de détermination la plus ancienne du référentiel (mesurée le 28/08/2026 via une
- * requête WFS ponctuelle sur `GEODESIE:data_geod`, triée par `obs_date` croissant).
+ * Année de détermination la plus ancienne du référentiel ( 28/08/2026 )
  */
 export const GDP_GEODESY_MIN_DETERMINATION_YEAR = 1823;
 
