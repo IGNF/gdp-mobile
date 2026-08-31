@@ -1,0 +1,76 @@
+.wheel {
+  position: relative;
+  width: 160px;
+  height: var(--wheel-height);
+  margin: 0 auto;
+}
+
+.list {
+  height: 100%;
+  margin: 0;
+  overflow-y: auto;
+  scroll-snap-type: y mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  outline: none;
+}
+
+.list::-webkit-scrollbar {
+  display: none;
+}
+
+.spacer {
+  height: var(--spacer-height);
+}
+
+.row {
+  height: var(--row-height);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  scroll-snap-align: center;
+  font-family: 'Fira Sans';
+  font-size: 1.0625rem;
+  color: var(--color-medium);
+  opacity: 0.9;
+  cursor: pointer;
+  transition: color 0.15s ease, opacity 0.15s ease, font-size 0.15s ease;
+}
+
+.row[data-distance='0'] {
+  color: var(--color-primary);
+  font-weight: 700;
+  font-size: 1.3125rem;
+  opacity: 1;
+}
+
+.row[data-distance='1'] {
+  opacity: 0.65;
+}
+
+.row[data-distance='2'] {
+  opacity: 0.4;
+}
+
+.row[data-distance='3'] {
+  opacity: 0.22;
+}
+
+.frameTop,
+.frameBottom {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 0;
+  border-top: 1.5px solid var(--color-dark);
+  pointer-events: none;
+}
+
+.frameTop {
+  top: calc(50% - (var(--row-height) / 2));
+}
+
+.frameBottom {
+  top: calc(50% + (var(--row-height) / 2));
+}
