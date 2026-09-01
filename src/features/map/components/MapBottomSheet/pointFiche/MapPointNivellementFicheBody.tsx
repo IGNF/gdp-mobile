@@ -8,6 +8,7 @@ import {
   filterUnmappedPointFields,
   formatSentenceCase,
   readProperty,
+  resolveVoieSuivieLabel,
   stripAltitudeSystemLabel,
 } from './pointFicheUtils';
 import { getDisplayedFieldIds } from './getDisplayedFieldIds';
@@ -70,12 +71,7 @@ export function MapPointNivellementFicheBody({ action, snapIndex }: MapPointNive
   const partenaire = readProperty(action, 'proprio');
   const partenaireId = readProperty(action, 'proprio_id');
 
-  const voieSuivie = readProperty(action, 'voie_suivie');
-  const voieDe = readProperty(action, 'voie_de');
-  const voieVers = readProperty(action, 'voie_vers');
-  const voieSuivieValue = [voieSuivie, voieDe && voieVers ? `De ${voieDe} à ${voieVers}` : null]
-    .filter(Boolean)
-    .join(', ') || null;
+  const voieSuivieValue = resolveVoieSuivieLabel(action.reportContext.properties);
 
   const voisinDistance = readProperty(action, 'voisin_distance');
   const voisin = readProperty(action, 'voisin');

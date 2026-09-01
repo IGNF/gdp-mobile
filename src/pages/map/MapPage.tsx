@@ -5,6 +5,7 @@ import {
   isGeodesyPointReportAllowed,
 } from '@ign/gdp-tools';
 import { useGeodesyOnMap, useGeodesyWfsLoading } from '@ign/gdp-tools/react';
+import { fromLonLat } from 'ol/proj';
 
 import { BottomTabbar } from '@/app/components/BottomTabbar';
 import { LeftMenu, isLeftMenuOverlayRoute, type LeftMenuOverlayRoute } from '@/app/components/LeftMenu';
@@ -87,6 +88,27 @@ function isMapFocusReportState(value: unknown): value is MapFocusReportState {
     typeof focus.longitude === 'number' &&
     typeof focus.latitude === 'number'
   );
+}
+
+interface OpenReportPointState {
+  openReportPoint?: {
+    longitude: number;
+    latitude: number;
+  };
+}
+
+function isOpenReportPointState(value: unknown): value is OpenReportPointState {
+  if (!value || typeof value !== 'object') {
+    return false;
+  }
+
+  const candidate = value as OpenReportPointState;
+  const point = candidate.openReportPoint;
+  if (!point) {
+    return false;
+  }
+
+  return typeof point.longitude === 'number' && typeof point.latitude === 'number';
 }
 
 export function MapPage() {
@@ -257,6 +279,32 @@ export function MapPage() {
     void focusOnCoordinate(focusReport.longitude, focusReport.latitude, GROUP_REPORT_MAP_FOCUS_ZOOM);
     navigate('/map', { replace: true, state: null });
   }, [focusOnCoordinate, isMapReady, location.state, navigate]);
+
+  useEffect(() => {
+    if (!isMapReady || !isOpenReportPointState(location.state)) {
+      return;
+    }
+
+    const { openReportPoint } = location.state;
+    if (!openReportPoint) {
+      return;
+    }
+
+    navigate('/map', { replace: true, state: null });
+
+    void (async () => {
+      await focusOnCoordinate(openReportPoint.longitude, openReportPoint.latitude, GROUP_REPORT_MAP_FOCUS_ZOOM);
+      // Laisse le temps à la source WFS de recharger les entités de la nouvelle emprise
+      // (déclenché par le "moveend" de fin d'animation) avant d'interroger le point au clic.
+      await new Promise((resolve) => setTimeout(resolve, 300));
+      await mapClick.openPointAtCoordinate(
+        fromLonLat([openReportPoint.longitude, openReportPoint.latitude]),
+      );
+    })();
+    // mapClick.openPointAtCoordinate est stable (mémoïsé) ; l'objet mapClick lui-même est
+    // recréé à chaque rendu, donc on ne dépend que du callback.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [focusOnCoordinate, isMapReady, location.state, mapClick.openPointAtCoordinate, navigate]);
 
   useEffect(() => {
     if (location.state?.openSearch) {

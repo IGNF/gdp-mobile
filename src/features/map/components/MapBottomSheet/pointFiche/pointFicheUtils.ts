@@ -119,8 +119,10 @@ function isScalarPropertyValue(value: unknown): value is string | number | boole
   );
 }
 
-export function readProperty(action: MapGeodesyClickAction, key: string): string | null {
-  const properties = action.reportContext.properties;
+export function readPropertyValue(
+  properties: Record<string, unknown>,
+  key: string,
+): string | null {
   const raw = properties[key] ?? properties[key.toUpperCase()];
   if (raw === null || raw === undefined) {
     return null;
@@ -128,6 +130,23 @@ export function readProperty(action: MapGeodesyClickAction, key: string): string
 
   const text = String(raw).trim();
   return text || null;
+}
+
+export function readProperty(action: MapGeodesyClickAction, key: string): string | null {
+  return readPropertyValue(action.reportContext.properties, key);
+}
+
+/** Libellé « Voie suivie » d'un repère de nivellement (ex. « De Paris à Lyon »). */
+export function resolveVoieSuivieLabel(properties: Record<string, unknown>): string | null {
+  const voieSuivie = readPropertyValue(properties, 'voie_suivie');
+  const voieDe = readPropertyValue(properties, 'voie_de');
+  const voieVers = readPropertyValue(properties, 'voie_vers');
+
+  return (
+    [voieSuivie, voieDe && voieVers ? `De ${voieDe} à ${voieVers}` : null]
+      .filter(Boolean)
+      .join(', ') || null
+  );
 }
 
 export function findAttributeByLabel(

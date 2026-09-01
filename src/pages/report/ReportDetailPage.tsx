@@ -24,6 +24,7 @@ import IconCamera from '@/shared/assets/icons/icon-camera.svg?react';
 import IconCheck from '@/shared/assets/icons/icon-check.svg?react';
 import IconClose from '@/shared/assets/icons/icon-close.svg?react';
 import IconDelete from '@/shared/assets/icons/icon-delete.svg?react';
+import IconEye from '@/shared/assets/icons/icon-eye.svg?react';
 import IconPencil from '@/shared/assets/icons/icon-pencil.svg?react';
 import IconSend from '@/shared/assets/icons/icon-send.svg?react';
 
@@ -57,6 +58,21 @@ export function ReportDetailPage() {
     }
     await deleteLocalReportDraft(id);
     navigate('/reports');
+  };
+
+  const handleViewOnMap = () => {
+    if (!draft) {
+      return;
+    }
+
+    navigate('/map', {
+      state: {
+        openReportPoint: {
+          longitude: draft.longitude,
+          latitude: draft.latitude,
+        },
+      },
+    });
   };
 
   return (
@@ -161,27 +177,40 @@ export function ReportDetailPage() {
               </p>
             </div>
 
-            <div className={styles.actions}>
-              <Button
-                type="button"
-                variant="outline"
-                color="danger"
-                fullWidth
-                onClick={() => {
-                  void handleDelete();
-                }}
-              >
-                <IconDelete className={styles.actionIcon} aria-hidden />
-                Supprimer
-              </Button>
-              <Button type="button" fullWidth onClick={() => {}}>
-                <IconSend className={styles.actionIcon} aria-hidden />
-                Envoyer
-              </Button>
-            </div>
+            <Button
+              type="button"
+              variant="ghost"
+              fullWidth
+              className={styles.viewOnMap}
+              onClick={handleViewOnMap}
+            >
+              <IconEye className={styles.actionIcon} aria-hidden />
+              Voir sur la carte
+            </Button>
           </>
         )}
       </main>
+
+      {draft ? (
+        <div className={styles.footer}>
+          <Button
+            type="button"
+            variant="outline"
+            color="danger"
+            fullWidth
+            onClick={() => {
+              void handleDelete();
+            }}
+          >
+            <IconDelete className={styles.actionIcon} aria-hidden />
+            Supprimer
+          </Button>
+          <Button type="button" fullWidth onClick={() => {}}>
+            <IconSend className={styles.actionIcon} aria-hidden />
+            Envoyer
+          </Button>
+        </div>
+      ) : null}
 
       <BottomTabbar activeTab="signalements" />
     </div>

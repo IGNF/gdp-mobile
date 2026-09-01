@@ -1,3 +1,5 @@
+import type { GeodesyPointTitlePicto } from '@ign/gdp-tools';
+
 export type LocalReportDraftPhotoRole = 'photo1' | 'photo2';
 
 export interface LocalReportDraftPhoto {
@@ -11,7 +13,9 @@ export interface LocalReportDraft {
   id: string;
   geodesyId?: string;
   title: string;
+  titlePicto?: GeodesyPointTitlePicto;
   layerTitle?: string;
+  voieSuivie?: string;
   longitude: number;
   latitude: number;
   positionModified: boolean;

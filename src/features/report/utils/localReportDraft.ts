@@ -3,6 +3,7 @@ import type { GeodesyPointReportContext } from '@ign/gdp-tools';
 import type { LocalReportDraft, LocalReportDraftPhoto } from '@/domain/report/localReportDraft';
 import type { ReportPhoto } from '@/domain/report/models';
 import type { NonConformReason } from '@/features/report/components/GeodesyPointReportWizard';
+import { resolveVoieSuivieLabel } from '@/features/map/components/MapBottomSheet/pointFiche/pointFicheUtils';
 
 function generateLocalReportDraftId(): string {
   if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
@@ -46,7 +47,9 @@ export async function buildLocalReportDraft(
     id: generateLocalReportDraftId(),
     geodesyId: params.reportContext.geodesyId,
     title: params.reportContext.title,
+    titlePicto: params.reportContext.titlePicto,
     layerTitle: params.reportContext.layerTitle,
+    voieSuivie: resolveVoieSuivieLabel(params.reportContext.properties) ?? undefined,
     longitude: params.longitude,
     latitude: params.latitude,
     positionModified: params.positionModified,
