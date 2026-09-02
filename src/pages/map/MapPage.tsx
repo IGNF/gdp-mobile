@@ -5,6 +5,7 @@ import {
   isGeodesyPointReportAllowed,
 } from '@ign/gdp-tools';
 import { useGeodesyOnMap, useGeodesyWfsLoading } from '@ign/gdp-tools/react';
+import { fromLonLat } from 'ol/proj';
 
 import { BottomTabbar } from '@/app/components/BottomTabbar';
 import { LeftMenu, isLeftMenuOverlayRoute, type LeftMenuOverlayRoute } from '@/app/components/LeftMenu';
@@ -89,6 +90,27 @@ function isMapFocusReportState(value: unknown): value is MapFocusReportState {
   );
 }
 
+interface OpenReportPointState {
+  openReportPoint?: {
+    longitude: number;
+    latitude: number;
+  };
+}
+
+function isOpenReportPointState(value: unknown): value is OpenReportPointState {
+  if (!value || typeof value !== 'object') {
+    return false;
+  }
+
+  const candidate = value as OpenReportPointState;
+  const point = candidate.openReportPoint;
+  if (!point) {
+    return false;
+  }
+
+  return typeof point.longitude === 'number' && typeof point.latitude === 'number';
+}
+
 export function MapPage() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -115,10 +137,7 @@ export function MapPage() {
   const [isTabbarHiddenByFilters, setIsTabbarHiddenByFilters] = useState(false);
   const [forceExpandSearch, setForceExpandSearch] = useState(false);
   const [forceCloseSearch, setForceCloseSearch] = useState(false);
-  const [forceExpandReports, setForceExpandReports] = useState(false);
-  const [forceCloseReports, setForceCloseReports] = useState(false);
   const [isSearchPanelOpen, setIsSearchPanelOpen] = useState(false);
-  const [isReportsPanelOpen, setIsReportsPanelOpen] = useState(false);
   const [reportWizardContext, setReportWizardContext] = useState<GeodesyPointReportMapContext | null>(
     null,
   );
@@ -262,22 +281,38 @@ export function MapPage() {
   }, [focusOnCoordinate, isMapReady, location.state, navigate]);
 
   useEffect(() => {
+    if (!isMapReady || !isOpenReportPointState(location.state)) {
+      return;
+    }
+
+    const { openReportPoint } = location.state;
+    if (!openReportPoint) {
+      return;
+    }
+
+    navigate('/map', { replace: true, state: null });
+
+    void (async () => {
+      await focusOnCoordinate(openReportPoint.longitude, openReportPoint.latitude, GROUP_REPORT_MAP_FOCUS_ZOOM);
+      // Laisse le temps à la source WFS de recharger les entités de la nouvelle emprise
+      // (déclenché par le "moveend" de fin d'animation) avant d'interroger le point au clic.
+      await new Promise((resolve) => setTimeout(resolve, 300));
+      await mapClick.openPointAtCoordinate(
+        fromLonLat([openReportPoint.longitude, openReportPoint.latitude]),
+      );
+    })();
+    // mapClick.openPointAtCoordinate est stable (mémoïsé) ; l'objet mapClick lui-même est
+    // recréé à chaque rendu, donc on ne dépend que du callback.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [focusOnCoordinate, isMapReady, location.state, mapClick.openPointAtCoordinate, navigate]);
+
+  useEffect(() => {
     if (location.state?.openSearch) {
       setIsLayersPanelOpen(false);
       setIsLegendOpen(false);
       setForceExpandSearch(true);
       navigate('/map', { replace: true, state: null });
       setTimeout(() => setForceExpandSearch(false), 100);
-    }
-  }, [location.state, navigate]);
-
-  useEffect(() => {
-    if (location.state?.openReports) {
-      setIsLayersPanelOpen(false);
-      setIsLegendOpen(false);
-      setForceExpandReports(true);
-      navigate('/map', { replace: true, state: null });
-      setTimeout(() => setForceExpandReports(false), 100);
     }
   }, [location.state, navigate]);
 
@@ -315,11 +350,7 @@ export function MapPage() {
 
   const closeBrowsePanels = useCallback(() => {
     setForceCloseSearch(true);
-    setForceCloseReports(true);
-    window.setTimeout(() => {
-      setForceCloseSearch(false);
-      setForceCloseReports(false);
-    }, 100);
+    window.setTimeout(() => setForceCloseSearch(false), 100);
   }, []);
 
   const handleOpenMenu = useCallback(() => {
@@ -410,11 +441,6 @@ export function MapPage() {
   const handleCloseSearch = useCallback(() => {
     setForceCloseSearch(true);
     setTimeout(() => setForceCloseSearch(false), 100);
-  }, []);
-
-  const handleCloseReports = useCallback(() => {
-    setForceCloseReports(true);
-    setTimeout(() => setForceCloseReports(false), 100);
   }, []);
 
   const hasActiveFilters =
@@ -553,26 +579,19 @@ export function MapPage() {
             collapseBrowseSearch={isLayersPanelOpen || isTabbarHiddenByFilters}
             forceExpandSearch={forceExpandSearch}
             forceCloseSearch={forceCloseSearch}
-            forceExpandReports={forceExpandReports}
-            forceCloseReports={forceCloseReports}
             onSearchPanelStateChange={setIsSearchPanelOpen}
-            onReportsPanelStateChange={setIsReportsPanelOpen}
           />
 
           {isTabbarVisible ? (
             <BottomTabbar
-              activeTab={isSearchPanelOpen ? 'recherche' : isReportsPanelOpen ? 'signalements' : 'carte'}
+              activeTab={isSearchPanelOpen ? 'recherche' : 'carte'}
               onCloseSearch={handleCloseSearch}
-              onCloseReports={handleCloseReports}
               onTabClick={(tab) => {
                 setIsLayersPanelOpen(false);
                 setIsLegendOpen(false);
                 if (tab === 'recherche') {
                   setForceExpandSearch(true);
                   window.setTimeout(() => setForceExpandSearch(false), 100);
-                } else if (tab === 'signalements') {
-                  setForceExpandReports(true);
-                  window.setTimeout(() => setForceExpandReports(false), 100);
                 }
               }}
             />

@@ -1,5 +1,6 @@
 import type { BuildGeodesyPointDisplayOptions, GeodesyPointReportContext } from '@ign/gdp-tools';
 import { useGeodesyMapClick } from '@ign/gdp-tools/react';
+import type { Coordinate } from 'ol/coordinate';
 import type Map from 'ol/Map';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 
@@ -20,7 +21,7 @@ export interface UseMapGeodesyClickOptions extends BuildGeodesyPointDisplayOptio
 export function useMapGeodesyClick(map: Map | null, options: UseMapGeodesyClickOptions) {
   const { enabled = true, isMapReady = false, attributeCatalog, pictoUrlMaps } = options;
 
-  const { pendingClick, clearPendingClick } = useGeodesyMapClick(map, {
+  const { pendingClick, clearPendingClick, openAtCoordinate } = useGeodesyMapClick(map, {
     enabled,
     isMapReady,
     attributeCatalog,
@@ -73,8 +74,18 @@ export function useMapGeodesyClick(map: Map | null, options: UseMapGeodesyClickO
     clearPendingClick();
   }, [clearPendingClick]);
 
+  /** Ouvre la fiche géodésique à une coordonnée connue, sans clic réel (ex. depuis un signalement). */
+  const openPointAtCoordinate = useCallback(
+    (coordinate: Coordinate) => {
+      openPointKeyRef.current = null;
+      return openAtCoordinate(coordinate);
+    },
+    [openAtCoordinate],
+  );
+
   return {
     pendingAction,
     closeActionSheet,
+    openPointAtCoordinate,
   };
 }

@@ -144,6 +144,12 @@
   color: var(--color-medium);
 }
 
+.reportVoie {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--color-medium);
+}
+
 .reportMeta {
   display: flex;
   align-items: center;

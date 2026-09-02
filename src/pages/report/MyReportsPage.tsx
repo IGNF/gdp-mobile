@@ -1,5 +1,6 @@
 import { useMemo, useState, type CSSProperties } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { GeodesyPointTitle } from '@ign/gdp-tools/react';
 
 import { BottomTabbar } from '@/app/components/BottomTabbar';
 import type { LocalReportDraftStatus } from '@/domain/report/localReportDraft';
@@ -121,7 +122,11 @@ export function MyReportsPage() {
                     onClick={() => navigate(`/reports/${draft.id}`)}
                   >
                     <div className={styles.reportCardHeader}>
-                      <span className={styles.reportId}>ID_{draft.geodesyId ?? draft.title}</span>
+                      <GeodesyPointTitle
+                        title={draft.title}
+                        picto={draft.titlePicto}
+                        className={styles.reportId}
+                      />
                       <span
                         className={styles.statusBadge}
                         style={{ color: statusColors.color, background: statusColors.background }}
@@ -130,6 +135,9 @@ export function MyReportsPage() {
                       </span>
                     </div>
                     <p className={styles.reportReason}>{reasonLabel}</p>
+                    {draft.voieSuivie ? (
+                      <p className={styles.reportVoie}>{draft.voieSuivie}</p>
+                    ) : null}
                     <div className={styles.reportMeta}>
                       <span className={styles.reportMetaItem}>
                         <IconLocation className={styles.reportMetaIcon} aria-hidden />
