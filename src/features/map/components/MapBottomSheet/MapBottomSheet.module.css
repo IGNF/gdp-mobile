@@ -530,10 +530,6 @@
 }
 
 
-.sheetSearchActive {
-  padding-bottom: calc(6.5rem + var(--safe-bottom)); /* hauteur tabbar */
-}
-
 
 .rgpTitle {
   margin: 0 0 0.75rem;
@@ -635,7 +631,7 @@
 .sheetSearchActive {
   /* Étend la sheet pour couvrir la zone tabbar */
   margin-bottom: calc(-1 * (6.5rem + var(--safe-bottom)));
-  padding-bottom: calc(6.5rem + var(--safe-bottom));
+ /* padding-bottom: calc(6.5rem + var(--safe-bottom));*/
   
   /* Passe au-dessus de la tabbar */
   z-index: 10;
