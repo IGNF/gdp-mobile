@@ -85,19 +85,25 @@ function isActiveDateFilterValue(value: boolean | string | null | undefined): bo
   return typeof value === 'string' && value.trim() !== '';
 }
 
+// Chaque paire FROM/TO forme un seul filtre visuellement (une paire de cellules "Du"/"Au"),
+// mais compte pour 2 côté gdp-tools (une par id) : on déduit 1 par paire active pour refléter
+// un seul filtre dans le badge.
+const DATE_RANGE_FILTER_PAIRS: ReadonlyArray<readonly [string, string]> = [
+  ['OBS_DATE_FROM', 'OBS_DATE_TO'],
+  ['VIS_DATE_FROM', 'VIS_DATE_TO'],
+];
+
 export function countActiveMapGeodesyFilters(
   filters: readonly GeodesyWfsAttributeFilterDefinition[],
   values: GeodesyWfsAttributeFilterValues,
 ): number {
   const baseCount = countActiveGeodesyWfsAttributeFilters(filters, values);
 
-  // OBS_DATE_FROM/OBS_DATE_TO forment un seul filtre "Année de détermination" visuellement
-  // (une paire de cellules), mais comptent pour 2 côté gdp-tools (une par id) : on déduit 1
-  // quand les deux bornes sont actives ensemble pour refléter un seul filtre dans le badge.
-  const hasDeterminationRange =
-    isActiveDateFilterValue(values.OBS_DATE_FROM) && isActiveDateFilterValue(values.OBS_DATE_TO);
+  const activeRangePairs = DATE_RANGE_FILTER_PAIRS.filter(
+    ([fromId, toId]) => isActiveDateFilterValue(values[fromId]) && isActiveDateFilterValue(values[toId]),
+  ).length;
 
-  return hasDeterminationRange ? baseCount - 1 : baseCount;
+  return baseCount - activeRangePairs;
 }
 
 export function createDefaultMapGeodesyFilterValues(

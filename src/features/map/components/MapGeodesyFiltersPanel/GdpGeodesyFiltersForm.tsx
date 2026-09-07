@@ -5,7 +5,10 @@ import {
   type GeodesyWfsAttributeFilterValues,
 } from '@ign/gdp-tools';
 
-import { GDP_GEODESY_MIN_DETERMINATION_YEAR } from '@/shared/constants/geodesy';
+import {
+  GDP_GEODESY_MIN_DETERMINATION_YEAR,
+  GDP_GEODESY_MIN_VIS_YEAR,
+} from '@/shared/constants/geodesy';
 import { ActionSheet } from '@/shared/ui/ActionSheet';
 import { YearWheelPicker } from '@/shared/ui/YearWheelPicker';
 import { clampNumber } from '@/shared/utils/number';
@@ -198,6 +201,7 @@ function YearCellField({
 
 function YearPickerSheet({
   isOpen,
+  title,
   initialValue,
   min,
   max,
@@ -205,6 +209,7 @@ function YearPickerSheet({
   onValidate,
 }: {
   isOpen: boolean;
+  title: string;
   initialValue: number;
   min: number;
   max: number;
@@ -223,7 +228,7 @@ function YearPickerSheet({
     <ActionSheet
       isOpen={isOpen}
       onClose={onCancel}
-      title="Année de détermination"
+      title={title}
       buttons={[
         { label: 'Annuler', variant: 'outline', onClick: onCancel },
         { label: 'Valider', onClick: () => onValidate(pendingYear) },
@@ -253,21 +258,24 @@ function parseYearFromIsoDate(raw: boolean | string | null | undefined): number 
   return Number.isFinite(year) ? year : null;
 }
 
-function DeterminationYearRangeRow({
+function YearRangeRow({
+  title,
+  minYearBound,
   values,
   fromId,
   toId,
   onChange,
 }: {
+  title: string;
+  minYearBound: number;
   values: GeodesyWfsAttributeFilterValues;
   fromId: string;
   toId: string;
   onChange: (values: GeodesyWfsAttributeFilterValues) => void;
 }) {
-  const minYearBound = GDP_GEODESY_MIN_DETERMINATION_YEAR;
   const maxYearBound = new Date().getFullYear();
 
-  // OBS_DATE_FROM/TO stockent des bornes décalées d'un jour pour contourner la comparaison
+  // Les bornes FROM/TO stockent des dates décalées d'un jour pour contourner la comparaison
   // stricte (`>`/`<`) de gdp-tools et inclure l'année choisie : voir `commitRange`.
   const fromYear = parseYearFromIsoDate(values[fromId]);
   const toYear = parseYearFromIsoDate(values[toId]);
@@ -320,6 +328,7 @@ function DeterminationYearRangeRow({
       </div>
       <YearPickerSheet
         isOpen={openCell !== null}
+        title={title}
         initialValue={
           openCell === 'to'
             ? toYear !== null
@@ -349,6 +358,7 @@ export function GdpGeodesyFiltersForm({ filters, values, onChange }: GdpGeodesyF
   const proprioFilter = filters.find((filter) => filter.id === 'PROPRIO');
   const photoFilter = filters.find((filter) => filter.id === 'HAS_PHOTO');
   const hasObservationDates = filters.some((filter) => filter.id === 'OBS_DATE_FROM');
+  const hasVisitDates = filters.some((filter) => filter.id === 'VIS_DATE_FROM');
 
   const setFilterValue = (id: string, value: boolean | string | null) => {
     onChange(updateValue(values, id, value));
@@ -389,10 +399,26 @@ export function GdpGeodesyFiltersForm({ filters, values, onChange }: GdpGeodesyF
         </section>
       ) : null}
 
+      {hasVisitDates ? (
+        <section className={styles.section}>
+          <h3 className={styles.sectionTitle}>Vu en place</h3>
+          <YearRangeRow
+            title="Vu en place"
+            minYearBound={GDP_GEODESY_MIN_VIS_YEAR}
+            values={values}
+            fromId="VIS_DATE_FROM"
+            toId="VIS_DATE_TO"
+            onChange={onChange}
+          />
+        </section>
+      ) : null}
+
       {hasObservationDates ? (
         <section className={styles.section}>
           <h3 className={styles.sectionTitle}>Année de détermination</h3>
-          <DeterminationYearRangeRow
+          <YearRangeRow
+            title="Année de détermination"
+            minYearBound={GDP_GEODESY_MIN_DETERMINATION_YEAR}
             values={values}
             fromId="OBS_DATE_FROM"
             toId="OBS_DATE_TO"

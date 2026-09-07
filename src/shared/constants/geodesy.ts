@@ -47,6 +47,12 @@ const wfsApiKeyOption = GDP_GEODESY_WFS_API_KEY || undefined;
  */
 export const GDP_GEODESY_MIN_DETERMINATION_YEAR = 1823;
 
+/**
+ * Borne basse de la roue « Vu en place » (vis_date). Un point ne peut pas avoir été vu en
+ * place avant sa détermination : on réutilise la même borne, faute de statistique dédiée.
+ */
+export const GDP_GEODESY_MIN_VIS_YEAR = GDP_GEODESY_MIN_DETERMINATION_YEAR;
+
 /** Filtres expert GDP — ordre et libellés alignés sur la maquette Figma. */
 export const GDP_GEODESY_EXPERT_WFS_ATTRIBUTE_FILTERS: readonly GeodesyWfsAttributeFilterDefinition[] =
   [
@@ -80,6 +86,20 @@ export const GDP_GEODESY_EXPERT_WFS_ATTRIBUTE_FILTERS: readonly GeodesyWfsAttrib
       property: 'img1_url',
       trueLabel: 'Avec photo',
       falseLabel: 'Sans photo',
+    },
+    {
+      id: 'VIS_DATE_FROM',
+      type: 'date',
+      title: 'Vu en place',
+      property: 'vis_date',
+      operator: 'after',
+    },
+    {
+      id: 'VIS_DATE_TO',
+      type: 'date',
+      title: 'Vu en place',
+      property: 'vis_date',
+      operator: 'before',
     },
     {
       id: 'OBS_DATE_FROM',
