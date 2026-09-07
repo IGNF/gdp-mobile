@@ -62,6 +62,7 @@ export function MapGeodesyFiltersPanel({
       titleBadge={activeCount > 0 ? activeCount : undefined}
       sheetClassName={styles.sheetLarge}
       ariaLabel="Filtres des points"
+      draggable
       footer={
         <div className={styles.footer}>
           <Button type="button" variant="outline" fullWidth onClick={handleReset}>

@@ -31,11 +31,24 @@
   max-height: min(40vh, 22rem);
   overflow: hidden;
   transform: translateY(110%);
-  transition: transform 0.3s ease-out;
+  transition: transform 0.3s ease-out, height 0.3s ease-out;
 }
 
 .sheetVisible {
   transform: translateY(0);
+}
+
+.sheetDragging {
+  transition: transform 0.3s ease-out;
+}
+
+.handleAreaDraggable {
+  cursor: grab;
+  touch-action: none;
+}
+
+.handleAreaDraggable:active {
+  cursor: grabbing;
 }
 
 .header {
