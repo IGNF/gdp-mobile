@@ -149,6 +149,11 @@ export function resolveVoieSuivieLabel(properties: Record<string, unknown>): str
   );
 }
 
+/** Nom de la commune du point (ex. « Reims »). */
+export function resolveCommuneLabel(properties: Record<string, unknown>): string | null {
+  return readPropertyValue(properties, 'commune');
+}
+
 export function findAttributeByLabel(
   action: MapGeodesyClickAction,
   matcher: (label: string) => boolean,

@@ -14,7 +14,7 @@ import {
   getLocalReportDraftStatusColors,
   getLocalReportDraftStatusLabel,
 } from '@/features/report/utils/localReportDraftStatus';
-import { formatRelativeDayLabel, formatTime } from '@/shared/utils/date';
+import { formatRelativeDayLabel } from '@/shared/utils/date';
 import { joinCSSClassNames } from '@/shared/utils/join';
 import { PageHeader } from '@/shared/ui/PageHeader';
 import IconAngleRight from '@/shared/assets/icons/icon-angle-right.svg?react';
@@ -140,13 +140,15 @@ export function MyReportsPage() {
                     ) : null}
                     <div className={styles.reportMeta}>
                       <span className={styles.reportMetaItem}>
-                        <IconLocation className={styles.reportMetaIcon} aria-hidden />
-                        {draft.latitude.toFixed(4)}° N
-                      </span>
-                      <span className={styles.reportMetaItem}>
                         <IconCalendar className={styles.reportMetaIcon} aria-hidden />
-                        {formatRelativeDayLabel(createdAt)} · {formatTime(createdAt)}
+                        {formatRelativeDayLabel(createdAt)}
                       </span>
+                      {draft.commune ? (
+                        <span className={styles.reportMetaItem}>
+                          <IconLocation className={styles.reportMetaIcon} aria-hidden />
+                          {draft.commune}
+                        </span>
+                      ) : null}
                     </div>
                     <IconAngleRight className={styles.reportChevron} aria-hidden />
                   </button>
