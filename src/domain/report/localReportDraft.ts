@@ -16,6 +16,7 @@ export interface LocalReportDraft {
   titlePicto?: GeodesyPointTitlePicto;
   layerTitle?: string;
   voieSuivie?: string;
+  commune?: string;
   longitude: number;
   latitude: number;
   positionModified: boolean;
