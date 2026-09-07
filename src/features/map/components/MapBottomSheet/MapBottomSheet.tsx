@@ -387,6 +387,7 @@ export function MapBottomSheet({
         dragOffset !== 0 ? styles.sheetDragging : '',
         isSheetAuto ? styles.sheetAuto : '',
         isPointMode ? styles.sheetPointFiche : '',
+        isBrowseExpanded ? styles.sheetSearchActive : '',
         isBrowseCollapsed ? styles.sheetCollapsed : '',
       ]
         .filter(Boolean)

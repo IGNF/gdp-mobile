@@ -25,7 +25,7 @@ export interface SlideUpPageProps {
 	fullPage?: boolean;
 }
 
-export function SlideUpPage({ children, isOpen, className, level = 1, fullPage = true }: SlideUpPageProps) {
+export function SlideUpPage({ children, isOpen, onClose, className, level = 1, fullPage = true }: SlideUpPageProps) {
 	const [isVisible, setIsVisible] = useState(isOpen);
 	const [shouldRender, setShouldRender] = useState(isOpen);
 
@@ -67,11 +67,17 @@ export function SlideUpPage({ children, isOpen, className, level = 1, fullPage =
 
 	const content = (
 		<div className={classNames} style={{ zIndex }} data-scroll-root='true'>
-			<div className={innerClassNames}>
-				{children}
-			</div>
+		  {/* Backdrop cliquable sur desktop */}
+		  <div 
+			className={styles.backdrop} 
+			onClick={onClose}
+			aria-hidden="true"
+		  />
+		  <div className={innerClassNames}>
+			{children}
+		  </div>
 		</div>
-	);
+	  );
 
 	// Use portal to render at document body level for proper stacking
 	return createPortal(content, document.body);

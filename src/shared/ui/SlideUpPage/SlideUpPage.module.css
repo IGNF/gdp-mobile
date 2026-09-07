@@ -23,3 +23,29 @@
 	padding-left: var(--safe-left, 0px);
 	padding-right: var(--safe-right, 0px);
 }
+
+/* CSS pour le backdrop */
+.backdrop {
+	display: none; /* caché sur mobile */
+  }
+  @media (min-width: 768px) {
+	.backdrop {
+	  display: block;
+	  position: absolute;
+	  inset: 0;
+	  z-index: -1; /* derrière le contenu */
+	}
+  }
+
+@media (min-width: 768px) {
+	.slideUpPage {
+	  display: flex;
+	  justify-content: left;
+	}
+	.slideUpPageInner {
+	  width: 100%;
+	  max-width: 680px;
+	  border-radius: 1.25rem 1.25rem 0 0;
+	  box-shadow: 0 -4px 24px rgba(9, 22, 37, 0.15);
+	}
+  }
