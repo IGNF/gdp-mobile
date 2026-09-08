@@ -4,7 +4,15 @@
   flex-shrink: 0;
   overflow: hidden;
   margin-bottom: 1rem;
-  transition: height 0.3s ease-out;
+  transition: height 0.3s ease-out, margin-bottom 0.3s ease-out, border-radius 0.3s ease-out,
+    box-shadow 0.3s ease-out;
+}
+
+/* Consultation complète : la fiche passe en plein écran (poignée tirée jusqu'en haut). */
+.sheet.sheetFullscreen {
+  margin-bottom: 0;
+  border-radius: 0;
+  box-shadow: none;
 }
 
 .sheetDragging {
@@ -65,6 +73,11 @@
   /* Ne jamais couvrir la pile de FAB (filtre/couches/légende) de MapPage : 3 boutons de
      3rem + 2 espaces de 0.5rem, plus une marge de respiration. */
   max-height: calc(100dvh - max(0.75rem, var(--safe-top)) - 10.75rem);
+}
+
+/* Plein écran : plus de réserve pour la pile de FAB, la fiche occupe tout l'espace disponible. */
+.sheetPointFiche.sheetFullscreen {
+  max-height: calc(100dvh - max(0.75rem, var(--safe-top)));
 }
 
 .contentPointMini {
