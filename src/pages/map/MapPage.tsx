@@ -57,6 +57,7 @@ import {
 } from '@/infra/map/openlayers/geoportailLayers';
 
 import IconGeolocation from '@/shared/assets/icons/icon-geolocation.svg?react';
+import IconCompass from '@/shared/assets/icons/icon-compass-needle.svg?react';
 import IconFilter from '@/shared/assets/icons/icon-filter.svg?react';
 import IconBurger from '@/shared/assets/icons/icon-burger.svg?react';
 import IconLayers from '@/shared/assets/icons/icon-layers.svg?react';
@@ -124,6 +125,8 @@ export function MapPage() {
     isMapReady,
     userFollowingMode,
     setUserFollowingMode,
+    rotation,
+    resetRotation,
   } = useMap();
   const [activeBasemap, setActiveBasemap] = useState<string>(GEOPORTAIL_LAYERS.PLAN_IGN);
   const [geoservicesVisible, setGeoservicesVisible] = useState(true);
@@ -531,6 +534,20 @@ export function MapPage() {
               </span>
             </div>
           )}
+
+          <button
+            type="button"
+            className={styles.mapFab + ' ' + styles.compassFab}
+            aria-label="Réorienter la carte vers le Nord"
+            disabled={!isMapReady}
+            onClick={() => resetRotation()}
+          >
+            <IconCompass
+              className={styles.compassIcon}
+              style={{ transform: `rotate(${(-rotation * 180) / Math.PI}deg)` }}
+              aria-hidden
+            />
+          </button>
 
           <button
             type="button"

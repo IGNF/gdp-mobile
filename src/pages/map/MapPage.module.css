@@ -131,6 +131,16 @@
   bottom: calc(var(--map-tabbar-height) + 0.8rem);
 }
 
+.compassFab {
+  right: 1rem;
+  bottom: calc(var(--map-tabbar-height) + 0.2rem + 3.5rem);
+}
+
+.compassIcon {
+  width: 2.25rem;
+  height: 2.25rem;
+  transition: transform 0.1s ease-out;
+}
 
 .geolocationIcon {
   width: 1.75rem;

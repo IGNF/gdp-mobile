@@ -63,7 +63,7 @@ export function MapPointNivellementFicheBody({ action, snapIndex }: MapPointNive
   const altitude =
     readProperty(action, 'cp1_coord3') + " m" ;
 
-  const repereTypeComplement = readProperty(action, 'complement');
+  const repereTypeComplement = readProperty(action, 'type_info');
   const repereType = readProperty(action, 'type');
   const actDate = readProperty(action, 'action_date');
   const remark = readProperty(action, 'remarque') ;
@@ -104,7 +104,7 @@ export function MapPointNivellementFicheBody({ action, snapIndex }: MapPointNive
               <FieldCard label="Système d'altitude" value={altitudeSystem} />
               <FieldCard label={altitudeType} value={altitude} />
               <FieldCard label="Complément" value={repereTypeComplement} />
-              <FieldCard label="Type" value={repereType} />
+              <FieldCard label="Type" value={repereType} wide />
             </div>
           </section>
 

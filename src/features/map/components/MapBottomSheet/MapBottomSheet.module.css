@@ -67,6 +67,11 @@
 	max-height: calc(100dvh - max(var(--spacing-sm), var(--safe-top)) - 10.75rem);
 }
 
+/* Plein écran : plus de réserve pour la pile de FAB, la fiche occupe tout l'espace disponible. */
+.sheetPointFiche.sheetFullscreen {
+  max-height: calc(100dvh - max(0.75rem, var(--safe-top)));
+}
+
 .contentPointMini {
   flex: 0 0 auto;
   overflow: visible;
