@@ -1,0 +1,6 @@
+<svg id="icon-compass-needle" xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30">
+  <circle cx="15" cy="15" r="13" fill="none" stroke="#091625" stroke-width="1.5"/>
+  <polygon points="15,4 20,15 10,15" fill="#e50000"/>
+  <polygon points="15,26 20,15 10,15" fill="#091625"/>
+  <circle cx="15" cy="15" r="1.6" fill="#ffffff"/>
+</svg>

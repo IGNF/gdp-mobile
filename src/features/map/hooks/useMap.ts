@@ -78,6 +78,8 @@ interface UseMapReturn {
   isLocating: boolean;
   isLockedUserLocation: boolean;
   isMapReady: boolean;
+  rotation: number;
+  resetRotation: (animationDuration?: number) => void;
 }
 
 export function useMap(options: UseMapOptions = {}): UseMapReturn {
@@ -98,6 +100,7 @@ export function useMap(options: UseMapOptions = {}): UseMapReturn {
   const [isFeatureGeolocationRecenterActive, setIsGeolocationRecenterActive] = useState(false);
   const [isLocating, setIsLocating] = useState(false);
   const [isMapReady, setIsMapReady] = useState(false);
+  const [rotation, setRotation] = useState(0);
   const [hasInitialCenterCompleted, setHasInitialCenterCompleted] = useState(
     () => !shouldCenterOnMount,
   );
@@ -174,6 +177,32 @@ export function useMap(options: UseMapOptions = {}): UseMapReturn {
   const lockUserLocationOnMap = useCallback(() => {
     setUserFollowingMode((mode) => (mode === 'locked' ? 'none' : 'locked'));
   }, []);
+
+  const resetRotation = useCallback(
+    (animationDuration: number = 250) => {
+      const targetMap = mapRef.current;
+      if (!targetMap) {
+        return;
+      }
+
+      const view = targetMap.getView();
+      const currentRotation = view.getRotation() ?? 0;
+      if (currentRotation === 0) {
+        return;
+      }
+
+      // On vise le multiple de 2π le plus proche pour animer par le chemin le plus court.
+      const TWO_PI = 2 * Math.PI;
+      const targetRotation = Math.round(currentRotation / TWO_PI) * TWO_PI;
+
+      const endProgrammaticViewportChange = markProgrammaticViewportChange();
+      view.animate({ rotation: targetRotation, duration: animationDuration }, () => {
+        view.setRotation(0);
+        endProgrammaticViewportChange();
+      });
+    },
+    [markProgrammaticViewportChange],
+  );
 
   const animateToPosition = useCallback(
     async (targetMap: Map, position: Position, animationDuration: number) => {
@@ -449,8 +478,8 @@ export function useMap(options: UseMapOptions = {}): UseMapReturn {
         layers: [createGeoportailLayerGroup()],
         interactions: defaultInteractions({
           onFocusOnly: true,
-          altShiftDragRotate: false,
-          pinchRotate: false,
+          altShiftDragRotate: true,
+          pinchRotate: true,
         }),
         controls: defaultControls({ zoom: false, attribution: false, rotate: false }).extend([
           ...(DEFAULT_MAP_SHOW_SCALELINE ? [new ScaleLine()] : []),
@@ -462,7 +491,7 @@ export function useMap(options: UseMapOptions = {}): UseMapReturn {
         view: new View({
           center: fromLonLat([savedPreferences.longitude, savedPreferences.latitude]),
           zoom: savedPreferences.zoom,
-          enableRotation: false,
+          enableRotation: true,
         }),
       });
 
@@ -479,6 +508,23 @@ export function useMap(options: UseMapOptions = {}): UseMapReturn {
       setIsMapReady(false);
     };
   }, []);
+
+  useEffect(() => {
+    const olMap = mapRef.current;
+    if (!olMap) {
+      return;
+    }
+
+    const view = olMap.getView();
+    setRotation(view.getRotation() ?? 0);
+    const rotationKey = view.on('change:rotation', () => {
+      setRotation(view.getRotation() ?? 0);
+    });
+
+    return () => {
+      unByKey(rotationKey);
+    };
+  }, [map]);
 
   useEffect(() => {
     const olMap = mapRef.current;
@@ -572,5 +618,7 @@ export function useMap(options: UseMapOptions = {}): UseMapReturn {
     isLocating,
     isLockedUserLocation,
     isMapReady,
+    rotation,
+    resetRotation,
   };
 }
