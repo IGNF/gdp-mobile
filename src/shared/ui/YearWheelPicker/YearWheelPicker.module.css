@@ -32,14 +32,14 @@
   scroll-snap-align: center;
   font-family: 'Fira Sans';
   font-size: 1.0625rem;
-  color: var(--color-medium);
+  color: var(--color-text-secondary);
   opacity: 0.9;
   cursor: pointer;
   transition: color 0.15s ease, opacity 0.15s ease, font-size 0.15s ease;
 }
 
 .row[data-distance='0'] {
-  color: var(--color-primary);
+  color: var(--color-text-primary);
   font-weight: 700;
   font-size: 1.3125rem;
   opacity: 1;
@@ -63,7 +63,7 @@
   left: 0;
   right: 0;
   height: 0;
-  border-top: 1.5px solid var(--color-dark);
+  border-top: 1.5px solid var(--color-text);
   pointer-events: none;
 }
 

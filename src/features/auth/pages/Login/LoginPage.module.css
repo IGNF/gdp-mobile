@@ -6,7 +6,7 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background-color: #f7f7f7;
+  background-color: var(--color-bg-page);
   padding-top: max(0.75rem, var(--safe-top));
   padding-right: 1.5rem;
   padding-bottom: max(1.25rem, calc(var(--safe-bottom) + 0.75rem));
@@ -41,7 +41,7 @@
 }
 
 .title {
-  color: var(--Content-Neutral-Primary, var(--gray-12, #2A2826));
+  color: var(--color-text-title);
   text-align: center;
   
   /* Headings/Hero */
@@ -57,7 +57,7 @@
   font-size: 1.0625rem;
   font-weight: 400;
   line-height: normal;
-  color: #2a2826;
+  color: var(--color-text-title);
 }
 
 .form {
@@ -79,7 +79,7 @@
   gap: var(--Spacing-2xs, 0.25rem);
   align-self: stretch;
   border-radius: 6.25rem;
-  background: var(--Dark-green, #26A581);
+  background: var(--color-bg-primary);
 }
 
 .outlineButton {
@@ -91,10 +91,10 @@
   width: 100%;
   min-height: 44px;
   padding: 0.6875rem 0.625rem;
-  border: 1px solid rgba(42, 40, 38, 0.2);
+  border: 1px solid var(--color-bg-hover);
   border-radius: 100px;
   background: transparent;
-  color: var(--green-5, #229574);
+  color: var(--color-action-primary-hover);
   font-size: 0.875rem;
   font-weight: 600;
   text-decoration: none;
@@ -103,7 +103,7 @@
 }
 
 .outlineButton:hover {
-  background-color: var(--color-primary-light);
+  background-color: var(--color-bg-primary-subtle);
 }
 
 .buttonIcon {
@@ -117,7 +117,7 @@
 }
 
 .forgotPasswordLink {
-  color: var(--Content-Neutral-Primary, var(--gray-12, #2A2826));
+  color: var(--color-text-title);
   text-align: center;
 
   /* Body/Small */

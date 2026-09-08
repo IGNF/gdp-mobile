@@ -3,7 +3,7 @@
   flex-direction: column;
   height: 100dvh;
   margin-top: calc(-1 * var(--safe-top));
-  background: var(--color-dark);
+
   --map-tabbar-height: calc(6.5rem + var(--safe-bottom));
   --map-sheet-height: 4.5rem;
   --map-fab-sheet-offset: 4.5rem;
@@ -58,7 +58,7 @@
   padding: 0;
   border: none;
   border-radius: 50%;
-  background-color: var(--color-white);
+  background-color: var(--color-bg-subtle);
   box-shadow: 0 2px 12px rgba(9, 22, 37, 0.16);
   cursor: pointer;
   pointer-events: auto;
@@ -70,7 +70,7 @@
 }
 
 .mapFabActive {
-  background-color: var(--color-primary);
+  background-color: var(--color-text-primary);
   color: var(--color-white);
 }
 
@@ -80,7 +80,7 @@
 }
 
 .mapFabLocked {
-  background-color: var(--color-primary);
+  background-color: var(--color-text-primary);
   color: var(--color-white);
   animation: pulse-locked 2s ease-in-out infinite;
 }
@@ -105,12 +105,12 @@
 }
 
 .mapFabIcon path {
-  fill: var(--color-dark);
+  fill: var(--color-text);
 }
 
 .mapFabStack {
   position: absolute;
-  top: max(0.75rem, var(--safe-top));
+  top: max(2.5rem, var(--safe-top));
   right: 1rem;
   z-index: 2;
   display: flex;
@@ -127,8 +127,8 @@
 }
 
 .geolocationFab {
-  right: 1rem;
-  bottom: calc(var(--map-tabbar-height) + 0.2rem);
+  right: 1.2rem;
+  bottom: calc(var(--map-tabbar-height) + 0.8rem);
 }
 
 
@@ -138,7 +138,7 @@
 }
 
 .geolocationIcon path {
-  fill: var(--color-dark);
+  fill: var(--color-text);
 }
 
 .geolocationLoading {
@@ -151,7 +151,7 @@
 }
 
 .mapTarget :global(.ol-scale-line) {
-  bottom: calc(var(--map-tabbar-height) + 0.2rem);
+  bottom: calc(var(--map-tabbar-height) + 0.8rem);
   left: 1rem;
 }
 

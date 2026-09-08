@@ -3,7 +3,7 @@
 .surface {
   display: flex;
   flex-direction: column;
-  background: var(--color-dark-contrast);
+  background: var(--color-bg-surface);
   border-radius: 1.25rem;
   box-shadow: 0 -4px 24px rgba(9, 22, 37, 0.12);
 }
@@ -20,7 +20,7 @@
   width: 2.5rem;
   height: 0.25rem;
   border-radius: 999px;
-  background: var(--color-light-shade);
+  background: var(--color-bg-disabled);
 }
 
 .body {

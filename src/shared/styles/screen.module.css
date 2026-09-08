@@ -1,14 +1,19 @@
+/* Screen layout utilities */
+
 .screenContainer {
-  padding: 25px;
+	padding-top: var(--spacing-sm);
+	padding-bottom: var(--spacing-2xl);
+	padding-left: var(--spacing-lg);
+	padding-right: var(--spacing-lg);
 }
 
 .screenExtendedContainer {
-  padding: 15px;
+	padding: var(--spacing-md);
 }
 
 /* Shared overlay style for modals and menus */
 .overlay {
-  position: fixed;
-  inset: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+	position: fixed;
+	inset: 0;
+	background-color: rgba(0, 0, 0, 0.5);
 }

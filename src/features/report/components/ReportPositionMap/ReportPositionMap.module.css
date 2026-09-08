@@ -8,8 +8,8 @@
   position: relative;
   overflow: hidden;
   border-radius: 10px;
-  border: 1px solid var(--color-light-shade);
-  background: var(--color-light-light);
+  border: 1px solid var(--color-bg-disabled);
+  background: var(--color-bg-subtle);
 }
 
 .mapTarget {
@@ -23,18 +23,18 @@
   right: 8px;
   z-index: 2;
   padding: 0.375rem 0.75rem;
-  border: 1px solid var(--color-light-shade);
+  border: 1px solid var(--color-bg-disabled);
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.94);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
   font-size: 0.8125rem;
   font-weight: 600;
-  color: var(--color-dark);
+  color: var(--color-text);
   cursor: pointer;
 }
 
 .resetButton:active {
-  background: var(--color-light-light);
+  background: var(--color-bg-subtle);
 }
 
 .loadingOverlay {
@@ -50,12 +50,12 @@
 .hint {
   margin: 0;
   font-size: 0.8125rem;
-  color: var(--color-medium);
+  color: var(--color-text-secondary);
 }
 
 .coordinates {
   margin: 0;
   font-size: 0.875rem;
   font-variant-numeric: tabular-nums;
-  color: var(--color-dark);
+  color: var(--color-text);
 }

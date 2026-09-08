@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: column;
   min-height: 100dvh;
-  background: var(--color-light-light);
+  background: var(--color-bg-subtle);
 }
 
 .main {
@@ -25,7 +25,7 @@
   left: 0.875rem;
   width: 1.125rem;
   height: 1.125rem;
-  color: var(--color-medium);
+  color: var(--color-text-secondary);
   pointer-events: none;
 }
 
@@ -36,17 +36,17 @@
 .searchInput {
   width: 100%;
   padding: 0.75rem 0.875rem 0.75rem 2.5rem;
-  border: 1px solid var(--color-light);
+  border: 1px solid var(--color-border);
   border-radius: 0.75rem;
   background: var(--color-fiche-surface);
   font: inherit;
   font-size: 0.9375rem;
-  color: var(--color-dark);
+  color: var(--color-text);
   box-sizing: border-box;
 }
 
 .searchInput::placeholder {
-  color: var(--color-medium);
+  color: var(--color-text-secondary);
 }
 
 .filterRow {
@@ -63,27 +63,27 @@
 .filterChip {
   flex-shrink: 0;
   padding: 0.5rem 0.875rem;
-  border: 1px solid var(--color-light);
+  border: 1px solid var(--color-border);
   border-radius: 999px;
   background: var(--color-fiche-surface);
   font-size: 0.8125rem;
   font-weight: 600;
-  color: var(--color-medium);
+  color: var(--color-text-secondary);
   cursor: pointer;
   white-space: nowrap;
 }
 
 .filterChipActive {
-  border-color: var(--color-primary);
-  background: var(--color-primary);
-  color: var(--color-primary-contrast);
+  border-color: var(--color-text-primary);
+  background: var(--color-bg-primary);
+  color: var(--color-bg-surface);
 }
 
 .empty {
   padding: 2rem 0;
   text-align: center;
   font-size: 0.875rem;
-  color: var(--color-medium);
+  color: var(--color-text-secondary);
 }
 
 .reportList {
@@ -126,7 +126,7 @@
 .reportId {
   font-size: 0.9375rem;
   font-weight: 700;
-  color: var(--color-dark);
+  color: var(--color-text);
 }
 
 .statusBadge {
@@ -141,13 +141,13 @@
 .reportReason {
   margin: 0;
   font-size: 0.875rem;
-  color: var(--color-medium);
+  color: var(--color-text-secondary);
 }
 
 .reportVoie {
   margin: 0;
   font-size: 0.8125rem;
-  color: var(--color-medium);
+  color: var(--color-text-secondary);
 }
 
 .reportMeta {
@@ -161,7 +161,7 @@
   align-items: center;
   gap: 0.3125rem;
   font-size: 0.8125rem;
-  color: var(--color-medium);
+  color: var(--color-text-secondary);
 }
 
 .reportMetaIcon {
@@ -181,7 +181,7 @@
   transform: translateY(-50%);
   width: 1rem;
   height: 1rem;
-  color: var(--color-medium);
+  color: var(--color-text-secondary);
 }
 
 .reportChevron path {

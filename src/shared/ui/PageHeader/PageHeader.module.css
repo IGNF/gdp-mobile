@@ -6,9 +6,9 @@
 	align-items: center;
 	justify-content: space-between;
 	margin-top: calc(0px - var(--page-header-safe-top, 0px));
-	padding: calc(16px + var(--page-header-safe-top, 0px)) 16px 16px;
-	border-bottom: 0.1px solid var(--color-light-tint);
-	background-color: var(--color-white);
+	padding: calc(var(--spacing-md) + var(--page-header-safe-top, 0px)) var(--spacing-md) var(--spacing-md);
+	border-bottom: 0.1px solid var(--color-bg-hover);
+	background-color: var(--color-bg-page);
 }
 
 .headerTitle {
@@ -17,21 +17,22 @@
 }
 
 .headerMainTitle {
-	font-size: 1rem;
-	font-weight: 600;
-	color: var(--color-dark);
+	font-size: var(--font-size-2xl);
+	font-weight: var(--font-weight-semibold);
+	font-family: var(--font-family-heading);
+	color: var(--color-text-title);
 	margin: 0;
 }
 
 .headerSubtitle {
-	font-size: 0.875rem;
-	color: var(--color-medium);
+	font-size: var(--font-size-base);
+	color: var(--color-text-secondary);
 	margin: 0;
 }
 
 /* Spacer to balance the header layout */
 .headerSpacer {
-	width: 40px;
+	width: 2.5rem;
 }
 
 /* Shared button styles for back and close buttons */
@@ -39,31 +40,31 @@
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	width: 40px;
-	height: 40px;
+	width: 2.5rem;
+	height: 2.5rem;
 	padding: 0;
 	background: none;
-	border: 1px solid var(--color-light-tint);
-	border-radius: 50%;
+	border: 1px solid var(--color-bg-hover);
+	border-radius: var(--radius-circle);
 	cursor: pointer;
 }
 
 .headerIcon {
-	width: 20px;
-	height: 20px;
-	color: var(--color-dark);
+	width: var(--icon-base);
+	height: var(--icon-base);
+	color: var(--color-text);
 }
 
 .headerButtonActive {
-	background-color: var(--color-secondary-light);
-	border-color: var(--color-secondary);
+	background-color: var(--color-bg-secondary-subtle);
+	border-color: var(--color-action-secondary);
 }
 
 .headerButtonPrimary {
-	background-color: var(--color-primary);
-	border-color: var(--color-primary);
+	background-color: var(--color-text-primary);
+	border-color: var(--color-text-primary);
 }
 
 .headerIconOnPrimary {
-	color: var(--color-primary-contrast);
+	color: var(--color-bg-surface);
 }

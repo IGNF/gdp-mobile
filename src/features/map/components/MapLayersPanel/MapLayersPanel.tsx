@@ -1,8 +1,7 @@
 import { MapOverlaySheet } from '@/features/map/components/MapOverlaySheet';
 import type { MapLayerSheetItem } from '@/features/map/types/mapLayerSheet';
 
-import IconInfo from '@/shared/assets/icons/icon-info.svg?react';
-import IconReset from '@/shared/assets/icons/icon-reset.svg?react';
+
 import IconCheck from '@/shared/assets/icons/icon-check.svg?react';
 
 import styles from './MapLayersPanel.module.css';
@@ -21,8 +20,6 @@ export function MapLayersPanel({
   onClose,
   items,
   onOpacityChange,
-  onInfo,
-  onRefresh,
 }: MapLayersPanelProps) {
   return (
     <MapOverlaySheet isOpen={isOpen} onClose={onClose} ariaLabel="Couches de la carte">
@@ -47,28 +44,7 @@ export function MapLayersPanel({
                   </span>
                 ) : null}
               </button>
-              <div className={styles.cardActions}>
-                {item.showRefresh && onRefresh ? (
-                  <button
-                    type="button"
-                    className={styles.cardActionButton}
-                    onClick={() => onRefresh(item.id)}
-                    aria-label={`Rafraîchir ${item.title}`}
-                  >
-                    <IconReset className={styles.cardActionIcon} aria-hidden />
-                  </button>
-                ) : null}
-                {item.showInfo !== false ? (
-                  <button
-                    type="button"
-                    className={styles.cardActionButton}
-                    onClick={() => onInfo(item.id)}
-                    aria-label={`Informations sur ${item.title}`}
-                  >
-                    <IconInfo className={styles.cardActionIcon} aria-hidden />
-                  </button>
-                ) : null}
-              </div>
+
             </div>
 
             <div className={styles.cardContent}>

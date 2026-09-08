@@ -5,8 +5,6 @@ import { SlideUpPage } from '@/shared/ui/SlideUpPage';
 import { Button } from '@/shared/ui/Button';
 
 import screen from '@/shared/styles/screen.module.css';
-import typography from '@/shared/styles/typography.module.css';
-
 import styles from './LogoutPage.module.css';
 
 export interface LogoutPageProps {
@@ -31,11 +29,11 @@ export function LogoutPage({ isOpen, onClose, onLogout }: LogoutPageProps) {
       <PageHeader title="Déconnexion" onClose={onClose} />
 
       <main className={`${screen.screenContainer} ${styles.content}`}>
-        <h1 className={typography.title}>Se déconnecter ?</h1>
-        <p className={typography.subtitle}>
+        <h1 className="page-title">Se déconnecter ?</h1>
+        <p className="page-subtitle">
           Vous devrez vous reconnecter pour accéder à vos signalements.
         </p>
-        <p className={typography.paragraph}>
+        <p className="body">
           Vos brouillons locaux restent enregistrés sur cet appareil.
         </p>
 

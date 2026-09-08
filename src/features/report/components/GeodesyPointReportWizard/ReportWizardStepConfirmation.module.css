@@ -31,7 +31,7 @@
   margin-top: -3.25rem;
   margin-left: -0.09375rem;
   border-radius: 999px;
-  background: var(--color-primary-light);
+  background: var(--color-bg-primary-subtle);
   transform-origin: 50% 3.25rem;
 }
 
@@ -44,13 +44,13 @@
   width: 5.5rem;
   height: 5.5rem;
   border-radius: 50%;
-  background: var(--color-primary-light);
+  background: var(--color-bg-primary-subtle);
 }
 
 .icon {
   width: 2.25rem;
   height: 2.25rem;
-  color: var(--color-primary);
+  color: var(--color-text-primary);
 }
 
 .icon path {
@@ -67,7 +67,7 @@
   width: 1.75rem;
   height: 1.75rem;
   border-radius: 50%;
-  background: var(--color-primary);
+  background: var(--color-bg-primary);
   border: 2px solid var(--color-fiche-surface);
 }
 
@@ -85,7 +85,7 @@
   margin: 0;
   font-size: 1.0625rem;
   font-weight: 700;
-  color: var(--color-dark);
+  color: var(--color-text);
 }
 
 .body {
@@ -93,7 +93,7 @@
   max-width: 22rem;
   font-size: 0.875rem;
   line-height: 1.45;
-  color: var(--color-medium);
+  color: var(--color-text-secondary);
 }
 
 .actions {

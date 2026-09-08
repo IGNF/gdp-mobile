@@ -8,3 +8,7 @@
 .backButton {
   margin-top: 1.5rem;
 }
+
+.text-error {
+  color: var(--color-danger);
+}

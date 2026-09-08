@@ -2,7 +2,7 @@
   margin: 0 0 0.75rem;
   font-size: 1.125rem;
   font-weight: 700;
-  color: var(--color-dark);
+  color: var(--color-text);
 }
 
 .preview {
@@ -10,7 +10,7 @@
   aspect-ratio: 16 / 9;
   margin-bottom: 1rem;
   border-radius: 0.75rem;
-  border: 1px solid var(--color-light-shade);
+  border: 1px solid var(--color-bg-disabled);
   background: var(--gradient-geodesy-layer-preview);
   overflow: hidden;
 }
@@ -26,15 +26,15 @@
   margin: 0 0 1rem;
   font-size: 0.875rem;
   line-height: 1.5;
-  color: var(--color-medium-shade);
+  color: var(--color-border-strong);
   white-space: pre-line;
 }
 
 .legend {
   width: 100%;
   border-radius: 0.75rem;
-  border: 1px solid var(--color-light-shade);
-  background: var(--color-white);
+  border: 1px solid var(--color-bg-disabled);
+  background: var(--color-bg-subtle);
   overflow: hidden;
 }
 

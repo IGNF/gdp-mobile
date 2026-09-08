@@ -1,36 +1,207 @@
 .content {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: var(--spacing-lg);
+  padding-bottom: var(--spacing-2xl);
 }
 
+/* ── Non connecté ── */
 .notConnected {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--spacing-md);
 }
 
-.infoTable {
+/* ── Avatar et nom ── */
+.profileHeader {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-lg) 0;
+}
+
+.avatarContainer {
+  position: relative;
+}
+
+.avatar {
+  width: 7.5rem;
+  height: 7.5rem;
+  border-radius: var(--radius-circle);
+  background-color: var(--color-bg-inverse);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatarIcon {
+  width: 3rem;
+  height: 3rem;
+  color: var(--color-bg-white);
+}
+
+
+
+.locationIcon,
+.bookIcon {
+  width: var(--icon-base);
+  height: var(--icon-base);
+}
+.iconWrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--icon-wrap-md);
+  height: var(--icon-wrap-md);
+  border-radius: var(--radius-circle);
+  background: var(--icon-color-1); 
+  flex-shrink: 0;
+}
+
+.locationIcon path ,
+.bookIcon path {
+  fill: var(--icon-color-8);
+}
+
+.cameraButton {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: var(--radius-circle);
+  background: var(--icon-color-8); 
+  color: var(--color-bg-surface);
+  border-color: var(--icon-color-8);
+}
+
+
+.cameraButton:hover {
+  background-color: var(--color-action-primary-hover);
+}
+
+.cameraButton:active {
+  background-color: var(--color-bg-primary-pressed);
+}
+
+.profileName {
+  font-family: var(--font-family-heading);
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary-emphasis);
+  margin: 0;
+  text-align: center;
+}
+
+/* ── Card informations ── */
+.infoCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  background-color: var(--color-bg-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
 }
 
 .infoRow {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid var(--color-light);
+  gap: var(--spacing-3xs);
 }
 
 .infoLabel {
-  font-size: 13px;
-  color: var(--color-medium);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary-label);
+  font-weight: var(--font-weight-semibold);
 }
 
 .infoValue {
-  font-size: 15px;
-  color: var(--color-dark);
+  font-size: var(--font-size-base);
+  color: var(--color-text-title);
+  font-weight: var(--font-weight-semibold);
   word-break: break-word;
+}
+
+/* ── Mes contributions ── */
+.contributionsSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.sectionTitle {
+  font-family: var(--font-family-heading);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text);
+  margin: 0;
+}
+
+.contributionsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-md);
+}
+
+.contributionCard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-lg);
+  background-color: var(--color-bg-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.contributionIcon {
+  width: 2.5rem;
+  height: 2.5rem;
+  color: var(--color-text-secondary);
+  background-color: var(--color-bg-primary-subtle);
+  border-radius: 1.5rem;
+}
+
+.contributionIcon path {
+  fill: var(--color-text-primary-8);
+}
+
+.contributionValue {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary-8);
+  line-height: 1;
+}
+
+.contributionLabel {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-gray-10);
+  text-align: center;
+  font-weight: var(--font-weight-normal);
+}
+
+.badge {
+  position: absolute;
+  top: var(--spacing-xs);
+  right: var(--spacing-xs);
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: var(--radius-circle);
+  background-color: var(--color-action-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-bg-surface);
+}
+
+/* ── Note de bas de page ── */
+.footerNote {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  text-align: center;
+  line-height: var(--line-height-relaxed);
+  margin: 0;
 }

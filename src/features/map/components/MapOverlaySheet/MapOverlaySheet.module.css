@@ -32,6 +32,7 @@
   overflow: hidden;
   transform: translateY(110%);
   transition: transform 0.3s ease-out, height 0.3s ease-out;
+  background-color: var(--color-bg-page);
 }
 
 .sheetVisible {
@@ -64,15 +65,7 @@
   grid-template-columns: 1fr auto;
 }
 
-.closeOnlyHeader {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: -2rem;
-  padding: 0 0.5rem 0.5rem;
-  flex-shrink: 0;
-  position: relative;
-  z-index: 1;
-}
+
 
 .backButton {
   border: none;
@@ -81,7 +74,7 @@
   font: inherit;
   font-size: 0.875rem;
   font-weight: 600;
-  color: var(--color-primary-shade);
+  color: var(--color-text-primary);
   cursor: pointer;
 }
 
@@ -106,12 +99,12 @@
   justify-content: center;
   font-size: 1.125rem;
   font-weight: 700;
-  color: var(--color-dark);
+  color: var(--color-text);
   text-align: center;
 }
 
 .titleLeft {
-  color: var(--Grey800, #3F4A55);
+  color: var(--color-text);
   font-family: "Fira Sans";
   font-size: 1.0625rem;
   font-style: normal;
@@ -127,8 +120,8 @@
   padding: 0 0.375rem;
   box-sizing: border-box;
   border-radius: 999px;
-  background: var(--color-primary, #26a581);
-  color: #fff;
+  background: var(--color-bg-primary);
+  color: var(--color-white);
   font-family: "Fira Sans";
   font-size: 0.6875rem;
   font-style: normal;
@@ -156,7 +149,7 @@
 }
 
 .closeIcon path {
-  fill: var(--color-dark);
+  fill: var(--color-text);
 }
 
 .footer {

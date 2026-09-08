@@ -25,7 +25,6 @@ export function MapLayerInfoPanel({
     <MapOverlaySheet
       isOpen={isOpen}
       onClose={onClose}
-      showBackButton
       onBack={onBack}
       ariaLabel={title}
     >

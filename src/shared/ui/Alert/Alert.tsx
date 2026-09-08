@@ -4,7 +4,6 @@ import { Button } from '@/shared/ui/Button';
 import type { ButtonColor, ButtonVariant } from '@/shared/ui/Button';
 import IconClose from '@/shared/assets/icons/icon-close.svg?react';
 import { joinCSSClassNames } from '@/shared/utils/join';
-import typography from '@/shared/styles/typography.module.css';
 import styles from './Alert.module.css';
 
 const ANIMATION_DURATION = 200; // ms, matches CSS transition duration
@@ -87,8 +86,8 @@ export function Alert({
 				</button>
 
 				<div className={styles.content} data-scroll-root='true'>
-					<h2 className={typography.heading2}>{title}</h2>
-					{subtitle && <p className={typography.body}>{subtitle}</p>}
+					<h2 className="heading-2">{title}</h2>
+					{subtitle && <p className="body">{subtitle}</p>}
 
 					{children && <div className={styles.childrenContainer}>{children}</div>}
 

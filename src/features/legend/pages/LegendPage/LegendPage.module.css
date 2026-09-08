@@ -2,8 +2,8 @@
   margin: 1.5rem 0 0;
   padding: 1.25rem;
   border-radius: 0.75rem;
-  background: var(--color-dark-contrast);
-  color: var(--color-medium);
+  background: var(--color-bg-surface);
+  color: var(--color-text-secondary);
   font-size: 0.9375rem;
   text-align: center;
 }
