@@ -9,13 +9,13 @@
   margin: 0;
   font-size: 1.0625rem;
   font-weight: 700;
-  color: var(--color-dark);
+  color: var(--color-text);
 }
 
 .subtitle {
   margin: 0.25rem 0 0;
   font-size: 0.8125rem;
-  color: var(--color-medium);
+  color: var(--color-text-secondary);
 }
 
 .photoCard {
@@ -23,12 +23,12 @@
   height: 11rem;
   border-radius: 0.75rem;
   overflow: hidden;
-  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-shade) 100%);
+  background: linear-gradient(135deg, var(--color-bg-primary) 0%, var(--color-bg-primary-hover) 100%);
   transition: box-shadow 0.15s ease;
 }
 
 .photoCard:hover {
-  box-shadow: 0 0 0 2px var(--color-primary), 0 2px 10px rgba(var(--color-primary-rgb), 0.18);
+  box-shadow: 0 0 0 2px var(--color-border-primary), 0 2px 10px rgba(var(--color-primary-rgb), 0.18);
 }
 
 .photoImage {
@@ -67,7 +67,7 @@
   height: 2rem;
   border: none;
   border-radius: 50%;
-  background: var(--color-white);
+  background: var(--color-bg-subtle);
   box-shadow: 0 2px 6px rgba(9, 22, 37, 0.18);
   cursor: pointer;
 }
@@ -78,7 +78,7 @@
 }
 
 .editIcon path {
-  fill: var(--color-primary);
+  fill: var(--color-text-primary);
 }
 
 .grid {
@@ -93,14 +93,14 @@
   flex-direction: column;
   gap: 0.25rem;
   padding: 0.875rem 1rem;
-  border: 1px solid var(--color-light);
+  border: 1px solid var(--color-border);
   border-radius: 0.75rem;
   background: var(--color-fiche-surface);
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .card:hover {
-  border-color: var(--color-primary);
+  border-color: var(--color-text-primary);
   box-shadow: 0 2px 10px rgba(var(--color-primary-rgb), 0.18);
 }
 
@@ -125,7 +125,7 @@
 }
 
 .cardEditIcon path {
-  fill: var(--color-primary);
+  fill: var(--color-text-primary);
 }
 
 .cardLabel {
@@ -134,7 +134,7 @@
   font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: var(--color-medium);
+  color: var(--color-text-secondary);
 }
 
 .cardValue {
@@ -144,7 +144,7 @@
   gap: 0.375rem;
   font-size: 0.9375rem;
   font-weight: 700;
-  color: var(--color-dark);
+  color: var(--color-text);
 }
 
 .cardValueIcon {
@@ -155,7 +155,7 @@
 }
 
 .cardValueIconConform {
-  color: var(--color-primary);
+  color: var(--color-text-primary);
 }
 
 .cardValueIconNonConform {
@@ -174,7 +174,7 @@
 .cardDetail {
   margin: 0;
   font-size: 0.8125rem;
-  color: var(--color-medium);
+  color: var(--color-text-secondary);
 }
 
 .commentCard {
@@ -182,14 +182,14 @@
   flex-direction: column;
   gap: 0.625rem;
   padding: 0.875rem 1rem;
-  border: 1px solid var(--color-light);
+  border: 1px solid var(--color-border);
   border-radius: 0.75rem;
   background: var(--color-fiche-surface);
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .commentCard:hover {
-  border-color: var(--color-primary);
+  border-color: var(--color-text-primary);
   box-shadow: 0 2px 10px rgba(var(--color-primary-rgb), 0.18);
 }
 
@@ -208,7 +208,7 @@
   font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: var(--color-medium);
+  color: var(--color-text-secondary);
 }
 
 .commentIcon {
@@ -218,7 +218,7 @@
 }
 
 .commentIcon path {
-  fill: var(--color-primary);
+  fill: var(--color-text-primary);
 }
 
 .commentEditButton {
@@ -230,7 +230,7 @@
   background: none;
   font-size: 0.8125rem;
   font-weight: 600;
-  color: var(--color-primary);
+  color: var(--color-text-primary);
   cursor: pointer;
 }
 
@@ -240,12 +240,12 @@
 }
 
 .commentEditIcon path {
-  fill: var(--color-primary);
+  fill: var(--color-text-primary);
 }
 
 .commentBody {
   margin: 0;
   font-size: 0.875rem;
   line-height: 1.45;
-  color: var(--color-dark);
+  color: var(--color-text);
 }

@@ -16,7 +16,7 @@
 
 .card {
 	position: relative;
-	background: var(--color-white);
+	background: var(--color-bg-subtle);
 	border-radius: 16px;
 	width: 100%;
 	max-width: 400px;
@@ -48,15 +48,15 @@
 	height: 36px;
 	padding: 0;
 	background: none;
-	border: 1px solid var(--color-light-tint);
-	border-radius: 50%;
+	border: 1px solid var(--color-bg-hover);
+	border-radius: var(--radius-circle);
 	cursor: pointer;
 }
 
 .closeIcon {
 	width: 18px;
 	height: 18px;
-	color: var(--color-dark);
+	color: var(--color-text);
 }
 
 .content {

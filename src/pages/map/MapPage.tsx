@@ -481,7 +481,7 @@ export function MapPage() {
           <button
             type="button"
             className={styles.mapFab}
-            style={{ top: 'max(0.75rem, var(--safe-top))', left: '1rem' }}
+            style={{ top: 'max(2.5rem, var(--safe-top))', left: '1rem' }}
             onClick={handleOpenMenu}
             aria-label="Menu"
           >

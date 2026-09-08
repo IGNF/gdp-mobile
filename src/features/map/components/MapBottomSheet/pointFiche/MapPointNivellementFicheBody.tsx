@@ -53,7 +53,7 @@ export function MapPointNivellementFicheBody({ action, snapIndex }: MapPointNive
     return filterUnmappedPointFields(collectAllPointFields(action), displayedIds);
   }, [action, snapIndex]);
 
-  console.log('action', action);  
+ // console.log('action', action);  
   const altitudeSystemRaw =
     readProperty(action, 'cp1_srv') ??
     readProperty(action, 'systeme_altitude');

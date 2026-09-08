@@ -2,7 +2,7 @@ import { PageHeader } from '@/shared/ui/PageHeader';
 import { SlideUpPage } from '@/shared/ui/SlideUpPage';
 
 import screen from '@/shared/styles/screen.module.css';
-import typography from '@/shared/styles/typography.module.css';
+import styles from './CommunityPage.module.css';
 
 export interface CommunityPageProps {
   isOpen: boolean;
@@ -12,10 +12,14 @@ export interface CommunityPageProps {
 export function CommunityPage({ isOpen, onClose }: CommunityPageProps) {
   return (
     <SlideUpPage isOpen={isOpen} onClose={onClose}>
-      <PageHeader title="Communauté" onClose={onClose} />
+      <PageHeader title="Communauté" onClose={onClose} showCloseButton={false} showBackButton={true} onBack={onClose}  />
 
-      <main className={screen.screenContainer}>
-        <h1 className={typography.title}>Communauté</h1>
+      <main className={`${screen.screenContainer} ${styles.content}`}>
+        <section className={styles.section}>
+          <p className="body">
+            Votre communauté sera affichée ici.
+          </p>
+        </section>
       </main>
     </SlideUpPage>
   );

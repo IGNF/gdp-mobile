@@ -29,71 +29,71 @@
 }
 
 .handleArea {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 1.75rem;
-  padding: 0.375rem 0.5rem 0.25rem 1rem;
-  flex-shrink: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 1.75rem;
+	padding: var(--spacing-2xs) var(--spacing-xs) var(--spacing-3xs) var(--spacing-md);
+	flex-shrink: 0;
 }
 
 .handle {
-  width: 2.5rem;
-  height: 0.25rem;
-  border-radius: 999px;
-  background: var(--color-light-shade);
+	width: 2.5rem;
+	height: var(--spacing-3xs);
+	border-radius: var(--radius-pill);
+	background: var(--color-bg-disabled);
 }
 
 .header {
-  flex-shrink: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  padding: 0 1rem 0.5rem;
+	flex-shrink: 0;
+	display: flex;
+	flex-direction: column;
+	gap: var(--spacing-xs);
+	padding: 0 var(--spacing-md) var(--spacing-xs);
 }
 
 .headerTop {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 0.75rem;
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: var(--spacing-sm);
 }
 
 .titleRow {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  min-width: 0;
-  flex: 1;
+	display: flex;
+	align-items: center;
+	gap: var(--spacing-xs);
+	min-width: 0;
+	flex: 1;
 }
 
 .title {
-  font-size: 1.125rem;
-  font-weight: 700;
-  color: var(--color-dark);
+	font-size: var(--font-size-xl);
+	font-weight: var(--font-weight-bold);
+	color: var(--color-text);
 }
 
 .copyButton {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 2rem;
-  height: 2rem;
-  padding: 0;
-  border: none;
-  background: none;
-  cursor: pointer;
-  flex-shrink: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 2rem;
+	height: 2rem;
+	padding: 0;
+	border: none;
+	background: none;
+	cursor: pointer;
+	flex-shrink: 0;
 }
 
 .copyIcon {
-  width: 1.125rem;
-  height: 1.125rem;
+	width: 1.125rem;
+	height: 1.125rem;
 }
 
 .copyIcon path {
-  /* Charte : gris-brun foncé dédié aux icônes de la fiche (#363331), hors palette --color-*. */
-  fill: #363331;
+	/* Charte : gris-brun foncé dédié aux icônes de la fiche */
+	fill: var(--figma-gray-11);
 }
 
 .favoriteButton {
@@ -104,8 +104,8 @@
   height: 2.5rem;
   padding: 0;
   border: none;
-  border-radius: 50%;
-  background: var(--figma-green-light-hover);
+  border-radius: var(--radius-circle);
+  background: var(--color-bg-primary-hover-subtle);
   cursor: default;
   flex-shrink: 0;
 }
@@ -116,7 +116,7 @@
 }
 
 .favoriteIcon path {
-  fill: var(--color-primary-shade);
+  fill: var(--color-text-primary);
 }
 
 .statusMetaRow {
@@ -130,21 +130,21 @@
   flex-shrink: 0;
   padding: 0.25rem 0.75rem;
   border-radius: 999px;
-  background: var(--color-warning-light);
-  color: var(--color-danger-shade);
-  font-size: 0.8125rem;
-  font-weight: 600;
+  background: var(--color-bg-warning-subtle);
+  color: var(--color-danger-emphasis);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
 }
 
 .statusBadgeGood {
-  background: var(--color-primary-light);
-  color: var(--color-primary-shade);
+  background: var(--color-bg-primary-subtle);
+  color: var(--color-text-primary);
 }
 
 .meta {
   margin: 0;
-  font-size: 0.875rem;
-  color: var(--color-medium-shade);
+  font-size: var(--font-size-base);
+  color: var(--color-border-strong);
 }
 
 .body {
@@ -180,7 +180,7 @@
    d'import des CSS modules. */
 .footer .footerButton {
   height: 3.75rem;
-  font-size: 1.125rem;
+  font-size: var(--font-size-xl);
 }
 
 .authInfoTrigger {
@@ -194,8 +194,8 @@
   width: 1.5rem;
   height: 1.5rem;
   padding: 0;
-  border: 1px solid var(--color-light-shade);
-  border-radius: 50%;
+  border: 1px solid var(--color-bg-disabled);
+  border-radius: var(--radius-circle);
   background: var(--color-fiche-surface);
   cursor: pointer;
 }
@@ -203,7 +203,7 @@
 .authInfoIcon {
   width: 1rem;
   height: 1rem;
-  color: var(--color-medium);
+  color: var(--color-text-secondary);
 }
 
 .authInfoIcon path {
@@ -218,7 +218,7 @@
   width: 13.5rem;
   padding: 0.75rem 0.875rem;
   border-radius: 0.75rem;
-  background: var(--color-dark);
+  background: var(--color-text);
   box-shadow: 0 4px 16px rgba(9, 22, 37, 0.24);
 }
 
@@ -229,13 +229,13 @@
   right: 0.875rem;
   width: 0.75rem;
   height: 0.75rem;
-  background: var(--color-dark);
+  background: var(--color-text);
   transform: rotate(45deg);
 }
 
 .authInfoText {
   margin: 0;
-  font-size: 0.8125rem;
+  font-size: var(--font-size-xs);
   line-height: 1.4;
   color: var(--color-white);
 }
@@ -246,9 +246,9 @@
   padding: 0;
   border: none;
   background: none;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  color: var(--color-primary-tint);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-border-primary-subtle);
   text-decoration: underline;
   cursor: pointer;
 }
@@ -256,21 +256,21 @@
 .sectionTitle {
   width: 16.9375rem;
   height: 1.125rem;
-  color: var(--Grey800, #3F4A55);
+  color: var(--color-text);
   /* Appli - H2 */
   font-family: "Fira Sans";
-  font-size: 0.9375rem;
+  font-size: var(--font-size-base);
   font-style: normal;
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
   line-height: normal;
 }
 
 .carouselCaption {
   margin: 0;
-  font-size: 0.875rem;
+  font-size: var(--font-size-base);
   font-style: italic;
-  font-weight: 400;
-  color: var(--color-medium);
+  font-weight: var(--font-weight-normal);
+  color: var(--color-text-secondary);
 }
 
 .descriptionHeader {
@@ -291,10 +291,10 @@
   gap: 0.375rem;
   padding: 0.25rem 0.625rem;
   border-radius: 999px;
-  background: var(--gps-exploitability-bg, var(--color-light));
-  color: var(--gps-exploitability-fg, var(--color-medium-shade));
-  font-size: 0.75rem;
-  font-weight: 600;
+  background: var(--gps-exploitability-bg, var(--color-bg-active));
+  color: var(--gps-exploitability-fg, var(--color-border-strong));
+  font-size: var(--font-size-2xs);
+  font-weight: var(--font-weight-semibold);
   text-align: right;
 }
 
@@ -303,8 +303,8 @@
 .gpsExploitabilityBadge[data-variant='excentrated'],
 .gpsExploitabilityBadge[data-variant='inexploitable'],
 .gpsExploitabilityBadge[data-variant='neutral'] {
-  --gps-exploitability-bg: var(--color-light);
-  --gps-exploitability-fg: var(--color-medium-shade);
+  --gps-exploitability-bg: var(--color-bg-active);
+  --gps-exploitability-fg: var(--color-border-strong);
 }
 
 .gpsExploitabilityIcon {
@@ -336,14 +336,14 @@
 .fieldLabel {
   display: block;
   margin-bottom: 0.25rem;
-  font-size: 0.75rem;
-  color: var(--color-medium);
+  font-size: var(--font-size-2xs);
+  color: var(--color-text-secondary);
 }
 
 .fieldValue {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--color-dark);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
   word-break: break-word;
 }
 
@@ -361,7 +361,7 @@
   align-items: center;
   justify-content: center;
   border-radius: 0.5rem;
-  border: 1px solid var(--figma-neutral-light-active);
+  border: 1px solid var(--color-bg-hover);
   background: var(--color-fiche-surface);
   overflow: hidden;
 }
@@ -373,21 +373,21 @@
 }
 
 .partnerLogoPlaceholder {
-  font-size: 0.625rem;
-  font-weight: 600;
+  font-size: var(--font-size-2xs);
+  font-weight: var(--font-weight-semibold);
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  color: var(--color-medium);
+  color: var(--color-text-secondary);
 }
 
 .partnerName {
   margin: 0;
   flex: 1;
   min-width: 0;
-  font-size: 0.875rem;
-  font-weight: 600;
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
   line-height: 1.35;
-  color: var(--color-dark);
+  color: var(--color-text);
   word-break: break-word;
 }
 
@@ -396,11 +396,11 @@
   padding: 0.75rem 0.75rem 0.75rem 1rem;
   border-radius: 0.625rem;
   border-left: 4px solid var(--color-warning);
-  background: var(--color-warning-light);
-  font-size: 0.875rem;
+  background: var(--color-bg-warning-subtle);
+  font-size: var(--font-size-base);
   font-style: italic;
   line-height: 1.45;
-  color: var(--figma-green-darker);
+  color: var(--color-text-primary-emphasis);
 }
 
 
@@ -408,9 +408,9 @@
   margin: 0;
   padding: 0.75rem;
   border-radius: 0.625rem;
-  border: 1px dashed var(--color-light-shade);
-  font-size: 0.8125rem;
-  color: var(--color-medium);
+  border: 1px dashed var(--color-bg-disabled);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
 }
 
 .coordSection {
@@ -425,7 +425,7 @@
 
 .coordTabs {
   display: flex;
-  border-bottom: 1px solid var(--figma-neutral-light-active);
+  border-bottom: 1px solid var(--color-bg-hover);
 }
 
 .coordTab,
@@ -434,22 +434,22 @@
   padding: 0.625rem 0.5rem;
   border: none;
   background: none;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--color-medium);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
   cursor: pointer;
   border-bottom: 2px solid transparent;
   margin-bottom: -1px;
 }
 
 .coordTabActive {
-  color: var(--color-primary);
-  font-weight: 600;
-  border-bottom-color: var(--color-primary);
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-semibold);
+  border-bottom-color: var(--color-text-primary);
 }
 
 .coordTab:disabled {
-  opacity: 0.35;
+  opacity: var(--opacity-subtle);
   cursor: not-allowed;
 }
 
@@ -459,7 +459,7 @@
   gap: 0.75rem;
   padding: 0.75rem;
   border-radius: 0.625rem;
-  border: 1px solid var(--figma-neutral-light-active);
+  border: 1px solid var(--color-bg-hover);
   background: var(--color-fiche-surface);
   text-decoration: none;
 }
@@ -471,8 +471,8 @@
   width: 2.5rem;
   height: 2.5rem;
   flex-shrink: 0;
-  border-radius: 50%;
-  background: var(--color-primary-light);
+  border-radius: var(--radius-circle);
+  background: var(--color-bg-primary-subtle);
 }
 
 .pdfDownloadIcon {
@@ -481,7 +481,7 @@
 }
 
 .pdfDownloadIcon path {
-  fill: var(--color-primary);
+  fill: var(--color-text-primary);
 }
 
 .pdfDownloadTextGroup {
@@ -492,17 +492,17 @@
 }
 
 .pdfDownloadTitle {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--color-dark);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
 }
 
 .pdfDownloadSubtitle {
   display: flex;
   align-items: center;
   gap: 0.25rem;
-  font-size: 0.75rem;
-  color: var(--color-medium);
+  font-size: var(--font-size-2xs);
+  color: var(--color-text-secondary);
 }
 
 .pdfDownloadExternalIcon {
@@ -512,5 +512,5 @@
 }
 
 .pdfDownloadExternalIcon path {
-  fill: var(--color-medium);
+  fill: var(--color-text-secondary);
 }

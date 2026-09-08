@@ -1,78 +1,70 @@
 .sheet {
-  position: relative;
-  z-index: 2;
-  flex-shrink: 0;
-  overflow: hidden;
-  margin-bottom: 1rem;
-  transition: height 0.3s ease-out, margin-bottom 0.3s ease-out, border-radius 0.3s ease-out,
-    box-shadow 0.3s ease-out;
-}
-
-/* Consultation complète : la fiche passe en plein écran (poignée tirée jusqu'en haut). */
-.sheet.sheetFullscreen {
-  margin-bottom: 0;
-  border-radius: 0;
-  box-shadow: none;
+	position: relative;
+	z-index: 2;
+	flex-shrink: 0;
+	overflow: hidden;
+	margin-bottom: var(--spacing-md);
+	transition: height var(--duration-slow) var(--ease-standard);
 }
 
 .sheetDragging {
-  transition: none;
+	transition: none;
 }
 
 .sheetAuto {
-  height: auto;
+	height: auto;
 }
 
 .sheetCollapsed {
-  height: 0;
-  overflow: hidden;
-  background: transparent;
-  box-shadow: none;
-  border-radius: 0;
-  pointer-events: none;
-  transition: height 0.3s ease-out, background 0.3s ease-out, box-shadow 0.3s ease-out;
+	height: 0;
+	overflow: hidden;
+	background: transparent;
+	box-shadow: none;
+	border-radius: 0;
+	pointer-events: none;
+	transition: height var(--duration-slow) var(--ease-standard), background var(--duration-slow) var(--ease-standard), box-shadow var(--duration-slow) var(--ease-standard);
 }
 
 .searchFab {
-  --search-fab-size: 3rem;
-  position: absolute;
-  right: 1rem;
-  bottom: 0.75rem;
-  z-index: 2;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: var(--search-fab-size);
-  height: var(--search-fab-size);
-  padding: 0;
-  border: none;
-  border-radius: 50%;
-  background: var(--color-white);
-  box-shadow: 0 2px 12px rgba(9, 22, 37, 0.16);
-  cursor: pointer;
-  pointer-events: auto;
+	--search-fab-size: 3rem;
+	position: absolute;
+	right: var(--spacing-md);
+	bottom: var(--spacing-sm);
+	z-index: 2;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: var(--search-fab-size);
+	height: var(--search-fab-size);
+	padding: 0;
+	border: none;
+	border-radius: var(--radius-circle);
+	background: var(--color-bg-subtle);
+	box-shadow: var(--shadow-md);
+	cursor: pointer;
+	pointer-events: auto;
 }
 
 .searchFab:hover,
 .searchFab:focus-visible {
-  background: var(--color-primary-light);
-  outline: none;
+	background: var(--color-bg-primary-subtle);
+	outline: none;
 }
 
 .searchFabIcon {
-  width: 1.5rem;
-  height: 1.5rem;
+	width: 1.5rem;
+	height: 1.5rem;
 }
 
 .searchFabIcon path {
-  fill: var(--color-dark);
+	fill: var(--color-text);
 }
 
 .sheetPointFiche {
-  background: var(--color-fiche-canvas);
-  /* Ne jamais couvrir la pile de FAB (filtre/couches/légende) de MapPage : 3 boutons de
-     3rem + 2 espaces de 0.5rem, plus une marge de respiration. */
-  max-height: calc(100dvh - max(0.75rem, var(--safe-top)) - 10.75rem);
+	background: var(--color-fiche-canvas);
+	/* Ne jamais couvrir la pile de FAB (filtre/couches/légende) de MapPage : 3 boutons de
+	   3rem + 2 espaces de 0.5rem, plus une marge de respiration. */
+	max-height: calc(100dvh - max(var(--spacing-sm), var(--safe-top)) - 10.75rem);
 }
 
 /* Plein écran : plus de réserve pour la pile de FAB, la fiche occupe tout l'espace disponible. */
@@ -105,101 +97,101 @@
 }
 
 .contentExpanded {
-  flex: 1;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  padding: 0 1rem 1rem;
+	flex: 1;
+	min-height: 0;
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+	padding: 0 var(--spacing-md) var(--spacing-md);
 }
 
 .browsePanel {
-  flex: 1;
-  min-height: 0;
-  overflow: auto;
+	flex: 1;
+	min-height: 0;
+	overflow: auto;
 }
 
 .browseHome {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
+	display: flex;
+	flex-direction: column;
+	gap: var(--spacing-md);
 }
 
 .rgpNavigateRow {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  width: 100%;
-  padding: 0.875rem 0;
-  border: none;
-  border-bottom: 1px solid var(--figma-neutral-light-active);
-  background: transparent;
-  cursor: pointer;
-  text-align: left;
-  font: inherit;
+	display: flex;
+	align-items: center;
+	gap: var(--spacing-sm);
+	width: 100%;
+	padding: var(--spacing-s) 0;
+	border: none;
+	border-bottom: 1px solid var(--color-bg-hover);
+	background: transparent;
+	cursor: pointer;
+	text-align: left;
+	font: inherit;
 }
 
 .rgpNavigateRow:hover,
 .rgpNavigateRow:focus-visible {
-  background: var(--color-primary-light);
+	background: var(--color-bg-primary-subtle);
 }
 
 .rgpNavigateIconWrap {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 2.25rem;
-  height: 2.25rem;
-  border-radius: 50%;
-  background: var(--color-rgp-background);
-  flex-shrink: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: var(--icon-wrap-sm);	
+	height: var(--icon-wrap-sm);
+	border-radius: var(--radius-circle);
+	background: var(--color-rgp-bg);
+	flex-shrink: 0;
 }
 
 .rgpNavigateIcon {
-  width: 1.125rem;
-  height: 1.125rem;
+	width: 1.125rem;
+	height: 1.125rem;
 
 }
 
 .rgpNavigateIcon path {
-  fill: var(--color-rgp);
+	fill: var(--color-rgp);
 }
 
 .rgpNavigateLabel {
-  flex: 1;
-  min-width: 0;
-  font-size: 0.9375rem;
-  font-weight: 700;
-  color: var(--color-dark);
+	flex: 1;
+	min-width: 0;
+	font-size: var(--font-size-base);
+	font-weight: var(--font-weight-bold);
+	color: var(--color-text);
 }
 
 .rgpNavigateChevron {
-  width: 1rem;
-  height: 1rem;
-  flex-shrink: 0;
+	width: 1rem;
+	height: 1rem;
+	flex-shrink: 0;
 }
 
 .rgpNavigateChevron path {
-  fill: var(--color-medium);
+	fill: var(--color-text-secondary);
 }
 
 .recentSearchesSection {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+	display: flex;
+	flex-direction: column;
+	gap: var(--spacing-xs);
 }
 
 .recentSearchesTitle {
-  margin: 0;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  color: var(--color-medium);
+	margin: 0;
+	font-size: var(--font-size-xs);
+	font-weight: var(--font-weight-semibold);
+	color: var(--color-text-secondary);
 }
 
 .recentSearchesEmpty {
-  margin: 0;
-  font-size: 0.8125rem;
-  color: var(--color-medium);
+	margin: 0;
+	font-size: var(--font-size-xs);
+	color: var(--color-text-secondary);
 }
 
 .recentSearchesList {
@@ -211,166 +203,166 @@
 }
 
 .recentSearchItem {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.75rem;
-  width: 100%;
-  padding: 0.75rem 0;
-  border: none;
-  border-bottom: 1px solid var(--figma-neutral-light-active);
-  background: transparent;
-  cursor: pointer;
-  text-align: left;
-  font: inherit;
+	display: flex;
+	align-items: flex-start;
+	gap: var(--spacing-sm);
+	width: 100%;
+	padding: var(--spacing-sm) 0;
+	border: none;
+	border-bottom: 1px solid var(--color-bg-hover);
+	background: transparent;
+	cursor: pointer;
+	text-align: left;
+	font: inherit;
 }
 
 .recentSearchItem:last-child {
-  border-bottom: none;
+	border-bottom: none;
 }
 
 .recentSearchItem:hover,
 .recentSearchItem:focus-visible {
-  background: var(--color-primary-light);
+	background: var(--color-bg-primary-subtle);
 }
 
 .recentSearchIconWrap {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 2rem;
-  height: 2rem;
-  border-radius: 50%;
-  background: var(--color-light);
-  flex-shrink: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: var(--icon-wrap-xs);
+	height: var(--icon-wrap-xs);
+	border-radius: var(--radius-circle);
+	background: var(--color-bg-active);
+	flex-shrink: 0;
 }
 
 .recentSearchIcon {
-  width: 1rem;
-  height: 1rem;
+	width: 1rem;
+	height: 1rem;
 }
 
 .recentSearchIcon path {
-  fill: var(--color-medium-shade);
+	fill: var(--color-border-strong);
 }
 
 .recentSearchText {
-  display: flex;
-  flex-direction: column;
-  gap: 0.125rem;
-  min-width: 0;
-  flex: 1;
+	display: flex;
+	flex-direction: column;
+	gap: var(--spacing-4xs);
+	min-width: 0;
+	flex: 1;
 }
 
 .recentSearchTitle {
-  font-size: 0.9375rem;
-  font-weight: 700;
-  color: var(--color-dark);
+	font-size: var(--font-size-base);
+	font-weight: var(--font-weight-bold);
+	color: var(--color-text);
 }
 
 .recentSearchSubtitle {
-  font-size: 0.8125rem;
-  color: var(--color-medium);
+	font-size: var(--font-size-xs);
+	color: var(--color-text-secondary);
 }
 
 .browseRgpPanel {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  min-height: 0;
+	display: flex;
+	flex-direction: column;
+	gap: var(--spacing-sm);
+	min-height: 0;
 }
 
 .browseRgpHeader {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
+	display: flex;
+	align-items: center;
+	gap: var(--spacing-sm);
 }
 
 .browseRgpBackButton {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 2.25rem;
-  height: 2.25rem;
-  padding: 0;
-  border: 1px solid var(--figma-neutral-light-active);
-  border-radius: 50%;
-  background: var(--color-dark-contrast);
-  cursor: pointer;
-  flex-shrink: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 2.25rem;
+	height: 2.25rem;
+	padding: 0;
+	border: 1px solid var(--color-bg-hover);
+	border-radius: var(--radius-circle);
+	background: var(--color-bg-surface);
+	cursor: pointer;
+	flex-shrink: 0;
 }
 
 .browseRgpBackButton:hover,
 .browseRgpBackButton:focus-visible {
-  border-color: var(--color-primary-tint);
-  background: var(--color-primary-light);
+	border-color: var(--color-border-primary-subtle);
+	background: var(--color-bg-primary-subtle);
 }
 
 .browseRgpBackIcon {
-  width: 1rem;
-  height: 1rem;
+	width: 1rem;
+	height: 1rem;
 }
 
 .browseRgpBackIcon path {
-  fill: var(--color-dark);
+	fill: var(--color-text);
 }
 
 .browseRgpTitle {
-  margin: 0;
-  font-size: 1rem;
-  font-weight: 700;
-  color: var(--color-dark);
+	margin: 0;
+	font-size: var(--font-size-lg);
+	font-weight: var(--font-weight-bold);
+	color: var(--color-text);
 }
 
 .rgpUpdateRow {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-  padding-bottom: 0.25rem;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--spacing-sm);
+	padding-bottom: var(--spacing-3xs);
 }
 
 .rgpUpdateText {
-  margin: 0;
-  flex: 1;
-  min-width: 0;
-  font-size: 0.75rem;
-  line-height: 1.35;
-  color: var(--color-medium);
+	margin: 0;
+	flex: 1;
+	min-width: 0;
+	font-size: var(--font-size-2xs);
+	line-height: 1.35;
+	color: var(--color-text-secondary);
 }
 
 .rgpRefreshButton {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.375rem;
-  flex-shrink: 0;
-  padding: 0.375rem 0.625rem;
-  border: 1px solid var(--figma-neutral-light-active);
-  border-radius: 999px;
-  background: var(--color-dark-contrast);
-  color: var(--color-primary-shade);
-  font-size: 0.75rem;
-  font-weight: 600;
-  cursor: pointer;
+	display: inline-flex;
+	align-items: center;
+	gap: var(--spacing-2xs);
+	flex-shrink: 0;
+	padding: var(--spacing-2xs) var(--spacing-4);
+	border: 1px solid var(--color-bg-hover);
+	border-radius: var(--radius-pill);
+	background: var(--color-bg-surface);
+	color: var(--color-text-primary);
+	font-size: var(--font-size-2xs);
+	font-weight: var(--font-weight-semibold);
+	cursor: pointer;
 }
 
 .rgpRefreshButton:hover:not(:disabled),
 .rgpRefreshButton:focus-visible:not(:disabled) {
-  border-color: var(--color-primary-tint);
-  background: var(--color-primary-light);
+	border-color: var(--color-border-primary-subtle);
+	background: var(--color-bg-primary-subtle);
 }
 
 .rgpRefreshButton:disabled {
-  opacity: 0.6;
-  cursor: wait;
+	opacity: var(--opacity-disabled);
+	cursor: wait;
 }
 
 .rgpRefreshIcon {
-  width: 0.875rem;
-  height: 0.875rem;
+	width: var(--spacing-s);
+	height: var(--spacing-s);
 }
 
 .rgpRefreshIcon path {
-  fill: currentColor;
+	fill: currentColor;
 }
 
 .contentExpanded .searchContainer :global(.ol-search ul.autocomplete.history) {
@@ -378,79 +370,79 @@
 }
 
 .contentCompact {
-  flex: 0 0 auto;
-  overflow: visible;
-  padding: 0 1rem 0.75rem;
+	flex: 0 0 auto;
+	overflow: visible;
+	padding: 0 var(--spacing-md) var(--spacing-sm);
 }
 
 .searchArea {
-  flex-shrink: 0;
-  overflow: visible;
-  z-index: 1;
+	flex-shrink: 0;
+	overflow: visible;
+	z-index: 1;
 }
 
 .rgpSection {
-  flex: 1;
-  min-height: 0;
-  margin-top: 1rem;
-  overflow: auto;
+	flex: 1;
+	min-height: 0;
+	margin-top: var(--spacing-md);
+	overflow: auto;
 }
 
 .rgpDispoGroup {
-  display: grid;
-  grid-template-columns: repeat(4, 1.125rem);
-  align-items: center;
-  gap: 0.25rem;
-  flex-shrink: 0;
+	display: grid;
+	grid-template-columns: repeat(4, 1.125rem);
+	align-items: center;
+	gap: var(--spacing-3xs);
+	flex-shrink: 0;
 }
 
 .rgpDispoOk,
 .rgpDispoBad {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 1.125rem;
-  height: 1.125rem;
-  border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 1.125rem;
+	height: 1.125rem;
+	border-radius: var(--radius-circle);
 }
 
 .rgpDispoOk {
-  background: var(--color-primary);
+	background: var(--color-bg-primary);
 }
 
 .rgpDispoBad {
-  background: var(--color-danger);
+	background: var(--color-danger);
 }
 
 .rgpDispoGlyph {
-  width: 0.625rem;
-  height: 0.625rem;
+	width: 0.625rem;
+	height: 0.625rem;
 }
 
 .rgpDispoGlyph path {
-  fill: var(--color-dark-contrast);
+	fill: var(--color-bg-surface);
 }
 
 .searchField {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.625rem 0.875rem;
-  border: 1.5px solid var(--color-light);
-  border-radius: 999px;
-  background: var(--color-light-light);
+	position: relative;
+	z-index: 1;
+	display: flex;
+	align-items: center;
+	gap: var(--spacing-xs);
+	padding: var(--spacing-4) var(--spacing-s);
+	border: 1.5px solid var(--color-border);
+	border-radius: var(--radius-pill);
+	background: var(--color-bg-subtle);
 }
 
 .searchIcon {
-  width: 1.25rem;
-  height: 1.25rem;
-  flex-shrink: 0;
+	width: 1.25rem;
+	height: 1.25rem;
+	flex-shrink: 0;
 }
 
 .searchIcon path {
-  fill: var(--color-medium);
+	fill: var(--color-text-secondary);
 }
 
 .searchContainer {
@@ -473,24 +465,24 @@
 }
 
 .searchContainer :global(.ol-search input.search) {
-  width: 100%;
-  padding: 0;
-  border: none;
-  font-size: 1rem;
-  line-height: 1.25rem;
-  font-family: inherit;
-  background: transparent;
-  box-sizing: border-box;
-  margin: 0;
-  height: 1.25rem;
+	width: 100%;
+	padding: 0;
+	border: none;
+	font-size: var(--font-size-lg);
+	line-height: 1.25rem;
+	font-family: var(--font-family-base);
+	background: transparent;
+	box-sizing: border-box;
+	margin: 0;
+	height: 1.25rem;
 }
 
 .searchContainer :global(.ol-search input.search:focus) {
-  outline: none;
+	outline: none;
 }
 
 .searchContainer :global(.ol-search input.search::placeholder) {
-  color: var(--color-medium);
+	color: var(--color-text-secondary);
 }
 
 .searchContainer :global(.ol-search button.ol-revers) {
@@ -499,146 +491,146 @@
 
 /* Masqué tant que le champ n'est pas actif */
 .searchContainer :global(.ol-search ul.autocomplete) {
-  display: none;
-  position: absolute;
-  left: -2.75rem;
-  right: -0.875rem;
-  top: calc(100% + 0.5rem);
-  bottom: auto;
-  max-height: min(40vh, 16rem);
-  overflow-y: auto;
-  max-width: none;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  border: 1px solid var(--color-light-shade);
-  border-radius: 0.75rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-  z-index: 20;
-  background: var(--color-dark-contrast);
+	display: none;
+	position: absolute;
+	left: -2.75rem;
+	right: calc(-1 * var(--spacing-s));
+	top: calc(100% + var(--spacing-xs));
+	bottom: auto;
+	max-height: min(40vh, 16rem);
+	overflow-y: auto;
+	max-width: none;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	border: 1px solid var(--color-bg-disabled);
+	border-radius: var(--radius-sm);
+	box-shadow: var(--shadow-md);
+	z-index: 20;
+	background: var(--color-bg-surface);
 }
 
 .searchField:focus-within .searchContainer :global(.ol-search ul.autocomplete:not(:empty)) {
-  display: block !important;
+	display: block !important;
 }
 
 .searchContainer :global(.ol-search ul:empty) {
-  display: none !important;
+	display: none !important;
 }
 
 .searchContainer :global(.ol-search ul li) {
-  padding: 0.625rem 0.875rem;
-  font-size: 0.875rem;
-  cursor: pointer;
+	padding: var(--spacing-4) var(--spacing-s);
+	font-size: var(--font-size-base);
+	cursor: pointer;
 }
 
 .searchContainer :global(.ol-search ul li.copy) {
-  display: none !important;
+	display: none !important;
 }
 
 .searchContainer :global(.ol-search ul li.select),
 .searchContainer :global(.ol-search ul li:hover) {
-  background-color: var(--color-primary-light);
-  color: var(--color-dark);
+	background-color: var(--color-bg-primary-subtle);
+	color: var(--color-text);
 }
 
 
 
 .rgpTitle {
-  margin: 0 0 0.75rem;
-  font-size: 0.875rem;
-  font-weight: 700;
-  color: var(--color-dark);
+	margin: 0 0 var(--spacing-sm);
+	font-size: var(--font-size-base);
+	font-weight: var(--font-weight-bold);
+	color: var(--color-text);
 }
 
 .rgpLoading {
-  display: flex;
-  justify-content: center;
-  padding: 0.5rem 0;
+	display: flex;
+	justify-content: center;
+	padding: var(--spacing-xs) 0;
 }
 
 .rgpError {
-  margin: 0;
-  font-size: 0.8125rem;
-  color: var(--color-danger);
+	margin: 0;
+	font-size: var(--font-size-xs);
+	color: var(--color-danger);
 }
 
 .rgpEmpty {
-  margin: 0;
-  font-size: 0.8125rem;
-  color: var(--color-medium);
+	margin: 0;
+	font-size: var(--font-size-xs);
+	color: var(--color-text-secondary);
 }
 
 .rgpList {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	flex-direction: column;
+	gap: var(--spacing-xs);
 }
 
 .rgpItem {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  width: 100%;
-  padding: 0.875rem 0.75rem;
-  border: 1px solid var(--figma-neutral-light-active);
-  border-radius: 0.75rem;
-  background: var(--color-dark-contrast);
-  cursor: pointer;
-  text-align: left;
-  font: inherit;
+	display: flex;
+	align-items: center;
+	gap: var(--spacing-sm);
+	width: 100%;
+	padding: var(--spacing-s) var(--spacing-sm);
+	border: 1px solid var(--color-bg-hover);
+	border-radius: var(--radius-sm);
+	background: var(--color-bg-surface);
+	cursor: pointer;
+	text-align: left;
+	font: inherit;
 }
 
 .rgpItem:hover,
 .rgpItem:focus-visible {
-  border-color: var(--color-primary-tint);
-  background: var(--color-primary-light);
+	border-color: var(--color-border-primary-subtle);
+	background: var(--color-bg-primary-subtle);
 }
 
 .rgpDotAvailable,
 .rgpDotUnavailable {
-  display: none;
+	display: none;
 }
 
 .rgpName {
-  font-size: 0.9375rem;
-  font-weight: 700;
-  color: var(--color-dark);
+	font-size: var(--font-size-base);
+	font-weight: var(--font-weight-bold);
+	color: var(--color-text);
 }
 
 .rgpCommune {
-  font-size: 0.8125rem;
-  color: var(--color-medium);
+	font-size: var(--font-size-xs);
+	color: var(--color-text-secondary);
 }
 
 .rgpDistance {
-  font-size: 0.875rem;
-  font-weight: 700;
-  color: var(--color-dark);
-  flex-shrink: 0;
+	font-size: var(--font-size-base);
+	font-weight: var(--font-weight-bold);
+	color: var(--color-text);
+	flex-shrink: 0;
 }
 
 .rgpItemText {
-  display: flex;
-  flex-direction: column;
-  gap: 0.125rem;
-  min-width: 0;
-  flex: 1;
+	display: flex;
+	flex-direction: column;
+	gap: var(--spacing-4xs);
+	min-width: 0;
+	flex: 1;
 }
 
 .levelContent {
-  padding-bottom: 0.5rem;
+	padding-bottom: var(--spacing-xs);
 }
 
 .placeholder {
-  margin: 0;
-  padding: 1rem 0;
-  text-align: center;
-  color: var(--color-medium);
-  font-size: 0.875rem;
+	margin: 0;
+	padding: var(--spacing-md) 0;
+	text-align: center;
+	color: var(--color-text-secondary);
+	font-size: var(--font-size-base);
 }
 
 .sheetSearchActive {

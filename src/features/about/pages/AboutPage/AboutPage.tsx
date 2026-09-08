@@ -5,8 +5,6 @@ import { ExternalLink } from '@/shared/ui/ExternalLink';
 import { EXTERNAL_LINKS } from '@/shared/constants/externalLinks';
 
 import screen from '@/shared/styles/screen.module.css';
-import typography from '@/shared/styles/typography.module.css';
-
 import styles from './AboutPage.module.css';
 
 export interface AboutPageProps {
@@ -17,19 +15,18 @@ export interface AboutPageProps {
 export function AboutPage({ isOpen, onClose }: AboutPageProps) {
   return (
     <SlideUpPage isOpen={isOpen} onClose={onClose}>
-      <PageHeader title="À propos" onClose={onClose} />
+      <PageHeader title="À propos" onClose={onClose} showCloseButton={false} showBackButton={true} onBack={onClose} />
 
       <main className={`${screen.screenContainer} ${styles.content}`}>
         <AppLogo size="sm" />
-        <h1 className={typography.title}>À propos</h1>
-        <p className={typography.subtitle}>Application mobile Géodésie de poche.</p>
+        <p className="page-subtitle">Application mobile Géodésie de poche.</p>
 
         <section className={styles.section}>
-          <p className={typography.paragraph}>
+          <p className="body">
             Cette application permet de consulter la cartographie IGN, les repères géodésiques
             en mode expert (WFS) et de signaler leur état sur le terrain.
           </p>
-          <p className={typography.paragraph}>
+          <p className="body">
             Éditée par l’
             <ExternalLink href="https://www.ign.fr/">Institut national de l’information géographique et forestière</ExternalLink>
             .
@@ -38,7 +35,7 @@ export function AboutPage({ isOpen, onClose }: AboutPageProps) {
 
         <section className={styles.section}>
           <h2 className={styles.sectionTitle}>Mentions légales</h2>
-          <p className={typography.paragraph}>
+          <p className="body">
             Pour les conditions d’utilisation et la protection des données, consultez{' '}
             <ExternalLink href={EXTERNAL_LINKS.ESPACE_COLLABORATIF}>
               l’Espace collaboratif IGN

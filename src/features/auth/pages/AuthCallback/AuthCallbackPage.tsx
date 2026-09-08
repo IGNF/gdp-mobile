@@ -7,8 +7,6 @@ import { Button } from '@/shared/ui/Button';
 import { Loading } from '@/shared/ui/Loading';
 
 import screen from '@/shared/styles/screen.module.css';
-import typography from '@/shared/styles/typography.module.css';
-
 import styles from './AuthCallbackPage.module.css';
 
 /**
@@ -68,8 +66,8 @@ export function AuthCallbackPage() {
   if (error) {
     return (
       <div className={`${styles.container} ${screen.screenContainer}`}>
-        <h1 className={typography.title}>Erreur de connexion</h1>
-        <p className={typography.error}>{error}</p>
+        <h1 className="page-title">Erreur de connexion</h1>
+        <p className="text-error">{error}</p>
         <Button className={styles.backButton} onClick={() => navigate('/login', { replace: true })}>
           Retour à la connexion
         </Button>
@@ -79,7 +77,7 @@ export function AuthCallbackPage() {
 
   return (
     <div className={`${styles.container} ${screen.screenContainer}`}>
-      <h1 className={typography.title}>Connexion en cours…</h1>
+      <h1 className="page-title">Connexion en cours…</h1>
       <Loading label="Finalisation de l’authentification…" />
     </div>
   );

@@ -21,5 +21,5 @@
   gap: var(--Spacing-2xs, 0.25rem);
   align-self: stretch;
   border-radius: 6.25rem;
-  background: var(--Dark-green, #26A581);
+  background: var(--color-bg-primary);
 }

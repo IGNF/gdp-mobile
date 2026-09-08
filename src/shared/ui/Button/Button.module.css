@@ -1,34 +1,34 @@
 .button {
-  	width: 80%;
-  	margin: 0 auto;
+	width: 80%;
+	margin: 0 auto;
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	gap: 0.5rem;
+	gap: var(--spacing-xs);
 	border: 1px solid transparent;
 	cursor: pointer;
-	transition: background-color 0.2s, border-color 0.2s, opacity 0.2s;
+	transition: 
+		background-color var(--duration-base) var(--ease-standard),
+		border-color var(--duration-base) var(--ease-standard),
+		opacity var(--duration-base) var(--ease-standard);
 
-	display: flex;
 	height: 2.75rem;
-	padding: 0 1.25rem;
-	justify-content: center;
-	align-items: center;
+	padding: 0 var(--spacing-lg);
 	flex: 1 0 0;
-	border-radius: 6.25rem;
-	background: var(--PRIMARY, #26A581);
+	border-radius: var(--radius-pill);
+	background: var(--color-bg-primary);
 
-	color: var(--Blanc, #FFF);
+	color: var(--color-white);
 	text-align: center;
-	font-family: "Open Sans";
-	font-size: 0.875rem;
+	font-family: var(--font-family-base);
+	font-size: var(--font-size-base);
 	font-style: normal;
-	font-weight: 600;
+	font-weight: var(--font-weight-semibold);
 	line-height: normal;
 }
 
 .button:disabled {
-	opacity: 0.5;
+	opacity: var(--opacity-subtle);
 	cursor: not-allowed;
 }
 
@@ -37,78 +37,65 @@
 }
 
 .iconOnly {
-  width: 2.5rem;
-  height: 2.5rem;
-  margin: 0;
-  padding: 0;
-  gap: 0;
-  flex-shrink: 0;
-  border-radius: 999px;
+	width: var( --icon-wrap-md);
+	height: var( --icon-wrap-md);
+	margin: 0;
+	padding: 0;
+	gap: 0;
+	flex-shrink: 0;
+	border-radius: var(--radius-circle);
 }
 
 /* Color mappings - set CSS variables per color */
 .primary {
-	--btn-color: var(--color-primary);
-	--btn-contrast: var(--color-primary-contrast);
-	--btn-shade: var(--color-primary-shade);
-	--btn-light: var(--color-primary-light);
-	--btn-rgb: var(--color-primary-rgb);
+	--btn-color: var(--color-action-primary);
+	--btn-contrast: var(--color-bg-surface);
+	--btn-shade: var(--color-action-primary-hover);
+	--btn-light: var(--color-bg-primary-subtle);
+	--btn-rgb: var(--color-action-primary-rgb);
 }
 .secondary {
-	--btn-color: var(--color-secondary);
-	--btn-contrast: var(--color-secondary-contrast);
-	--btn-shade: var(--color-secondary-shade);
-	--btn-light: var(--color-secondary-light);
-	--btn-rgb: var(--color-secondary-rgb);
+	--btn-color: var(--color-action-secondary);
+	--btn-contrast: var(--color-bg-surface);
+	--btn-shade: var(--color-action-secondary-hover);
+	--btn-light: var(--color-bg-secondary-subtle);
+	--btn-rgb: var(--color-action-secondary-rgb);
 }
-.tertiary {
-	--btn-color: var(--color-tertiary);
-	--btn-contrast: var(--color-tertiary-contrast);
-	--btn-shade: var(--color-tertiary-shade);
-	--btn-light: rgba(var(--color-tertiary-rgb), 0.1);
-	--btn-rgb: var(--color-tertiary-rgb);
-}
-.success {
-	--btn-color: var(--color-success);
-	--btn-contrast: var(--color-success-contrast);
-	--btn-shade: var(--color-success-shade);
-	--btn-light: rgba(var(--color-success-rgb), 0.1);
-	--btn-rgb: var(--color-success-rgb);
-}
+
 .warning {
 	--btn-color: var(--color-warning);
-	--btn-contrast: var(--color-warning-contrast);
-	--btn-shade: var(--color-warning-shade);
-	--btn-light: var(--color-warning-light);
+	--btn-contrast: var(--color-bg-surface);
+	--btn-shade: var(--color-warning-emphasis);
+	--btn-light: var(--color-bg-warning-subtle);
 	--btn-rgb: var(--color-warning-rgb);
 }
 .danger {
 	--btn-color: var(--color-danger);
-	--btn-contrast: var(--color-danger-contrast);
-	--btn-shade: var(--color-danger-shade);
+	--btn-contrast: var(--color-bg-surface);
+	--btn-shade: var(--color-danger-emphasis);
 	--btn-light: rgba(var(--color-danger-rgb), 0.1);
 	--btn-rgb: var(--color-danger-rgb);
 }
 .light {
-	--btn-color: var(--color-light);
-	--btn-contrast: var(--color-light-contrast);
-	--btn-shade: var(--color-light-shade);
-	--btn-light: var(--color-light-light);
-	--btn-rgb: var(--color-light-rgb);
+	--btn-color: var(--color-bg-active);
+	--btn-contrast: var(--color-text);
+	--btn-shade: var(--color-bg-disabled);
+	--btn-light: var(--color-bg-subtle);
+	--btn-rgb: 234, 234, 233;
 }
 .medium {
-	--btn-color: var(--color-medium);
-	--btn-contrast: var(--color-medium-contrast);
-	--btn-shade: var(--color-medium-shade);
-	--btn-light: rgba(var(--color-medium-rgb), 0.1);
-	--btn-rgb: var(--color-medium-rgb);
+	--btn-color: var(--color-text-secondary);
+	--btn-contrast: var(--color-bg-surface);
+	--btn-shade: var(--color-border-strong);
+	--btn-light: rgba(var(--color-text-secondary-rgb), 0.1);
+	--btn-rgb: var(--color-text-secondary-rgb);
 }
 .dark {
-	--btn-color: var(--color-dark);
-	--btn-contrast: var(--color-dark-contrast);
-	--btn-shade: var(--color-dark-shade);
-	--btn-light: rgba(var(--color-dark-rgb), 0.1);
-	--btn-rgb: var(--color-dark-rgb);
+	--btn-color: var(--color-text);
+	--btn-contrast: var(--color-bg-surface);
+	--btn-shade: var(--color-bg-inverse);
+	--btn-light: rgba(var(--color-text-rgb), 0.1);
+	--btn-rgb: var(--color-text-rgb);
 }
 
 /* Solid variant */
@@ -121,11 +108,11 @@
 }
 
 .primary.solid:hover:not(:disabled) {
-	background-color: var(--color-primary-hover);
+	background-color: var(--color-action-primary-hover);
 }
 
 .primary.solid:active:not(:disabled) {
-	background-color: var(--color-primary-active);
+	background-color: var(--color-bg-primary-pressed);
 }
 
 /* Outline variant */
@@ -139,7 +126,7 @@
 }
 
 .iconOnly.outline {
-  background-color: var(--color-white);
+  background-color: var(--color-bg-subtle);
   border-color: rgba(var(--btn-rgb), 0.24);
 }
 
@@ -161,7 +148,7 @@
 	height: 1.25em;
 	border: 1px solid currentColor;
 	border-bottom-color: transparent;
-	border-radius: 50%;
+	border-radius: var(--radius-circle);
 	display: inline-block;
 	box-sizing: border-box;
 	animation: rotation 1s linear infinite;
@@ -178,10 +165,10 @@
 
 /* Icon */
 .icon {
-  width: 24px;
-  height: 24px;
+	width: var(--icon-xl);
+	height: var(--icon-xl);
 }
 
 .icon path {
-  fill: currentColor;
+	fill: currentColor;
 }

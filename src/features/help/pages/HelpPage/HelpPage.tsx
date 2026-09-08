@@ -5,8 +5,6 @@ import { ExternalLink } from '@/shared/ui/ExternalLink';
 import { EXTERNAL_LINKS } from '@/shared/constants/externalLinks';
 
 import screen from '@/shared/styles/screen.module.css';
-import typography from '@/shared/styles/typography.module.css';
-
 import styles from './HelpPage.module.css';
 
 const FAQ_ITEMS = [
@@ -39,19 +37,18 @@ export interface HelpPageProps {
 export function HelpPage({ isOpen, onClose }: HelpPageProps) {
   return (
     <SlideUpPage isOpen={isOpen} onClose={onClose}>
-      <PageHeader title="Aide" onClose={onClose} />
+      <PageHeader title="Aide" onClose={onClose} showCloseButton={false} showBackButton={true} onBack={onClose} />
 
       <main className={`${screen.screenContainer} ${styles.content}`}>
         <AppLogo size="sm" />
-        <h1 className={typography.title}>Aide</h1>
-        <p className={typography.subtitle}>Questions fréquentes sur Géodésie de poche.</p>
+        <p className="page-subtitle">Questions fréquentes sur Géodésie de poche.</p>
 
         <section className={styles.faqSection}>
           {FAQ_ITEMS.map((item) => (
             <article key={item.question} className={styles.faqItem}>
               <p className={styles.question}>{item.question}</p>
               {item.answer === 'menu' ? (
-                <p className={typography.paragraph}>
+                <p className="body">
                   Ouvrez le menu latéral, section « Mon compte », puis « Se connecter ». Vous pouvez
                   aussi créer un compte sur{' '}
                   <ExternalLink href={EXTERNAL_LINKS.ESPACE_COLLABORATIF}>
@@ -60,7 +57,7 @@ export function HelpPage({ isOpen, onClose }: HelpPageProps) {
                   .
                 </p>
               ) : (
-                <p className={typography.paragraph}>{item.answer}</p>
+                <p className="body">{item.answer}</p>
               )}
             </article>
           ))}

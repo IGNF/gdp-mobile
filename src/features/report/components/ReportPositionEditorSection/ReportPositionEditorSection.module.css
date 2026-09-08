@@ -10,7 +10,7 @@
   gap: 0.75rem;
   width: 100%;
   padding: 0.75rem 1rem;
-  border: 1px solid var(--color-light);
+  border: 1px solid var(--color-border);
   border-radius: 0.75rem;
   background: var(--color-fiche-surface);
   cursor: pointer;
@@ -21,7 +21,7 @@
 
 .positionRow:hover,
 .positionRow:focus-visible {
-  border-color: var(--color-primary);
+  border-color: var(--color-text-primary);
   box-shadow: 0 2px 10px rgba(var(--color-primary-rgb), 0.18);
 }
 
@@ -32,7 +32,7 @@
   width: 2rem;
   height: 2rem;
   border-radius: 50%;
-  background: var(--color-primary-light);
+  background: var(--color-bg-primary-subtle);
   flex-shrink: 0;
 }
 
@@ -42,7 +42,7 @@
 }
 
 .positionIcon path {
-  fill: var(--color-primary);
+  fill: var(--color-text-primary);
 }
 
 .positionLabel {
@@ -50,7 +50,7 @@
   min-width: 0;
   font-size: 0.9375rem;
   font-weight: 700;
-  color: var(--color-primary-shade);
+  color: var(--color-text-primary);
 }
 
 .positionChevron {
@@ -61,7 +61,7 @@
 }
 
 .positionChevron path {
-  fill: var(--color-medium);
+  fill: var(--color-text-secondary);
 }
 
 .positionRow[aria-expanded='true'] .positionChevron {

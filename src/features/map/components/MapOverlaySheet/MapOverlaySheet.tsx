@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 
-import IconClose from '@/shared/assets/icons/icon-close.svg?react';
 import sheetChrome from '@/features/map/styles/mapSheet.module.css';
 import { useBottomSheetSnap } from '@/features/map/hooks/useBottomSheetSnap';
 
@@ -24,7 +23,6 @@ export interface MapOverlaySheetProps {
   titleAlign?: 'left' | 'center';
   titleBadge?: number;
   sheetClassName?: string;
-  showBackButton?: boolean;
   onBack?: () => void;
   children: ReactNode;
   footer?: ReactNode;
@@ -40,8 +38,6 @@ export function MapOverlaySheet({
   titleAlign = 'center',
   titleBadge,
   sheetClassName,
-  showBackButton = false,
-  onBack,
   children,
   footer,
   ariaLabel,
@@ -91,14 +87,6 @@ export function MapOverlaySheet({
     return null;
   }
 
-  const handleBack = () => {
-    if (onBack) {
-      onBack();
-      return;
-    }
-    onClose();
-  };
-
   const isDragging = draggable && dragOffset !== 0;
 
   const content = (
@@ -132,17 +120,10 @@ export function MapOverlaySheet({
           <span className={sheetChrome.handle} />
         </div>
 
-        {(title || showBackButton) && (
+        {(title ) && (
           <header
-            className={`${styles.header} ${titleAlign === 'left' && !showBackButton ? styles.headerTitleLeft : ''}`}
+            className={`${styles.header} ${titleAlign === 'left' }`}
           >
-            {showBackButton ? (
-              <button type="button" className={styles.backButton} onClick={handleBack}>
-                Retour
-              </button>
-            ) : titleAlign === 'left' ? null : (
-              <span className={styles.headerSpacer} />
-            )}
             {title ? (
               <h2 className={titleAlign === 'left' ? styles.titleLeft : styles.title}>
                 <span>{title}</span>
@@ -155,14 +136,6 @@ export function MapOverlaySheet({
             )}
           </header>
         )}
-
-        {!title && !showBackButton ? (
-          <div className={styles.closeOnlyHeader}>
-            <button type="button" className={styles.closeButton} onClick={onClose} aria-label="Fermer">
-              <IconClose className={styles.closeIcon} aria-hidden />
-            </button>
-          </div>
-        ) : null}
 
         <div className={sheetChrome.body} data-scroll-root="true">
           {children}

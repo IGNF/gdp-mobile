@@ -9,11 +9,12 @@
 .form {
   display: flex;
   flex-direction: column;
+
 }
 
 .section {
   padding-bottom: 1rem;
-  border-bottom: 1px solid var(--gray-5, #EBEAE9);
+  border-bottom: 1px solid var(--color-border);
 }
 
 .section:last-child {
@@ -21,7 +22,7 @@
 }
 
 .sectionTitle {
-  color: var(--Grey800, #3F4A55);
+  color: var(--color-text);
   font-family: "Fira Sans";
   font-size: 0.9375rem;
   font-style: normal;
@@ -39,7 +40,7 @@
 .segment {
   flex: 0 0 auto;
   width: auto;
-  color: var(--gray-11, #363331);
+  color: var(--color-text);
   text-align: center;
   /* Appli - Btn label */
   font-family: "Open Sans";
@@ -50,18 +51,18 @@
   padding: 0.53125rem 1rem 0.59375rem 1rem;
   height: 2.75rem;
   border-radius: 0.5rem;
-  border: 1px solid var(--gray-8, #605A56);
+  border: 1px solid var(--color-border-strong);
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 0.5rem;
-  background-color: white;
+  background-color: var(--color-bg-page);
 }
 
 .segment[data-active='true'] {
-  color: var(--green-8, #17634D);
-  border: 1px solid var(--green-8, #17634D);
-  background: rgba(188, 227, 216, 0.60);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border-active);
+  background: var(--color-bg-primary-subtle);
 }
 
 .segment[data-active='true']::before {
@@ -69,8 +70,8 @@
   width: 0.375rem;
   height: 0.375rem;
   border-radius: 50%;
-  background:  var(--green-8, #17634D);
-  color: var(--green-8, #17634D);
+  background: var(--color-border-active);
+  color: var(--color-text-primary);
   font-size: 0.875rem;
   flex-shrink: 0;
 }
@@ -90,7 +91,7 @@
 }
 
 .dateFieldLabel {
-  color: var(--gray-10, #484441);
+  color: var(--color-text);
   /* Appli - Txt */
   font-family: "Open Sans";
   font-size: 0.8125rem;
@@ -106,9 +107,9 @@
   gap: 0.375rem;
   min-height: 1.75rem;
   padding: 0.375rem 0.5rem 0.375rem 0.75rem;
-  border: 1.5px solid var(--color-light);
+  border: 1.5px solid var(--color-border);
   border-radius: 0.625rem;
-  background: var(--color-dark-contrast);
+  background: var(--color-bg-surface);
 }
 
 .datePickerTrigger {
@@ -127,19 +128,19 @@
 }
 
 .datePickerTrigger:focus-visible {
-  outline: 2px solid var(--color-primary);
+  outline: 2px solid var(--color-border-primary);
   outline-offset: 2px;
   border-radius: 0.25rem;
 }
 
 .datePlaceholder {
   font-size: 0.875rem;
-  color: var(--color-medium);
+  color: var(--color-text-secondary);
 }
 
 .dateDisplayValue {
   font-size: 0.875rem;
-  color: var(--color-dark);
+  color: var(--color-text);
 }
 
 .dateClearButton {
@@ -157,7 +158,7 @@
 }
 
 .dateClearButton:focus-visible {
-  outline: 2px solid var(--color-primary);
+  outline: 2px solid var(--color-border-primary);
   outline-offset: 1px;
 }
 
@@ -167,7 +168,7 @@
 }
 
 .dateClearIcon path {
-  fill: var(--color-medium);
+  fill: var(--color-text-secondary);
 }
 
 .footer {
@@ -175,7 +176,7 @@
   grid-template-columns: 1fr 1fr;
   gap: 0.75rem;
   padding-top: 1rem;
-  border-top: 1px solid var(--color-light);
+  border-top: 1px solid var(--color-border);
 }
 
 .sheetContent {

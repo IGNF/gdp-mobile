@@ -1,62 +1,64 @@
 .tabbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-  gap: 1rem;
-  flex-shrink: 0;
-  background-color: var(--color-white);
-  margin: 0 0 calc(1rem + var(--safe-bottom)) 0;
-  border-radius : 5rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  height: 4.5rem;
+	display: flex;
+	align-items: center;
+	justify-content: space-around;
+	gap: var(--spacing-md);
+	flex-shrink: 0;
+	width: 19.0625rem;
+	background-color: var(--color-bg-subtle);
+	margin: 0 auto calc(var(--spacing-xl) + var(--safe-bottom));
+	border-radius: var(--radius-pill);
+	box-shadow: var(--shadow-md);
+	height: 4.5rem;
 }
 
 .tab {
-  background: none;
-  border: none;
-  border-radius: 5rem;
-  cursor: pointer;
-  font: inherit;
-  transition: all 0.2s;
-  min-width: 2.5rem;
-  display: flex;
-  padding: var(--Spacing-xs, 0.5rem) var(--Spacing-md, 1rem) var(--Spacing-xs, 0.5rem) var(--Spacing-sm, 0.75rem);
-  justify-content: center;
-  align-items: center;
-  gap: var(--Spacing-xs, 0.5rem);
-  fill: var(--gray-11, #363331);
+	background: none;
+	border: none;
+	border-radius: var(--radius-pill);
+	cursor: pointer;
+	font: inherit;
+	transition: all var(--duration-base) var(--ease-standard);
+	min-width: 2.5rem;
+	display: flex;
+	padding: var(--spacing-xs) var(--spacing-md) var(--spacing-xs) var(--spacing-sm);
+	justify-content: center;
+	align-items: center;
+	gap: var(--spacing-xs);
+	fill: var(--color-text);
 }
 
 .tab.active {
-  border-radius: var(--Radius-Full, 624.9375rem);
-  background: var(--green-6, #1E8467);
+	border-radius: var(--radius-pill);
+	background: var(--color-bg-primary-pressed);
 }
 
 .tabIcon {
-  width: 1.5rem;
-  height: 1.5rem;
-  flex-shrink: 0;
+	width: var(--icon-xl);
+	height: var(--icon-xl);
+	flex-shrink: 0;
 }
 
 .tabIcon path {
-  fill: var(--gray-11, #363331);
-  transition: fill 0.2s;
+	fill: var(--color-text);
+	transition: fill var(--duration-base) var(--ease-standard);
 }
 
 .active .tabIcon path {
-  fill: var(--color-white);
+	fill: var(--color-white);
 }
 
 .tabLabel {
-  font-size: 0.9375rem;
-  font-weight: 600;
-  color: var(--color-white);
-  white-space: nowrap;
-  display: none;
+	font-family: var(--font-family-heading);
+	font-size: var(--font-size-base);
+	font-weight: var(--font-weight-semibold);
+	color: var(--color-white);
+	white-space: nowrap;
+	display: none;
 }
 
 .active .tabLabel {
-  display: block;
+	display: block;
 }
 
 .iconCircle {
