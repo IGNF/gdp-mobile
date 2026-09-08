@@ -7,6 +7,14 @@
 	transition: height var(--duration-slow) var(--ease-standard);
 }
 
+/* Consultation complète : la fiche passe en plein écran (poignée tirée jusqu'en haut). */
+.sheet.sheetFullscreen {
+	margin-bottom: 0;
+	border-radius: 0;
+	box-shadow: none;
+  }
+  
+
 .sheetDragging {
 	transition: none;
 }
