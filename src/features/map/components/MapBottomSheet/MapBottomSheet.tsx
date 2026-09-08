@@ -47,13 +47,17 @@ function getSafeAreaTopPx(): number {
 }
 
 function getPointSnapHeights(viewportHeight: number, safeAreaTop: number): readonly number[] {
-  const maxHeight = Math.max(220, viewportHeight - Math.max(12, safeAreaTop) - FAB_STACK_RESERVE_PX);
+  const topInset = Math.max(12, safeAreaTop);
+  // Consultation rapide : la fiche ne recouvre jamais la pile de FAB (filtre/couches/légende).
+  const quickViewMaxHeight = Math.max(220, viewportHeight - topInset - FAB_STACK_RESERVE_PX);
+  // Consultation complète (poignée tirée jusqu'en haut) : la fiche passe en plein écran.
+  const fullscreenHeight = Math.max(quickViewMaxHeight, viewportHeight - topInset);
 
   return [
     220,
-    Math.min(Math.round(viewportHeight * 0.48), maxHeight),
-    Math.min(Math.round(viewportHeight * 0.68), maxHeight),
-    maxHeight,
+    Math.min(Math.round(viewportHeight * 0.48), quickViewMaxHeight),
+    Math.min(Math.round(viewportHeight * 0.68), quickViewMaxHeight),
+    fullscreenHeight,
   ];
 }
 
@@ -151,6 +155,7 @@ export function MapBottomSheet({
   const isBrowseCollapsed = !isPointMode && browseSnap.snapIndex === 0;
   const isBrowseExpanded = !isPointMode && browseSnap.snapIndex > 0;
   const isPointMiniFiche = isPointMode && snapIndex === 0;
+  const isPointFullscreen = isPointMode && snapIndex === pointSnapHeights.length - 1;
   const isSheetAuto = (isBrowseCollapsed || isPointMiniFiche) && dragOffset === 0;
 
   browseSnapIndexRef.current = isPointMode ? 0 : browseSnap.snapIndex;
@@ -387,6 +392,7 @@ export function MapBottomSheet({
         dragOffset !== 0 ? styles.sheetDragging : '',
         isSheetAuto ? styles.sheetAuto : '',
         isPointMode ? styles.sheetPointFiche : '',
+        isPointFullscreen ? styles.sheetFullscreen : '',
         isBrowseExpanded ? styles.sheetSearchActive : '',
         isBrowseCollapsed ? styles.sheetCollapsed : '',
       ]

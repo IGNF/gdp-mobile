@@ -50,7 +50,7 @@ export const NIVELLEMENT_FICHE_SNAP1_FIELD_KEYS = [
   'type',
   'altitude',
   'alt',
-  'complement',
+  'type_info',
   'sys_alt',
   'systeme_altitude',
   'commune',
