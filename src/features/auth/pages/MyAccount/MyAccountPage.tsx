@@ -6,7 +6,8 @@ import { Button } from '@/shared/ui/Button';
 import { ExternalLink } from '@/shared/ui/ExternalLink';
 import { PageHeader } from '@/shared/ui/PageHeader';
 import { SlideUpPage } from '@/shared/ui/SlideUpPage';
-import { EXTERNAL_LINKS } from '@/shared/constants/externalLinks';
+import { config } from '@/shared/config/env';
+import { EXTERNAL_LINKS, getGeopfSsoAccountUrl } from '@/shared/constants/externalLinks';
 import { joinTruthy } from '@/shared/utils/join';
 
 import IconCamera from '@/shared/assets/icons/icon-camera.svg?react';
@@ -29,6 +30,7 @@ export function MyAccountPage({ isOpen, onClose }: MyAccountPageProps) {
 
   const fullName = joinTruthy([user?.firstName, user?.lastName], ' ') || null;
   const displayName = fullName || user?.username || '—';
+  const ssoAccountUrl = getGeopfSsoAccountUrl(config.oAuth.clientId);
 
   return (
     <SlideUpPage isOpen={isOpen} onClose={onClose}>
@@ -62,9 +64,14 @@ export function MyAccountPage({ isOpen, onClose }: MyAccountPageProps) {
                     <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" fill="currentColor"/>
                   </svg>
                 </div>
-                <button className={styles.cameraButton} type="button" aria-label="Modifier la photo"  aria-hidden>
+                <ExternalLink
+                  href={ssoAccountUrl}
+                  className={styles.cameraButton}
+                  showIcon={false}
+                  aria-label="Modifier la photo"
+                >
                   <IconCamera className={styles.photoIcon} aria-hidden />
-                </button>
+                </ExternalLink>
               </div>
               <h2 className={styles.profileName}>{displayName}</h2>
             </div>
@@ -108,7 +115,9 @@ export function MyAccountPage({ isOpen, onClose }: MyAccountPageProps) {
 
             {/* Note en bas */}
             <p className={styles.footerNote}>
-              Pour modifier votre profil, rendez-vous sur{' '}
+              Pour personnaliser votre compte, rendez-vous sur votre{' '}
+              <ExternalLink href={ssoAccountUrl}>compte Géoplateforme</ExternalLink>
+              . Pour modifier vos autres informations, rendez-vous sur{' '}
               <ExternalLink href={EXTERNAL_LINKS.ESPACE_COLLABORATIF}>
                 l'espace collaboratif
               </ExternalLink>
