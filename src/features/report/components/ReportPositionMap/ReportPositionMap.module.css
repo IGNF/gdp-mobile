@@ -148,6 +148,12 @@
   background: var(--color-bg-primary-subtle);
 }
 
+.layerMenuSeparator {
+  height: 1px;
+  margin: 0.375rem 0.25rem;
+  background: var(--color-bg-disabled);
+}
+
 /* ---- Bouton plein écran + overlay ---- */
 
 .fullscreenButton {

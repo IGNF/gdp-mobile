@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { useGeodesyOnMap } from '@ign/gdp-tools/react';
 
 import Collection from 'ol/Collection';
 import Feature from 'ol/Feature';
@@ -18,7 +19,6 @@ import 'ol/ol.css';
 
 import {
   createGeoportailLayerGroup,
-  getGeoportailLayerTitle,
   preloadGeoportailCapabilities,
   setActiveGeoportailLayer,
 } from '@/infra/map/openlayers/geoportailLayers';
@@ -43,6 +43,15 @@ const BASEMAP_LAYER_NAMES = [
   GEOPORTAIL_LAYERS.MAPS_SCAN25TOUR,
 ] as const;
 
+const BASEMAP_LABELS: Record<string, string> = {
+  [GEOPORTAIL_LAYERS.ORTHOPHOTOS]: 'Photos aériennes',
+  [GEOPORTAIL_LAYERS.PLAN_IGN]: 'Plan IGN',
+  [GEOPORTAIL_LAYERS.MAPS_SCAN25TOUR]: 'Topo 25',
+};
+
+/** Couche géodésie affichée par la case à cocher « Géodésie » (réseau RBF, actif par défaut côté gdp-tools). */
+const GEODESY_TOGGLE_LAYER_ID = 'RBF' as const;
+
 export interface ReportPositionMapProps {
   longitude: number | null;
   latitude: number | null;
@@ -60,6 +69,8 @@ export interface ReportPositionMapProps {
   showFullscreenButton?: boolean;
   /** Fond de carte initial — sert à synchroniser la vue plein écran avec la mini-carte. */
   initialBasemap?: string;
+  /** Couche Géodésie visible au montage — sert à synchroniser la vue plein écran avec la mini-carte. */
+  initialGeodesyVisible?: boolean;
   /** Usage interne (vue plein écran) : la carte occupe toute la hauteur de son conteneur. */
   fillContainer?: boolean;
 }
@@ -99,10 +110,12 @@ export function ReportPositionMap({
   showLayerSwitcher = false,
   showFullscreenButton = false,
   initialBasemap,
+  initialGeodesyVisible = false,
   fillContainer = false,
 }: ReportPositionMapProps) {
   const mapElementRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<Map | null>(null);
+  const [olMap, setOlMap] = useState<Map | null>(null);
   const geoportailGroupRef = useRef<LayerGroup | null>(null);
   const markerFeatureRef = useRef<Feature<Point> | null>(null);
   const hasCenteredOnPositionRef = useRef(false);
@@ -145,7 +158,9 @@ export function ReportPositionMap({
 
       const markerLayer = new VectorLayer({
         source: markerSource,
-        zIndex: 10,
+        // Au-dessus de la couche Géodésie (zIndex ~20 côté gdp-tools) : le repère du
+        // signalement doit toujours rester visible par-dessus les points géodésiques.
+        zIndex: 50,
       });
 
       const initialCenter =
@@ -207,12 +222,14 @@ export function ReportPositionMap({
       }
 
       mapRef.current = map;
+      setOlMap(map);
     })();
 
     return () => {
       aborted = true;
       mapRef.current?.setTarget(undefined);
       mapRef.current = null;
+      setOlMap(null);
       markerFeatureRef.current = null;
       geoportailGroupRef.current = null;
     };
@@ -270,6 +287,15 @@ export function ReportPositionMap({
     setIsLayerPickerOpen(false);
   };
 
+  // Couche Géodésie (points), montée uniquement quand le sélecteur est affiché — ne change
+  // rien pour les autres usages de ReportPositionMap (formulaire de signalement).
+  const geodesy = useGeodesyOnMap(showLayerSwitcher ? olMap : null, {
+    initialActive: initialGeodesyVisible ? [GEODESY_TOGGLE_LAYER_ID] : [],
+    popup: false,
+  });
+  const isGeodesyVisible = geodesy.visibility[GEODESY_TOGGLE_LAYER_ID] ?? false;
+  const handleToggleGeodesy = () => geodesy.toggleLayer(GEODESY_TOGGLE_LAYER_ID);
+
   useEffect(() => {
     if (!isFullscreenOpen) {
       return;
@@ -304,23 +330,40 @@ export function ReportPositionMap({
       </button>
 
       {isLayerPickerOpen ? (
-        <ul className={styles.layerMenu} role="listbox" aria-label="Fonds de carte">
+        <ul className={styles.layerMenu} aria-label="Fonds et couches de la carte">
           {BASEMAP_LAYER_NAMES.map((name) => (
-            <li key={name}>
+            <li key={name} role="none">
               <button
                 type="button"
-                role="option"
-                aria-selected={name === activeBasemap}
+                role="menuitemradio"
+                aria-checked={name === activeBasemap}
                 className={joinCSSClassNames(
                   styles.layerMenuItem,
                   name === activeBasemap && styles.layerMenuItemActive,
                 )}
                 onClick={() => handleSelectBasemap(name)}
               >
-                {getGeoportailLayerTitle(name)}
+                {BASEMAP_LABELS[name]}
               </button>
             </li>
           ))}
+
+          <li role="none" className={styles.layerMenuSeparator} aria-hidden />
+
+          <li role="none">
+            <button
+              type="button"
+              role="menuitemcheckbox"
+              aria-checked={isGeodesyVisible}
+              className={joinCSSClassNames(
+                styles.layerMenuItem,
+                isGeodesyVisible && styles.layerMenuItemActive,
+              )}
+              onClick={handleToggleGeodesy}
+            >
+              Géodésie
+            </button>
+          </li>
         </ul>
       ) : null}
     </div>
@@ -398,6 +441,7 @@ export function ReportPositionMap({
                   readOnly
                   showLayerSwitcher={showLayerSwitcher}
                   initialBasemap={activeBasemap}
+                  initialGeodesyVisible={isGeodesyVisible}
                   fillContainer
                 />
               </div>
