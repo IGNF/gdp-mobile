@@ -126,7 +126,10 @@
   --color-action-primary-rgb: 38, 165, 129;
   --color-action-primary-hover: var(--figma-green-5);
   --color-action-primary-pressed: var(--figma-green-6);
-  
+  /* Alias legacy — lu entre autres par getColorCode('primary') pour le marqueur de
+     ReportPositionMap ; sans lui la mini-carte de position ne s'initialise jamais. */
+  --color-primary: var(--color-action-primary);
+
   --color-bg-primary: var(--figma-green-4);
   --color-bg-primary-hover: var(--figma-green-5);
   --color-bg-primary-pressed: var(--figma-green-6);
