@@ -8,11 +8,9 @@ import {
   type ApiGroupReportResponse,
 } from '@/domain/report/groupReportMappers';
 import { ReportPositionMap } from '@/features/report/components/ReportPositionMap';
-import { useReportAttachmentImages } from '@/features/report/hooks/useReportAttachmentImages';
 import { collabApiClient, ensureCollabApiSession } from '@/infra/api';
 import { getStatusColors, getStatusLabel } from '@/shared/utils/reportStatus';
 import { Button } from '@/shared/ui/Button';
-import { Loading } from '@/shared/ui/Loading';
 import { PageHeader } from '@/shared/ui/PageHeader';
 import IconAlertCircle from '@/shared/assets/icons/icon-alert-circle.svg?react';
 import IconArticle from '@/shared/assets/icons/icon-article.svg?react';
@@ -24,7 +22,7 @@ export function ReportHistoryDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [report, setReport] = useState<GroupReport | null | undefined>(undefined);
-  const { imageUrls, isLoading: isLoadingPhotos } = useReportAttachmentImages(report?.photoUrls ?? []);
+  const [photoFailed, setPhotoFailed] = useState(false);
 
   useEffect(() => {
     const reportId = Number(id);
@@ -34,6 +32,7 @@ export function ReportHistoryDetailPage() {
     }
 
     let cancelled = false;
+    setPhotoFailed(false);
 
     void (async () => {
       const sessionReady = await ensureCollabApiSession();
@@ -99,15 +98,14 @@ export function ReportHistoryDetailPage() {
               </span>
             </div>
 
-            {isLoadingPhotos ? (
+            {report.photoUrls[0] && !photoFailed ? (
               <div className={styles.photoCard}>
-                <div className={styles.photoPlaceholder}>
-                  <Loading size="small" />
-                </div>
-              </div>
-            ) : imageUrls[0] ? (
-              <div className={styles.photoCard}>
-                <img src={imageUrls[0]} alt="" className={styles.photoImage} />
+                <img
+                  src={report.photoUrls[0]}
+                  alt=""
+                  className={styles.photoImage}
+                  onError={() => setPhotoFailed(true)}
+                />
               </div>
             ) : (
               <div className={styles.photoWarning}>

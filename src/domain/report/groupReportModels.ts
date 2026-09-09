@@ -14,9 +14,10 @@ export interface GroupReport {
   modifiedAt?: Date;
   authorName?: string;
   /**
-   * URLs des pièces jointes (photos) du signalement, telles que renvoyées par l'API.
-   * Nécessitent un téléchargement authentifié (voir `collabApiClient.getDocument`) — pas
-   * utilisables directement comme `src` d'une balise `<img>`.
+   * URLs des pièces jointes (photos) du signalement (`attachments[].uri` /
+   * `attachments[].download_uri`) — URLs absolues et publiques, utilisables directement
+   * comme `src` d'une balise `<img>` (vérifié en conditions réelles, aucune authentification
+   * requise sur `espacecollaboratif.ign.fr/document/...`).
    */
   photoUrls: string[];
 }

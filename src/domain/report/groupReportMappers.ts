@@ -83,8 +83,12 @@ function parseApiAttributes(
   };
 }
 
-/** Clés plausibles pour l'URL d'une pièce jointe — la forme exacte n'est pas documentée côté API. */
-const ATTACHMENT_URL_KEYS = ['url', 'href', 'path', 'document', 'file', 'src', 'link'];
+/**
+ * Clés observées sur `GET /reports/:id` (Espace collaboratif) pour un élément de `attachments` :
+ * `uri` (URL de visualisation) et `download_uri` (URL de téléchargement) sont toutes deux des
+ * URLs absolues et publiques (pas d'authentification requise, vérifié en conditions réelles).
+ */
+const ATTACHMENT_URL_KEYS = ['uri', 'download_uri'];
 
 function extractAttachmentUrl(entry: unknown): string | null {
   if (typeof entry === 'string') {
