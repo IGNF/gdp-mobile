@@ -37,7 +37,7 @@ export function MapLayerInfoPanel({
       <p className={styles.description}>{description}</p>
       {legend ? (
         <div className={styles.legend}>
-          <h3 className={styles.legendTitle}>Légende</h3>
+          <h3>Légende</h3>
           <img src={legend} alt="Légende" className={styles.previewImage} />
         </div>
       ) : null}

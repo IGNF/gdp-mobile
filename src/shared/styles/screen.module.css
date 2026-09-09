@@ -7,10 +7,6 @@
 	padding-right: var(--spacing-lg);
 }
 
-.screenExtendedContainer {
-	padding: var(--spacing-md);
-}
-
 /* Shared overlay style for modals and menus */
 .overlay {
 	position: fixed;
