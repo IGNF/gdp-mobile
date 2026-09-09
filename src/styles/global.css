@@ -165,6 +165,7 @@
   --color-text-secondary: var(--figma-gray-7);
   --color-text-secondary-rgb: 105, 102, 97;
   --color-text-disabled: var(--figma-gray-9);
+  --color-text-9: var(--figma-gray-9);
   --color-text-inverse: var(--color-white);
   --color-text-gray-10: var(--figma-gray-10);
 
