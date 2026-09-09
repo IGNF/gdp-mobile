@@ -8,12 +8,14 @@ import {
   type ApiGroupReportResponse,
 } from '@/domain/report/groupReportMappers';
 import { ReportPositionMap } from '@/features/report/components/ReportPositionMap';
+import { useReportAttachmentImages } from '@/features/report/hooks/useReportAttachmentImages';
 import { collabApiClient, ensureCollabApiSession } from '@/infra/api';
 import { getStatusColors, getStatusLabel } from '@/shared/utils/reportStatus';
 import { Button } from '@/shared/ui/Button';
+import { Loading } from '@/shared/ui/Loading';
 import { PageHeader } from '@/shared/ui/PageHeader';
+import IconAlertCircle from '@/shared/assets/icons/icon-alert-circle.svg?react';
 import IconArticle from '@/shared/assets/icons/icon-article.svg?react';
-import IconCamera from '@/shared/assets/icons/icon-camera.svg?react';
 import IconEye from '@/shared/assets/icons/icon-eye.svg?react';
 
 import styles from './ReportDetailPage.module.css';
@@ -22,6 +24,7 @@ export function ReportHistoryDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [report, setReport] = useState<GroupReport | null | undefined>(undefined);
+  const { imageUrls, isLoading: isLoadingPhotos } = useReportAttachmentImages(report?.photoUrls ?? []);
 
   useEffect(() => {
     const reportId = Number(id);
@@ -96,11 +99,22 @@ export function ReportHistoryDetailPage() {
               </span>
             </div>
 
-            <div className={styles.photoCard}>
-              <div className={styles.photoPlaceholder}>
-                <IconCamera className={styles.photoPlaceholderIcon} aria-hidden />
+            {isLoadingPhotos ? (
+              <div className={styles.photoCard}>
+                <div className={styles.photoPlaceholder}>
+                  <Loading size="small" />
+                </div>
               </div>
-            </div>
+            ) : imageUrls[0] ? (
+              <div className={styles.photoCard}>
+                <img src={imageUrls[0]} alt="" className={styles.photoImage} />
+              </div>
+            ) : (
+              <div className={styles.photoWarning}>
+                <IconAlertCircle className={styles.photoWarningIcon} aria-hidden />
+                <span>Pas de photo pour ce signalement.</span>
+              </div>
+            )}
 
             {report.longitude !== null && report.latitude !== null ? (
               <div className={styles.mapPreview}>

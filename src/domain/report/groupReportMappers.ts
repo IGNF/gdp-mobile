@@ -19,6 +19,8 @@ export interface ApiGroupReportResponse {
   updating_date?: string;
   author?: { id: number; username: string };
   attributes?: ApiThemeAttributeBlock[] | string;
+  /** Forme non documentée côté API (collaboratif-client-api ne la type pas) — extraction défensive. */
+  attachments?: unknown[];
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -81,6 +83,38 @@ function parseApiAttributes(
   };
 }
 
+/** Clés plausibles pour l'URL d'une pièce jointe — la forme exacte n'est pas documentée côté API. */
+const ATTACHMENT_URL_KEYS = ['url', 'href', 'path', 'document', 'file', 'src', 'link'];
+
+function extractAttachmentUrl(entry: unknown): string | null {
+  if (typeof entry === 'string') {
+    return entry.trim() || null;
+  }
+
+  if (!isRecord(entry)) {
+    return null;
+  }
+
+  for (const key of ATTACHMENT_URL_KEYS) {
+    const value = entry[key];
+    if (typeof value === 'string' && value.trim()) {
+      return value.trim();
+    }
+  }
+
+  return null;
+}
+
+function normalizeAttachmentUrls(attachments: unknown): string[] {
+  if (!Array.isArray(attachments)) {
+    return [];
+  }
+
+  return attachments
+    .map(extractAttachmentUrl)
+    .filter((url): url is string => url !== null);
+}
+
 export function mapApiReportToGroupReport(apiReport: ApiGroupReportResponse): GroupReport {
   const { themeName, themeAttributes } = parseApiAttributes(apiReport.attributes);
   const geometry = apiReport.geometry ?? '';
@@ -99,6 +133,7 @@ export function mapApiReportToGroupReport(apiReport: ApiGroupReportResponse): Gr
     createdAt: apiReport.opening_date ? new Date(apiReport.opening_date) : new Date(),
     modifiedAt: apiReport.updating_date ? new Date(apiReport.updating_date) : undefined,
     authorName: apiReport.author?.username,
+    photoUrls: normalizeAttachmentUrls(apiReport.attachments),
   };
 }
 

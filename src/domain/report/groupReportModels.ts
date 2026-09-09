@@ -13,4 +13,10 @@ export interface GroupReport {
   createdAt: Date;
   modifiedAt?: Date;
   authorName?: string;
+  /**
+   * URLs des pièces jointes (photos) du signalement, telles que renvoyées par l'API.
+   * Nécessitent un téléchargement authentifié (voir `collabApiClient.getDocument`) — pas
+   * utilisables directement comme `src` d'une balise `<img>`.
+   */
+  photoUrls: string[];
 }
