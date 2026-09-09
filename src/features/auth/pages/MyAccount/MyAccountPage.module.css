@@ -64,6 +64,10 @@
   fill: var(--icon-color-8);
 }
 
+.photoIcon {
+  width: var(--icon-base);
+  height: var(--icon-base);
+}
 .cameraButton {
   position: absolute;
   bottom: 0;
@@ -157,18 +161,6 @@
   box-shadow: var(--shadow-sm);
 }
 
-.contributionIcon {
-  width: 2.5rem;
-  height: 2.5rem;
-  color: var(--color-text-secondary);
-  background-color: var(--color-bg-primary-subtle);
-  border-radius: 1.5rem;
-}
-
-.contributionIcon path {
-  fill: var(--color-text-primary-8);
-}
-
 .contributionValue {
   font-size: var(--font-size-2xl);
   font-weight: var(--font-weight-bold);
@@ -183,19 +175,6 @@
   font-weight: var(--font-weight-normal);
 }
 
-.badge {
-  position: absolute;
-  top: var(--spacing-xs);
-  right: var(--spacing-xs);
-  width: 1.5rem;
-  height: 1.5rem;
-  border-radius: var(--radius-circle);
-  background-color: var(--color-action-primary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--color-bg-surface);
-}
 
 /* ── Note de bas de page ── */
 .footerNote {

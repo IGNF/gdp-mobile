@@ -96,6 +96,7 @@
 	fill: var(--figma-gray-11);
 }
 
+/*   Favori désactivé pour cette version — fonctionnalité prévue pour une version ultérieure.
 .favoriteButton {
   display: flex;
   align-items: center;
@@ -108,7 +109,7 @@
   background: var(--color-bg-primary-hover-subtle);
   cursor: default;
   flex-shrink: 0;
-}
+} 
 
 .favoriteIcon {
   width: 1.25rem;
@@ -118,7 +119,7 @@
 .favoriteIcon path {
   fill: var(--color-text-primary);
 }
-
+*/
 .statusMetaRow {
   display: flex;
   align-items: center;
