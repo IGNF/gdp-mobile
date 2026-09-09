@@ -28,15 +28,6 @@
     height: 0.4rem;
   }
 
-  .cardActionButton {
-    width: 1.75rem;
-    height: 1.75rem;
-  }
-
-  .cardActionIcon {
-    width: 1rem;
-    height: 1rem;
-  }
 
   .cardTitle {
     font-size: 0.6875rem;
@@ -118,50 +109,6 @@
   fill: var(--color-white);
 }
 
-.cardActions {
-  position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
-  z-index: 1;
-  display: flex;
-  gap: 0.25rem;
-  opacity: 0;
-  transition: opacity 0.2s;
-}
-
-.cardThumbnail:hover .cardActions,
-.cardThumbnail:focus-within .cardActions {
-  opacity: 1;
-}
-
-.cardActionButton {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 2rem;
-  height: 2rem;
-  padding: 0;
-  border: none;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.95);
-  cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  transition: transform 0.2s;
-}
-
-.cardActionButton:hover {
-  transform: scale(1.1);
-  background: var(--color-bg-subtle);
-}
-
-.cardActionIcon {
-  width: 1.125rem;
-  height: 1.125rem;
-}
-
-.cardActionIcon path {
-  fill: var(--color-text);
-}
 
 .cardContent {
   display: flex;

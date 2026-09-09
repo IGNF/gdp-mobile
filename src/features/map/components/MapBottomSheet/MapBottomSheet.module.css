@@ -33,41 +33,6 @@
 	transition: height var(--duration-slow) var(--ease-standard), background var(--duration-slow) var(--ease-standard), box-shadow var(--duration-slow) var(--ease-standard);
 }
 
-.searchFab {
-	--search-fab-size: 3rem;
-	position: absolute;
-	right: var(--spacing-md);
-	bottom: var(--spacing-sm);
-	z-index: 2;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	width: var(--search-fab-size);
-	height: var(--search-fab-size);
-	padding: 0;
-	border: none;
-	border-radius: var(--radius-circle);
-	background: var(--color-bg-subtle);
-	box-shadow: var(--shadow-md);
-	cursor: pointer;
-	pointer-events: auto;
-}
-
-.searchFab:hover,
-.searchFab:focus-visible {
-	background: var(--color-bg-primary-subtle);
-	outline: none;
-}
-
-.searchFabIcon {
-	width: 1.5rem;
-	height: 1.5rem;
-}
-
-.searchFabIcon path {
-	fill: var(--color-text);
-}
-
 .sheetPointFiche {
 	background: var(--color-fiche-canvas);
 	/* Ne jamais couvrir la pile de FAB (filtre/couches/légende) de MapPage : 3 boutons de
@@ -377,23 +342,12 @@
   display: none !important;
 }
 
-.contentCompact {
-	flex: 0 0 auto;
-	overflow: visible;
-	padding: 0 var(--spacing-md) var(--spacing-sm);
-}
+
 
 .searchArea {
 	flex-shrink: 0;
 	overflow: visible;
 	z-index: 1;
-}
-
-.rgpSection {
-	flex: 1;
-	min-height: 0;
-	margin-top: var(--spacing-md);
-	overflow: auto;
 }
 
 .rgpDispoGroup {
@@ -542,15 +496,6 @@
 	color: var(--color-text);
 }
 
-
-
-.rgpTitle {
-	margin: 0 0 var(--spacing-sm);
-	font-size: var(--font-size-base);
-	font-weight: var(--font-weight-bold);
-	color: var(--color-text);
-}
-
 .rgpLoading {
 	display: flex;
 	justify-content: center;
@@ -598,10 +543,6 @@
 	background: var(--color-bg-primary-subtle);
 }
 
-.rgpDotAvailable,
-.rgpDotUnavailable {
-	display: none;
-}
 
 .rgpName {
 	font-size: var(--font-size-base);
@@ -627,18 +568,6 @@
 	gap: var(--spacing-4xs);
 	min-width: 0;
 	flex: 1;
-}
-
-.levelContent {
-	padding-bottom: var(--spacing-xs);
-}
-
-.placeholder {
-	margin: 0;
-	padding: var(--spacing-md) 0;
-	text-align: center;
-	color: var(--color-text-secondary);
-	font-size: var(--font-size-base);
 }
 
 .sheetSearchActive {

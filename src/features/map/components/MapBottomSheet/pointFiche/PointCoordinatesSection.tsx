@@ -70,7 +70,6 @@ export function PointCoordinatesSection({ action }: PointCoordinatesSectionProps
       </div>
 
       <div
-        className={styles.coordPanel}
         role="tabpanel"
         aria-label={resolvedTab === 'geographic' ? 'Coordonnées géographiques' : 'Coordonnées projetées'}
       >

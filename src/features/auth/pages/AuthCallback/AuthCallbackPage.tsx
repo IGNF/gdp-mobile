@@ -67,7 +67,7 @@ export function AuthCallbackPage() {
     return (
       <div className={`${styles.container} ${screen.screenContainer}`}>
         <h1 className="page-title">Erreur de connexion</h1>
-        <p className="text-error">{error}</p>
+        <p className={styles.textError}>{error}</p>
         <Button className={styles.backButton} onClick={() => navigate('/login', { replace: true })}>
           Retour à la connexion
         </Button>

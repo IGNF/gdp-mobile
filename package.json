@@ -12,6 +12,7 @@
     "build:qualif": "tsc -b && vite build --mode qualif && cp scripts/htaccess-qualif.example dist/.htaccess",
     "build:mobile": "VITE_GEODESY_SOURCE=dist tsc -b && vite build",
     "lint": "eslint .",
+    "lint:css-modules": "node scripts/check-css-modules.js",
     "preview": "vite preview",
     "preview:qualif": "vite preview --mode qualif",
     "generate-apk": "bash ./scripts/generate-apk.sh",

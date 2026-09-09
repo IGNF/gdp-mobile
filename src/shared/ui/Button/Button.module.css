@@ -47,6 +47,8 @@
 }
 
 /* Color mappings - set CSS variables per color */
+.success,
+.tertiary,
 .primary {
 	--btn-color: var(--color-action-primary);
 	--btn-contrast: var(--color-bg-surface);
@@ -163,12 +165,3 @@
 	}
 }
 
-/* Icon */
-.icon {
-	width: var(--icon-xl);
-	height: var(--icon-xl);
-}
-
-.icon path {
-	fill: currentColor;
-}
