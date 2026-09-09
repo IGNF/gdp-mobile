@@ -2,6 +2,8 @@ import { useState } from 'react';
 
 import type { AppUser } from '@/domain/user/models';
 import { config } from '@/shared/config/env';
+import { EXTERNAL_LINKS } from '@/shared/constants/externalLinks';
+import { ExternalLink } from '@/shared/ui/ExternalLink';
 
 import IconAngleRight from '@/shared/assets/icons/icon-angle-right.svg?react';
 import IconSettings from '@/shared/assets/icons/icon-settings.svg?react';
@@ -11,6 +13,8 @@ import IconUser from '@/shared/assets/icons/icon-user.svg?react';
 import IconStar from '@/shared/assets/icons/icon-heart.svg?react';
 import IconTeam from '@/shared/assets/icons/icon-team.svg?react';
 import IconDisconnect from '@/shared/assets/icons/icon-deconnect.svg?react';
+import IconSend from '@/shared/assets/icons/icon-send.svg?react';
+import IconExternalLink from '@/shared/assets/icons/icon-external-link.svg?react';
 
 import screen from '@/shared/styles/screen.module.css';
 
@@ -27,12 +31,20 @@ export interface LeftMenuProps {
 /** `always` = visible pour tous ; `authenticated` = connecté ; `guest` = non connecté */
 type AuthVisibility = 'always' | 'authenticated' | 'guest';
 
-type MenuGroupId = 'monCompte' | 'mesFavoris' | 'parametres' | 'communaute' | 'aide' | 'aPropos';
+type MenuGroupId =
+  | 'monCompte'
+  | 'mesFavoris'
+  | 'parametres'
+  | 'communaute'
+  | 'aide'
+  | 'aPropos'
+  | 'jeDonneMonAvis';
 
 interface MenuItem {
   id: string;
   label: string;
-  route: string;
+  route?: string;
+  href?: string;
   authVisibility?: AuthVisibility;
 }
 
@@ -92,6 +104,19 @@ const menuGroups: MenuGroup[] = [
     title: 'À propos',
     icon: IconInfo,
     items: [{ id: 'aPropos', label: 'À propos', route: '/about' }],
+  },
+  {
+    id: 'jeDonneMonAvis',
+    title: 'Je donne mon avis',
+    icon: IconSend,
+    authVisibility: 'authenticated',
+    items: [
+      {
+        id: 'jeDonneMonAvis',
+        label: 'Je donne mon avis',
+        href: EXTERNAL_LINKS.JE_DONNE_MON_AVIS,
+      },
+    ],
   },
 ];
 
@@ -233,22 +258,44 @@ export function LeftMenu({
         <div className={styles.menuContent}>
           {visibleGroups.map((group) => {
             const IconComponent = group.icon;
-            const route = group.items[0]?.route;
-            if (!route) {
+            const item = group.items[0];
+            if (!item) {
               return null;
             }
 
+            const { href, route } = item;
+            const content = (
+              <>
+                <IconComponent className={styles.groupIcon} aria-hidden />
+                <span className={styles.groupTitle}>{group.title}</span>
+                {href ? (
+                  <IconExternalLink className={styles.externalIcon} aria-hidden />
+                ) : (
+                  <IconAngleRight className={styles.chevron} aria-hidden />
+                )}
+              </>
+            );
+
             return (
               <div key={group.id} className={styles.menuGroup}>
-                <button
-                  type="button"
-                  className={styles.groupHeader}
-                  onClick={() => handleItemClick(route)}
-                >
-                  <IconComponent className={styles.groupIcon} aria-hidden />
-                  <span className={styles.groupTitle}>{group.title}</span>
-                  <IconAngleRight className={styles.chevron} aria-hidden />
-                </button>
+                {href ? (
+                  <ExternalLink
+                    href={href}
+                    className={styles.groupHeader}
+                    showIcon={false}
+                    onClick={onClose}
+                  >
+                    {content}
+                  </ExternalLink>
+                ) : route ? (
+                  <button
+                    type="button"
+                    className={styles.groupHeader}
+                    onClick={() => handleItemClick(route)}
+                  >
+                    {content}
+                  </button>
+                ) : null}
               </div>
             );
           })}

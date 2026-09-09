@@ -155,14 +155,25 @@
 	font-weight: var(--font-weight-normal);
 }
 
-.chevron {
+.chevron,
+.externalIcon {
 	width: var(--icon-sm);
 	height: var(--icon-sm);
+	flex-shrink: 0;
 	transition: transform var(--duration-base) var(--ease-standard);
 }
 
-.chevron path {
+.chevron path,
+.externalIcon path {
 	fill: var(--color-text);
+}
+
+a.groupHeader {
+	display: flex;
+	text-decoration: none;
+	box-sizing: border-box;
+	color: inherit;
+	font-weight: inherit;
 }
 
 .standaloneItems {

@@ -3,6 +3,7 @@ export const EXTERNAL_LINKS = {
   GEOPF_SSO_RESET_CREDENTIALS:
     'https://sso.geopf.fr/realms/geoplateforme/login-actions/reset-credentials',
   GEOPF_SSO_ACCOUNT: 'https://sso.geopf.fr/realms/geoplateforme/account/',
+  JE_DONNE_MON_AVIS: 'https://jedonnemonavis.numerique.gouv.fr/Demarches/4229?button=4930',
 } as const;
 
 /** URL de consultation d’un signalement sur l’Espace collaboratif (ex. …/georem/1150059). */
