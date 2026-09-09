@@ -157,6 +157,14 @@ export function MyReportsPage() {
             })}
           </ul>
         )}
+
+        <button
+          type="button"
+          className={styles.historyLink}
+          onClick={() => navigate('/reports/history')}
+        >
+          Mes anciens signalements
+        </button>
       </main>
 
       <BottomTabbar activeTab="signalements" />
