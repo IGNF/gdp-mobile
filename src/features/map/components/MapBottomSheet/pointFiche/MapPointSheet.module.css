@@ -70,7 +70,7 @@
 .title {
 	font-size: var(--font-size-xl);
 	font-weight: var(--font-weight-bold);
-	color: var(--color-text);
+	color: var(--color-text-title);
 }
 
 .copyButton {
@@ -143,8 +143,9 @@
 
 .meta {
   margin: 0;
-  font-size: var(--font-size-base);
-  color: var(--color-border-strong);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-9);
+  font-weight: var(--font-weight-semibold);
 }
 
 .body {
@@ -178,9 +179,14 @@
 
 /* Sélecteur composé pour primer sur .button (Button.module.css) sans dépendre de l'ordre
    d'import des CSS modules. */
-.footer .footerButton {
+.footer  {
   height: 3.75rem;
   font-size: var(--font-size-xl);
+}
+
+.footerButton {
+  height: 2.75rem;
+  font-size: var(--font-size-base);
 }
 
 .authInfoTrigger {
@@ -326,7 +332,7 @@
 .fieldCard {
   padding: 0.625rem 0.75rem;
   border-radius: 0.625rem;
-  background: var(--color-fiche-surface);
+  background: var(--color-white);
 }
 
 .fieldCardWide {
