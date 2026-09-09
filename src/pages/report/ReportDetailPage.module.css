@@ -44,6 +44,7 @@
 }
 
 .photoCard {
+  position: relative;
   height: 11rem;
   border-radius: 0.75rem;
   overflow: hidden;
@@ -55,6 +56,32 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+.photoExpandButton {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: rgba(9, 22, 37, 0.72);
+  box-shadow: 0 2px 8px rgba(9, 22, 37, 0.24);
+  cursor: pointer;
+}
+
+.photoExpandIcon {
+  width: 1.125rem;
+  height: 1.125rem;
+}
+
+.photoExpandIcon path {
+  fill: var(--color-white);
 }
 
 .photoPlaceholder {
