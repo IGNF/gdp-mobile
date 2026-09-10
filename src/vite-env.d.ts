@@ -16,6 +16,7 @@ interface ImportMetaEnv {
   readonly VITE_GDP_REPORT_COMMUNITY_ID?: string;
   readonly VITE_GDP_REPORT_DISPLAY_THEMES?: string;
   readonly VITE_GDP_REPORT_SUBMISSION_THEME?: string;
+  readonly VITE_GDP_NEWS_URL?: string;
 }
 
 interface ImportMeta {

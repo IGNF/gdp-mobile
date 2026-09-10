@@ -21,6 +21,8 @@ import { LegendPage } from '@/features/legend/pages/LegendPage';
 import { MapBottomSheet } from '@/features/map/components/MapBottomSheet';
 import { GeodesyPointReportWizard } from '@/features/map/components/GeodesyPointReportWizard';
 import { MapLayersPanelFlow } from '@/features/map/components/MapLayersPanelFlow';
+import { GdpNewsBanners } from '@/features/news/components/GdpNewsBanners/GdpNewsBanners';
+import { useGdpNews } from '@/features/news/hooks/useGdpNews';
 import { countActiveMapGeodesyFilters } from '@/features/map/components/MapGeodesyFiltersPanel';
 import type { MapLayerGroupId } from '@/features/map/types/mapLayerGroups';
 import type { GeodesyPointReportMapContext } from '@/domain/report/geodesyPointMapContext';
@@ -116,6 +118,13 @@ export function MapPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, isAuthenticated, logout } = useAuth();
+  const {
+    banners: newsBanners,
+    modal: newsModal,
+    currentItems: currentNews,
+    isLoading: isNewsLoading,
+    dismiss: dismissNews,
+  } = useGdpNews();
   const {
     mapElementRef,
     map,
@@ -472,12 +481,19 @@ export function MapPage() {
         user={user}
         isAuthenticated={isAuthenticated}
         onNavigate={handleMenuNavigate}
+        hasNews={currentNews.length > 0}
       />
 
       <div className={styles.mapContainer}>
         <div ref={mapElementRef} className={styles.mapTarget} />
 
         <div className={styles.mapOverlays}>
+          <GdpNewsBanners
+            banners={newsBanners}
+            modal={newsModal}
+            onDismiss={dismissNews}
+          />
+
           <button
             type="button"
             className={styles.mapFab}
@@ -674,7 +690,12 @@ export function MapPage() {
         isOpen={activeOverlay === '/community'}
         onClose={() => setActiveOverlay(null)}
       />
-      <HelpPage isOpen={activeOverlay === '/help'} onClose={() => setActiveOverlay(null)} />
+      <HelpPage
+        isOpen={activeOverlay === '/help'}
+        onClose={() => setActiveOverlay(null)}
+        newsItems={currentNews}
+        isNewsLoading={isNewsLoading}
+      />
       <AboutPage isOpen={activeOverlay === '/about'} onClose={() => setActiveOverlay(null)} />
     </div>
   );

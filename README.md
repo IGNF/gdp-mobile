@@ -13,6 +13,7 @@ Pour en savoir plus sur la gestion du projet (intranet) [loop](https://loop.clou
 ```bash
 # Depuis la racine du monorepo
 cp gdp-mobile/.env.dist gdp-mobile/.env   # puis renseigner les variables
+nvm use 22
 npm install
 npm run dev                                 # gdp-tools (watch) + app (5173)
 ```
@@ -43,6 +44,7 @@ git checkout main
 # si ce n'est pas encore fait, renseigner VITE_OAUTH_WEB_REDIRECT_URI et VITE_GDP_*
 cp gdp-mobile/.env.qualif.dist gdp-mobile/.env.qualif 
 # ensuite
+nvm use 22
 npm run build:qualif
 ```
 
@@ -62,6 +64,7 @@ Avec le compte user, déposer sur sftp://cadillac2.ign.fr/var/www/intranet/qlf-g
 | `VITE_GDP_REPORT_COMMUNITY_ID` | `l'id de la communauté geodesie` |
 | `VITE_GDP_REPORT_DISPLAY_THEMES` | `les thèmes à afficher` |
 | `VITE_GDP_REPORT_SUBMISSION_THEME` | `le thème pour les signalements` |
+| `VITE_GDP_NEWS_URL` | JSON des news / alertes (voir [docs/NEWS.md](./docs/NEWS.md)) |
 
 
 Keycloak : enregistrer la même URI de redirection web (http et https si les deux sont utilisés). En web, l’URI réelle est aussi dérivée de `window.location`.
@@ -69,6 +72,7 @@ Keycloak : enregistrer la même URI de redirection web (http et https si les deu
 Test local du build :
 
 ```bash
+nvm use 22
 npm run preview:qualif -w gdp-mobile
 # http://localhost:4173/qlf-gdp/
 ```
@@ -97,6 +101,7 @@ Le script installe les dépendances, ajoute la plateforme Capacitor Android si b
 ### Générer l’APK debug
 
 ```bash
+nvm use 22
 npm run generate-apk
 ```
 
@@ -215,6 +220,7 @@ Branding (icône lanceur) : voir [scripts/GDP/readme.md](./scripts/GDP/readme.md
 - [Fiche point (carte)](./docs/FICHE_POINT.md)
 - [Mode d'emploi](./docs/MODE_EMPLOI.md)
 - [Configuration des thèmes de signalement](./docs/CONFIGURATION_THEMES.md)
+- [News et alertes](./docs/NEWS.md)
 
 ## Références
 
