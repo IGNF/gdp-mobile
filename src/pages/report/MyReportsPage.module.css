@@ -146,15 +146,23 @@
 }
 
 .reportReason {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.375rem;
   margin: 0;
   font-size: 0.875rem;
   color: var(--color-text-secondary);
 }
 
-.reportVoie {
-  margin: 0;
-  font-size: 0.8125rem;
+.reportReasonSeparator {
   color: var(--color-text-secondary);
+}
+
+.reportDateInline {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3125rem;
 }
 
 .reportMeta {
@@ -167,8 +175,42 @@
   display: flex;
   align-items: center;
   gap: 0.3125rem;
+  flex-shrink: 0;
   font-size: 0.8125rem;
   color: var(--color-text-secondary);
+}
+
+.reportLocationRow {
+  display: flex;
+  align-items: center;
+  gap: 0.3125rem;
+  min-width: 0;
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary);
+}
+
+.reportLocationText {
+  display: flex;
+  align-items: baseline;
+  gap: 0.3125rem;
+  min-width: 0;
+}
+
+.reportVoieText {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.reportLocationSeparator {
+  flex-shrink: 0;
+}
+
+.reportCommuneText {
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .reportMetaIcon {

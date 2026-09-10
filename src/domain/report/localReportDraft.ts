@@ -7,7 +7,7 @@ export interface LocalReportDraftPhoto {
   dataUrl: string;
 }
 
-export type LocalReportDraftStatus = 'not_sent' | 'taken_into_account' | 'rejected';
+export type LocalReportDraftStatus = 'not_sent' | 'sent';
 
 export interface LocalReportDraft {
   id: string;

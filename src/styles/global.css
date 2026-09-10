@@ -160,6 +160,12 @@
   --color-danger-rgb: 232, 111, 74;
   --color-danger-emphasis: #cc6241;
 
+  /* ── Feedback : Navy (badges de statut de signalement) ── */
+  --color-navy: var(--figma-blue-9);
+  --color-navy-rgb: 26, 66, 109;
+  --color-navy-emphasis: var(--figma-blue-10);
+  --color-bg-navy-subtle: var(--figma-blue-1);
+
   /* ── Texte gray ── */
   --color-text: var(--figma-gray-11);
   --color-text-title: var(--figma-gray-12);
