@@ -132,13 +132,13 @@
 }
 
 .compassFab {
-  right: 1rem;
-  bottom: calc(var(--map-tabbar-height) + 0.2rem + 3.5rem);
+  right: 1.2rem;
+  bottom: calc(var(--map-tabbar-height) + 0.8rem + var(--map-fab-size) + 0.5rem);
 }
 
 .compassIcon {
-  width: 2.25rem;
-  height: 2.25rem;
+  width: 1.5rem;
+  height: 1.5rem;
   transition: transform 0.1s ease-out;
 }
 
