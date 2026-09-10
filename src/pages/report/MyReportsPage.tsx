@@ -17,7 +17,9 @@ import {
 } from '@/features/report/utils/localReportDraftStatus';
 import { formatRelativeDayLabel } from '@/shared/utils/date';
 import { joinCSSClassNames } from '@/shared/utils/join';
+import { EXTERNAL_LINKS } from '@/shared/constants/externalLinks';
 import { Button } from '@/shared/ui/Button';
+import { ExternalLink } from '@/shared/ui/ExternalLink';
 import { PageHeader } from '@/shared/ui/PageHeader';
 import IconAngleRight from '@/shared/assets/icons/icon-angle-right.svg?react';
 import IconCalendar from '@/shared/assets/icons/icon-calendar.svg?react';
@@ -31,8 +33,7 @@ type StatusFilter = 'all' | LocalReportDraftStatus;
 const FILTERS: Array<{ value: StatusFilter; label: string }> = [
   { value: 'all', label: 'Tous' },
   { value: 'not_sent', label: 'Pas envoyés' },
-  { value: 'taken_into_account', label: 'Pris en compte' },
-  { value: 'rejected', label: 'Rejeté' },
+  { value: 'sent', label: 'Envoyés' },
 ];
 
 export function MyReportsPage() {
@@ -150,22 +151,32 @@ export function MyReportsPage() {
                             {getLocalReportDraftStatusLabel(draft.status)}
                           </span>
                         </div>
-                        <p className={styles.reportReason}>{reasonLabel}</p>
-                        {draft.voieSuivie ? (
-                          <p className={styles.reportVoie}>{draft.voieSuivie}</p>
-                        ) : null}
-                        <div className={styles.reportMeta}>
-                          <span className={styles.reportMetaItem}>
+                        <p className={styles.reportReason}>
+                          <span>{reasonLabel}</span>
+                          <span className={styles.reportReasonSeparator}>·</span>
+                          <span className={styles.reportDateInline}>
                             <IconCalendar className={styles.reportMetaIcon} aria-hidden />
                             {formatRelativeDayLabel(createdAt)}
                           </span>
-                          {draft.commune ? (
-                            <span className={styles.reportMetaItem}>
-                              <IconLocation className={styles.reportMetaIcon} aria-hidden />
-                              {draft.commune}
+                        </p>
+                        {draft.voieSuivie || draft.commune ? (
+                          <div className={styles.reportLocationRow}>
+                            <IconLocation className={styles.reportMetaIcon} aria-hidden />
+                            <span className={styles.reportLocationText}>
+                              {draft.commune ? (
+                                <span className={styles.reportCommuneText}>{draft.commune}</span>
+                              ) : null}
+                              {draft.commune && draft.voieSuivie ? (
+                                <span className={styles.reportLocationSeparator}>,</span>
+                              ) : null}
+                              {draft.voieSuivie ? (
+                                <span className={styles.reportVoieText} title={draft.voieSuivie}>
+                                  {draft.voieSuivie}
+                                </span>
+                              ) : null}
                             </span>
-                          ) : null}
-                        </div>
+                          </div>
+                        ) : null}
                         <IconAngleRight className={styles.reportChevron} aria-hidden />
                       </button>
                     </li>
@@ -173,6 +184,11 @@ export function MyReportsPage() {
                 })}
               </ul>
             )}
+
+            <p className={styles.espaceCollaboratifNote}>
+              Pour plus de détails sur vos signalements (statut, historique…), rendez-vous sur{' '}
+              <ExternalLink href={EXTERNAL_LINKS.ESPACE_COLLABORATIF_PROFILE}>l'espace collaboratif</ExternalLink>.
+            </p>
           </>
         )}
       </main>

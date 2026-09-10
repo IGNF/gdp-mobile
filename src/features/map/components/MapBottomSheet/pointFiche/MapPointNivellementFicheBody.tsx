@@ -6,6 +6,7 @@ import {
   buildPointCarouselItems,
   collectAllPointFields,
   filterUnmappedPointFields,
+  formatObsDateCaption,
   formatSentenceCase,
   readProperty,
   resolveVoieSuivieLabel,
@@ -65,7 +66,8 @@ export function MapPointNivellementFicheBody({ action, snapIndex }: MapPointNive
 
   const repereTypeComplement = readProperty(action, 'type_info');
   const repereType = readProperty(action, 'type');
-  const actDate = readProperty(action, 'action_date');
+  const obsDate = readProperty(action, 'obs_date');
+  const obsDateCaption = obsDate ? formatObsDateCaption(obsDate) : null;
   const remark = readProperty(action, 'remarque') ;
   const altitudeType = formatSentenceCase(readProperty(action, 'cp1_altitude_type') ?? '');
   const partenaire = readProperty(action, 'proprio');
@@ -96,7 +98,7 @@ export function MapPointNivellementFicheBody({ action, snapIndex }: MapPointNive
         <>
           <PointImageCarousel items={carouselItems} />
 
-          {actDate ? <p className={styles.carouselCaption}>Determiné en {actDate}</p> : null}
+          {obsDateCaption ? <p className={styles.carouselCaption}>{obsDateCaption}</p> : null}
 
           <section>
             <h3 className={styles.sectionTitle}>Repère de nivellement</h3>
