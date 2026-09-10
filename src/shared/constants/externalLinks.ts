@@ -1,5 +1,6 @@
 export const EXTERNAL_LINKS = {
   ESPACE_COLLABORATIF: 'https://espacecollaboratif.ign.fr/',
+  ESPACE_COLLABORATIF_PROFILE: 'https://espacecollaboratif.ign.fr/profile/',
   GEOPF_SSO_RESET_CREDENTIALS:
     'https://sso.geopf.fr/realms/geoplateforme/login-actions/reset-credentials',
   GEOPF_SSO_ACCOUNT: 'https://sso.geopf.fr/realms/geoplateforme/account/',

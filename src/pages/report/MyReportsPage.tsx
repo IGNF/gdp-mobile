@@ -17,7 +17,9 @@ import {
 } from '@/features/report/utils/localReportDraftStatus';
 import { formatRelativeDayLabel } from '@/shared/utils/date';
 import { joinCSSClassNames } from '@/shared/utils/join';
+import { EXTERNAL_LINKS } from '@/shared/constants/externalLinks';
 import { Button } from '@/shared/ui/Button';
+import { ExternalLink } from '@/shared/ui/ExternalLink';
 import { PageHeader } from '@/shared/ui/PageHeader';
 import IconAngleRight from '@/shared/assets/icons/icon-angle-right.svg?react';
 import IconCalendar from '@/shared/assets/icons/icon-calendar.svg?react';
@@ -182,6 +184,11 @@ export function MyReportsPage() {
                 })}
               </ul>
             )}
+
+            <p className={styles.espaceCollaboratifNote}>
+              Pour plus de détails sur vos signalements (statut, historique…), rendez-vous sur{' '}
+              <ExternalLink href={EXTERNAL_LINKS.ESPACE_COLLABORATIF_PROFILE}>l'espace collaboratif</ExternalLink>.
+            </p>
           </>
         )}
       </main>
