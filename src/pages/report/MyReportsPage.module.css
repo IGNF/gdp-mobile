@@ -86,6 +86,13 @@
   color: var(--color-text-secondary);
 }
 
+.notConnected {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md, 1rem);
+  padding: 2rem 0;
+}
+
 .reportList {
   list-style: none;
   margin: 0;
@@ -186,25 +193,4 @@
 
 .reportChevron path {
   fill: currentColor;
-}
-
-/* Petit bouton secondaire vers l'historique serveur : suit la fin de la liste tant que
-   tout tient à l'écran, puis reste ancré (sticky) en bas de la zone visible si la liste
-   dépasse la hauteur de page, sans quitter le flux normal ni recouvrir la tabbar. */
-.historyLink {
-  position: sticky;
-  bottom: 0;
-  align-self: center;
-  flex-shrink: 0;
-  margin-top: 0.25rem;
-  padding: 0.5rem 1rem;
-  border: 1px solid var(--color-border);
-  border-radius: 999px;
-  background: var(--color-fiche-surface);
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
-  font-size: 0.8125rem;
-  font-weight: 600;
-  color: var(--color-text-primary);
-  cursor: pointer;
-  white-space: nowrap;
 }
