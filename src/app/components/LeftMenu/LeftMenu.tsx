@@ -26,6 +26,7 @@ export interface LeftMenuProps {
   user?: AppUser | null;
   isAuthenticated: boolean;
   onNavigate: (route: string) => void;
+  hasNews?: boolean;
 }
 
 /** `always` = visible pour tous ; `authenticated` = connecté ; `guest` = non connecté */
@@ -195,6 +196,7 @@ export function LeftMenu({
   user,
   isAuthenticated,
   onNavigate,
+  hasNews = false,
 }: LeftMenuProps) {
   const visibleGroups = menuGroups
     .filter((group) => isAuthVisible(group.authVisibility, isAuthenticated))
@@ -264,10 +266,14 @@ export function LeftMenu({
             }
 
             const { href, route } = item;
+            const showNewsBadge = group.id === 'aide' && hasNews;
             const content = (
               <>
                 <IconComponent className={styles.groupIcon} aria-hidden />
-                <span className={styles.groupTitle}>{group.title}</span>
+                <span className={styles.groupTitle}>
+                  {group.title}
+                  {showNewsBadge ? <span className={styles.newsBadge}>News</span> : null}
+                </span>
                 {href ? (
                   <IconExternalLink className={styles.externalIcon} aria-hidden />
                 ) : (
@@ -291,6 +297,7 @@ export function LeftMenu({
                   <button
                     type="button"
                     className={styles.groupHeader}
+                    aria-label={showNewsBadge ? `${group.title}, actualités en cours` : undefined}
                     onClick={() => handleItemClick(route)}
                   >
                     {content}

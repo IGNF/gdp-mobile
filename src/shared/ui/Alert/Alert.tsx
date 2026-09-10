@@ -25,6 +25,7 @@ export interface AlertProps {
 	children?: ReactNode;
 	buttons?: AlertButton[];
 	size?: 'default' | 'wide';
+	showCloseButton?: boolean;
 }
 
 export function Alert({
@@ -35,6 +36,7 @@ export function Alert({
 	children,
 	buttons = [],
 	size = 'default',
+	showCloseButton = true,
 }: AlertProps) {
 	const [isVisible, setIsVisible] = useState(isOpen);
 	const [shouldRender, setShouldRender] = useState(isOpen);
@@ -68,7 +70,7 @@ export function Alert({
 				styles.overlay,
 				isVisible && styles.overlayVisible
 			)}
-			onClick={onClose}
+			onClick={showCloseButton ? onClose : undefined}
 		>
 			<div
 				className={joinCSSClassNames(
@@ -77,13 +79,15 @@ export function Alert({
 				)}
 				onClick={(e) => e.stopPropagation()}
 			>
-				<button
-					className={styles.closeButton}
-					onClick={onClose}
-					aria-label="Close"
-				>
-					<IconClose className={styles.closeIcon} />
-				</button>
+				{showCloseButton ? (
+					<button
+						className={styles.closeButton}
+						onClick={onClose}
+						aria-label="Fermer"
+					>
+						<IconClose className={styles.closeIcon} />
+					</button>
+				) : null}
 
 				<div className={styles.content} data-scroll-root='true'>
 					<h2 className="heading-2">{title}</h2>

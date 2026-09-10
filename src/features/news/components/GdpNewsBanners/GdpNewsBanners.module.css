@@ -1,0 +1,19 @@
+.stack {
+  position: absolute;
+  top: calc(max(2.5rem, var(--safe-top)) + 3.75rem);
+  left: 1rem;
+  right: 4.5rem;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--spacing-sm);
+  max-width: 20rem;
+  max-height: 40%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.stack > * {
+  pointer-events: auto;
+}
