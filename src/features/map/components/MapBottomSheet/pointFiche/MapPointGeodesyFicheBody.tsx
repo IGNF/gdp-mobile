@@ -6,7 +6,7 @@ import {
   buildPointCarouselItems,
   collectAllPointFields,
   filterUnmappedPointFields,
-  formatActionDateCaption,
+  formatObsDateCaption,
   normalizeLabel,
   readProperty,
 } from './pointFicheUtils';
@@ -70,7 +70,8 @@ export function MapPointGeodesyFicheBody({ action, snapIndex }: MapPointGeodesyF
   const explGpsVariant = explGps ? resolveGpsExploitabilityVariant(explGps, explGpsCode) : null;
   const explGpsLabel = explGpsVariant === 'inexploitable' ? 'Inexploitable' : 'Exploitable par GPS';
   const repereType = readProperty(action, 'type');
-  const actDate = readProperty(action, 'action_date');
+  const obsDate = readProperty(action, 'obs_date');
+  const obsDateCaption = obsDate ? formatObsDateCaption(obsDate) : null;
   const remark = readProperty(action, 'remarque');
   const partenaire = readProperty(action, 'proprio');
   const partenaireId = readProperty(action, 'proprio_id');
@@ -92,7 +93,7 @@ export function MapPointGeodesyFicheBody({ action, snapIndex }: MapPointGeodesyF
         <>
           <PointImageCarousel items={carouselItems} />
 
-          {actDate ? <p className={styles.carouselCaption}>{formatActionDateCaption(actDate)}</p> : null}
+          {obsDateCaption ? <p className={styles.carouselCaption}>{obsDateCaption}</p> : null}
 
           <section>
             <h3 className={styles.sectionTitle}>Point géodésique</h3>

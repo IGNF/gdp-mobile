@@ -183,13 +183,10 @@ export function findVisitYear(action: MapGeodesyClickAction): string | null {
   return yearMatch?.[0] ?? null;
 }
 
-const YEAR_ONLY_PATTERN = /^\d{4}$/;
-
-/** « Déterminé en 1967 » si `action_date` n'est qu'une année, sinon « Déterminé le 2025/07/28 ». */
-export function formatActionDateCaption(actionDate: string): string {
-  return YEAR_ONLY_PATTERN.test(actionDate)
-    ? `Déterminé en ${actionDate}`
-    : `Déterminé le ${actionDate}`;
+/** « Déterminé en 1967 » (seule l'année de `obs_date` est affichée, le jour/mois ne sont pas utiles). */
+export function formatObsDateCaption(obsDate: string): string | null {
+  const yearMatch = obsDate.match(/\d{4}/);
+  return yearMatch ? `Déterminé en ${yearMatch[0]}` : null;
 }
 
 function normalizeCarouselImageUrl(url: string): string {
