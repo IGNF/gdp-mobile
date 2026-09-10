@@ -90,7 +90,7 @@ Côté web, le serveur qui héberge le JSON doit autoriser CORS pour l’origine
 2. La plateforme courante est dans `platforms`.
 3. `audience` : `authenticated` n’est montré que si l’utilisateur est connecté.
 4. Si `showOnce` et que l’`id` a déjà été fermé sur cet appareil, l’item est masqué.
-5. Si l’utilisateur ferme un item `dismissible` pendant la session, il disparaît jusqu’au prochain lancement (sauf `showOnce`, alors définitif).
+5. Une news affichée sur la carte pendant la session n’est plus réaffichée en y revenant (navigation interne). Une fermeture explicite a le même effet. `showOnce` : masquage définitif sur l’appareil.
 6. Plusieurs bandeaux peuvent s’empiler. Ordre : `error`, puis `warning`, puis `info`.
 7. Une seule modale à la fois (la plus sévère parmi les items `display: "modal"` visibles).
 8. Le menu **Aide** affiche un badge `News` s’il existe au moins une actualité encore valide. La liste se consulte depuis un lien **Actualités** dans la page d’aide (y compris les items déjà fermés sur la carte).

@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
+import { withGeodesyPointReportPosition } from '@ign/gdp-tools';
 
 import type { GeodesyPointReportMapContext } from '@/domain/report/geodesyPointMapContext';
+import type { LocalReportDraft } from '@/domain/report/localReportDraft';
 import { useBottomSheetSnap } from '@/features/map/hooks/useBottomSheetSnap';
 import {
   ReportWizardStepConformity,
@@ -14,7 +16,13 @@ import {
   type NonConformReason,
 } from '@/features/report/components/GeodesyPointReportWizard';
 import { useGeodesyPointReportForm } from '@/features/report/hooks/useGeodesyPointReportForm';
+import { useSubmitGeodesyPointReport } from '@/features/report/hooks/useSubmitGeodesyPointReport';
 import { buildLocalReportDraft } from '@/features/report/utils/localReportDraft';
+import {
+  buildGdpWizardComment,
+  buildGdpWizardThemeFormAttributes,
+} from '@/features/report/utils/gdpWizardThemeAttributes';
+import { buildGeodesyPointReportThemeAttributesForSubmit } from '@/features/report/utils/geodesyReportTheme';
 import { saveLocalReportDraft } from '@/infra/storage/localReportDraftsStore';
 import { Button } from '@/shared/ui/Button';
 import IconClose from '@/shared/assets/icons/icon-close.svg?react';
@@ -61,6 +69,9 @@ function GeodesyPointReportWizardContent({ isOpen, context, onClose }: GeodesyPo
   const [isConform, setIsConform] = useState<boolean | null>(null);
   const [nonConformReasons, setNonConformReasons] = useState<NonConformReason[]>([]);
   const [isSavingDraft, setIsSavingDraft] = useState(false);
+  const [savedDraft, setSavedDraft] = useState<LocalReportDraft | null>(null);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const { submitGeodesyPointReport, isSubmitting } = useSubmitGeodesyPointReport();
   const totalSteps = isConform === false ? 4 : 3;
   const mediaStep = isConform === false ? 2 : 1;
   const summaryStep = isConform === false ? 3 : 2;
@@ -70,6 +81,26 @@ function GeodesyPointReportWizardContent({ isOpen, context, onClose }: GeodesyPo
     initialComment: '',
   });
 
+  const positionedContext = useMemo(
+    () =>
+      withGeodesyPointReportPosition(reportContext, {
+        longitude: form.longitude,
+        latitude: form.latitude,
+      }),
+    [form.latitude, form.longitude, reportContext],
+  );
+
+  const wizardThemeAttributes = useMemo(
+    () =>
+      buildGdpWizardThemeFormAttributes({
+        isConform: isConform === true,
+        nonConformReasons,
+        extraThemeAttributes: form.normalizedThemeAttributes,
+        positionModified: form.canResetPosition,
+      }),
+    [form.canResetPosition, form.normalizedThemeAttributes, isConform, nonConformReasons],
+  );
+
   const handleSaveDraftAndContinue = useCallback(async () => {
     if (isSavingDraft) {
       return;
@@ -77,17 +108,25 @@ function GeodesyPointReportWizardContent({ isOpen, context, onClose }: GeodesyPo
 
     setIsSavingDraft(true);
     try {
+      const comment = buildGdpWizardComment(form.comment, nonConformReasons);
+      const themeAttributes = buildGeodesyPointReportThemeAttributesForSubmit(
+        positionedContext,
+        form.theme,
+        wizardThemeAttributes,
+      );
       const draft = await buildLocalReportDraft({
-        reportContext,
+        reportContext: positionedContext,
         isConform: isConform === true,
         nonConformReasons,
-        comment: form.comment,
+        comment,
         longitude: form.longitude,
         latitude: form.latitude,
         positionModified: form.canResetPosition,
         photos: form.photos,
+        themeAttributes,
       });
       await saveLocalReportDraft(draft);
+      setSavedDraft(draft);
       setStep(confirmationStep);
     } finally {
       setIsSavingDraft(false);
@@ -99,10 +138,56 @@ function GeodesyPointReportWizardContent({ isOpen, context, onClose }: GeodesyPo
     form.latitude,
     form.longitude,
     form.photos,
+    form.theme,
     isConform,
     isSavingDraft,
     nonConformReasons,
-    reportContext,
+    positionedContext,
+    wizardThemeAttributes,
+  ]);
+
+  const handleSendNow = useCallback(async () => {
+    if (isSubmitting) {
+      return;
+    }
+
+    setSubmitError(null);
+    const comment = buildGdpWizardComment(form.comment, nonConformReasons);
+    let lastError: string | null = null;
+    const result = await submitGeodesyPointReport(
+      positionedContext,
+      comment,
+      form.photos,
+      wizardThemeAttributes,
+      {
+        onError: (error) => {
+          lastError = error.message;
+        },
+      },
+    );
+
+    if (result && savedDraft) {
+      await saveLocalReportDraft({ ...savedDraft, serverId: result.serverId });
+    }
+
+    if (result && !lastError) {
+      onClose();
+      navigate('/reports');
+      return;
+    }
+
+    setSubmitError(lastError ?? 'Impossible d’envoyer le signalement pour le moment.');
+  }, [
+    form.comment,
+    form.photos,
+    isSubmitting,
+    navigate,
+    nonConformReasons,
+    onClose,
+    positionedContext,
+    savedDraft,
+    submitGeodesyPointReport,
+    wizardThemeAttributes,
   ]);
 
   const handleCloseAndViewReports = useCallback(() => {
@@ -158,6 +243,8 @@ function GeodesyPointReportWizardContent({ isOpen, context, onClose }: GeodesyPo
       setStep(0);
       setIsConform(null);
       setNonConformReasons([]);
+      setSavedDraft(null);
+      setSubmitError(null);
     }
   }, [isOpen]);
 
@@ -227,7 +314,11 @@ function GeodesyPointReportWizardContent({ isOpen, context, onClose }: GeodesyPo
           ) : step === confirmationStep ? (
             <ReportWizardStepConfirmation
               onSendLater={handleCloseAndViewReports}
-              onSendNow={handleCloseAndViewReports}
+              onSendNow={() => {
+                void handleSendNow();
+              }}
+              isSubmitting={isSubmitting}
+              submitError={submitError}
             />
           ) : (
             <p className="debug-banner">DOING — Écran en cours de reconstruction</p>

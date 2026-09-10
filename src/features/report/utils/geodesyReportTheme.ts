@@ -1,8 +1,5 @@
 import {
-  buildGeodesyPointReportPrefillMap,
-  buildGeodesyPointReportThemeAttributes,
-  mergeGeodesyPointReportMandatoryThemeAttributes,
-  resolveGeodesyPointReportPrefillValue,
+  buildGdpPointReportThemeAttributes,
   type GeodesyPointReportContext,
 } from '@ign/gdp-tools';
 import type { CommunityThemeAttribute, CommunityThemeConfig } from '@/domain/community/models';
@@ -76,58 +73,24 @@ function getGeodesyThemeAttributeNames(
   return names;
 }
 
-/** Attributs thème envoyés au collaboratif (repère, champs auto, saisie formulaire). */
+/** Attributs thème envoyés au collaboratif (whitelist thème `gdp-tools`, sans sketch). */
 export function buildGeodesyPointReportThemeAttributesForSubmit(
   context: GeodesyPointReportContext,
   theme: CommunityThemeConfig | null,
   formThemeAttributes: Record<string, string>,
-  themeName: string = GEODESY_REPORT_THEME,
+  _themeName: string = GEODESY_REPORT_THEME,
 ): Record<string, string> {
-  const themeAttributeNames = getGeodesyThemeAttributeNames(theme, context);
-  const prefillMap = buildGeodesyPointReportPrefillMap(context);
-  const attributes: Record<string, string> = {};
+  const themeAttributeNames = [...getGeodesyThemeAttributeNames(theme, context)];
 
-  if (themeAttributeNames.size > 0) {
-    for (const name of themeAttributeNames) {
-      const candidate = resolveGeodesyPointReportPrefillValue(context, name, prefillMap);
-      if (candidate === undefined) {
-        continue;
-      }
-
-      attributes[name] = candidate;
-    }
-  } else if (matchesGeodesyReportThemeName(themeName)) {
-    Object.assign(attributes, buildGeodesyPointReportThemeAttributes(context));
-  }
-
-  for (const attribute of theme?.autofilled_attributes ?? []) {
-    if (attributes[attribute.name] !== undefined) {
-      continue;
-    }
-
-    const fromContext = context.properties[attribute.name];
-    if (fromContext !== null && fromContext !== undefined && String(fromContext).trim()) {
-      attributes[attribute.name] = String(fromContext).trim();
-      continue;
-    }
-
-    if (attribute.default) {
-      attributes[attribute.name] = attribute.default;
-    }
-  }
-
-  for (const [name, rawValue] of Object.entries(formThemeAttributes)) {
-    if (themeAttributeNames.size > 0 && !themeAttributeNames.has(name)) {
-      continue;
-    }
-
-    const value = rawValue.trim();
-    if (value) {
-      attributes[name] = value;
-    }
-  }
-
-  return mergeGeodesyPointReportMandatoryThemeAttributes(context, attributes);
+  return buildGdpPointReportThemeAttributes(context, {
+    themeAttributeNames: themeAttributeNames.length > 0 ? themeAttributeNames : undefined,
+    formAttributes: formThemeAttributes,
+    autofilledAttributes: theme?.autofilled_attributes,
+    themeAttributeDefs: [
+      ...(theme?.attributes ?? []),
+      ...(theme?.autofilled_attributes ?? []),
+    ],
+  });
 }
 
 export function formatGeodesyThemeLookupHint(themeNames: readonly string[]): string {
@@ -148,12 +111,7 @@ export function resolveGeodesyReportThemeNameFromConfigs(
 
 export function buildGeodesyReportSubmissionComment(
   userComment: string,
-  themeName: string,
   deviceInfo: ReportSubmissionDeviceInfo,
 ): string {
-  const themeLine = `Thème collaboratif : ${themeName}`;
-  const trimmedComment = userComment.trim();
-  const withTheme = trimmedComment ? `${trimmedComment}\n\n${themeLine}` : themeLine;
-
-  return appendDeviceInfoToReportComment(withTheme, deviceInfo);
+  return appendDeviceInfoToReportComment(userComment.trim(), deviceInfo);
 }

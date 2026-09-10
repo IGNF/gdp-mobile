@@ -8,7 +8,9 @@ import { useAuth } from '@/features/auth/hooks/useAuth';
 import { fetchGdpNews } from '@/infra/news/fetchGdpNews';
 import {
   getPersistedDismissedNewsIds,
+  getSessionSeenNewsIds,
   persistDismissedNewsId,
+  rememberSessionNewsIds,
 } from '@/infra/storage/dismissedNewsStore';
 import { config } from '@/shared/config/env';
 
@@ -24,7 +26,9 @@ export function useGdpNews() {
   const { isAuthenticated } = useAuth();
   const [items, setItems] = useState<GdpNewsItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [sessionDismissedIds, setSessionDismissedIds] = useState<Set<string>>(() => new Set());
+  const [sessionDismissedIds, setSessionDismissedIds] = useState<Set<string>>(
+    () => new Set(getSessionSeenNewsIds()),
+  );
   const [persistedDismissedIds, setPersistedDismissedIds] = useState<Set<string>>(() => new Set());
 
   const load = useCallback(async () => {
@@ -80,11 +84,20 @@ export function useGdpNews() {
     [items, isAuthenticated, platform, sessionDismissedIds, persistedDismissedIds],
   );
 
+  useEffect(() => {
+    if (visibleItems.length === 0) {
+      return;
+    }
+
+    rememberSessionNewsIds(visibleItems.map((item) => item.id));
+  }, [visibleItems]);
+
   const dismiss = useCallback(async (item: GdpNewsItem) => {
     if (!item.dismissible) {
       return;
     }
 
+    rememberSessionNewsIds([item.id]);
     setSessionDismissedIds((current) => {
       const next = new Set(current);
       next.add(item.id);
