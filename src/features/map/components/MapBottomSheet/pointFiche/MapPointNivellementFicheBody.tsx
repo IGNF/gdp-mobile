@@ -6,6 +6,7 @@ import {
   buildPointCarouselItems,
   collectAllPointFields,
   filterUnmappedPointFields,
+  formatActionDateCaption,
   formatSentenceCase,
   readProperty,
   resolveVoieSuivieLabel,
@@ -96,7 +97,7 @@ export function MapPointNivellementFicheBody({ action, snapIndex }: MapPointNive
         <>
           <PointImageCarousel items={carouselItems} />
 
-          {actDate ? <p className={styles.carouselCaption}>Determiné en {actDate}</p> : null}
+          {actDate ? <p className={styles.carouselCaption}>{formatActionDateCaption(actDate)}</p> : null}
 
           <section>
             <h3 className={styles.sectionTitle}>Repère de nivellement</h3>
