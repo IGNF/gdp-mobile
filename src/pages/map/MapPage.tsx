@@ -210,7 +210,11 @@ export function MapPage() {
     pictoUrlMaps: geodesy.catalog.wfsPictoUrlMaps,
   });
 
-  useUserLocationMarker({ map, isMapReady });
+  useUserLocationMarker({
+    map,
+    isMapReady,
+    enabled: userFollowingMode !== 'none',
+  });
   useMapClickSelectionMarker({
     map,
     isMapReady,
