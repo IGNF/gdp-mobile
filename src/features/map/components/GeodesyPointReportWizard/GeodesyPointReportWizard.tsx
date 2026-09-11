@@ -6,6 +6,7 @@ import { withGeodesyPointReportPosition } from '@ign/gdp-tools';
 import type { GeodesyPointReportMapContext } from '@/domain/report/geodesyPointMapContext';
 import type { LocalReportDraft } from '@/domain/report/localReportDraft';
 import { useBottomSheetSnap } from '@/features/map/hooks/useBottomSheetSnap';
+import { resolvePointVariantFromReportContext } from '@/features/map/components/MapBottomSheet/pointFiche/resolvePointFicheVariant';
 import {
   ReportWizardStepConformity,
   ReportWizardStepNonConformReason,
@@ -300,6 +301,7 @@ function GeodesyPointReportWizardContent({ isOpen, context, onClose }: GeodesyPo
             <ReportWizardStepNonConformReason
               reasons={nonConformReasons}
               onChange={setNonConformReasons}
+              allowPositionReason={resolvePointVariantFromReportContext(reportContext) === 'nivellement'}
             />
           ) : step === mediaStep ? (
             <ReportWizardStepMedia form={form} />
