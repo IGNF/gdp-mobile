@@ -185,6 +185,14 @@ export function MyReportsPage() {
               </ul>
             )}
 
+            <button
+              type="button"
+              className={styles.historyLink}
+              onClick={() => navigate('/reports/history')}
+            >
+              Mes anciens signalements
+            </button>
+
             <p className={styles.espaceCollaboratifNote}>
               Pour plus de détails sur vos signalements (statut, historique…), rendez-vous sur{' '}
               <ExternalLink href={EXTERNAL_LINKS.ESPACE_COLLABORATIF_PROFILE}>l'espace collaboratif</ExternalLink>.
