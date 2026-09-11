@@ -11,7 +11,7 @@ function resolveAppVersion(fallbackVersion: string): string {
     return __APP_VERSION__.trim();
   }
 
-  return fallbackVersion.trim() || '0.0.0';
+  return fallbackVersion.trim();
 }
 
 function getWebBrowserLabel(): string {

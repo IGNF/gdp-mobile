@@ -26,7 +26,7 @@ const useGeodesySourceAlias = process.env.VITE_GEODESY_SOURCE !== 'dist'
 const appPackage = JSON.parse(
   readFileSync(path.join(__dirname, 'package.json'), 'utf8'),
 ) as { version?: string }
-const appVersion = appPackage.version ?? '0.0.0'
+const appVersion = appPackage.version ?? '4.0.0'
 
 const oauthDevProxyPrefix = '/__sso'
 

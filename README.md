@@ -31,6 +31,7 @@ Scripts utiles :
 | `npm run dev:gdp-tools`      | Package géodésie seul             |
 | `npm run build`              | Build complet (racine web `/`)    |
 | `npm run build:qualif`       | Build qualification (`/qlf-gdp/`) |
+| `npm run bump:version -- 4.0.1` | Version app + natif + tag `v4.0.1` |
 | `npm run lint -w gdp-mobile` | ESLint                            |
 
 
@@ -79,6 +80,32 @@ npm run preview:qualif -w gdp-mobile
 
 La configuration serveur (fallback SPA, proxy OAuth) est gérée côté infra.
 
+## Versions
+
+Source unique : `gdp-mobile/package.json` (`4.0.0`). Pas de suffixe prerelease.
+
+Même modèle que Cartes IGN : un numéro semver aligne web, Android et iOS. Le `versionCode` Android est dérivé (`major × 10000 + minor × 100 + patch`, donc `4.0.0` → `40000`). iOS reçoit la même chaîne en `MARKETING_VERSION` et `CURRENT_PROJECT_VERSION`.
+
+Pour une livraison :
+
+```bash
+# Depuis la racine du monorepo et après avoir mergé
+git chechout main
+git pull
+npm run bump:version -- 4.0.1
+git push && git push origin v4.0.1
+```
+
+Cela met à jour `package.json` et les projets natifs s’ils existent, crée le commit `4.0.1` et le tag `v4.0.1`. Le push du tag pourra plus tard déclencher la CI store (comme Cartes IGN). Sans git :
+
+```bash
+npm run bump:version -- 4.0.1 --no-git
+```
+
+`npm run bump:app:versions` (et `generate-apk` / `setup-android`) recopie seulement la version courante dans Gradle / Xcode, sans commit.
+
+L’écran **À propos** affiche cette version. Les APK de test `fr.ign.gdp` cohabitent avec l’ancienne app `fr.ign.canex`.
+
 ## APK Android
 
 Application unique (`fr.ign.gdp`) — pas de switcher multi-apps.
@@ -96,7 +123,17 @@ Application unique (`fr.ign.gdp`) — pas de switcher multi-apps.
 npm run setup-android
 ```
 
-Le script installe les dépendances, ajoute la plateforme Capacitor Android si besoin, et applique la config GDP (OAuth `fr.ign.gdp://`, géolocalisation, caméra).
+Le script installe les dépendances, ajoute la plateforme Capacitor Android si elle est absente, et aligne la version native sur `package.json`. Le projet `android/` (manifest OAuth `fr.ign.gdp://`, permissions, icônes) est versionné.
+
+### Icône lanceur
+
+Source Capacitor : [`resources/icon.png`](./resources/icon.png) (1024×1024). Les densités Android sont dans `android/app/src/main/res/mipmap-*`. Favicon web : `public/logo.png`.
+
+Pour régénérer les icônes lanceur après un changement de logo :
+
+```bash
+npx @capacitor/assets generate --android
+```
 
 ### Générer l’APK debug
 
@@ -211,8 +248,6 @@ adb reverse tcp:5173 tcp:5173    # à refaire après chaque reconnexion USB
 ```
 
 Sur le téléphone : Chrome → `http://localhost:5173` → **inspect** dans `chrome://inspect`. OAuth web avec redirect `http://localhost:5173/auth/callback`.
-
-Branding (icône lanceur) : voir [scripts/GDP/readme.md](./scripts/GDP/readme.md).
 
 ## Documentation
 

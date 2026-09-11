@@ -1,7 +1,7 @@
 {
   "name": "gdp-mobile",
   "private": true,
-  "version": "0.0.0",
+  "version": "4.0.0",
   "engines": {
     "node": ">=22.0.0"
   },
@@ -17,7 +17,9 @@
     "preview:qualif": "vite preview --mode qualif",
     "generate-apk": "bash ./scripts/generate-apk.sh",
     "setup-android": "bash ./scripts/setup-android.sh",
-    "capacitor-build": "npm run build:mobile && npx cap sync android",
+    "bump:app:versions": "node ./scripts/bump-app-versions.js",
+    "bump:version": "node ./scripts/bump-version.js",
+    "capacitor-build": "npm run build:mobile && npm run bump:app:versions && npx cap sync android",
     "capacitor-run-android": "npm run capacitor-build && npx cap run android",
     "open-android": "npx cap open android"
   },

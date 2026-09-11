@@ -20,6 +20,7 @@ export function AboutPage({ isOpen, onClose }: AboutPageProps) {
       <main className={`${screen.screenContainer} ${styles.content}`}>
         <AppLogo size="sm" />
         <p className="page-subtitle">Application mobile Géodésie de poche.</p>
+        <p className={styles.version}>Version {__APP_VERSION__}</p>
 
         <section className={styles.section}>
           <p className="body">
