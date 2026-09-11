@@ -1,265 +1,135 @@
-# Géodésie de poche — app mobile
+# Géodésie de poche
 
-Application React web-first pour la consultation de points géodésiques et les signalements, basée sur `@ign/gdp-tools`.
+Application React web-first pour la consultation de points géodésiques et les signalements (`@ign/gdp-tools`).
 
-Pour en savoir plus sur la gestion du projet (intranet) [loop](https://loop.cloud.microsoft/p/eyJ3Ijp7InUiOiJodHRwczovL2lnbmYuc2hhcmVwb2ludC5jb20vP25hdj1jejBsTWtZbVpEMWlJV2gwZUhkWlpHNTZiakJYVlVRMlpsZDNSRlJtVEZCQldVVnVSSE5sVms1RmN5MWxkRUpGVURselRWZDNRWGMxUTJvelZtNVJXbmh2WDJreE9EZFZZMEVtWmowd01VSlFTa1pMTnpKUlExSkNTRWREUzBkSVdrSkxSazB6VEVSVlYwWlhVMHhXSm1NOUptWnNkV2xrUFRFJTNEIiwiciI6ZmFsc2V9LCJwIjp7InUiOiJodHRwczovL2lnbmYuc2hhcmVwb2ludC5jb20vOmZsOi9yL2NvbnRlbnRzdG9yYWdlL0NTUF82MTcwZGM4Ni1mM2Q5LTQ1OWYtOTQwZi1hN2Q2YzAzNGRmMmMvQmlibGlvdGglQzMlQThxdWUlMjBkZSUyMGRvY3VtZW50cy9Mb29wQXBwRGF0YS9TYW5zJTIwdGl0cmUubG9vcD9kPXc4NzQzZjU1OGRhNTA0ZTg3OWIxOTNhY2Y5MjczNzNiYSZjc2Y9MSZ3ZWI9MSZuYXY9Y3owbE1rWmpiMjUwWlc1MGMzUnZjbUZuWlNVeVJrTlRVRjgyTVRjd1pHTTROaTFtTTJRNUxUUTFPV1l0T1RRd1ppMWhOMlEyWXpBek5HUm1NbU1tWkQxaUlXaDBlSGRaWkc1NmJqQlhWVVEyWmxkM1JGUm1URkJCV1VWdVJITmxWazVGY3kxbGRFSkZVRGx6VFZkM1FYYzFRMm96Vm01UlduaHZYMmt4T0RkVlkwRW1aajB3TVVKUVNrWkxOekpaTmxaQ1dVOVZSekpSTlVoS1YwZEtNbG8yU2toSE5EVXlKbU05SlRKR0ptWnNkV2xrUFRFbVlUMU1iMjl3UVhCd0puQTlKVFF3Wm14MWFXUjRKVEpHYkc5dmNDMXdZV2RsTFdOdmJuUmhhVzVsY2laNFBTVTNRaVV5TW5jbE1qSWxNMEVsTWpKVU1GSlVWVWg0Y0ZveU5XMU1iazV2V1ZoS2JHTkhPWEJpYmxGMVdUSTVkR1pIU1doaFNGSTBaREZzYTJKdWNIVk5SbVJXVWtSYWJWWXpaRVZXUjFwTlZVVkdXbEpYTlVWak1sWlhWR3RXZWt4WFZqQlJhMVpSVDFoT1RsWXpaRUprZWxaRVlXcE9WMkpzUm1GbFJ6bG1ZVlJGTkU0eFZtcFJXSGQzVFZWS1VWTnJXa3hPZWtwU1VURktRMU5GWkVSVE1HUkpWMnRLVEZKck1IcFVSVkpXVmpCYVdGVXdlRmNsTWpJbE1rTWxNakpwSlRJeUpUTkJKVEl5Wm1VeU9UTXdPR1l0TWpoaVppMDBOV1U0TFRoallUY3RNelZpTkdSbU5HSTVNVGMzSlRJeUpUZEUiLCJyIjpmYWxzZX0sImkiOnsiaSI6ImZlMjkzMDhmLTI4YmYtNDVlOC04Y2E3LTM1YjRkZjRiOTE3NyJ9fQ)
-## Prérequis
+Gestion du projet (intranet) : [Loop](https://loop.cloud.microsoft/p/eyJ3Ijp7InUiOiJodHRwczovL2lnbmYuc2hhcmVwb2ludC5jb20vP25hdj1jejBsTWtZbVpEMWlJV2gwZUhkWlpHNTZiakJYVlVRMlpsZDNSRlJtVEZCQldVVnVSSE5sVms1RmN5MWxkRUpGVURselRWZDNRWGMxUTJvelZtNVJXbmh2WDJreE9EZFZZMEVtWmowd01VSlFTa1pMTnpKUlExSkNTRWREUzBkSVdrSkxSazB6VEVSVlYwWlhVMHhXSm1NOUptWnNkV2xrUFRFJTNEIiwiciI6ZmFsc2V9LCJwIjp7InUiOiJodHRwczovL2lnbmYuc2hhcmVwb2ludC5jb20vOmZsOi9yL2NvbnRlbnRzdG9yYWdlL0NTUF82MTcwZGM4Ni1mM2Q5LTQ1OWYtOTQwZi1hN2Q2YzAzNGRmMmMvQmlibGlvdGglQzMlQThxdWUlMjBkZSUyMGRvY3VtZW50cy9Mb29wQXBwRGF0YS9TYW5zJTIwdGl0cmUubG9vcD9kPXc4NzQzZjU1OGRhNTA0ZTg3OWIxOTNhY2Y5MjczNzNiYSZjc2Y9MSZ3ZWI9MSZuYXY9Y3owbE1rWmpiMjUwWlc1MGMzUnZjbUZuWlNVeVJrTlRVRjgyTVRjd1pHTTROaTFtTTJRNUxUUTFPV1l0T1RRd1ppMWhOMlEyWXpBek5HUm1NbU1tWkQxaUlXaDBlSGRaWkc1NmJqQlhWVVEyWmxkM1JGUm1URkJCV1VWdVJITmxWazVGY3kxbGRFSkZVRGx6VFZkM1FYYzFRMm96Vm01UlduaHZYMmt4T0RkVlkwRW1aajB3TVVKUVNrWkxOekpaTmxaQ1dVOVZSekpSTlVoS1YwZEtNbG8yU2toSE5EVXlKbU05SlRKR0ptWnNkV2xrUFRFbVlUMU1iMjl3UVhCd0puQTlKVFF3Wm14MWFXUjRKVEpHYkc5dmNDMXdZV2RsTFdOdmJuUmhhVzVsY2laNFBTVTNRaVV5TW5jbE1qSWxNMEVsTWpKVU1GSlVWVWg0Y0ZveU5XMU1iazV2V1ZoS2JHTkhPWEJpYmxGMVdUSTVkR1pIU1doaFNGSTBaREZzYTJKdWNIVk5SbVJXVWtSYWJWWXpaRVZXUjFwTlZVVkdXbEpYTlVWak1sWlhWR3RXZWt4WFZqQlJhMVpSVDFoT1RsWXpaRUprZWxaRVlXcE9WMkpzUm1GbFJ6bG1ZVlJGTkU0eFZtcFJXSGQzVFZWS1VWTnJXa3hPZWtwU1VURktRMU5GWkVSVE1HUkpWMnRLVEZKck1IcFVSVkpXVmpCYVdGVXdlRmNsTWpJbE1rTWxNakpwSlRJeUpUTkJKVEl5Wm1VeU9UTXdPR1l0TWpoaVppMDBOV1U0TFRoallUY3RNelZpTkdSbU5HSTVNVGMzSlRJeUpUZEUiLCJyIjpmYWxzZX0sImkiOnsiaSI6ImZlMjkzMDhmLTI4YmYtNDVlOC04Y2E3LTM1YjRkZjRiOTE3NyJ9fQ).
 
-- Node.js ≥ 22
-- Accès SSH GitHub IGNF (`mobile-core`, `mobile-device`, `collaboratif-client-api`)
+En cas de blocage : [Dépannage](./docs/DEPANNAGE.md).
 
-## Démarrage
+## Installation initiale
+
+Prérequis : Node.js ≥ 22, accès SSH GitHub IGNF (`mobile-core`, `mobile-device`, `collaboratif-client-api`).
+
+Depuis la racine du monorepo `geodesie-de-poche/` :
 
 ```bash
-# Depuis la racine du monorepo
 cp gdp-mobile/.env.dist gdp-mobile/.env   # puis renseigner les variables
-nvm use 22
 npm install
-npm run dev                                 # gdp-tools (watch) + app (5173)
 ```
 
-**Proxy IGN (502 OAuth en dev web)** — le navigateur atteint Keycloak, mais Vite (`/__sso`) parle en Node. Sans proxy, tu as `bad_gateway` / `ECONNREFUSED`.
+## Run en dev (local)
 
-`HTTPS_PROXY` / `NO_PROXY` (souvent dans `~/.bashrc` : `http://proxy.ign.fr:3128`) sont utilisés par le proxy Vite. Relancer `npm run dev` depuis un terminal où `echo $HTTPS_PROXY` affiche le proxy. `NO_PROXY` doit contenir `localhost`. Si Cursor lance Vite sans ces variables, les exporter dans ce terminal-là.
+```bash
+npm run dev
+```
 
-Scripts utiles :
+Ouvre l’app sur [http://localhost:5173](http://localhost:5173) (`gdp-tools` en watch + Vite).
 
+## Déploiement en qualif
 
-| Commande                     | Description                       |
-| ---------------------------- | --------------------------------- |
-| `npm run dev:app`            | App seule                         |
-| `npm run dev:gdp-tools`      | Package géodésie seul             |
-| `npm run build`              | Build complet (racine web `/`)    |
-| `npm run build:qualif`       | Build qualification (`/qlf-gdp/`) |
-| `npm run bump:version -- 4.0.1` | Version app + natif + tag `v4.0.1` |
-| `npm run lint -w gdp-mobile` | ESLint                            |
+Sur `main`, en local :
+La première fois, pensez à créer le fichier `.env.qualif` depuis `.env.qualif.dist`
 
-
-## Déploiement qualification
-
-Build dédié lorsque l’app est servie sous un **sous-chemin** (ex. `/qlf-gdp/`) : Vite préfixe les assets (`/qlf-gdp/assets/…`).
-
-### En local, sur la branche main
 ```bash
 git checkout main
-# si ce n'est pas encore fait, renseigner VITE_OAUTH_WEB_REDIRECT_URI et VITE_GDP_*
-cp gdp-mobile/.env.qualif.dist gdp-mobile/.env.qualif 
-# ensuite
-nvm use 22
+git pull
 npm run build:qualif
 ```
 
-### Sur le serveur de qualification
-Déployer le contenu de `gdp-mobile/dist/` sur le serveur de qualification.
-Avec le compte user, déposer sur sftp://cadillac2.ign.fr/var/www/intranet/qlf-gdp/ le contenu de gdp-mobile/dist
+Déposer le contenu de `gdp-mobile/dist/` via SFTP :
 
-[Url de consultation](http://sgm.ign.fr/qlf-gdp/map)
+`sftp://cadillac2.ign.fr/var/www/intranet/qlf-gdp/`
 
-### Variables d'environnement
+Consultation : [http://sgm.ign.fr/qlf-gdp/map](http://sgm.ign.fr/qlf-gdp/map)
 
-| Variable (`.env.qualif`)      | Rôle                                 |
-| ----------------------------- | ------------------------------------ |
-| `VITE_BASE_PATH`              | Sous-chemin, ex. `/qlf-gdp/`         |
-| `VITE_USE_QUALIF`             | `true`                               |
-| `VITE_OAUTH_WEB_REDIRECT_URI` | `<url-qualif>/qlf-gdp/auth/callback` |
-| `VITE_GDP_REPORT_COMMUNITY_ID` | `l'id de la communauté geodesie` |
-| `VITE_GDP_REPORT_DISPLAY_THEMES` | `les thèmes à afficher` |
-| `VITE_GDP_REPORT_SUBMISSION_THEME` | `le thème pour les signalements` |
-| `VITE_GDP_NEWS_URL` | JSON des news / alertes (voir [docs/NEWS.md](./docs/NEWS.md)) |
+Aperçu local du même build : `npm run preview:qualif -w gdp-mobile` → [http://localhost:4173/qlf-gdp/](http://localhost:4173/qlf-gdp/).
+
+| Variable (`.env.qualif`)         | Rôle                                 |
+| -------------------------------- | ------------------------------------ |
+| `VITE_BASE_PATH`                 | Sous-chemin, ex. `/qlf-gdp/`         |
+| `VITE_USE_QUALIF`                | `true`                               |
+| `VITE_OAUTH_WEB_REDIRECT_URI`    | `<url-qualif>/qlf-gdp/auth/callback` |
+| `VITE_GDP_REPORT_COMMUNITY_ID`   | ID de la communauté géodésie         |
+| `VITE_GDP_REPORT_DISPLAY_THEMES` | Thèmes à afficher                    |
+| `VITE_GDP_REPORT_SUBMISSION_THEME` | Thème pour les signalements        |
+| `VITE_GDP_NEWS_URL`              | JSON news / alertes ([docs/NEWS.md](./docs/NEWS.md)) |
 
 
-Keycloak : enregistrer la même URI de redirection web (http et https si les deux sont utilisés). En web, l’URI réelle est aussi dérivée de `window.location`.
+## Déploiement avec tag 
+!! A terme, cette commande lancera aussi le déploiement sur les stores. !!
+Un numéro semver dans `package.json`, recopié dans Android / iOS. Pas de suffixe. Le `versionCode` Android vaut `major × 10000 + minor × 100 + patch` (`4.0.1` → `40001`). L’écran **À propos** affiche cette version.
 
-Test local du build :
+Semver = semantic versioning : un numéro en trois parties, majeur.mineur.patch.
 
-```bash
-nvm use 22
-npm run preview:qualif -w gdp-mobile
-# http://localhost:4173/qlf-gdp/
-```
-
-La configuration serveur (fallback SPA, proxy OAuth) est gérée côté infra.
-
-## Versions
-
-Source unique : `gdp-mobile/package.json` (`4.0.0`). Pas de suffixe prerelease.
-
-Même modèle que Cartes IGN : un numéro semver aligne web, Android et iOS. Le `versionCode` Android est dérivé (`major × 10000 + minor × 100 + patch`, donc `4.0.0` → `40000`). iOS reçoit la même chaîne en `MARKETING_VERSION` et `CURRENT_PROJECT_VERSION`.
-
-Pour une livraison :
+Depuis `main` :
 
 ```bash
-# Depuis la racine du monorepo et après avoir mergé
-git chechout main
+git checkout main
 git pull
 npm run bump:version -- 4.0.1
 git push && git push origin v4.0.1
 ```
 
-Cela met à jour `package.json` et les projets natifs s’ils existent, crée le commit `4.0.1` et le tag `v4.0.1`. Le push du tag pourra plus tard déclencher la CI store (comme Cartes IGN). Sans git :
+Commit `4.0.1` + tag `v4.0.1`. Le push du tag déclenche la CI store.
 
-```bash
-npm run bump:version -- 4.0.1 --no-git
-```
+## Test sur mobile avec Chrome
 
-`npm run bump:app:versions` (et `generate-apk` / `setup-android`) recopie seulement la version courante dans Gradle / Xcode, sans commit.
-
-L’écran **À propos** affiche cette version. Les APK de test `fr.ign.gdp` cohabitent avec l’ancienne app `fr.ign.canex`.
-
-## APK Android
-
-Application unique (`fr.ign.gdp`) — pas de switcher multi-apps.
-
-### Prérequis
-
-- Node.js ≥ 22
-- JDK 17 ou 21 (`javac` disponible)
-- [Android SDK](https://developer.android.com/studio) (variables `ANDROID_HOME` ou SDK via Android Studio)
-
-### Première fois
-
-```bash
-# Depuis la racine du monorepo
-npm run setup-android
-```
-
-Le script installe les dépendances, ajoute la plateforme Capacitor Android si elle est absente, et aligne la version native sur `package.json`. Le projet `android/` (manifest OAuth `fr.ign.gdp://`, permissions, icônes) est versionné.
-
-### Icône lanceur
-
-Source Capacitor : [`resources/icon.png`](./resources/icon.png) (1024×1024). Les densités Android sont dans `android/app/src/main/res/mipmap-*`. Favicon web : `public/logo.png`.
-
-Pour régénérer les icônes lanceur après un changement de logo :
-
-```bash
-npx @capacitor/assets generate --android
-```
-
-### Générer l’APK debug
-
-```bash
-nvm use 22
-npm run generate-apk
-```
-
-Produit : `gdp-mobile/android/app/build/outputs/apk/debug/app-debug.apk`
-
-Transférer l’APK sur le téléphone (USB, mail, etc.) puis l’installer. L’APK debug accepte l’installation depuis des sources inconnues si besoin.
-
-### Lancer depuis Android Studio
-
-C’est le parcours le plus simple pour installer l’app sur un téléphone ou un émulateur, puis l’inspecter dans Chrome.
-
-```bash
-# Depuis la racine du monorepo
-nvm use 22
-npm run capacitor-build -w gdp-mobile   # build dist + copie dans android/
-npm run open-android -w gdp-mobile      # ouvre gdp-mobile/android dans Android Studio
-```
-
-**`Unable to launch Android Studio`** — Capacitor cherche par défaut `studio.sh` ici :
-
-`/usr/local/android-studio/bin/studio.sh`
-
-Si ce fichier n’existe plus (Studio déplacé ou désinstallé), `npx cap open android` échoue même si le SDK (`ANDROID_HOME`) est encore là.
-
-Solutions :
-
-1. Ouvrir le projet à la main dans Android Studio : **File → Open** → `gdp-mobile/android`
-2. Pointer Capacitor vers le vrai binaire (à adapter) :
-
-```bash
-export CAPACITOR_ANDROID_STUDIO_PATH=/chemin/vers/android-studio/bin/studio.sh
-npm run open-android -w gdp-mobile
-```
-
-Pour le rendre permanent, ajouter l’`export` dans `~/.bashrc` (ou équivalent).
-
-3. Réinstaller Android Studio au chemin par défaut Linux (`/usr/local/android-studio`), puis relancer `npm run open-android -w gdp-mobile`.
-
-Dans **Android Studio** :
-
-1. Attendre la sync Gradle (barre de statut en bas). La première ouverture peut prendre plusieurs minutes.
-2. Brancher le téléphone (débogage USB) **ou** démarrer un émulateur (*Device Manager*).
-3. Dans la barre d’outils, choisir l’appareil cible.
-4. Cliquer sur **Run** (triangle vert, `Shift+F10`). L’app s’installe et s’ouvre.
-
-Sans Android Studio, en ligne de commande :
-
-```bash
-npm run capacitor-run-android -w gdp-mobile
-```
-
-Après chaque modification web (React / CSS), refaire `npm run capacitor-build -w gdp-mobile` **avant** de relancer Run : l’APK embarque le bundle `dist/`, pas le serveur Vite.
-
-### Déboguer l’APK — `chrome://inspect/#devices`
-
-Une fois l’app **ouverte** sur l’appareil (via Android Studio, `capacitor-run-android`, ou APK installé), inspecter la WebView Capacitor (console, réseau, éléments) depuis Chrome sur le poste de dev.
-
-**Prérequis**
-
-- **Google Chrome** sur le poste (pas Chromium, pas Firefox)
-- Téléphone Android : *Options pour les développeurs* → **Débogage USB** activé
-- [Platform-tools](https://developer.android.com/tools/releases/platform-tools) (`adb`) installés
-- Câble USB en mode **transfert de fichiers** (pas « charge seule »)
-- Accepter la popup « Autoriser le débogage USB » sur le téléphone (cocher *Toujours autoriser*)
-
-**Étapes**
-
-1. Installer l’APK debug sur le téléphone et **lancer l’app** (Géodésie de poche doit être au premier plan).
-2. Brancher le téléphone au poste et vérifier la connexion ADB :
-  ```bash
-   adb devices
-  ```
-   La liste doit afficher un appareil en état `device` (pas `unauthorized`, pas `offline`).
-3. Sur le poste, ouvrir **chrome://inspect/#devices**
-4. Cocher **Discover USB devices** si proposé.
-5. Sous **Remote Target**, repérer **WebView in fr.ign.gdp** → cliquer **inspect** ou **inspect fallback** .
-
-L’APK charge le bundle `dist` embarqué (pas le serveur Vite). Pour du hot-reload web, préférer Chrome mobile + `npm run dev` (voir ci-dessous).
-
-**Le téléphone n’apparaît pas dans `chrome://inspect`**
-
-
-| Symptôme                                     | Piste                                                                                                                                                                                        |
-| -------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `adb devices` → `unauthorized`               | Débrancher/rebrancher le câble ; accepter la popup sur le téléphone ; révoquer les autorisations USB (*Options développeur* → *Révoquer les autorisations de débogage USB*) puis reconnecter |
-| `adb devices` → liste vide                   | Changer de câble ou de port USB ; activer *Débogage USB* ; sur Linux, règles udev (voir ci-dessous)                                                                                          |
-| ADB OK mais pas de **WebView in fr.ign.gdp** | L’app doit être **ouverte** ; utiliser l’APK **debug** (`npm run generate-apk`, pas release) ; redémarrer l’app après installation                                                           |
-| Page `chrome://inspect` vide                 | Utiliser **Google Chrome** ; cocher *Discover USB devices* ; `adb kill-server && adb start-server` puis `adb devices`                                                                        |
-
-
-**Linux — règles udev** (si `adb devices` ne voit rien sans `sudo`) :
-
-```bash
-# Exemple Debian/Ubuntu — adapter selon la doc Android
-sudo apt install android-sdk-platform-tools-common
-# Débrancher/rebrancher le téléphone, puis :
-adb devices
-```
-
-Ajouter l’utilisateur au groupe `plugdev` si besoin, puis se reconnecter.
-
-**Alternative — Chrome mobile + serveur Vite** (sans APK, hot-reload) :
+Hot-reload via le serveur Vite, sans APK. Brancher le téléphone en USB (débogage USB activé).
 
 ```bash
 npm run dev
 adb reverse tcp:5173 tcp:5173    # à refaire après chaque reconnexion USB
 ```
 
-Sur le téléphone : Chrome → `http://localhost:5173` → **inspect** dans `chrome://inspect`. OAuth web avec redirect `http://localhost:5173/auth/callback`.
+Sur le téléphone : Chrome → `http://localhost:5173`. Inspecter depuis le poste : `chrome://inspect`. Redirect OAuth : `http://localhost:5173/auth/callback`.
+
+## Création d’un APK de test
+
+Prérequis : JDK 17 ou 21, [Android SDK](https://developer.android.com/studio) (`ANDROID_HOME`). Première fois :
+
+```bash
+npm run setup-android
+```
+
+Téléphone branché en USB (débogage USB activé) — build, installe et lance l’app (sans Android Studio) :
+
+```bash
+npm run run-apk
+```
+
+Pour seulement produire le fichier (clé USB, mail, etc.) :
+
+```bash
+npm run generate-apk
+```
+
+APK : `gdp-mobile/android/app/build/outputs/apk/debug/app-debug.apk`. Identifiant `fr.ign.gdp` : cohabite avec l’ancienne app `fr.ign.canex`.
+
+Inspecter la WebView (bundle `dist`, pas Vite) : `chrome://inspect/#devices` → **WebView in fr.ign.gdp**.
+
+## Scripts (`gdp-mobile`)
+
+| Commande | Rôle |
+| --- | --- |
+| `npm run dev` | Serveur Vite (local) |
+| `npm run build` | Build web à la racine `/` |
+| `npm run build:qualif` | Build qualification (`/qlf-gdp/`) |
+| `npm run build:mobile` | Build web pour l’APK (`gdp-tools` en `dist`) — appelé par `generate-apk` / `run-apk` |
+| `npm run preview:qualif` | Aperçu local du build qualif |
+| `npm run setup-android` | Première config Android |
+| `npm run generate-apk` | Produit le fichier APK debug |
+| `npm run run-apk` | Build, installe et lance l’APK sur le téléphone USB |
+| `npm run bump:version -- 4.0.1` | Version + commit + tag `v4.0.1` |
+| `npm run lint` | ESLint |
+| `npm run lint:css-modules` | Contrôle des CSS modules |
+
+Depuis la racine du monorepo, les mêmes noms marchent pour `dev`, `build`, `build:qualif`, `setup-android`, `generate-apk`, `run-apk` et `bump:version`.
 
 ## Documentation
 
+- [Dépannage](./docs/DEPANNAGE.md)
 - [Architecture](./docs/ARCHITECTURE.md)
 - [Fiche point (carte)](./docs/FICHE_POINT.md)
 - [Mode d'emploi](./docs/MODE_EMPLOI.md)
 - [Configuration des thèmes de signalement](./docs/CONFIGURATION_THEMES.md)
 - [News et alertes](./docs/NEWS.md)
-
-## Références
-
-- `@ign/gdp-tools` : logique carto géodésie (WMS/WFS, hooks React)
-- `bof-mobile` : patterns auth, API, carte
-- `espaceco-mobile-refonte` : charte graphique et composants UI
-
