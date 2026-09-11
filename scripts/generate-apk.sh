@@ -36,6 +36,7 @@ npm run build:mobile -w gdp-mobile --prefix "${REPO_ROOT}"
 
 echo "Syncing Capacitor with Android…"
 cd "${APP_DIR}"
+node "${SCRIPT_DIR}/bump-app-versions.js"
 npx cap sync android
 
 echo "Building APK…"
