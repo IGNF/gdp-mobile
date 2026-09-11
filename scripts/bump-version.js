@@ -9,6 +9,7 @@
  *   npm run bump:version -- 4.0.1 --no-git
  */
 import { execFileSync } from 'node:child_process';
+import fs from 'node:fs';
 import path from 'node:path';
 import {
   APP_DIR,
@@ -74,10 +75,10 @@ try {
 
   const gitRoot = gitRootFrom(APP_DIR);
   const toStage = [PACKAGE_JSON];
-  if (ANDROID_GRADLE && !isIgnored(gitRoot, ANDROID_GRADLE)) {
+  if (fs.existsSync(ANDROID_GRADLE) && !isIgnored(gitRoot, ANDROID_GRADLE)) {
     toStage.push(ANDROID_GRADLE);
   }
-  if (IOS_PBXPROJ && !isIgnored(gitRoot, IOS_PBXPROJ)) {
+  if (fs.existsSync(IOS_PBXPROJ) && !isIgnored(gitRoot, IOS_PBXPROJ)) {
     toStage.push(IOS_PBXPROJ);
   }
 
