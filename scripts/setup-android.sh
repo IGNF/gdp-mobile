@@ -37,9 +37,6 @@ if [[ ! -d "${APP_DIR}/android" ]]; then
   echo "Attention : android/ était absent. Vérifiez le manifeste OAuth (fr.ign.gdp) et les icônes lanceur."
 fi
 
-echo "Application de la version native (package.json)…"
-node "${SCRIPT_DIR}/bump-app-versions.js"
-
 echo ""
 echo "Projet Android prêt."
 echo "  Depuis la racine du monorepo : npm run generate-apk"

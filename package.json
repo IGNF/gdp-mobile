@@ -13,15 +13,11 @@
     "build:mobile": "VITE_GEODESY_SOURCE=dist tsc -b && vite build",
     "lint": "eslint .",
     "lint:css-modules": "node scripts/check-css-modules.js",
-    "preview": "vite preview",
     "preview:qualif": "vite preview --mode qualif",
     "generate-apk": "bash ./scripts/generate-apk.sh",
+    "run-apk": "bash ./scripts/run-apk.sh",
     "setup-android": "bash ./scripts/setup-android.sh",
-    "bump:app:versions": "node ./scripts/bump-app-versions.js",
-    "bump:version": "node ./scripts/bump-version.js",
-    "capacitor-build": "npm run build:mobile && npm run bump:app:versions && npx cap sync android",
-    "capacitor-run-android": "npm run capacitor-build && npx cap run android",
-    "open-android": "npx cap open android"
+    "bump:version": "node ./scripts/bump-version.js"
   },
   "dependencies": {
     "@capacitor/app": "^8.0.0",
