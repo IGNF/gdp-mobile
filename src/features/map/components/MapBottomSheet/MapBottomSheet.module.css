@@ -7,21 +7,16 @@
 	transition: height var(--duration-slow) var(--ease-standard);
 }
 
-/* Consultation complète : la fiche passe en plein écran (poignée tirée jusqu'en haut). */
 .sheet.sheetFullscreen {
 	margin-bottom: 0;
 	border-radius: 0;
 	box-shadow: none;
-  }
-  
+}
 
 .sheetDragging {
 	transition: none;
 }
 
-.sheetAuto {
-	height: auto;
-}
 
 .sheetCollapsed {
 	height: 0;
@@ -33,23 +28,25 @@
 	transition: height var(--duration-slow) var(--ease-standard), background var(--duration-slow) var(--ease-standard), box-shadow var(--duration-slow) var(--ease-standard);
 }
 
-.sheetPointFiche {
+/* Fenêtre modale flottant au-dessus de la carte : marges latérales, coins hauts arrondis,
+   pas de marge basse (la fiche part du bas de l'écran). Le compound selector (.sheet +
+   .sheetPointFiche) prime volontairement sur .sheet (margin-bottom) et sur sheetChrome.surface
+   (border-radius) qui, seuls, ont la même spécificité CSS. */
+.sheet.sheetPointFiche {
+	margin: 0 0.25rem 0;
 	background: var(--color-fiche-canvas);
-	/* Ne jamais couvrir la pile de FAB (filtre/couches/légende) de MapPage : 3 boutons de
-	   3rem + 2 espaces de 0.5rem, plus une marge de respiration. */
-	max-height: calc(100dvh - max(var(--spacing-sm), var(--safe-top)) - 10.75rem);
-}
+	border-radius: 1.25rem 1.25rem 0 0;
+	transition: height 0.3s ease-out, margin 0.3s ease-out;
+	/* Petite marge en haut même à l'ouverture maximale — cohérent avec usePointFicheSheetDrag. */
+	max-height: calc(100dvh - max(0.75rem, var(--safe-top)));
+  }
+  
+  /* Ouverture maximale : la fiche occupe toute la largeur, plus de marges latérales. */
+  .sheet.sheetPointFiche.sheetFullscreen {
+	margin-left: 0;
+	margin-right: 0;
+  }
 
-/* Plein écran : plus de réserve pour la pile de FAB, la fiche occupe tout l'espace disponible. */
-.sheetPointFiche.sheetFullscreen {
-  max-height: calc(100dvh - max(0.75rem, var(--safe-top)));
-}
-
-.contentPointMini {
-  flex: 0 0 auto;
-  overflow: visible;
-  padding: 0;
-}
 
 .contentPointSheet {
   flex: 1;

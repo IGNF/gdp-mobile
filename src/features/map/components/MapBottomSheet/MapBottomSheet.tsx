@@ -3,6 +3,10 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import type { MapGeodesyClickAction } from '@/features/map/hooks/useMapGeodesyClick';
 import { useBottomSheetSnap } from '@/features/map/hooks/useBottomSheetSnap';
+import {
+  getPointFicheSheetGeometry,
+  usePointFicheSheetDrag,
+} from '@/features/map/hooks/usePointFicheSheetDrag';
 import { useNearestRgpStations } from '@/features/map/hooks/useNearestRgpStations';
 import { useUserLocation } from '@/features/map/hooks/useUserLocation';
 import { useAddressSearchHistory } from '@/features/search/hooks/useAddressSearchHistory';
@@ -10,7 +14,6 @@ import type { AddressSearchHistoryEntry } from '@/features/search/utils/addressS
 import { useSearchGeoportail } from '@/features/search/hooks/useSearchGeoportail';
 import type { UserFollowingMode } from '@/features/map/hooks/useMap';
 import { openExternalNavigation } from '@/shared/utils/externalNavigation';
-import { PageHeader } from '@/shared/ui/PageHeader';
 
 import sheetChrome from '@/features/map/styles/mapSheet.module.css';
 
@@ -19,6 +22,8 @@ import { BrowseSearchHome } from './BrowseSearchHome';
 import { MapPointSheet } from './pointFiche/MapPointSheet';
 import styles from './MapBottomSheet.module.css';
 import { RiSearchLine } from 'react-icons/ri';
+
+import { PageHeader } from '@/shared/ui/PageHeader';
 
 type BrowsePanelView = 'search' | 'rgp';
 
@@ -31,11 +36,6 @@ function getBrowseSnapHeights(viewportHeight: number): readonly number[] {
   return [0, normalHeight, maxHeight];
 }
 
-// 3 boutons de 3rem + 2 espaces de 0.5rem + 0.75rem de marge = 10.75rem (172px),
-// doit rester cohérent avec le max-height de .sheetPointFiche (MapBottomSheet.module.css)
-// pour que la fiche ne recouvre jamais la pile de FAB (filtre/couches/légende).
-const FAB_STACK_RESERVE_PX = 172;
-
 function getSafeAreaTopPx(): number {
   if (typeof window === 'undefined') {
     return 0;
@@ -45,21 +45,6 @@ function getSafeAreaTopPx(): number {
     getComputedStyle(document.documentElement).getPropertyValue('--safe-top'),
   );
   return Number.isFinite(parsed) ? parsed : 0;
-}
-
-function getPointSnapHeights(viewportHeight: number, safeAreaTop: number): readonly number[] {
-  const topInset = Math.max(12, safeAreaTop);
-  // Consultation rapide : la fiche ne recouvre jamais la pile de FAB (filtre/couches/légende).
-  const quickViewMaxHeight = Math.max(220, viewportHeight - topInset - FAB_STACK_RESERVE_PX);
-  // Consultation complète (poignée tirée jusqu'en haut) : la fiche passe en plein écran.
-  const fullscreenHeight = Math.max(quickViewMaxHeight, viewportHeight - topInset);
-
-  return [
-    220,
-    Math.min(Math.round(viewportHeight * 0.48), quickViewMaxHeight),
-    Math.min(Math.round(viewportHeight * 0.68), quickViewMaxHeight),
-    fullscreenHeight,
-  ];
 }
 
 export interface MapBottomSheetProps {
@@ -75,7 +60,7 @@ export interface MapBottomSheetProps {
   /** Désactive le suivi GPS (following / locked) après une recherche d’adresse ou de commune. */
   onDisableUserFollowing?: () => void;
   onSheetHeightChange?: (height: number) => void;
-  /** Offset carte pour GPS / échelle — suit la hauteur de la sheet, y compris en mini-fiche. */
+  /** Offset carte pour GPS / échelle — suit la hauteur de la sheet. */
   onFabSheetOffsetChange?: (offset: number) => void;
   onTabbarVisibleChange?: (visible: boolean) => void;
   hideBrowseSheet?: boolean;
@@ -110,9 +95,10 @@ export function MapBottomSheet({
   onSearchPanelStateChange,
 }: MapBottomSheetProps) {
   const [searchContainer, setSearchContainer] = useState<HTMLDivElement | null>(null);
-  const searchContainerRef = useRef<HTMLDivElement | null>(null);
+  const searchContainerRef = useRef<HTMLDivElement>(null);
+
   searchContainerRef.current = searchContainer;
-  const sheetRef = useRef<HTMLElement>(null);
+
   const browseSnapIndexRef = useRef(0);
   const browseViewRef = useRef<BrowsePanelView>('search');
   const pendingBrowseViewRef = useRef<BrowsePanelView | null>(null);
@@ -123,6 +109,7 @@ export function MapBottomSheet({
   const [browseView, setBrowseView] = useState<BrowsePanelView>('search');
   browseViewRef.current = browseView;
 
+  const sheetRef = useRef<HTMLElement>(null);
   useEffect(() => {
     const handleResize = () => {
       setViewportHeight(window.innerHeight);
@@ -134,8 +121,8 @@ export function MapBottomSheet({
   }, []);
 
   const browseSnapHeights = useMemo(() => getBrowseSnapHeights(viewportHeight), [viewportHeight]);
-  const pointSnapHeights = useMemo(
-    () => getPointSnapHeights(viewportHeight, safeAreaTop),
+  const pointGeometry = useMemo(
+    () => getPointFicheSheetGeometry(viewportHeight, safeAreaTop),
     [viewportHeight, safeAreaTop],
   );
 
@@ -145,22 +132,27 @@ export function MapBottomSheet({
     enabled: !isPointMode,
   });
 
-  const pointSnap = useBottomSheetSnap({
-    snapHeights: pointSnapHeights,
-    initialIndex: 0,
+  const pointSheet = usePointFicheSheetDrag({
+    geometry: pointGeometry,
+    viewportHeight,
     enabled: isPointMode,
     onDismiss: onClosePoint,
   });
 
-  const { currentHeight, dragHandleProps, snapIndex, dragOffset, setSnapIndex } = isPointMode
-    ? pointSnap
-    : browseSnap;
+  const { setSnapIndex } = browseSnap;
+  const currentHeight = isPointMode ? pointSheet.currentHeight : browseSnap.currentHeight;
+  const dragHandleProps = isPointMode ? pointSheet.dragHandleProps : browseSnap.dragHandleProps;
+  const dragOffset = isPointMode ? pointSheet.dragOffset : browseSnap.dragOffset;
   const isBrowseCollapsed = !isPointMode && browseSnap.snapIndex === 0;
   const isBrowseExpanded = !isPointMode && browseSnap.snapIndex > 0;
-  const isPointMiniFiche = isPointMode && snapIndex === 0;
-  const isPointFullscreen = isPointMode && snapIndex === pointSnapHeights.length - 1;
-  const isSheetAuto = (isBrowseCollapsed || isPointMiniFiche) && dragOffset === 0;
+  // Contenu de la fiche point : niveau 1 (compact, glissé libre 18 %-40 %) ou niveau 2
+  // (fiche étendue à 40 % ou en grand) — voir usePointFicheSheetDrag pour les seuils.
+  const pointContentLevel = pointSheet.currentHeight >= pointGeometry.freeMaxHeight - 1 ? 2 : 1;
+  // Ouverture maximale : la fiche perd ses marges latérales et occupe toute la largeur.
+  const isPointFullscreen = isPointMode && pointSheet.currentHeight >= pointGeometry.fullscreenHeight - 1;
 
+  
+  const isSheetAuto = isBrowseCollapsed  && dragOffset === 0;
   browseSnapIndexRef.current = isPointMode ? 0 : browseSnap.snapIndex;
 
   useEffect(() => {
@@ -255,6 +247,23 @@ export function MapBottomSheet({
     onSearchPanelStateChange?.(isSearchOpen);
   }, [isBrowseExpanded, browseView, onSearchPanelStateChange]);
 
+  useEffect(() => {
+    if (!map || !isMapReady || isPointMode) {
+      return;
+    }
+
+    const handleMapClick = () => {
+      if (browseSnapIndexRef.current > 0) {
+        collapseBrowseSheet();
+      }
+    };
+
+    map.on('singleclick', handleMapClick);
+    return () => {
+      map.un('singleclick', handleMapClick);
+    };
+  }, [collapseBrowseSheet, isMapReady, isPointMode, map]);
+
   const { entries: historyEntries, refresh: refreshSearchHistory } = useAddressSearchHistory(isBrowseExpanded);
 
   const handleSearchSelect = useCallback(() => {
@@ -278,7 +287,7 @@ export function MapBottomSheet({
   const { selectHistoryEntry } = useSearchGeoportail({
     map,
     addressContainer: searchContainer,
-    isOpen: isMapReady && !isPointMode && isBrowseExpanded && browseView === 'search',
+    isOpen: isMapReady && !isPointMode && isBrowseExpanded,
     placeholder: 'Rechercher un point, une adresse…',
     onFocus: expandBrowseSheet,
     onSelect: handleSearchSelect,
@@ -298,6 +307,7 @@ export function MapBottomSheet({
       onTabbarVisibleChange?.(true);
     };
   }, [isPointMode, onTabbarVisibleChange]);
+
 
   useEffect(() => {
     if (!isPointMode && hideBrowseSheet) {
@@ -346,7 +356,6 @@ export function MapBottomSheet({
     onFabSheetOffsetChange,
     onSheetHeightChange,
   ]);
-
   const referencePosition = useUserLocation({ enabled: userFollowingMode !== 'none' });
 
   const handleNavigateToPoint = () => {
@@ -372,7 +381,6 @@ export function MapBottomSheet({
 
   return (
     <section
-      ref={sheetRef}
       className={[
         sheetChrome.surface,
         styles.sheet,
@@ -396,13 +404,13 @@ export function MapBottomSheet({
       }
       aria-label={isPointMode ? 'Fiche repère' : 'Recherche et stations RGP'}
     >
+
+
       {isPointMode && selectedPoint ? (
-        <div
-          className={`${sheetChrome.body} ${isPointMiniFiche ? styles.contentPointMini : styles.contentPointSheet}`}
-        >
+        <div className={`${sheetChrome.body} ${styles.contentPointSheet}`}>
           <MapPointSheet
             action={selectedPoint}
-            snapIndex={snapIndex}
+            snapIndex={pointContentLevel}
             referencePosition={referencePosition}
             canReport={canReportPoint}
             reportDisabledReason={reportDisabledReason}
@@ -413,54 +421,54 @@ export function MapBottomSheet({
         </div>
       ) : isBrowseCollapsed ? null : (
         <>
-          <PageHeader
-            title={browseView === 'rgp' ? 'Stations RGP' : 'Recherche'}
-            showBackButton
-            showCloseButton={false}
-            onBack={browseView === 'rgp' ? () => setBrowseView('search') : collapseBrowseSheet}
-          />
-          <div className={styles.contentExpanded}>
-          {browseView === 'search' ? (
-            <div className={styles.searchArea}>
-              <div
-                className={styles.searchField}
-                onPointerDown={(event) => {
-                  if (event.target instanceof HTMLInputElement) {
-                    return;
-                  }
+        <PageHeader
+          title={browseView === 'rgp' ? 'Stations RGP' : 'Recherche'}
+          showBackButton
+          showCloseButton={false}
+          onBack={browseView === 'rgp' ? () => setBrowseView('search') : collapseBrowseSheet}
+        />
+        <div className={styles.contentExpanded}>
+        {browseView === 'search' ? (
+          <div className={styles.searchArea}>
+            <div
+              className={styles.searchField}
+              onPointerDown={(event) => {
+                if (event.target instanceof HTMLInputElement) {
+                  return;
+                }
 
-                  handleSearchActivate();
-                }}
-              >
-                <RiSearchLine className={styles.searchIcon} aria-hidden />
-                <div ref={setSearchContainer} className={styles.searchContainer} />
-              </div>
+                handleSearchActivate();
+              }}
+            >
+              <RiSearchLine className={styles.searchIcon} aria-hidden />
+              <div ref={setSearchContainer} className={styles.searchContainer} />
             </div>
-          ) : null}
+          </div>
+        ) : null}
 
-          <div className={styles.browsePanel} data-scroll-root="true">
-            {browseView === 'search' ? (
-              <BrowseSearchHome
-                historyEntries={historyEntries}
-                onOpenRgpList={() => setBrowseView('rgp')}
-                onSelectHistoryEntry={handleSelectHistoryEntry}
-              />
-            ) : (
-              <BrowseRgpStationsList
-                stations={stations}
-                isLoading={isRgpLoading}
-                isReloading={isRgpReloading}
-                lastLoadedAt={rgpLastLoadedAt}
-                error={rgpError}
-                onRefresh={() => {
-                  void reloadFromServer();
-                }}
-                onSelectStation={handleRgpSelect}
-              />
-            )}
-          </div>
-          </div>
-        </>
+        <div className={styles.browsePanel} data-scroll-root="true">
+          {browseView === 'search' ? (
+            <BrowseSearchHome
+              historyEntries={historyEntries}
+              onOpenRgpList={() => setBrowseView('rgp')}
+              onSelectHistoryEntry={handleSelectHistoryEntry}
+            />
+          ) : (
+            <BrowseRgpStationsList
+              stations={stations}
+              isLoading={isRgpLoading}
+              isReloading={isRgpReloading}
+              lastLoadedAt={rgpLastLoadedAt}
+              error={rgpError}
+              onRefresh={() => {
+                void reloadFromServer();
+              }}
+              onSelectStation={handleRgpSelect}
+            />
+          )}
+        </div>
+        </div>
+      </>
       )}
     </section>
   );
