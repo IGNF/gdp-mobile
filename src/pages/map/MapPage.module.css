@@ -27,6 +27,19 @@
   pointer-events: none;
 }
 
+.mapChromeSearchOpen {
+  top: 0;
+  overflow: hidden;
+  background: var(--color-bg-page);
+  pointer-events: auto;
+}
+
+.mapChromeSearchOpen > :global(nav) {
+  position: relative;
+  z-index: 1;
+  margin-top: auto;
+}
+
 .mapChrome > * {
   pointer-events: auto;
 }

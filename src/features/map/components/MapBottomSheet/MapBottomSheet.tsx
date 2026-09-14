@@ -10,6 +10,7 @@ import type { AddressSearchHistoryEntry } from '@/features/search/utils/addressS
 import { useSearchGeoportail } from '@/features/search/hooks/useSearchGeoportail';
 import type { UserFollowingMode } from '@/features/map/hooks/useMap';
 import { openExternalNavigation } from '@/shared/utils/externalNavigation';
+import { PageHeader } from '@/shared/ui/PageHeader';
 
 import sheetChrome from '@/features/map/styles/mapSheet.module.css';
 
@@ -254,23 +255,6 @@ export function MapBottomSheet({
     onSearchPanelStateChange?.(isSearchOpen);
   }, [isBrowseExpanded, browseView, onSearchPanelStateChange]);
 
-  useEffect(() => {
-    if (!map || !isMapReady || isPointMode) {
-      return;
-    }
-
-    const handleMapClick = () => {
-      if (browseSnapIndexRef.current > 0) {
-        collapseBrowseSheet();
-      }
-    };
-
-    map.on('singleclick', handleMapClick);
-    return () => {
-      map.un('singleclick', handleMapClick);
-    };
-  }, [collapseBrowseSheet, isMapReady, isPointMode, map]);
-
   const { entries: historyEntries, refresh: refreshSearchHistory } = useAddressSearchHistory(isBrowseExpanded);
 
   const handleSearchSelect = useCallback(() => {
@@ -324,11 +308,11 @@ export function MapBottomSheet({
 
     const reportOffsets = (height: number) => {
       onSheetHeightChange?.(height);
-      // Bouton recherche seul (collapsed) : ne pousse pas le FAB géoloc.
-      onFabSheetOffsetChange?.(isBrowseCollapsed ? 0 : height);
+      // Écran recherche : la tabbar reste visible, les FAB restent derrière le panneau.
+      onFabSheetOffsetChange?.(isBrowseCollapsed || isBrowseExpanded ? 0 : height);
     };
 
-    if (isBrowseCollapsed) {
+    if (isBrowseCollapsed || isBrowseExpanded) {
       reportOffsets(0);
       return;
     }
@@ -356,6 +340,7 @@ export function MapBottomSheet({
     currentHeight,
     hideBrowseSheet,
     isBrowseCollapsed,
+    isBrowseExpanded,
     isPointMode,
     isSheetAuto,
     onFabSheetOffsetChange,
@@ -395,30 +380,22 @@ export function MapBottomSheet({
         isSheetAuto ? styles.sheetAuto : '',
         isPointMode ? styles.sheetPointFiche : '',
         isPointFullscreen ? styles.sheetFullscreen : '',
-        isBrowseExpanded ? styles.sheetSearchActive : '',
+        isBrowseExpanded ? styles.sheetSearchScreen : '',
         isBrowseCollapsed ? styles.sheetCollapsed : '',
       ]
         .filter(Boolean)
         .join(' ')}
       style={
-        isBrowseCollapsed
-          ? { height: 0, ['--map-sheet-height' as string]: '0px' }
-          : isSheetAuto
+        isPointMode
+          ? isSheetAuto
             ? undefined
             : { height: `${currentHeight}px`, ['--map-sheet-height' as string]: `${currentHeight}px` }
+          : isBrowseCollapsed
+            ? { height: 0, ['--map-sheet-height' as string]: '0px' }
+            : undefined
       }
       aria-label={isPointMode ? 'Fiche repère' : 'Recherche et stations RGP'}
     >
-      {!isPointMode && isBrowseExpanded ? (
-        <div
-          className={`${sheetChrome.handleArea} ${styles.handleAreaDraggable}`}
-          {...dragHandleProps}
-          aria-hidden={browseSnapHeights.length < 2}
-        >
-          <span className={sheetChrome.handle} />
-        </div>
-      ) : null}
-
       {isPointMode && selectedPoint ? (
         <div
           className={`${sheetChrome.body} ${isPointMiniFiche ? styles.contentPointMini : styles.contentPointSheet}`}
@@ -435,7 +412,14 @@ export function MapBottomSheet({
           />
         </div>
       ) : isBrowseCollapsed ? null : (
-        <div className={styles.contentExpanded}>
+        <>
+          <PageHeader
+            title={browseView === 'rgp' ? 'Stations RGP' : 'Recherche'}
+            showBackButton
+            showCloseButton={false}
+            onBack={browseView === 'rgp' ? () => setBrowseView('search') : collapseBrowseSheet}
+          />
+          <div className={styles.contentExpanded}>
           {browseView === 'search' ? (
             <div className={styles.searchArea}>
               <div
@@ -468,7 +452,6 @@ export function MapBottomSheet({
                 isReloading={isRgpReloading}
                 lastLoadedAt={rgpLastLoadedAt}
                 error={rgpError}
-                onBack={() => setBrowseView('search')}
                 onRefresh={() => {
                   void reloadFromServer();
                 }}
@@ -476,7 +459,8 @@ export function MapBottomSheet({
               />
             )}
           </div>
-        </div>
+          </div>
+        </>
       )}
     </section>
   );
