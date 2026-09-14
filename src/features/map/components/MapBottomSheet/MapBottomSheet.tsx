@@ -3,6 +3,10 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import type { MapGeodesyClickAction } from '@/features/map/hooks/useMapGeodesyClick';
 import { useBottomSheetSnap } from '@/features/map/hooks/useBottomSheetSnap';
+import {
+  getPointFicheSheetGeometry,
+  usePointFicheSheetDrag,
+} from '@/features/map/hooks/usePointFicheSheetDrag';
 import { useNearestRgpStations } from '@/features/map/hooks/useNearestRgpStations';
 import { useUserLocation } from '@/features/map/hooks/useUserLocation';
 import { useAddressSearchHistory } from '@/features/search/hooks/useAddressSearchHistory';
@@ -30,11 +34,6 @@ function getBrowseSnapHeights(viewportHeight: number): readonly number[] {
   return [0, normalHeight, maxHeight];
 }
 
-// 3 boutons de 3rem + 2 espaces de 0.5rem + 0.75rem de marge = 10.75rem (172px),
-// doit rester cohérent avec le max-height de .sheetPointFiche (MapBottomSheet.module.css)
-// pour que la fiche ne recouvre jamais la pile de FAB (filtre/couches/légende).
-const FAB_STACK_RESERVE_PX = 172;
-
 function getSafeAreaTopPx(): number {
   if (typeof window === 'undefined') {
     return 0;
@@ -44,21 +43,6 @@ function getSafeAreaTopPx(): number {
     getComputedStyle(document.documentElement).getPropertyValue('--safe-top'),
   );
   return Number.isFinite(parsed) ? parsed : 0;
-}
-
-function getPointSnapHeights(viewportHeight: number, safeAreaTop: number): readonly number[] {
-  const topInset = Math.max(12, safeAreaTop);
-  // Consultation rapide : la fiche ne recouvre jamais la pile de FAB (filtre/couches/légende).
-  const quickViewMaxHeight = Math.max(220, viewportHeight - topInset - FAB_STACK_RESERVE_PX);
-  // Consultation complète (poignée tirée jusqu'en haut) : la fiche passe en plein écran.
-  const fullscreenHeight = Math.max(quickViewMaxHeight, viewportHeight - topInset);
-
-  return [
-    220,
-    Math.min(Math.round(viewportHeight * 0.48), quickViewMaxHeight),
-    Math.min(Math.round(viewportHeight * 0.68), quickViewMaxHeight),
-    fullscreenHeight,
-  ];
 }
 
 export interface MapBottomSheetProps {
@@ -74,7 +58,7 @@ export interface MapBottomSheetProps {
   /** Désactive le suivi GPS (following / locked) après une recherche d’adresse ou de commune. */
   onDisableUserFollowing?: () => void;
   onSheetHeightChange?: (height: number) => void;
-  /** Offset carte pour GPS / échelle — suit la hauteur de la sheet, y compris en mini-fiche. */
+  /** Offset carte pour GPS / échelle — suit la hauteur de la sheet. */
   onFabSheetOffsetChange?: (offset: number) => void;
   onTabbarVisibleChange?: (visible: boolean) => void;
   hideBrowseSheet?: boolean;
@@ -109,7 +93,6 @@ export function MapBottomSheet({
   onSearchPanelStateChange,
 }: MapBottomSheetProps) {
   const searchContainerRef = useRef<HTMLDivElement>(null);
-  const sheetRef = useRef<HTMLElement>(null);
   const browseSnapIndexRef = useRef(0);
   const browseViewRef = useRef<BrowsePanelView>('search');
   const pendingBrowseViewRef = useRef<BrowsePanelView | null>(null);
@@ -131,8 +114,8 @@ export function MapBottomSheet({
   }, []);
 
   const browseSnapHeights = useMemo(() => getBrowseSnapHeights(viewportHeight), [viewportHeight]);
-  const pointSnapHeights = useMemo(
-    () => getPointSnapHeights(viewportHeight, safeAreaTop),
+  const pointGeometry = useMemo(
+    () => getPointFicheSheetGeometry(viewportHeight, safeAreaTop),
     [viewportHeight, safeAreaTop],
   );
 
@@ -142,21 +125,24 @@ export function MapBottomSheet({
     enabled: !isPointMode,
   });
 
-  const pointSnap = useBottomSheetSnap({
-    snapHeights: pointSnapHeights,
-    initialIndex: 0,
+  const pointSheet = usePointFicheSheetDrag({
+    geometry: pointGeometry,
+    viewportHeight,
     enabled: isPointMode,
     onDismiss: onClosePoint,
   });
 
-  const { currentHeight, dragHandleProps, snapIndex, dragOffset, setSnapIndex } = isPointMode
-    ? pointSnap
-    : browseSnap;
+  const { setSnapIndex } = browseSnap;
+  const currentHeight = isPointMode ? pointSheet.currentHeight : browseSnap.currentHeight;
+  const dragHandleProps = isPointMode ? pointSheet.dragHandleProps : browseSnap.dragHandleProps;
+  const dragOffset = isPointMode ? pointSheet.dragOffset : browseSnap.dragOffset;
   const isBrowseCollapsed = !isPointMode && browseSnap.snapIndex === 0;
   const isBrowseExpanded = !isPointMode && browseSnap.snapIndex > 0;
-  const isPointMiniFiche = isPointMode && snapIndex === 0;
-  const isPointFullscreen = isPointMode && snapIndex === pointSnapHeights.length - 1;
-  const isSheetAuto = (isBrowseCollapsed || isPointMiniFiche) && dragOffset === 0;
+  // Contenu de la fiche point : niveau 1 (compact, glissé libre 18 %-40 %) ou niveau 2
+  // (fiche étendue à 40 % ou en grand) — voir usePointFicheSheetDrag pour les seuils.
+  const pointContentLevel = pointSheet.currentHeight >= pointGeometry.freeMaxHeight - 1 ? 2 : 1;
+  // Ouverture maximale : la fiche perd ses marges latérales et occupe toute la largeur.
+  const isPointFullscreen = isPointMode && pointSheet.currentHeight >= pointGeometry.fullscreenHeight - 1;
 
   browseSnapIndexRef.current = isPointMode ? 0 : browseSnap.snapIndex;
 
@@ -320,42 +306,19 @@ export function MapBottomSheet({
       return;
     }
 
-    const reportOffsets = (height: number) => {
-      onSheetHeightChange?.(height);
-      // Bouton recherche seul (collapsed) : ne pousse pas le FAB géoloc.
-      onFabSheetOffsetChange?.(isBrowseCollapsed ? 0 : height);
-    };
-
     if (isBrowseCollapsed) {
-      reportOffsets(0);
+      onSheetHeightChange?.(0);
+      onFabSheetOffsetChange?.(0);
       return;
     }
 
-    if (!isSheetAuto) {
-      reportOffsets(currentHeight);
-      return;
-    }
-
-    const sheetElement = sheetRef.current;
-    if (!sheetElement) {
-      return;
-    }
-
-    const reportHeight = () => {
-      reportOffsets(sheetElement.getBoundingClientRect().height);
-    };
-
-    reportHeight();
-
-    const resizeObserver = new ResizeObserver(reportHeight);
-    resizeObserver.observe(sheetElement);
-    return () => resizeObserver.disconnect();
+    onSheetHeightChange?.(currentHeight);
+    onFabSheetOffsetChange?.(currentHeight);
   }, [
     currentHeight,
     hideBrowseSheet,
     isBrowseCollapsed,
     isPointMode,
-    isSheetAuto,
     onFabSheetOffsetChange,
     onSheetHeightChange,
   ]);
@@ -385,12 +348,10 @@ export function MapBottomSheet({
 
   return (
     <section
-      ref={sheetRef}
       className={[
         sheetChrome.surface,
         styles.sheet,
         dragOffset !== 0 ? styles.sheetDragging : '',
-        isSheetAuto ? styles.sheetAuto : '',
         isPointMode ? styles.sheetPointFiche : '',
         isPointFullscreen ? styles.sheetFullscreen : '',
         isBrowseExpanded ? styles.sheetSearchActive : '',
@@ -401,9 +362,7 @@ export function MapBottomSheet({
       style={
         isBrowseCollapsed
           ? { height: 0, ['--map-sheet-height' as string]: '0px' }
-          : isSheetAuto
-            ? undefined
-            : { height: `${currentHeight}px`, ['--map-sheet-height' as string]: `${currentHeight}px` }
+          : { height: `${currentHeight}px`, ['--map-sheet-height' as string]: `${currentHeight}px` }
       }
       aria-label={isPointMode ? 'Fiche repère' : 'Recherche et stations RGP'}
     >
@@ -418,12 +377,10 @@ export function MapBottomSheet({
       ) : null}
 
       {isPointMode && selectedPoint ? (
-        <div
-          className={`${sheetChrome.body} ${isPointMiniFiche ? styles.contentPointMini : styles.contentPointSheet}`}
-        >
+        <div className={`${sheetChrome.body} ${styles.contentPointSheet}`}>
           <MapPointSheet
             action={selectedPoint}
-            snapIndex={snapIndex}
+            snapIndex={pointContentLevel}
             referencePosition={referencePosition}
             canReport={canReportPoint}
             reportDisabledReason={reportDisabledReason}
