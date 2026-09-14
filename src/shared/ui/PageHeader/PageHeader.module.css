@@ -55,11 +55,6 @@
 	color: var(--color-text);
 }
 
-.headerButtonActive {
-	background-color: var(--color-bg-secondary-subtle);
-	border-color: var(--color-action-secondary);
-}
-
 .headerButtonPrimary {
 	background-color: var(--color-text-primary);
 	border-color: var(--color-text-primary);

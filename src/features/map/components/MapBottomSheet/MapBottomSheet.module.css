@@ -7,8 +7,20 @@
 	transition: height var(--duration-slow) var(--ease-standard);
 }
 
+/* Consultation complète : la fiche passe en plein écran (poignée tirée jusqu'en haut). */
+.sheet.sheetFullscreen {
+	margin-bottom: 0;
+	border-radius: 0;
+	box-shadow: none;
+  }
+  
+
 .sheetDragging {
 	transition: none;
+}
+
+.sheetAuto {
+	height: auto;
 }
 
 .sheetCollapsed {
@@ -21,23 +33,22 @@
 	transition: height var(--duration-slow) var(--ease-standard), background var(--duration-slow) var(--ease-standard), box-shadow var(--duration-slow) var(--ease-standard);
 }
 
-/* Fenêtre modale flottant au-dessus de la carte : marges latérales, coins hauts arrondis,
-   pas de marge basse (la fiche part du bas de l'écran). Le compound selector (.sheet +
-   .sheetPointFiche) prime volontairement sur .sheet (margin-bottom) et sur sheetChrome.surface
-   (border-radius) qui, seuls, ont la même spécificité CSS. */
-.sheet.sheetPointFiche {
-  margin: 0 0.25rem 0;
-  background: var(--color-fiche-canvas);
-  border-radius: 1.25rem 1.25rem 0 0;
-  transition: height 0.3s ease-out, margin 0.3s ease-out;
-  /* Petite marge en haut même à l'ouverture maximale — cohérent avec usePointFicheSheetDrag. */
+.sheetPointFiche {
+	background: var(--color-fiche-canvas);
+	/* Ne jamais couvrir la pile de FAB (filtre/couches/légende) de MapPage : 3 boutons de
+	   3rem + 2 espaces de 0.5rem, plus une marge de respiration. */
+	max-height: calc(100dvh - max(var(--spacing-sm), var(--safe-top)) - 10.75rem);
+}
+
+/* Plein écran : plus de réserve pour la pile de FAB, la fiche occupe tout l'espace disponible. */
+.sheetPointFiche.sheetFullscreen {
   max-height: calc(100dvh - max(0.75rem, var(--safe-top)));
 }
 
-/* Ouverture maximale : la fiche occupe toute la largeur, plus de marges latérales. */
-.sheet.sheetPointFiche.sheetFullscreen {
-  margin-left: 0;
-  margin-right: 0;
+.contentPointMini {
+  flex: 0 0 auto;
+  overflow: visible;
+  padding: 0;
 }
 
 .contentPointSheet {
@@ -327,12 +338,6 @@
 	fill: currentColor;
 }
 
-.contentExpanded .searchContainer :global(.ol-search ul.autocomplete.history) {
-  display: none !important;
-}
-
-
-
 .searchArea {
 	flex-shrink: 0;
 	overflow: visible;
@@ -377,14 +382,30 @@
 .searchField {
 	position: relative;
 	z-index: 1;
-	display: flex;
-	align-items: center;
 	gap: var(--spacing-xs);
 	padding: var(--spacing-4) var(--spacing-s);
 	border: 1.5px solid var(--color-border);
-	border-radius: var(--radius-pill);
-	background: var(--color-bg-subtle);
+	display: flex;
+	width: 344px;
+	height: 49px;
+	padding: 5px 8px;
+	align-items: center;
+	flex-shrink: 0;
+	border-radius: 5px;
+	background: var(--color-white);
+	/* Shadow */
+	box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.20);
 }
+.searchField:focus-within {
+	border: 2px solid var(--green-4, #26A581);
+	/* Shadow */
+	box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.20);
+}
+
+.searchField:focus-within .searchContainer :global(.ol-search ul.autocomplete:not(:empty)) {
+	display: block !important;
+}
+
 
 .searchIcon {
 	width: 1.25rem;
@@ -454,15 +475,11 @@
 	margin: 0;
 	padding: 0;
 	list-style: none;
-	border: 1px solid var(--color-bg-disabled);
-	border-radius: var(--radius-sm);
-	box-shadow: var(--shadow-md);
+	border: 1.5px solid var(--color-border);
+	border-radius: 5px;
+	box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.2);
 	z-index: 20;
-	background: var(--color-bg-surface);
-}
-
-.searchField:focus-within .searchContainer :global(.ol-search ul.autocomplete:not(:empty)) {
-	display: block !important;
+	background: var(--color-white);
 }
 
 .searchContainer :global(.ol-search ul:empty) {
@@ -470,9 +487,15 @@
 }
 
 .searchContainer :global(.ol-search ul li) {
-	padding: var(--spacing-4) var(--spacing-s);
+	padding: var(--spacing-sm) var(--spacing-s);
 	font-size: var(--font-size-base);
+	line-height: var(--line-height-tight);
+	color: var(--color-text);
 	cursor: pointer;
+	white-space: normal;
+	overflow: visible;
+	text-overflow: unset;
+	word-break: break-word;
 }
 
 .searchContainer :global(.ol-search ul li.copy) {
@@ -483,6 +506,48 @@
 .searchContainer :global(.ol-search ul li:hover) {
 	background-color: var(--color-bg-primary-subtle);
 	color: var(--color-text);
+}
+
+.searchContainer :global(.ol-search ul.autocomplete.history) {
+	padding: var(--spacing-2xs) 0 var(--spacing-3xs);
+}
+
+.searchContainer :global(.ol-search ul.autocomplete.history)::before {
+	content: 'Recherches récentes';
+	display: block;
+	padding: var(--spacing-xs) var(--spacing-s) var(--spacing-2xs);
+	font-size: var(--font-size-xs);
+	font-weight: var(--font-weight-semibold);
+	color: var(--color-text-secondary);
+}
+
+.searchContainer :global(.ol-search ul.autocomplete.history li) {
+	display: flex;
+	align-items: flex-start;
+	gap: var(--spacing-sm);
+	border-bottom: 1px solid var(--color-bg-hover);
+	font-weight: var(--font-weight-medium);
+}
+
+.searchContainer :global(.ol-search ul.autocomplete.history li::before) {
+	content: '';
+	flex-shrink: 0;
+	width: var(--icon-wrap-xs);
+	height: var(--icon-wrap-xs);
+	border-radius: var(--radius-circle);
+	background-color: var(--color-bg-active);
+	background-image: url('../../../../shared/assets/icons/icon-clock.svg');
+	background-repeat: no-repeat;
+	background-position: center;
+	background-size: 1.125rem;
+}
+
+.searchContainer :global(.ol-search ul.autocomplete.history li:last-child) {
+	border-bottom: none;
+}
+
+.searchArea:focus-within:has(:global(.ol-search ul.autocomplete.history:not(:empty))) ~ .browsePanel {
+	visibility: hidden;
 }
 
 .rgpLoading {
