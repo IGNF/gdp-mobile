@@ -27,7 +27,13 @@
 	gap: var(--spacing-xs);
 	fill: var(--color-text);
 }
+.tabSearch {
+	margin-right: var(--spacing-md);
+}
 
+.tabMAP {
+	margin-left: var(--spacing-md);
+}
 .tab.active {
 	border-radius: var(--radius-pill);
 	background: var(--color-bg-primary-pressed);

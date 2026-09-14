@@ -597,7 +597,9 @@ export function MapPage() {
           </button>
         </div>
 
-        <div className={styles.mapChrome}>
+        <div
+          className={`${styles.mapChrome} ${isSearchPanelOpen ? styles.mapChromeSearchOpen : ''}`}
+        >
           <MapBottomSheet
             map={map}
             isMapReady={isMapReady}

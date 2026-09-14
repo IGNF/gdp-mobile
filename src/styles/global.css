@@ -193,7 +193,7 @@
   --color-border: var(--figma-gray-5);
   --color-border-strong: var(--figma-gray-8);
   --color-border-subtle: var(--figma-gray-3);
-  --color-divider: var(--figma-gray-4);
+  --color-divider: #D9D9D9;
 
   --color-border-active: var(--figma-green-5);
 
