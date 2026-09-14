@@ -4,7 +4,6 @@ import { Button } from '@/shared/ui/Button';
 import type { ButtonColor, ButtonVariant } from '@/shared/ui/Button';
 import IconClose from '@/shared/assets/icons/icon-close.svg?react';
 import { joinCSSClassNames } from '@/shared/utils/join';
-import typography from '@/shared/styles/typography.module.css';
 import styles from './Alert.module.css';
 
 const ANIMATION_DURATION = 200; // ms, matches CSS transition duration
@@ -26,6 +25,7 @@ export interface AlertProps {
 	children?: ReactNode;
 	buttons?: AlertButton[];
 	size?: 'default' | 'wide';
+	showCloseButton?: boolean;
 }
 
 export function Alert({
@@ -36,6 +36,7 @@ export function Alert({
 	children,
 	buttons = [],
 	size = 'default',
+	showCloseButton = true,
 }: AlertProps) {
 	const [isVisible, setIsVisible] = useState(isOpen);
 	const [shouldRender, setShouldRender] = useState(isOpen);
@@ -69,7 +70,7 @@ export function Alert({
 				styles.overlay,
 				isVisible && styles.overlayVisible
 			)}
-			onClick={onClose}
+			onClick={showCloseButton ? onClose : undefined}
 		>
 			<div
 				className={joinCSSClassNames(
@@ -78,17 +79,19 @@ export function Alert({
 				)}
 				onClick={(e) => e.stopPropagation()}
 			>
-				<button
-					className={styles.closeButton}
-					onClick={onClose}
-					aria-label="Close"
-				>
-					<IconClose className={styles.closeIcon} />
-				</button>
+				{showCloseButton ? (
+					<button
+						className={styles.closeButton}
+						onClick={onClose}
+						aria-label="Fermer"
+					>
+						<IconClose className={styles.closeIcon} />
+					</button>
+				) : null}
 
 				<div className={styles.content} data-scroll-root='true'>
-					<h2 className={typography.heading2}>{title}</h2>
-					{subtitle && <p className={typography.body}>{subtitle}</p>}
+					<h2 className="heading-2">{title}</h2>
+					{subtitle && <p className="body">{subtitle}</p>}
 
 					{children && <div className={styles.childrenContainer}>{children}</div>}
 

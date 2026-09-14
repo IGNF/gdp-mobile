@@ -7,7 +7,7 @@ export interface LocalReportDraftPhoto {
   dataUrl: string;
 }
 
-export type LocalReportDraftStatus = 'not_sent' | 'taken_into_account' | 'rejected';
+export type LocalReportDraftStatus = 'not_sent' | 'sent';
 
 export interface LocalReportDraft {
   id: string;
@@ -26,4 +26,10 @@ export interface LocalReportDraft {
   photos: LocalReportDraftPhoto[];
   status: LocalReportDraftStatus;
   createdAt: string;
+  /** Whitelist thème `gdp-tools` au moment de l’enregistrement. */
+  themeAttributes?: Record<string, string>;
+  /** Propriétés WFS du repère (id, domaine, etat, expl_gps…). */
+  properties?: Record<string, unknown>;
+  /** Identifiant EspaceCo après envoi réussi. */
+  serverId?: number;
 }

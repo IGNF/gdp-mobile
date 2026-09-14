@@ -4,6 +4,14 @@
   gap: 24px;
 }
 
+.version {
+  margin: -12px 0 0;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-normal);
+  color: var(--color-text-secondary);
+  text-align: center;
+}
+
 .section {
   display: flex;
   flex-direction: column;
@@ -14,5 +22,5 @@
   margin: 0;
   font-size: 15px;
   font-weight: 600;
-  color: var(--color-dark);
+  color: var(--color-text);
 }

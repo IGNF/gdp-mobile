@@ -26,6 +26,9 @@ interface Config {
     displayThemes: string[];
     submissionTheme: string;
   };
+  news: {
+    feedUrl: string;
+  };
 }
 
 const useQualification = env.VITE_USE_QUALIF === 'true';
@@ -72,5 +75,11 @@ export const config: Config = {
       .map((t) => t.trim())
       .filter((t) => t.length > 0) || ['gdp-tools'],
     submissionTheme: trimEnv(env.VITE_GDP_REPORT_SUBMISSION_THEME) || 'gdp-tools',
+  },
+  news: {
+    feedUrl:
+      env.VITE_GDP_NEWS_URL === undefined
+        ? 'https://fiches-geodesie.ign.fr/checkinfo-gdp.json'
+        : trimEnv(env.VITE_GDP_NEWS_URL),
   },
 };

@@ -34,6 +34,7 @@ export interface BuildLocalReportDraftParams {
   latitude: number;
   positionModified: boolean;
   photos: ReportPhoto[];
+  themeAttributes?: Record<string, string>;
 }
 
 export async function buildLocalReportDraft(
@@ -63,5 +64,7 @@ export async function buildLocalReportDraft(
     photos,
     status: 'not_sent',
     createdAt: new Date().toISOString(),
+    themeAttributes: params.themeAttributes,
+    properties: params.reportContext.properties,
   };
 }

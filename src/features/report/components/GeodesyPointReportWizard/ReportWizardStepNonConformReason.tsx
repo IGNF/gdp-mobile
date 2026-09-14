@@ -53,12 +53,22 @@ export const NON_CONFORM_REASON_LABELS: Record<NonConformReason, string> = Objec
 export interface ReportWizardStepNonConformReasonProps {
   reasons: NonConformReason[];
   onChange: (reasons: NonConformReason[]) => void;
+  /** Un point géodésique est par définition bien positionné : seul un repère de nivellement peut être déplacé. */
+  allowPositionReason?: boolean;
 }
 
 export function ReportWizardStepNonConformReason({
   reasons,
   onChange,
+  allowPositionReason = true,
 }: ReportWizardStepNonConformReasonProps) {
+  const groups = allowPositionReason
+    ? NON_CONFORM_REASON_GROUPS
+    : NON_CONFORM_REASON_GROUPS.map((group) => ({
+        ...group,
+        options: group.options.filter((option) => option.value !== 'malPositionne'),
+      }));
+
   const toggleReason = (group: NonConformReasonGroup, value: NonConformReason) => {
     const isSelected = reasons.includes(value);
 
@@ -74,7 +84,7 @@ export function ReportWizardStepNonConformReason({
 
   return (
     <div className={styles.step}>
-      {NON_CONFORM_REASON_GROUPS.map((group) => (
+      {groups.map((group) => (
         <div key={group.title} className={styles.group}>
           <p className={styles.groupTitle}>{group.title}</p>
           <div

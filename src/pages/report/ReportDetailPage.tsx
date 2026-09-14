@@ -8,9 +8,18 @@ import {
   NON_CONFORM_REASON_LABELS,
   type NonConformReason,
 } from '@/features/report/components/GeodesyPointReportWizard';
+import { useSubmitGeodesyPointReport } from '@/features/report/hooks/useSubmitGeodesyPointReport';
+import {
+  buildGdpWizardThemeFormAttributes,
+} from '@/features/report/utils/gdpWizardThemeAttributes';
+import {
+  buildGeodesyPointReportContextFromDraft,
+  buildReportPhotosFromDraft,
+} from '@/features/report/utils/rebuildGeodesyPointReportFromDraft';
 import {
   deleteLocalReportDraft,
   getLocalReportDraft,
+  saveLocalReportDraft,
 } from '@/infra/storage/localReportDraftsStore';
 import {
   getLocalReportDraftStatusColors,
@@ -34,6 +43,8 @@ export function ReportDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [draft, setDraft] = useState<LocalReportDraft | null | undefined>(undefined);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const { submitGeodesyPointReport, isSubmitting } = useSubmitGeodesyPointReport();
 
   useEffect(() => {
     if (!id) {
@@ -58,6 +69,50 @@ export function ReportDetailPage() {
     }
     await deleteLocalReportDraft(id);
     navigate('/reports');
+  };
+
+  const handleSend = async () => {
+    if (!draft || draft.serverId || isSubmitting) {
+      return;
+    }
+
+    setSubmitError(null);
+    const reportContext = buildGeodesyPointReportContextFromDraft(draft);
+    const photos = buildReportPhotosFromDraft(draft);
+    const formThemeAttributes = {
+      ...(draft.themeAttributes ??
+        buildGdpWizardThemeFormAttributes({
+          isConform: draft.isConform,
+          nonConformReasons: (draft.nonConformReasons ?? []) as NonConformReason[],
+          positionModified: draft.positionModified,
+        })),
+      move: draft.positionModified ? 'true' : 'false',
+    };
+
+    let lastError: string | null = null;
+    const result = await submitGeodesyPointReport(
+      reportContext,
+      draft.comment,
+      photos,
+      formThemeAttributes,
+      {
+        onError: (error) => {
+          lastError = error.message;
+        },
+      },
+    );
+
+    if (result) {
+      const updated = { ...draft, serverId: result.serverId };
+      await saveLocalReportDraft(updated);
+      setDraft(updated);
+    }
+
+    if (result && !lastError) {
+      return;
+    }
+
+    setSubmitError(lastError ?? 'Impossible d’envoyer le signalement pour le moment.');
   };
 
   const handleViewOnMap = () => {
@@ -193,6 +248,7 @@ export function ReportDetailPage() {
 
       {draft ? (
         <div className={styles.footer}>
+          {submitError ? <p className={styles.submitError}>{submitError}</p> : null}
           <Button
             type="button"
             variant="outline"
@@ -205,9 +261,17 @@ export function ReportDetailPage() {
             <IconDelete className={styles.actionIcon} aria-hidden />
             Supprimer
           </Button>
-          <Button type="button" fullWidth onClick={() => {}}>
+          <Button
+            type="button"
+            fullWidth
+            loading={isSubmitting}
+            disabled={Boolean(draft.serverId)}
+            onClick={() => {
+              void handleSend();
+            }}
+          >
             <IconSend className={styles.actionIcon} aria-hidden />
-            Envoyer
+            {draft.serverId ? 'Envoyé' : 'Envoyer'}
           </Button>
         </div>
       ) : null}

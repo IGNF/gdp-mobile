@@ -1,4 +1,4 @@
-import { extractGeodesyPointReportDomaine } from '@ign/gdp-tools';
+import { extractGeodesyPointReportDomaine, type GeodesyPointReportContext } from '@ign/gdp-tools';
 
 import type { MapGeodesyClickAction } from '@/features/map/hooks/useMapGeodesyClick';
 
@@ -7,8 +7,10 @@ export type PointFicheVariant = 'geodesy' | 'nivellement';
 const NIVELLEMENT_DOMAINES = new Set(['nivf', 'nivo', 'nive']);
 const GEODESY_DOMAINES = new Set(['rsgf', 'rsgo', 'rsge']);
 
-export function resolvePointFicheVariant(action: MapGeodesyClickAction): PointFicheVariant {
-  const domaine = extractGeodesyPointReportDomaine(action.reportContext);
+export function resolvePointVariantFromReportContext(
+  reportContext: GeodesyPointReportContext,
+): PointFicheVariant {
+  const domaine = extractGeodesyPointReportDomaine(reportContext);
 
   if (domaine && NIVELLEMENT_DOMAINES.has(domaine)) {
     return 'nivellement';
@@ -18,10 +20,14 @@ export function resolvePointFicheVariant(action: MapGeodesyClickAction): PointFi
     return 'geodesy';
   }
 
-  const layerId = action.reportContext.layerId;
+  const layerId = reportContext.layerId;
   if (layerId === 'RN' || layerId === 'DOMAIN_NIVELLEMENT') {
     return 'nivellement';
   }
 
   return 'geodesy';
+}
+
+export function resolvePointFicheVariant(action: MapGeodesyClickAction): PointFicheVariant {
+  return resolvePointVariantFromReportContext(action.reportContext);
 }

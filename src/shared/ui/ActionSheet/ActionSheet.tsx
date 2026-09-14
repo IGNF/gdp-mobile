@@ -4,7 +4,6 @@ import { Button } from '@/shared/ui/Button';
 import type { ButtonColor, ButtonVariant } from '@/shared/ui/Button';
 import IconClose from '@/shared/assets/icons/icon-close.svg?react';
 import { joinCSSClassNames } from '@/shared/utils/join';
-import typography from '@/shared/styles/typography.module.css';
 import styles from './ActionSheet.module.css';
 
 const OPEN_ANIMATION_DELAY = 20;
@@ -97,7 +96,7 @@ export function ActionSheet({
         aria-labelledby={titleId}
       >
         <div className={styles.header}>
-          <h2 id={titleId} className={typography.heading2}>
+          <h2 id={titleId} className="heading-2">
             {title}
           </h2>
           <button
@@ -110,7 +109,7 @@ export function ActionSheet({
         </div>
 
         <div className={styles.content} data-scroll-root='true'>
-          {subtitle && <p className={typography.body}>{subtitle}</p>}
+          {subtitle && <p className="body">{subtitle}</p>}
 
           {children && <div className={styles.childrenContainer}>{children}</div>}
 

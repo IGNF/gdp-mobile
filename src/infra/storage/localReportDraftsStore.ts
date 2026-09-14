@@ -29,7 +29,8 @@ export async function getLocalReportDraft(id: string): Promise<LocalReportDraft 
 
 export async function saveLocalReportDraft(draft: LocalReportDraft): Promise<void> {
   const drafts = await listLocalReportDrafts();
-  await Storage.set(LOCAL_REPORT_DRAFTS_KEY, [draft, ...drafts], 'array');
+  const withoutCurrent = drafts.filter((entry) => entry.id !== draft.id);
+  await Storage.set(LOCAL_REPORT_DRAFTS_KEY, [draft, ...withoutCurrent], 'array');
 }
 
 export async function deleteLocalReportDraft(id: string): Promise<void> {

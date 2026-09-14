@@ -9,13 +9,13 @@
   margin: 0;
   font-size: 1.0625rem;
   font-weight: 700;
-  color: var(--color-dark);
+  color: var(--color-text);
 }
 
 .photoDropzone {
   display: block;
   position: relative;
-  border: 1px dashed var(--color-primary);
+  border: 1px dashed var(--color-border-primary);
   border-radius: 0.75rem;
   background: var(--color-fiche-surface);
   cursor: pointer;
@@ -24,7 +24,7 @@
 
 .photoDropzone:hover,
 .photoDropzone:focus-within {
-  border-color: var(--color-primary-shade);
+  border-color: var(--color-text-primary);
   box-shadow: 0 2px 10px rgba(var(--color-primary-rgb), 0.18);
 }
 
@@ -55,7 +55,7 @@
   width: 2.5rem;
   height: 2.5rem;
   border-radius: 50%;
-  background: var(--color-primary-light);
+  background: var(--color-bg-primary-subtle);
 }
 
 .photoIcon {
@@ -64,13 +64,13 @@
 }
 
 .photoIcon path {
-  fill: var(--color-primary);
+  fill: var(--color-text-primary);
 }
 
 .photoLabel {
   font-size: 0.875rem;
   font-weight: 600;
-  color: var(--color-primary);
+  color: var(--color-text-primary);
 }
 
 .photoPreviewWrap {
@@ -121,14 +121,14 @@
   gap: 0.5rem;
   padding: 0.875rem 1rem;
   border-radius: 0.75rem;
-  background: var(--color-primary-light);
+  background: var(--color-bg-primary-subtle);
 }
 
 .instructionsTitle {
   margin: 0;
   font-size: 0.875rem;
   font-weight: 700;
-  color: var(--color-dark);
+  color: var(--color-text);
 }
 
 .instructionsList {
@@ -145,7 +145,7 @@
   align-items: center;
   gap: 0.5rem;
   font-size: 0.8125rem;
-  color: var(--color-medium);
+  color: var(--color-text-secondary);
 }
 
 .instructionsIcon {
@@ -155,19 +155,19 @@
 }
 
 .instructionsIcon path {
-  fill: var(--color-primary);
+  fill: var(--color-text-primary);
 }
 
 .commentInput {
   width: 100%;
   min-height: 4.5rem;
   padding: 0.75rem 0.875rem;
-  border: 1px solid var(--color-light);
+  border: 1px solid var(--color-border);
   border-radius: 0.75rem;
   background: var(--color-fiche-surface);
   font: inherit;
   font-size: 0.875rem;
-  color: var(--color-dark);
+  color: var(--color-text);
   resize: vertical;
   box-sizing: border-box;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
@@ -175,11 +175,11 @@
 
 .commentInput:hover,
 .commentInput:focus {
-  border-color: var(--color-primary);
+  border-color: var(--color-text-primary);
   box-shadow: 0 2px 10px rgba(var(--color-primary-rgb), 0.18);
   outline: none;
 }
 
 .commentInput::placeholder {
-  color: var(--color-medium);
+  color: var(--color-text-secondary);
 }

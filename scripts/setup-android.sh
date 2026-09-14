@@ -2,6 +2,10 @@
 
 # Première configuration Android pour Géodésie de poche (Capacitor).
 # À exécuter une fois après le clonage, puis : npm run generate-apk
+#
+# android/ est versionné (manifest OAuth, permissions, icônes mipmap).
+# Icône source : resources/icon.png — pour régénérer les lanceurs :
+#   npx @capacitor/assets generate --android
 
 set -euo pipefail
 
@@ -30,21 +34,7 @@ cd "${APP_DIR}"
 if [[ ! -d "${APP_DIR}/android" ]]; then
   echo "Ajout de la plateforme Android Capacitor…"
   npx cap add android
-fi
-
-bash "${SCRIPT_DIR}/patch-android.sh"
-
-ICON_SOURCE="${SCRIPT_DIR}/GDP/assets/icon.png"
-if [[ -f "${ICON_SOURCE}" ]]; then
-  mkdir -p "${APP_DIR}/resources"
-  cp "${ICON_SOURCE}" "${APP_DIR}/resources/icon.png"
-  if command -v npx >/dev/null 2>&1; then
-    echo "Génération des icônes Android…"
-    npx --yes @capacitor/assets generate --android || true
-  fi
-else
-  echo "Astuce : placez une icône 1024×1024 dans scripts/GDP/assets/icon.png"
-  echo "         puis relancez setup-android pour régénérer les icônes lanceur."
+  echo "Attention : android/ était absent. Vérifiez le manifeste OAuth (fr.ign.gdp) et les icônes lanceur."
 fi
 
 echo ""

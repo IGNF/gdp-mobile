@@ -1,0 +1,27 @@
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3xs);
+}
+
+.period {
+  margin: 0;
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-tight);
+  color: var(--color-text-secondary);
+}

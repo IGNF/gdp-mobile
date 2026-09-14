@@ -2,20 +2,17 @@ import type { LocalReportDraftStatus } from '@/domain/report/localReportDraft';
 
 const STATUS_LABELS: Record<LocalReportDraftStatus, string> = {
   not_sent: 'Pas envoyé',
-  taken_into_account: 'Pris en compte',
-  rejected: 'Rejeté',
+  sent: 'Envoyé',
 };
 
 const STATUS_COLORS: Record<LocalReportDraftStatus, { color: string; background: string }> = {
-  not_sent: { color: 'var(--color-secondary)', background: 'var(--color-secondary-light)' },
-  taken_into_account: { color: 'var(--color-primary-shade)', background: 'var(--color-primary-light)' },
-  rejected: { color: 'var(--color-danger-shade)', background: 'rgba(var(--color-danger-rgb), 0.14)' },
+  not_sent: { color: 'var(--color-navy)', background: 'var(--color-bg-navy-subtle)' },
+  sent: { color: 'var(--color-primary)', background: 'var(--color-bg-primary-subtle)' },
 };
 
 const STATUS_ACCENT_RGB: Record<LocalReportDraftStatus, string> = {
-  not_sent: 'var(--color-secondary-rgb)',
-  taken_into_account: 'var(--color-primary-rgb)',
-  rejected: 'var(--color-danger-rgb)',
+  not_sent: 'var(--color-navy-rgb)',
+  sent: 'var(--color-action-primary-rgb)',
 };
 
 export function getLocalReportDraftStatusLabel(status: LocalReportDraftStatus): string {

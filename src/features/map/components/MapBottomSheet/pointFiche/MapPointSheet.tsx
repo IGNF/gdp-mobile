@@ -1,6 +1,8 @@
+import { useEffect } from 'react';
 import type { MapGeodesyClickAction } from '@/features/map/hooks/useMapGeodesyClick';
 import type { useBottomSheetSnap } from '@/features/map/hooks/useBottomSheetSnap';
 
+import { useTrackSheetView } from '@/features/map/hooks/useTrackSheetView';
 import { MapPointGeodesyFicheBody } from './MapPointGeodesyFicheBody';
 import { MapPointNivellementFicheBody } from './MapPointNivellementFicheBody';
 import { MapPointSheetFooter } from './MapPointSheetFooter';
@@ -31,6 +33,18 @@ export function MapPointSheet({
   onNavigate,
 }: MapPointSheetProps) {
   const variant = resolvePointFicheVariant(action);
+  const isExpanded = snapIndex >= 2;
+  const { trackSheetView } = useTrackSheetView();
+  const sheetId =
+    action.reportContext.geodesyId ??
+    action.point.title ??
+    `${action.point.longitude},${action.point.latitude}`;
+
+  useEffect(() => {
+    if (isExpanded && sheetId) {
+      trackSheetView(sheetId);
+    }
+  }, [isExpanded, sheetId, trackSheetView]);
 
   const handleArea = (
     <div className={styles.handleArea}>
