@@ -33,7 +33,7 @@ export function MapPointSheet({
   onNavigate,
 }: MapPointSheetProps) {
   const variant = resolvePointFicheVariant(action);
-  const isMiniSnap = snapIndex === 0;
+  const isExpanded = snapIndex >= 2;
   const { trackSheetView } = useTrackSheetView();
   const sheetId =
     action.reportContext.geodesyId ??
@@ -41,10 +41,10 @@ export function MapPointSheet({
     `${action.point.longitude},${action.point.latitude}`;
 
   useEffect(() => {
-    if (!isMiniSnap && sheetId) {
+    if (isExpanded && sheetId) {
       trackSheetView(sheetId);
     }
-  }, [isMiniSnap, sheetId, trackSheetView]);
+  }, [isExpanded, sheetId, trackSheetView]);
 
   const handleArea = (
     <div className={styles.handleArea}>
@@ -65,30 +65,20 @@ export function MapPointSheet({
 
   return (
     <div className={styles.sheetLayout}>
-      {isMiniSnap ? (
-        <div className={styles.dragZoneFull} {...dragHandleProps}>
-          {handleArea}
-          {header}
-          {footer}
-        </div>
-      ) : (
-        <>
-          <div className={styles.dragZone} {...dragHandleProps}>
-            {handleArea}
-            {header}
-          </div>
+      <div className={styles.dragZone} {...dragHandleProps}>
+        {handleArea}
+        {header}
+      </div>
 
-          <div className={styles.body} data-scroll-root="true">
-            {variant === 'nivellement' ? (
-              <MapPointNivellementFicheBody action={action} snapIndex={snapIndex} />
-            ) : (
-              <MapPointGeodesyFicheBody action={action} snapIndex={snapIndex} />
-            )}
-          </div>
+      <div className={styles.body} data-scroll-root="true">
+        {variant === 'nivellement' ? (
+          <MapPointNivellementFicheBody action={action} snapIndex={snapIndex} />
+        ) : (
+          <MapPointGeodesyFicheBody action={action} snapIndex={snapIndex} />
+        )}
+      </div>
 
-          {footer}
-        </>
-      )}
+      {footer}
     </div>
   );
 }
