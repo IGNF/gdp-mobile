@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 
 import type { MapGeodesyClickAction } from '@/features/map/hooks/useMapGeodesyClick';
 
@@ -18,12 +18,15 @@ import { PointCoordinatesSection } from './PointCoordinatesSection';
 import { PointImageCarousel } from './PointImageCarousel';
 import { PartenaireSection } from './PartenaireSection';
 import { UnmappedFieldsDebug } from './UnmappedFieldsDebug';
+import { useMeasuredHeight } from './useMeasuredHeight';
 
 import styles from './MapPointSheet.module.css';
 
 export interface MapPointNivellementFicheBodyProps {
   action: MapGeodesyClickAction;
   snapIndex: number;
+  /** Hauteur du bloc carrousel + légende, pour calculer le seuil d'ouverture dynamique. */
+  onPhotoBlockHeightChange?: (heightPx: number | null) => void;
 }
 
 function FieldCard({
@@ -47,8 +50,17 @@ function FieldCard({
   );
 }
 
-export function MapPointNivellementFicheBody({ action, snapIndex }: MapPointNivellementFicheBodyProps) {
+export function MapPointNivellementFicheBody({
+  action,
+  snapIndex,
+  onPhotoBlockHeightChange,
+}: MapPointNivellementFicheBodyProps) {
   const carouselItems = useMemo(() => buildPointCarouselItems(action), [action]);
+  const [photoBlockRef, photoBlockHeight] = useMeasuredHeight<HTMLDivElement>();
+
+  useEffect(() => {
+    onPhotoBlockHeightChange?.(photoBlockHeight);
+  }, [photoBlockHeight, onPhotoBlockHeightChange]);
   const unmappedFields = useMemo(() => {
     const displayedIds = getDisplayedFieldIds('nivellement', snapIndex);
     return filterUnmappedPointFields(collectAllPointFields(action), displayedIds);
@@ -96,8 +108,12 @@ export function MapPointNivellementFicheBody({ action, snapIndex }: MapPointNive
     <>
       {snapIndex >= 1 ? (
         <>
-          <PointImageCarousel items={carouselItems} />
+          <div ref={photoBlockRef}>
+            <PointImageCarousel items={carouselItems} />
+          </div>
 
+          {/* Non mesurée avec le carrousel : info secondaire, pas déterminante pour le seuil
+              d'ouverture ("la photo est visible") — voir MapPointSheet. */}
           {obsDateCaption ? <p className={styles.carouselCaption}>{obsDateCaption}</p> : null}
 
           <section>

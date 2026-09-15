@@ -101,6 +101,12 @@ export function MapBottomSheet({
   const [viewportHeight, setViewportHeight] = useState(() => window.innerHeight);
   const [safeAreaTop, setSafeAreaTop] = useState(() => getSafeAreaTopPx());
   const [browseView, setBrowseView] = useState<BrowsePanelView>('search');
+  // Hauteur de fiche nécessaire pour voir la photo/croquis en entier, mesurée dans le DOM par
+  // MapPointSheet — sert de seuil d'ouverture dynamique (voir usePointFicheSheetDrag).
+  const [measuredOpenThreshold, setMeasuredOpenThreshold] = useState<number | null>(null);
+  // Hauteur de fiche nécessaire pour l'en-tête + le pied de page seuls (plancher d'ouverture) —
+  // mesurée pour que --safe-bottom soit toujours pris en compte (pied de page jamais rogné).
+  const [measuredFloorHeight, setMeasuredFloorHeight] = useState<number | null>(null);
   browseViewRef.current = browseView;
 
   useEffect(() => {
@@ -115,8 +121,8 @@ export function MapBottomSheet({
 
   const browseSnapHeights = useMemo(() => getBrowseSnapHeights(viewportHeight), [viewportHeight]);
   const pointGeometry = useMemo(
-    () => getPointFicheSheetGeometry(viewportHeight, safeAreaTop),
-    [viewportHeight, safeAreaTop],
+    () => getPointFicheSheetGeometry(viewportHeight, safeAreaTop, measuredOpenThreshold, measuredFloorHeight),
+    [viewportHeight, safeAreaTop, measuredOpenThreshold, measuredFloorHeight],
   );
 
   const browseSnap = useBottomSheetSnap({
@@ -138,9 +144,11 @@ export function MapBottomSheet({
   const dragOffset = isPointMode ? pointSheet.dragOffset : browseSnap.dragOffset;
   const isBrowseCollapsed = !isPointMode && browseSnap.snapIndex === 0;
   const isBrowseExpanded = !isPointMode && browseSnap.snapIndex > 0;
-  // Contenu de la fiche point : niveau 1 (compact, glissé libre 18 %-40 %) ou niveau 2
-  // (fiche étendue à 40 % ou en grand) — voir usePointFicheSheetDrag pour les seuils.
-  const pointContentLevel = pointSheet.currentHeight >= pointGeometry.freeMaxHeight - 1 ? 2 : 1;
+  // Contenu de la fiche point : niveau 1 (compact, glissé libre entre le plancher et le seuil
+  // d'ouverture) ou niveau 2 (fiche étendue au seuil ou en grand) — voir usePointFicheSheetDrag
+  // pour le calcul des seuils. Basé sur restingHeight (pas la hauteur en plein glissé) pour ne
+  // jamais monter/démonter de contenu pendant un glissé actif (peut interrompre le geste).
+  const pointContentLevel = pointSheet.restingHeight >= pointGeometry.freeMaxHeight - 1 ? 2 : 1;
   // Ouverture maximale : la fiche perd ses marges latérales et occupe toute la largeur.
   const isPointFullscreen = isPointMode && pointSheet.currentHeight >= pointGeometry.fullscreenHeight - 1;
 
@@ -387,6 +395,8 @@ export function MapBottomSheet({
             dragHandleProps={dragHandleProps}
             onReport={onReportPoint}
             onNavigate={handleNavigateToPoint}
+            onOpenThresholdChange={setMeasuredOpenThreshold}
+            onFloorHeightChange={setMeasuredFloorHeight}
           />
         </div>
       ) : isBrowseCollapsed ? null : (

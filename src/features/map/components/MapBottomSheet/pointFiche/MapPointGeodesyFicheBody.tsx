@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 
 import type { MapGeodesyClickAction } from '@/features/map/hooks/useMapGeodesyClick';
 
@@ -17,6 +17,7 @@ import { PartenaireSection } from './PartenaireSection';
 import { PointCoordinatesSection } from './PointCoordinatesSection';
 import { PointImageCarousel } from './PointImageCarousel';
 import { UnmappedFieldsDebug } from './UnmappedFieldsDebug';
+import { useMeasuredHeight } from './useMeasuredHeight';
 import IconAlertCircle from '@/shared/assets/icons/icon-alert-circle.svg?react';
 
 import styles from './MapPointSheet.module.css';
@@ -24,6 +25,8 @@ import styles from './MapPointSheet.module.css';
 export interface MapPointGeodesyFicheBodyProps {
   action: MapGeodesyClickAction;
   snapIndex: number;
+  /** Hauteur du bloc carrousel + légende, pour calculer le seuil d'ouverture dynamique. */
+  onPhotoBlockHeightChange?: (heightPx: number | null) => void;
 }
 
 function deriveDepartementFromInsee(insee: string | null): string | null {
@@ -56,8 +59,17 @@ function FieldCard({
   );
 }
 
-export function MapPointGeodesyFicheBody({ action, snapIndex }: MapPointGeodesyFicheBodyProps) {
+export function MapPointGeodesyFicheBody({
+  action,
+  snapIndex,
+  onPhotoBlockHeightChange,
+}: MapPointGeodesyFicheBodyProps) {
   const carouselItems = useMemo(() => buildPointCarouselItems(action), [action]);
+  const [photoBlockRef, photoBlockHeight] = useMeasuredHeight<HTMLDivElement>();
+
+  useEffect(() => {
+    onPhotoBlockHeightChange?.(photoBlockHeight);
+  }, [photoBlockHeight, onPhotoBlockHeightChange]);
   const unmappedFields = useMemo(() => {
     const displayedIds = getDisplayedFieldIds('geodesy', snapIndex);
     return filterUnmappedPointFields(collectAllPointFields(action), displayedIds);
@@ -91,8 +103,12 @@ export function MapPointGeodesyFicheBody({ action, snapIndex }: MapPointGeodesyF
     <>
       {snapIndex >= 1 ? (
         <>
-          <PointImageCarousel items={carouselItems} />
+          <div ref={photoBlockRef}>
+            <PointImageCarousel items={carouselItems} />
+          </div>
 
+          {/* Non mesurée avec le carrousel : info secondaire, pas déterminante pour le seuil
+              d'ouverture ("la photo est visible") — voir MapPointSheet. */}
           {obsDateCaption ? <p className={styles.carouselCaption}>{obsDateCaption}</p> : null}
 
           <section>
