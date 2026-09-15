@@ -1,4 +1,5 @@
 import { useState, type ChangeEvent } from 'react';
+import { RiImageLine } from 'react-icons/ri';
 
 import { ReportPositionEditorSection } from '@/features/report/components/ReportPositionEditorSection';
 import type { UseGeodesyPointReportFormReturn } from '@/features/report/hooks/useGeodesyPointReportForm';
@@ -37,41 +38,55 @@ export function ReportWizardStepMedia({ form }: ReportWizardStepMediaProps) {
     <div className={styles.step}>
       <h2 className={styles.title}>Dites nous en plus</h2>
 
-      <label className={styles.photoDropzone}>
-        <input
-          type="file"
-          accept="image/*"
-          className={styles.photoInput}
-          onChange={handlePhotoChange}
-        />
-        {form.isPhotoProcessing ? (
+      {form.isPhotoProcessing ? (
+        <div className={styles.photoDropzone}>
           <span className={styles.photoPlaceholder}>
             <Loading size="small" label="Compression de la photo…" />
           </span>
-        ) : form.photo1 ? (
+        </div>
+      ) : form.photo1 ? (
+        <div className={styles.photoDropzone}>
           <span className={styles.photoPreviewWrap}>
             <img src={form.photo1.previewUrl} alt="" className={styles.photoPreview} />
             <button
               type="button"
               className={styles.photoRemove}
-              onClick={(event) => {
-                event.preventDefault();
-                handleRemovePhoto();
-              }}
+              onClick={handleRemovePhoto}
               aria-label="Retirer la photo"
             >
               <IconClose className={styles.photoRemoveIcon} aria-hidden />
             </button>
           </span>
-        ) : (
-          <span className={styles.photoPlaceholder}>
+        </div>
+      ) : (
+        <div className={styles.photoSourceRow}>
+          <label className={styles.photoSourceButton}>
+            <input
+              type="file"
+              accept="image/*"
+              capture="environment"
+              className={styles.photoInput}
+              onChange={handlePhotoChange}
+            />
             <span className={styles.photoIconWrap}>
               <IconCamera className={styles.photoIcon} aria-hidden />
             </span>
-            <span className={styles.photoLabel}>Ajouter une photo</span>
-          </span>
-        )}
-      </label>
+            <span className={styles.photoLabel}>Prendre une photo</span>
+          </label>
+          <label className={styles.photoSourceButton}>
+            <input
+              type="file"
+              accept="image/*"
+              className={styles.photoInput}
+              onChange={handlePhotoChange}
+            />
+            <span className={styles.photoIconWrap}>
+              <RiImageLine className={styles.photoIcon} aria-hidden />
+            </span>
+            <span className={styles.photoLabel}>Choisir dans la galerie</span>
+          </label>
+        </div>
+      )}
       {form.errors.photo1 ? <p className={styles.errorText}>{form.errors.photo1}</p> : null}
 
       <div className={styles.instructions}>
