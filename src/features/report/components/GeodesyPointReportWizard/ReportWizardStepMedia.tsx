@@ -41,7 +41,6 @@ export function ReportWizardStepMedia({ form }: ReportWizardStepMediaProps) {
         <input
           type="file"
           accept="image/*"
-          capture="environment"
           className={styles.photoInput}
           onChange={handlePhotoChange}
         />
