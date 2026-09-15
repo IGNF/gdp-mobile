@@ -285,16 +285,3 @@ export function getDefaultMapPreferences(): PersistedMapPreferences {
     reportMapLayers: DEFAULT_REPORT_MAP_LAYER_VISIBILITY,
   };
 }
-
-export async function getMapViewport(): Promise<PersistedMapViewport | null> {
-  const preferences = await getMapPreferences();
-  return preferences;
-}
-
-export async function saveMapViewport(viewport: PersistedMapViewport): Promise<void> {
-  await saveMapPreferences(viewport);
-}
-
-export function getDefaultMapViewport(): PersistedMapViewport {
-  return getDefaultMapPreferences();
-}

@@ -93,21 +93,8 @@ export function buildGeodesyPointReportThemeAttributesForSubmit(
   });
 }
 
-export function formatGeodesyThemeLookupHint(themeNames: readonly string[]): string {
-  const available = [...themeNames];
-  if (available.length === 0) {
-    return `Aucun thème trouvé pour la communauté ${GDP_REPORT_COMMUNITY_ID}. À l'envoi, le thème configuré « ${GEODESY_REPORT_THEME} » sera utilisé.`;
-  }
 
-  return `Thèmes disponibles dans la communauté : ${available.join(', ')}. Attendu : « ${GEODESY_REPORT_THEME} ».`;
-}
 
-/** Nom de thème envoyé au collaboratif (fiche communauté ou repli configuré). */
-export function resolveGeodesyReportThemeNameFromConfigs(
-  configs: CommunityThemeConfig[],
-): string {
-  return extractGeodesyReportThemeFromConfigs(configs)?.theme ?? GEODESY_REPORT_THEME;
-}
 
 export function buildGeodesyReportSubmissionComment(
   userComment: string,

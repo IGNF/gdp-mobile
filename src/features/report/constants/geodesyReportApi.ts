@@ -2,7 +2,7 @@
 export const GEODESY_REPORT_THEME = 'gdp-tools';
 
 /** Alias acceptés pour le thème géodésie (variantes de nommage API). */
-export const GEODESY_REPORT_THEME_ALIASES = [
+const GEODESY_REPORT_THEME_ALIASES = [
   GEODESY_REPORT_THEME,
   'mobile-geodesy',
   'mobile_geodesy',
@@ -10,7 +10,7 @@ export const GEODESY_REPORT_THEME_ALIASES = [
 ] as const;
 
 /** Normalise un identifiant de thème pour comparaison (casse, accents, tirets, espaces). */
-export function normalizeReportThemeName(themeName: string): string {
+function normalizeReportThemeName(themeName: string): string {
   return themeName
     .trim()
     .toLowerCase()

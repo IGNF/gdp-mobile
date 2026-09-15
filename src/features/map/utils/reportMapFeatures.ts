@@ -14,7 +14,7 @@ function hasValidCoordinates(longitude: number | null, latitude: number | null):
   );
 }
 
-export function createGroupReportMapFeature(report: GroupReport): Feature<Point> | null {
+function createGroupReportMapFeature(report: GroupReport): Feature<Point> | null {
   if (!hasValidCoordinates(report.longitude, report.latitude)) {
     return null;
   }
