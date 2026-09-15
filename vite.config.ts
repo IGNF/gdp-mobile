@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import path from 'path'
 import createHttpsProxyAgent from 'https-proxy-agent'
-import { defineConfig, loadEnv } from 'vite'
+import { defineConfig, loadEnv, type ViteDevServer } from 'vite'
 import react from '@vitejs/plugin-react'
 import svgr from 'vite-plugin-svgr'
 
@@ -34,14 +34,55 @@ function normalizeOAuthBaseUrl(url: string): string {
   return url.trim().replace(/\/+$/, '')
 }
 
-function getOutboundHttpProxyUrl(): string | undefined {
-  const value =
-    process.env.HTTPS_PROXY ||
-    process.env.https_proxy ||
-    process.env.HTTP_PROXY ||
-    process.env.http_proxy
-  const trimmed = value?.trim()
-  return trimmed ? trimmed : undefined
+function firstNonEmpty(...values: Array<string | undefined>): string | undefined {
+  for (const value of values) {
+    const trimmed = value?.trim()
+    if (trimmed) {
+      return trimmed
+    }
+  }
+  return undefined
+}
+
+/** Proxy sortant Node (Vite → sso.geopf.fr). Le navigateur n’en a pas besoin. */
+function getOutboundHttpProxyUrl(fileEnv: Record<string, string> = {}): string | undefined {
+  return firstNonEmpty(
+    process.env.HTTPS_PROXY,
+    process.env.https_proxy,
+    process.env.HTTP_PROXY,
+    process.env.http_proxy,
+    fileEnv.HTTPS_PROXY,
+    fileEnv.https_proxy,
+    fileEnv.HTTP_PROXY,
+    fileEnv.http_proxy,
+  )
+}
+
+function getNoProxy(fileEnv: Record<string, string> = {}): string {
+  return (
+    firstNonEmpty(
+      process.env.NO_PROXY,
+      process.env.no_proxy,
+      fileEnv.NO_PROXY,
+      fileEnv.no_proxy,
+    ) ?? ''
+  )
+}
+
+function applyFileProxyEnv(fileEnv: Record<string, string>): void {
+  const proxyUrl = getOutboundHttpProxyUrl(fileEnv)
+  if (proxyUrl && !process.env.HTTPS_PROXY && !process.env.https_proxy) {
+    process.env.HTTPS_PROXY = proxyUrl
+    process.env.https_proxy = proxyUrl
+    process.env.HTTP_PROXY ??= proxyUrl
+    process.env.http_proxy ??= proxyUrl
+  }
+
+  const noProxy = firstNonEmpty(fileEnv.NO_PROXY, fileEnv.no_proxy)
+  if (noProxy && !process.env.NO_PROXY && !process.env.no_proxy) {
+    process.env.NO_PROXY = noProxy
+    process.env.no_proxy = noProxy
+  }
 }
 
 function hostnameMatchesNoProxy(hostname: string, noProxyRaw: string): boolean {
@@ -62,9 +103,33 @@ function hostnameMatchesNoProxy(hostname: string, noProxyRaw: string): boolean {
   })
 }
 
-function createOauthProxyAgent(ssoTarget: string): ReturnType<typeof createHttpsProxyAgent> | undefined {
-  const proxyUrl = getOutboundHttpProxyUrl()
+function stripOauthBrowserOriginPlugin(mount: string) {
+  return {
+    name: 'gdp-strip-oauth-origin',
+    configureServer(server: ViteDevServer) {
+      server.middlewares.use((req, _res, next) => {
+        const url = req.url ?? ''
+        if (url === mount || url.startsWith(`${mount}/`)) {
+          delete req.headers.origin
+          delete req.headers.referer
+        }
+        next()
+      })
+    },
+  }
+}
+
+function createOauthProxyAgent(
+  ssoTarget: string,
+  fileEnv: Record<string, string> = {},
+): ReturnType<typeof createHttpsProxyAgent> | undefined {
+  const proxyUrl = getOutboundHttpProxyUrl(fileEnv)
   if (!proxyUrl) {
+    console.warn(
+      '[vite oauth proxy] HTTPS_PROXY absent — /__sso joint sso.geopf.fr en direct ' +
+        '(ECONNREFUSED fréquent au bureau IGN). Ajoutez HTTPS_PROXY dans gdp-mobile/.env ' +
+        'ou exportez-le avant npm run dev. Le navigateur / SSO n’a pas besoin de ce proxy.',
+    )
     return undefined
   }
 
@@ -75,7 +140,7 @@ function createOauthProxyAgent(ssoTarget: string): ReturnType<typeof createHttps
     return undefined
   }
 
-  const noProxy = process.env.NO_PROXY || process.env.no_proxy || ''
+  const noProxy = getNoProxy(fileEnv)
   if (hostnameMatchesNoProxy(hostname, noProxy)) {
     console.info(`[vite oauth proxy] ${hostname} est dans NO_PROXY — connexion directe`)
     return undefined
@@ -87,17 +152,18 @@ function createOauthProxyAgent(ssoTarget: string): ReturnType<typeof createHttps
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, __dirname, '')
+  applyFileProxyEnv(env)
   const oauthSsoTarget = normalizeOAuthBaseUrl(
     env.VITE_OAUTH_BASE_URL || 'https://sso.geopf.fr/realms/geoplateforme/protocol/openid-connect',
   )
 
   const basePath = env.VITE_BASE_PATH || '/'
   const oauthProxyMount = `${basePath.replace(/\/+$/, '')}${oauthDevProxyPrefix}`
-  const oauthProxyAgent = createOauthProxyAgent(oauthSsoTarget)
+  const oauthProxyAgent = createOauthProxyAgent(oauthSsoTarget, env)
 
   return {
     base: basePath,
-    plugins: [react(), svgr()],
+    plugins: [react(), svgr(), stripOauthBrowserOriginPlugin(oauthProxyMount)],
     define: {
       'process.env.SECRET': JSON.stringify(env.VITE_SECRET || 'default-secret'),
       __APP_VERSION__: JSON.stringify(appVersion),
@@ -170,6 +236,12 @@ export default defineConfig(({ mode }) => {
                     error_description: `Proxy OAuth indisponible: ${err.message}`,
                   }),
                 );
+              }
+            });
+            proxy.on('proxyRes', (proxyRes, req) => {
+              const requestUrl = req.url ?? '';
+              if (requestUrl.includes('/token') || requestUrl.includes('/revoke')) {
+                console.info(`[vite oauth proxy] ${req.method} ${requestUrl} → ${proxyRes.statusCode}`);
               }
             });
           },
