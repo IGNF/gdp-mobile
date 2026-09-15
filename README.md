@@ -42,13 +42,25 @@ Déposer le contenu de `gdp-mobile/dist/` via SFTP :
 
 Consultation : [http://sgm.ign.fr/qlf-gdp/map](http://sgm.ign.fr/qlf-gdp/map)
 
-Aperçu local du même build : `npm run preview:qualif -w gdp-mobile` → [http://localhost:4173/qlf-gdp/](http://localhost:4173/qlf-gdp/).
+Aperçu local du même build : `npm run preview:qualif -w gdp-mobile` → [http://localhost:4173/qlf-gdp/](http://localhost:4173/qlf-gdp/). `preview:qualif` n’inclut pas le reverse proxy `/__sso` : la connexion SSO se teste sur sgm ou en `npm run dev`.
+
+### Apache sur le serveur de qualif
+
+Le vhost (fichier type `qlf-gdp.conf`) sert les fichiers de `/var/www/intranet/qlf-gdp` sous `http://sgm.ign.fr/qlf-gdp/` et relaie OAuth `/qlf-gdp/__sso/` vers Keycloak — **même rôle que Vite `/__sso` en local**. Le login (`/auth`) reste une redirection navigateur vers `sso.geopf.fr`. Seuls `/token` et `/revoke` passent par Apache.
+
+Il faut retirer `Origin` et `Referer` avant d’appeler Keycloak (sinon `403 Invalid origin`). Sur Apache 2.4, le faire avec `SetEnvIf` + `RequestHeader unset` au niveau du VirtualHost, **pas** `unset … early` dans un `<Location>`.
+
+Référence à coller / comparer : [scripts/apache-qlf-gdp-sso.conf.example](./scripts/apache-qlf-gdp-sso.conf.example). Après modification : `sudo apachectl configtest && sudo systemctl reload apache2`.
+
+Keycloak (client PKCE) : Valid Redirect URI `http://sgm.ign.fr/qlf-gdp/auth/callback`. Le `ProxyPass` ne remplace pas cette URI.
+
+Le `.htaccess` copié dans `dist/` ne gère que le fallback SPA ; le proxy OAuth n’existe qu’en VirtualHost.
 
 | Variable (`.env.qualif`)         | Rôle                                 |
 | -------------------------------- | ------------------------------------ |
 | `VITE_BASE_PATH`                 | Sous-chemin, ex. `/qlf-gdp/`         |
 | `VITE_USE_QUALIF`                | `true`                               |
-| `VITE_OAUTH_WEB_REDIRECT_URI`    | `<url-qualif>/qlf-gdp/auth/callback` |
+| `VITE_OAUTH_WEB_REDIRECT_URI`    | `http://sgm.ign.fr/qlf-gdp/auth/callback` |
 | `VITE_GDP_REPORT_COMMUNITY_ID`   | ID de la communauté géodésie         |
 | `VITE_GDP_REPORT_DISPLAY_THEMES` | Thèmes à afficher                    |
 | `VITE_GDP_REPORT_SUBMISSION_THEME` | Thème pour les signalements        |

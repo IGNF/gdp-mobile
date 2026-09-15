@@ -74,7 +74,7 @@ flowchart TB
 flowchart TB
   subgraph identifier["S'identifier"]
     I1["Login / callback SSO<br/>gdp-mobile"] --> I2["@ign/mobile-core<br/>AuthManager · OAuth PKCE"]
-    I2 --> I3["Capacitor Browser<br/>SSO natif · proxy web en dev"]
+    I2 --> I3["SSO : navigateur → Keycloak /auth<br/>/token /revoke via /__sso (web)"]
     I2 --> I4["@ign/mobile-device<br/>Storage — tokens & profil user"]
     I4 --> I5["Session restaurée<br/>carte · signalements · compte"]
     I2 --> I6["collaboratif-client-api<br/>session API signalements"]
@@ -115,7 +115,7 @@ flowchart TB
 
 Notes :
 
-- **Identification** : requise pour envoyer un signalement et consulter le compte ; la carte reste consultable sans connexion. Pas de garde de route globale : les pages `/reports` s’adaptent à `useAuth()` (brouillons locaux vs signalements serveur).
+- **Identification** : requise pour envoyer un signalement et consulter le compte ; la carte reste consultable sans connexion. Pas de garde de route globale : les pages `/reports` s’adaptent à `useAuth()` (brouillons locaux vs signalements serveur). En **web**, `/token` et `/revoke` passent par `/__sso` (Vite en local, Apache `ProxyPass` en qualif) pour rester same-origin ; la page de login Keycloak n’est pas proxifiée. En **natif**, `AuthManager` parle à `VITE_OAUTH_BASE_URL`. Voir [README — Apache qualif](../README.md#apache-sur-le-serveur-de-qualif) et [Dépannage](./DEPANNAGE.md).
 - **GPS** : bouton de recentrage sur la carte ; wrapper dans `platform/device/` — pas de logique GPS dans `@ign/mobile-core`.
 - **Appareil photo** : pas de plugin Capacitor Camera dédié ; en natif, `<input type="file" accept="image/*" capture="environment">` ouvre la caméra ou la galerie. Vérification de l'orientation paysage côté app avant envoi.
 

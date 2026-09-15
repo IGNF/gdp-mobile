@@ -1,12 +1,22 @@
 # Dépannage
 
-Complément du [README](../README.md).
+Complément du [README](../README.md) (déploiement qualif et Apache : section *Déploiement en qualif*).
 
 ## Proxy IGN (502 OAuth en dev web)
 
-Le navigateur atteint Keycloak, mais Vite (`/__sso`) parle en Node. Sans proxy : `bad_gateway` / `ECONNREFUSED`.
+Le navigateur atteint Keycloak sans proxy. Vite (`/__sso`) parle en Node : sans `HTTPS_PROXY`, `/token` fait `bad_gateway` / `ECONNREFUSED`.
 
-`HTTPS_PROXY` / `NO_PROXY` (souvent dans `~/.bashrc` : `http://proxy.ign.fr:3128`) sont utilisés par le proxy Vite. Relancer `npm run dev` depuis un terminal où `echo $HTTPS_PROXY` affiche le proxy. `NO_PROXY` doit contenir `localhost`. Si Cursor lance Vite sans ces variables, les exporter dans ce terminal-là.
+`HTTPS_PROXY` / `NO_PROXY` (souvent dans `~/.bashrc` : `http://proxy.ign.fr:3128`) sont lus par le proxy Vite. `NO_PROXY` doit contenir `localhost`. Cursor ne charge pas `~/.bashrc` : les mettre dans `gdp-mobile/.env` (voir `.env.dist`) ou les exporter dans le terminal qui lance `npm run dev`. Au démarrage, le terminal doit afficher `[vite oauth proxy] sso.geopf.fr via http://proxy.ign.fr:3128`.
+
+## Qualif : `POST /qlf-gdp/__sso/token` → 403 Invalid origin
+
+Le navigateur envoie `Origin: http://sgm.ign.fr`. Si Apache le transmet, Keycloak répond `{"error":"Invalid origin"}`. Le message d’UI sur `VITE_OAUTH_WEB_REDIRECT_URI` est alors trompeur.
+
+Contrôle : le même POST **sans** `Origin` doit répondre `400` `Code not valid` (proxy OK). **Avec** `Origin`, après config correcte, on doit aussi avoir 400, plus 403.
+
+Config qui marche : `SetEnvIf` + `RequestHeader unset Origin` / `Referer` au niveau du VirtualHost (pas `unset … early` dans `<Location>`, ignoré sur Apache 2.4). Snippet : [scripts/apache-qlf-gdp-sso.conf.example](../scripts/apache-qlf-gdp-sso.conf.example). Puis `apachectl configtest` et reload.
+
+Le `.htaccess` du `dist/` ne s’applique pas au `ProxyPass`.
 
 ## Chrome inspect — le téléphone n’apparaît pas
 

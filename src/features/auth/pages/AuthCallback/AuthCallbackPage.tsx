@@ -17,14 +17,13 @@ export function AuthCallbackPage() {
   const [searchParams] = useSearchParams();
   const { setUserFromOAuthCallback } = useAuth();
   const [error, setError] = useState<string | null>(null);
+  const code = searchParams.get('code');
+  const errorParam = searchParams.get('error');
 
   useEffect(() => {
     let cancelled = false;
 
     async function processCallback() {
-      const code = searchParams.get('code');
-      const errorParam = searchParams.get('error');
-
       if (errorParam) {
         setError('La connexion a été refusée ou annulée.');
         return;
@@ -40,7 +39,9 @@ export function AuthCallbackPage() {
 
         if (result.success && result.user) {
           await setUserFromOAuthCallback(result.user);
-          navigate('/map', { replace: true });
+          if (!cancelled) {
+            navigate('/map', { replace: true });
+          }
           return;
         }
 
@@ -61,7 +62,7 @@ export function AuthCallbackPage() {
     return () => {
       cancelled = true;
     };
-  }, [navigate, searchParams, setUserFromOAuthCallback]);
+  }, [code, errorParam, navigate, setUserFromOAuthCallback]);
 
   if (error) {
     return (
