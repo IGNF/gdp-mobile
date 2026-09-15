@@ -42,4 +42,14 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-feature android:name="android.hardware.location.gps" android:required="false" />
+
+    <!-- Visibilité de paquets (Android 11+, cible ici API 36) : sans ce <queries>, l'app ne
+         "voit" aucune appli caméra via PackageManager.resolveActivity, et le WebChromeClient de
+         Capacitor (BridgeWebChromeClient#showImageCapturePicker) retombe silencieusement sur le
+         sélecteur de fichiers générique au lieu d'ouvrir l'appareil photo. -->
+    <queries>
+        <intent>
+            <action android:name="android.media.action.IMAGE_CAPTURE" />
+        </intent>
+    </queries>
 </manifest>
