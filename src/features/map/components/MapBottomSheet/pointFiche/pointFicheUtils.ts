@@ -67,11 +67,6 @@ export function parseGeographicReferenceSystem(cg1Srt: string): string {
   return parseCg1SrtParts(cg1Srt).system;
 }
 
-/** Extrait l’ellipsoïde depuis `cg1_srt` (ex. « IAG GRS 1980 »). */
-export function parseGeographicEllipsoid(cg1Srt: string): string {
-  return parseCg1SrtParts(cg1Srt).ellipsoid;
-}
-
 const CP1_SRT_PROJECTION_SEPARATOR = /\s*-\s*projection\s*:\s*/i;
 const CP1_SRT_PROJECTION_PREFIX = /^projection\s*:\s*/i;
 const CP1_SRT_SYSTEM_PREFIX = /^syst[eè]me(?:\s+de\s+projection)?\s*:\s*/i;
@@ -119,7 +114,7 @@ function isScalarPropertyValue(value: unknown): value is string | number | boole
   );
 }
 
-export function readPropertyValue(
+function readPropertyValue(
   properties: Record<string, unknown>,
   key: string,
 ): string | null {
@@ -154,7 +149,7 @@ export function resolveCommuneLabel(properties: Record<string, unknown>): string
   return readPropertyValue(properties, 'commune');
 }
 
-export function findAttributeByLabel(
+function findAttributeByLabel(
   action: MapGeodesyClickAction,
   matcher: (label: string) => boolean,
 ): string | null {

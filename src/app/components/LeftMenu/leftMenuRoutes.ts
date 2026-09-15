@@ -1,4 +1,4 @@
-export const leftMenuOverlayRoutes = [
+const leftMenuOverlayRoutes = [
   '/my-account',
   '/logout',
   '/favorites',
@@ -10,7 +10,7 @@ export const leftMenuOverlayRoutes = [
 
 export type LeftMenuOverlayRoute = (typeof leftMenuOverlayRoutes)[number];
 
-export const leftMenuNavigateRoutes = ['/login'] as const;
+const leftMenuNavigateRoutes = ['/login'] as const;
 
 export type LeftMenuNavigateRoute = (typeof leftMenuNavigateRoutes)[number];
 

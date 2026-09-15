@@ -20,7 +20,7 @@ const EXCLUSIVE_ETAT_REASONS: readonly NonConformReason[] = [
 const COMMENT_ONLY_REASONS: readonly NonConformReason[] = ['photoNonConforme'];
 
 /** Valeur `etat` du thème `gdp-tools` d’après le wizard. */
-export function resolveGdpReportEtatValue(params: {
+function resolveGdpReportEtatValue(params: {
   isConform: boolean;
   nonConformReasons: readonly NonConformReason[];
 }): string | undefined {

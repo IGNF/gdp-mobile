@@ -122,8 +122,9 @@ Inspecter la WebView (bundle `dist`, pas Vite) : `chrome://inspect/#devices` →
 | `npm run bump:version -- 4.0.1` | Version + commit + tag `v4.0.1` |
 | `npm run lint` | ESLint |
 | `npm run lint:css-modules` | Contrôle des CSS modules |
+| `npm run knip` | Fichiers, dépendances et exports inutilisés |
 
-Depuis la racine du monorepo, les mêmes noms marchent pour `dev`, `build`, `build:qualif`, `setup-android`, `generate-apk`, `run-apk` et `bump:version`.
+Depuis la racine du monorepo, les mêmes noms marchent pour `dev`, `build`, `build:qualif`, `setup-android`, `generate-apk`, `run-apk`, `bump:version` et `knip` (`npm run knip -w gdp-mobile`).
 
 ## Documentation
 

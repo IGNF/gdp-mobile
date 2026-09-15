@@ -125,7 +125,7 @@ export function createReportStatusMapMarkerStyle(status: ReportStatus | string):
 
 const clusterStyleCache = new Map<number, OlStyle>();
 
-export function createReportClusterMapMarkerStyle(count: number): OlStyle {
+function createReportClusterMapMarkerStyle(count: number): OlStyle {
   const cached = clusterStyleCache.get(count);
   if (cached) {
     return cached;

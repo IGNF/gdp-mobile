@@ -57,13 +57,8 @@
   flex-direction: column;
 }
 
-.handleAreaDraggable {
-  cursor: grab;
-  touch-action: none;
-}
-
-.handleAreaDraggable:active {
-  cursor: grabbing;
+.sheetAuto {
+	height: auto;
 }
 
 .contentExpanded {

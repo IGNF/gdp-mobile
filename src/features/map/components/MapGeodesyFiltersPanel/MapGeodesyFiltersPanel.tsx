@@ -106,7 +106,7 @@ export function countActiveMapGeodesyFilters(
   return baseCount - activeRangePairs;
 }
 
-export function createDefaultMapGeodesyFilterValues(
+function createDefaultMapGeodesyFilterValues(
   filters: readonly GeodesyWfsAttributeFilterDefinition[],
 ): GeodesyWfsAttributeFilterValues {
   return createDefaultGeodesyWfsAttributeFilterValues(filters);

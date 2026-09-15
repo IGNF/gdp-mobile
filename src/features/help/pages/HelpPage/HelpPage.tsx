@@ -18,7 +18,7 @@ const FAQ_ITEMS = [
   {
     question: 'Comment créer un signalement ?',
     answer:
-      'Sur la carte, touchez un repère géodésique pour consulter sa fiche et créer un signalement. Vous pouvez aussi ouvrir « Nouveau signalement repère » dans le menu.',
+      'Sur la carte, touchez un repère géodésique pour consulter sa fiche, puis le bouton Signaler.',
   },
   {
     question: 'Où sont stockés mes brouillons ?',
