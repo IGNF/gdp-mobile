@@ -1,3 +1,8 @@
+.sheet {
+  /* Plafond CSS généreux — la vraie limite (bouton légende) vient de maxExpandedHeightPx. */
+  max-height: min(92vh, 43.5rem);
+}
+
 .content {
   display: flex;
   flex-direction: column;
