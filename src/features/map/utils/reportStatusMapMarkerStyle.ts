@@ -3,49 +3,14 @@ import Feature from 'ol/Feature';
 import type { Style } from 'ol/style';
 import { Icon, Style as OlStyle, Text, Fill, Stroke } from 'ol/style';
 
-import { getColorCode } from '@/shared/utils/color';
-import { getStatusColorToken } from '@/shared/utils/reportStatus';
+import type { LocalReportDraftStatus } from '@/domain/report/localReportDraft';
+import { getLocalReportDraftStatusColors } from '@/features/report/utils/localReportDraftStatus';
+import { getColorCode, resolveCssColor } from '@/shared/utils/color';
+import { getStatusColors } from '@/shared/utils/reportStatus';
 
-type StatusIconKind = 'check' | 'clock' | 'close' | 'pencil' | 'send';
-
-/** Pictogrammes 24×24 simplifiés, lisibles dans l'épingle. */
-const STATUS_ICON_PATHS: Record<StatusIconKind, string> = {
-  check:
-    'M9.12 17.66 L3.7 12.24 l1.41-1.41 4.01 4.01 8.48-8.49 1.41 1.42 Z',
-  clock:
-    'M12 2 a10 10 0 1 0 0.01 0 Z M12 4 a8 8 0 1 1-0.01 0 Z M12.75 7 v5.05 l3.6 2.15 -0.75 1.25 -4.35-2.6 V7 Z',
-  close:
-    'M6.1 7.5 L7.5 6.1 17.9 16.5 16.5 17.9 Z M16.5 6.1 L17.9 7.5 7.5 17.9 6.1 16.5 Z',
-  pencil:
-    'M14.06 2.94 a1.5 1.5 0 0 1 2.12 0 l4.88 4.88 a1.5 1.5 0 0 1 0 2.12 L9.5 21.5 H4.5 v-5 L14.06 2.94 Z M6.5 18 v2 h2 l8.9-8.9 -2-2 L6.5 18 Z',
-  send:
-    'M3.2 11.2 L20.5 3.4 a0.9 0.9 0 0 1 1.15 1.15 L13.8 21.8 a0.9 0.9 0 0 1-1.65 0.05 L9.9 14.1 3.15 12.55 A0.9 0.9 0 0 1 3.2 11.2 Z M10.7 13.85 L18.4 6.1 11.55 14.55 Z',
-};
-
-function resolveStatusIconKind(status: ReportStatus | string): StatusIconKind {
-  switch (status) {
-    case ReportStatus.Valid:
-    case ReportStatus.Valid_Already_Treated:
-      return 'check';
-    case ReportStatus.Reject:
-    case ReportStatus.Reject_Irrelevant:
-      return 'close';
-    case ReportStatus.Submit:
-      return 'send';
-    case ReportStatus.Draft:
-      return 'pencil';
-    case ReportStatus.Pending:
-    case ReportStatus.Pending_Qualification:
-    case ReportStatus.Pending_Entry:
-    case ReportStatus.Pending_Validation:
-    case ReportStatus.Cluster:
-    default:
-      return 'clock';
-  }
-}
-
+/** Même couleur que le badge de statut affiché sur la page « Anciens signalements ». */
 function resolveStatusHexColor(status: ReportStatus | string): string {
-  return getColorCode(getStatusColorToken(status)) || '#888888';
+  return resolveCssColor(getStatusColors(status).color) || '#888888';
 }
 
 function encodeMarkerSvg(svg: string): string {
@@ -53,12 +18,10 @@ function encodeMarkerSvg(svg: string): string {
 }
 
 /**
- * Épingle colorée + disque blanc + picto.
+ * Épingle colorée + disque blanc, sans picto.
  * Ancrage en bas de la pointe pour pointer la coordonnée exacte.
  */
-function createPinMarkerSvg(color: string, iconKind: StatusIconKind): string {
-  const iconPath = STATUS_ICON_PATHS[iconKind];
-
+function createPinMarkerSvg(color: string): string {
   return `
     <svg xmlns="http://www.w3.org/2000/svg" width="36" height="48" viewBox="0 0 36 48">
       <defs>
@@ -72,11 +35,6 @@ function createPinMarkerSvg(color: string, iconKind: StatusIconKind): string {
           fill="${color}"
         />
         <circle cx="18" cy="17.5" r="9.5" fill="#ffffff"/>
-      </g>
-      <g transform="translate(18 17.5)">
-        <g transform="translate(-8 -8) scale(0.67)">
-          <path d="${iconPath}" fill="${color}"/>
-        </g>
       </g>
     </svg>
   `;
@@ -110,10 +68,9 @@ export function createReportStatusMapMarkerStyle(status: ReportStatus | string):
   }
 
   const color = resolveStatusHexColor(status);
-  const iconKind = resolveStatusIconKind(status);
   const style = new OlStyle({
     image: new Icon({
-      src: encodeMarkerSvg(createPinMarkerSvg(color, iconKind)),
+      src: encodeMarkerSvg(createPinMarkerSvg(color)),
       anchor: [0.5, 1],
       rotateWithView: false,
     }),
@@ -160,4 +117,41 @@ export function styleReportMapFeature(feature: Feature): Style {
   const targetFeature = clusteredFeatures?.[0] ?? feature;
   const status = targetFeature.get('status') ?? ReportStatus.Pending;
   return createReportStatusMapMarkerStyle(status);
+}
+
+/** Même couleur que le badge de statut affiché sur la page « Signalements » (brouillons locaux). */
+function resolveLocalDraftHexColor(status: LocalReportDraftStatus): string {
+  return resolveCssColor(getLocalReportDraftStatusColors(status).color) || '#4A7FB5';
+}
+
+const localDraftMarkerStyleCache = new Map<LocalReportDraftStatus, OlStyle>();
+
+export function createLocalReportDraftMapMarkerStyle(status: LocalReportDraftStatus): OlStyle {
+  const cached = localDraftMarkerStyleCache.get(status);
+  if (cached) {
+    return cached;
+  }
+
+  const color = resolveLocalDraftHexColor(status);
+  const style = new OlStyle({
+    image: new Icon({
+      src: encodeMarkerSvg(createPinMarkerSvg(color)),
+      anchor: [0.5, 1],
+      rotateWithView: false,
+    }),
+  });
+
+  localDraftMarkerStyleCache.set(status, style);
+  return style;
+}
+
+export function styleLocalReportDraftMapFeature(feature: Feature): Style {
+  const clusteredFeatures = feature.get('features') as Feature[] | undefined;
+  if (Array.isArray(clusteredFeatures) && clusteredFeatures.length > 1) {
+    return createReportClusterMapMarkerStyle(clusteredFeatures.length);
+  }
+
+  const targetFeature = clusteredFeatures?.[0] ?? feature;
+  const status = (targetFeature.get('status') as LocalReportDraftStatus | undefined) ?? 'not_sent';
+  return createLocalReportDraftMapMarkerStyle(status);
 }

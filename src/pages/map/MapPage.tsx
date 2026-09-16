@@ -27,6 +27,8 @@ import { countActiveMapGeodesyFilters } from '@/features/map/components/MapGeode
 import type { MapLayerGroupId } from '@/features/map/types/mapLayerGroups';
 import type { GeodesyPointReportMapContext } from '@/domain/report/geodesyPointMapContext';
 import type { GroupReport } from '@/domain/report/groupReportModels';
+import type { LocalReportDraft } from '@/domain/report/localReportDraft';
+import { useLocalReportDrafts } from '@/features/report/hooks/useLocalReportDrafts';
 import { useMap } from '@/features/map/hooks/useMap';
 import { useMapGeodesyClick } from '@/features/map/hooks/useMapGeodesyClick';
 import { useMapClickSelectionMarker } from '@/features/map/hooks/useMapClickSelectionMarker';
@@ -69,7 +71,6 @@ import styles from './MapPage.module.css';
 
 interface MapFocusReportState {
   focusReport?: {
-    id: number;
     longitude: number;
     latitude: number;
   };
@@ -86,11 +87,7 @@ function isMapFocusReportState(value: unknown): value is MapFocusReportState {
     return false;
   }
 
-  return (
-    typeof focus.id === 'number' &&
-    typeof focus.longitude === 'number' &&
-    typeof focus.latitude === 'number'
-  );
+  return typeof focus.longitude === 'number' && typeof focus.latitude === 'number';
 }
 
 interface OpenReportPointState {
@@ -229,13 +226,28 @@ export function MapPage() {
 
   const handleReportMapSelect = useCallback(
     (report: GroupReport) => {
-      if (report.longitude === null || report.latitude === null) {
-        return;
-      }
-
-      void focusOnCoordinate(report.longitude, report.latitude, GROUP_REPORT_MAP_FOCUS_ZOOM);
+      navigate(`/reports/history/${report.id}`, { state: { from: 'map' } });
     },
-    [focusOnCoordinate],
+    [navigate],
+  );
+
+  const { drafts: localReportDrafts, refetch: refetchLocalReportDrafts } = useLocalReportDrafts();
+  const notSentLocalReportDrafts = useMemo(
+    () => localReportDrafts.filter((draft) => draft.status === 'not_sent'),
+    [localReportDrafts],
+  );
+
+  useEffect(() => {
+    if (reportMapLayers.myReports) {
+      void refetchLocalReportDrafts();
+    }
+  }, [reportMapLayers.myReports, refetchLocalReportDrafts]);
+
+  const handleLocalDraftMapSelect = useCallback(
+    (draft: LocalReportDraft) => {
+      navigate(`/reports/${draft.id}`, { state: { from: 'map' } });
+    },
+    [navigate],
   );
 
   useReportMapLayers({
@@ -244,7 +256,9 @@ export function MapPage() {
     isAuthenticated,
     userId: user?.id,
     visibility: reportMapLayers,
+    localDrafts: notSentLocalReportDrafts,
     onReportSelect: handleReportMapSelect,
+    onLocalDraftSelect: handleLocalDraftMapSelect,
   });
 
   // Fermer couches / filtres / légende au clic carte (comme recherche & signalements).
