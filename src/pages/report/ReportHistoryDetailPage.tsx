@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
 import { BottomTabbar } from '@/app/components/BottomTabbar';
 import type { GroupReport } from '@/domain/report/groupReportModels';
@@ -23,6 +23,8 @@ import styles from './ReportDetailPage.module.css';
 export function ReportHistoryDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
+  const cameFromMap = (location.state as { from?: string } | null)?.from === 'map';
   const [report, setReport] = useState<GroupReport | null | undefined>(undefined);
   const [photoFailed, setPhotoFailed] = useState(false);
   const [isPhotoLightboxOpen, setIsPhotoLightboxOpen] = useState(false);
@@ -78,13 +80,24 @@ export function ReportHistoryDetailPage() {
     });
   };
 
+  const handleBack = () => {
+    if (cameFromMap && report && report.longitude !== null && report.latitude !== null) {
+      navigate('/map', {
+        state: { focusReport: { longitude: report.longitude, latitude: report.latitude } },
+      });
+      return;
+    }
+
+    navigate('/reports/history');
+  };
+
   return (
     <div className={styles.page}>
       <PageHeader
         title="Détail du signalement"
         showBackButton
         showCloseButton={false}
-        onBack={() => navigate('/reports/history')}
+        onBack={handleBack}
       />
 
       <main className={styles.main}>
