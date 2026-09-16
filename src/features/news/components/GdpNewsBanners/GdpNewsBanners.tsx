@@ -1,44 +1,43 @@
 import { Alert } from '@/shared/ui/Alert';
 import { ExternalLink } from '@/shared/ui/ExternalLink';
 import type { GdpNewsItem } from '@/domain/news/models';
-
-import { GdpNewsBanner } from '../GdpNewsBanner/GdpNewsBanner';
-import styles from './GdpNewsBanners.module.css';
+import { NEWS_SEVERITY_VISUALS } from '@/features/news/utils/newsSeverityVisuals';
 
 export interface GdpNewsBannersProps {
-  banners: GdpNewsItem[];
-  modal: GdpNewsItem | null;
+  items: GdpNewsItem[];
   onDismiss: (item: GdpNewsItem) => void;
 }
 
-export function GdpNewsBanners({ banners, modal, onDismiss }: GdpNewsBannersProps) {
-  if (banners.length === 0 && !modal) {
+/** N'affiche que l'item le plus sévère ; le suivant apparaît une fois celui-ci fermé. */
+export function GdpNewsBanners({ items, onDismiss }: GdpNewsBannersProps) {
+  const current = items[0] ?? null;
+
+  if (!current) {
     return null;
   }
 
-  return (
-    <>
-      {banners.length > 0 ? (
-        <div className={styles.stack}>
-          {banners.map((item) => (
-            <GdpNewsBanner key={item.id} item={item} onDismiss={onDismiss} />
-          ))}
-        </div>
-      ) : null}
+  const visual = NEWS_SEVERITY_VISUALS[current.severity];
 
-      {modal ? (
-        <Alert
-          isOpen
-          title={modal.title}
-          subtitle={modal.body}
-          showCloseButton={modal.dismissible}
-          onClose={() => onDismiss(modal)}
-        >
-          {modal.cta ? (
-            <ExternalLink href={modal.cta.url}>{modal.cta.label}</ExternalLink>
-          ) : null}
-        </Alert>
+  return (
+    <Alert
+      isOpen
+      title={current.title}
+      subtitle={current.body}
+      showCloseButton={current.dismissible}
+      onClose={() => onDismiss(current)}
+      placement="bottom"
+      icon={<visual.Icon aria-hidden />}
+      iconBackground={visual.background}
+      iconColor={visual.color}
+      buttons={
+        current.dismissible
+          ? [{ label: 'J’ai compris', onClick: () => onDismiss(current) }]
+          : []
+      }
+    >
+      {current.cta ? (
+        <ExternalLink href={current.cta.url}>{current.cta.label}</ExternalLink>
       ) : null}
-    </>
+    </Alert>
   );
 }

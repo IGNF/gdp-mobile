@@ -45,7 +45,7 @@ Côté web, le serveur qui héberge le JSON doit autoriser CORS pour l’origine
 | `endsAt` | string ISO 8601 | oui | Fin d’affichage (inclus). |
 | `platforms` | array | non | `"web"`, `"android"`, `"ios"`. Défaut : les trois. |
 | `audience` | `"all"` \| `"authenticated"` | non | `all` : tout le monde. `authenticated` : uniquement les utilisateurs connectés. Défaut : `all`. |
-| `display` | `"banner"` \| `"modal"` | non | `banner` : bandeau sur la carte. `modal` : fenêtre au-dessus. Défaut : `banner`. |
+| `display` | `"banner"` \| `"modal"` | non | Conservé pour compatibilité du contrat JSON, mais actuellement sans effet : tous les items s'affichent de la même façon (voir Règles d'affichage). Défaut : `banner`. |
 | `dismissible` | boolean | non | `true` : l’utilisateur peut fermer. `false` : le message reste tant que les dates sont valides. Défaut : `true`. |
 | `showOnce` | boolean | non | `true` : après fermeture, ne plus jamais réafficher (stockage local). `false` : réaffichage à la prochaine session. Défaut : `false`. |
 | `cta` | object | non | Bouton / lien optionnel. |
@@ -91,9 +91,8 @@ Côté web, le serveur qui héberge le JSON doit autoriser CORS pour l’origine
 3. `audience` : `authenticated` n’est montré que si l’utilisateur est connecté.
 4. Si `showOnce` et que l’`id` a déjà été fermé sur cet appareil, l’item est masqué.
 5. Une news affichée sur la carte pendant la session n’est plus réaffichée en y revenant (navigation interne). Une fermeture explicite a le même effet. `showOnce` : masquage définitif sur l’appareil.
-6. Plusieurs bandeaux peuvent s’empiler. Ordre : `error`, puis `warning`, puis `info`.
-7. Une seule modale à la fois (la plus sévère parmi les items `display: "modal"` visibles).
-8. Le menu **Aide** affiche un badge `News` s’il existe au moins une actualité encore valide. La liste se consulte depuis un lien **Actualités** dans la page d’aide (y compris les items déjà fermés sur la carte).
+6. Une seule news est affichée à la fois, dans une fenêtre glissante depuis le bas de l’écran (style `Alert`). S’il y en a plusieurs, la plus sévère est montrée en premier (`error`, puis `warning`, puis `info`) ; fermer celle-ci fait apparaître la suivante.
+7. Le menu **Aide** affiche un badge `News` s’il existe au moins une actualité encore valide. La liste se consulte depuis un lien **Actualités** dans la page d’aide (y compris les items déjà fermés sur la carte).
 
 ## Conseils de rédaction
 

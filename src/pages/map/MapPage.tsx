@@ -116,8 +116,7 @@ export function MapPage() {
   const location = useLocation();
   const { user, isAuthenticated, logout } = useAuth();
   const {
-    banners: newsBanners,
-    modal: newsModal,
+    items: newsItems,
     currentItems: currentNews,
     isLoading: isNewsLoading,
     dismiss: dismissNews,
@@ -526,11 +525,7 @@ export function MapPage() {
         <div ref={mapElementRef} className={styles.mapTarget} />
 
         <div className={styles.mapOverlays}>
-          <GdpNewsBanners
-            banners={newsBanners}
-            modal={newsModal}
-            onDismiss={dismissNews}
-          />
+          <GdpNewsBanners items={newsItems} onDismiss={dismissNews} />
 
           <button
             type="button"
