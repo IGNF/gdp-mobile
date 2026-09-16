@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
   isGeodesyLayerReportingEnabled,
@@ -140,6 +140,8 @@ export function MapPage() {
   const [layersPanelFocus, setLayersPanelFocus] = useState<MapLayerGroupId | null>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLegendOpen, setIsLegendOpen] = useState(false);
+  const legendFabRef = useRef<HTMLButtonElement>(null);
+  const [legendMaxSheetHeight, setLegendMaxSheetHeight] = useState<number | undefined>(undefined);
   const [sheetHeight, setSheetHeight] = useState(0);
   const [fabSheetOffset, setFabSheetOffset] = useState(0);
   const [isTabbarHiddenByPoint, setIsTabbarHiddenByPoint] = useState(false);
@@ -434,6 +436,24 @@ export function MapPage() {
     setIsLegendOpen((current) => !current);
   };
 
+  // Plafonne la fiche légende dépliée pour ne pas couvrir le bouton qui l'ouvre.
+  useEffect(() => {
+    if (!isLegendOpen) {
+      return;
+    }
+
+    const updateLegendMaxSheetHeight = () => {
+      const top = legendFabRef.current?.getBoundingClientRect().top;
+      if (top !== undefined) {
+        setLegendMaxSheetHeight(Math.max(0, window.innerHeight - top));
+      }
+    };
+
+    updateLegendMaxSheetHeight();
+    window.addEventListener('resize', updateLegendMaxSheetHeight);
+    return () => window.removeEventListener('resize', updateLegendMaxSheetHeight);
+  }, [isLegendOpen]);
+
   const handleCloseLayersPanel = () => {
     setIsLayersPanelOpen(false);
     setLayersPanelFocus(null);
@@ -544,6 +564,7 @@ export function MapPage() {
               <IconLayers className={styles.mapFabIcon} aria-hidden />
             </button>
             <button
+              ref={legendFabRef}
               type="button"
               className={`${styles.mapFab} ${isLegendOpen ? styles.mapFabActive : ''}`}
               aria-label="Légende"
@@ -687,7 +708,11 @@ export function MapPage() {
         onClose={() => setReportWizardContext(null)}
       />
 
-      <LegendPage isOpen={isLegendOpen} onClose={() => setIsLegendOpen(false)} />
+      <LegendPage
+        isOpen={isLegendOpen}
+        onClose={() => setIsLegendOpen(false)}
+        maxExpandedHeight={legendMaxSheetHeight}
+      />
 
       <MyAccountPage
         isOpen={activeOverlay === '/my-account'}

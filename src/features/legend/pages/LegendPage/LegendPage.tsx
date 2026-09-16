@@ -8,6 +8,8 @@ import styles from './LegendPage.module.css';
 export interface LegendPageProps {
   isOpen: boolean;
   onClose: () => void;
+  /** Hauteur max (px) de la fiche dépliée — ex. pour ne pas dépasser le bouton légende. */
+  maxExpandedHeight?: number;
 }
 
 function LegendDot({ color }: { color: string }) {
@@ -60,9 +62,19 @@ function LegendSection({ title, rows }: { title: string; rows: LegendRow[] }) {
   );
 }
 
-export function LegendPage({ isOpen, onClose }: LegendPageProps) {
+export function LegendPage({ isOpen, onClose, maxExpandedHeight }: LegendPageProps) {
   return (
-    <MapOverlaySheet isOpen={isOpen} onClose={onClose} titleAlign="left" title="Légende" ariaLabel="Légende">
+    <MapOverlaySheet
+      isOpen={isOpen}
+      onClose={onClose}
+      titleAlign="left"
+      title="Légende"
+      ariaLabel="Légende"
+      draggable
+      sheetClassName={styles.sheet}
+      maxExpandedHeightPx={maxExpandedHeight}
+      compactHeightRatio={0.3}
+    >
       <main className={styles.content}>
         <LegendSection
           title="Repère de nivellement (RN)"
