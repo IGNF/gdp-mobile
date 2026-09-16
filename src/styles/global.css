@@ -391,6 +391,7 @@ a:hover {
   --icon-wrap-xs: 2rem;   /* 32px - icône de base */
   --icon-wrap-sm: 2.25rem;   /* 36px - icône de base */
   --icon-wrap-md: 2.5rem;   /* 40px - icône de base */
+  --icon-wrap-lg: 3.5rem;   /* 56px - badge d'icône mis en avant (ex. carte news) */
 
   --icon-color-8: var(--figma-green-8);
   --icon-color-1: var(--figma-green-1);
