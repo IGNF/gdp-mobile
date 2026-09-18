@@ -114,12 +114,6 @@
   color: var(--color-non-conform-shade);
 }
 
-.cardDescription {
-  margin: 0;
-  font-size: 0.8125rem;
-  color: var(--color-text-secondary);
-}
-
 .radio {
   position: relative;
   flex-shrink: 0;
