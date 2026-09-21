@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { Button } from '@/shared/ui/Button';
 import type { ButtonColor, ButtonVariant } from '@/shared/ui/Button';
@@ -8,6 +8,13 @@ import { useDragToDismiss } from './useDragToDismiss';
 import styles from './Alert.module.css';
 
 const ANIMATION_DURATION = 200; // ms, matches CSS transition duration
+
+/**
+ * Attribut à poser sur un élément portalé (ex. une pile de flash messages) pour qu'un clic
+ * dedans ne ferme pas une alerte `nonBlocking` ouverte par ailleurs — sans lui, le clic sur
+ * cet élément serait vu comme « en dehors de la carte » et fermerait l'alerte en même temps.
+ */
+export const ALERT_OUTSIDE_CLICK_IGNORE_ATTRIBUTE = 'data-alert-ignore-outside-click';
 
 export interface AlertButton {
 	label: string;
@@ -35,6 +42,12 @@ export interface AlertProps {
 	iconColor?: string;
 	/** 'bottom' ancre la carte en bas de l'écran, façon fenêtre glissante. */
 	placement?: 'center' | 'bottom';
+	/**
+	 * Laisse l'arrière-plan cliquable (la carte reste utilisable) au lieu de le bloquer ;
+	 * un clic en dehors de la carte ferme l'alerte. Réservé aux messages non modaux :
+	 * une confirmation doit rester bloquante.
+	 */
+	nonBlocking?: boolean;
 }
 
 export function Alert({
@@ -50,9 +63,14 @@ export function Alert({
 	iconBackground,
 	iconColor,
 	placement = 'center',
+	nonBlocking = false,
 }: AlertProps) {
-	const [isVisible, setIsVisible] = useState(isOpen);
+	// Toujours false au montage (même si isOpen vaut déjà true) : sinon un composant monté
+	// directement ouvert — cas de GdpNewsBanners, qui n'insère l'Alert qu'une fois prête —
+	// démarre avec l'état « visible » et l'animation d'entrée ne joue jamais.
+	const [isVisible, setIsVisible] = useState(false);
 	const [shouldRender, setShouldRender] = useState(isOpen);
+	const cardRef = useRef<HTMLDivElement>(null);
 
 	if (isOpen && !shouldRender) {
 		setShouldRender(true);
@@ -81,6 +99,26 @@ export function Alert({
 		isBottomSheet && showCloseButton
 	);
 
+	// En mode non bloquant l'overlay laisse passer les clics : on écoute donc le document
+	// plutôt que l'overlay pour fermer sur un clic à côté de la carte.
+	useEffect(() => {
+		if (!nonBlocking || !isOpen || !showCloseButton) {
+			return;
+		}
+		const handlePointerDown = (event: PointerEvent) => {
+			const target = event.target as Element | null;
+			if (cardRef.current?.contains(event.target as Node)) {
+				return;
+			}
+			if (target?.closest(`[${ALERT_OUTSIDE_CLICK_IGNORE_ATTRIBUTE}]`)) {
+				return;
+			}
+			onClose();
+		};
+		document.addEventListener('pointerdown', handlePointerDown);
+		return () => document.removeEventListener('pointerdown', handlePointerDown);
+	}, [nonBlocking, isOpen, showCloseButton, onClose]);
+
 	if (!shouldRender) return null;
 
 	const content = (
@@ -88,11 +126,13 @@ export function Alert({
 			className={joinCSSClassNames(
 				styles.overlay,
 				isVisible && styles.overlayVisible,
-				isBottomSheet && styles.overlayBottom
+				isBottomSheet && styles.overlayBottom,
+				nonBlocking && styles.overlayPassthrough
 			)}
-			onClick={showCloseButton ? onClose : undefined}
+			onClick={showCloseButton && !nonBlocking ? onClose : undefined}
 		>
 			<div
+				ref={cardRef}
 				className={joinCSSClassNames(
 					styles.card,
 					size === 'wide' && styles.cardWide,

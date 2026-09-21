@@ -16,11 +16,24 @@
 
 .overlayBottom {
 	align-items: flex-end;
-	padding: 0;
+	/* Marge latérale (même valeur que la fiche point, .sheetPointFiche) : la carte reste
+	   visible sur les côtés, ce qui suggère qu'on peut glisser la fenêtre vers le bas
+	   plutôt que de la traiter comme un écran plein. */
+	padding: 0 0.25rem;
 }
 
 .overlayBottom.overlayVisible {
 	background-color: transparent;
+}
+
+/* Non bloquant : seule la carte capte les clics, l'arrière-plan (carte OL, FABs) reste utilisable. */
+.overlayPassthrough {
+	pointer-events: none;
+	background-color: transparent;
+}
+
+.overlayPassthrough .card {
+	pointer-events: auto;
 }
 
 .card {
@@ -44,12 +57,14 @@
 .cardBottom {
 	width: 100%;
 	max-width: 100%;
-	border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+	border-radius: var(--radius-lg);
 	background: var(--color-bg-surface);
 	box-shadow: var(--shadow-lg);
 	padding-bottom: var(--safe-bottom);
-	transform: translateY(1.5rem);
-	transition: opacity 0.2s ease, transform 0.25s var(--ease-material, ease-out);
+	/* Glisse depuis complètement sous l'écran à l'ouverture : montre que la fenêtre « vient
+	   du bas », pour suggérer qu'on peut la refermer en la faisant glisser dans l'autre sens. */
+	transform: translateY(100%);
+	transition: opacity 0.2s ease, transform 0.3s var(--ease-material, ease-out);
 }
 
 .overlayVisible .card {
