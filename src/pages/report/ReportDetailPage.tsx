@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import type { ReportStatus } from '@ign/mobile-core';
 
 import { BottomTabbar } from '@/app/components/BottomTabbar';
 import type { LocalReportDraft } from '@/domain/report/localReportDraft';
+import { mapApiReportToGroupReport, type ApiGroupReportResponse } from '@/domain/report/groupReportMappers';
 import { ReportPositionMap } from '@/features/report/components/ReportPositionMap';
 import {
   NON_CONFORM_REASON_LABELS,
@@ -25,6 +27,11 @@ import {
   getLocalReportDraftStatusColors,
   getLocalReportDraftStatusLabel,
 } from '@/features/report/utils/localReportDraftStatus';
+import {
+  getReportInstructionStatusColors,
+  getReportInstructionStatusLabel,
+} from '@/features/report/utils/reportInstructionStatus';
+import { collabApiClient, ensureCollabApiSession } from '@/infra/api';
 import { Button } from '@/shared/ui/Button';
 import { PageHeader } from '@/shared/ui/PageHeader';
 import { joinCSSClassNames } from '@/shared/utils/join';
@@ -46,6 +53,9 @@ export function ReportDetailPage() {
   const cameFromMap = (location.state as { from?: string } | null)?.from === 'map';
   const [draft, setDraft] = useState<LocalReportDraft | null | undefined>(undefined);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [remoteStatus, setRemoteStatus] = useState<{ serverId: number; status: ReportStatus } | null>(
+    null,
+  );
   const { submitGeodesyPointReport, isSubmitting } = useSubmitGeodesyPointReport();
 
   useEffect(() => {
@@ -64,6 +74,42 @@ export function ReportDetailPage() {
       cancelled = true;
     };
   }, [id]);
+
+  // Rejoue automatiquement juste après un envoi réussi (serverId passe de undefined à défini).
+  // `remoteStatus` garde le serverId auquel il correspond : un ancien résultat encore en vol
+  // en changeant de brouillon (id d'URL différent) est ainsi ignoré à l'affichage sans avoir
+  // à le réinitialiser explicitement ici.
+  useEffect(() => {
+    const serverId = draft?.serverId;
+    if (!serverId) {
+      return;
+    }
+
+    let cancelled = false;
+    void (async () => {
+      const sessionReady = await ensureCollabApiSession();
+      if (!sessionReady || cancelled) {
+        return;
+      }
+
+      try {
+        const response = await collabApiClient.report.get(serverId);
+        if (!cancelled) {
+          const status = mapApiReportToGroupReport(response.data as ApiGroupReportResponse).status;
+          setRemoteStatus({ serverId, status });
+        }
+      } catch {
+        // Silencieux : le badge « Envoyé » reste affiché, le badge d'instruction reste absent.
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [draft?.serverId]);
+
+  const currentRemoteStatus =
+    draft?.serverId && remoteStatus?.serverId === draft.serverId ? remoteStatus.status : null;
 
   const handleDelete = async () => {
     if (!id) {
@@ -105,7 +151,7 @@ export function ReportDetailPage() {
     );
 
     if (result) {
-      const updated = { ...draft, serverId: result.serverId };
+      const updated: LocalReportDraft = { ...draft, serverId: result.serverId, status: 'sent' };
       await saveLocalReportDraft(updated);
       setDraft(updated);
     }
@@ -161,12 +207,22 @@ export function ReportDetailPage() {
           <>
             <div className={styles.headerRow}>
               <span className={styles.reportId}>ID_{draft.geodesyId ?? draft.title}</span>
-              <span
-                className={styles.statusBadge}
-                style={getLocalReportDraftStatusColors(draft.status)}
-              >
-                {getLocalReportDraftStatusLabel(draft.status)}
-              </span>
+              <div className={styles.statusBadges}>
+                <span
+                  className={styles.statusBadge}
+                  style={getLocalReportDraftStatusColors(draft.status)}
+                >
+                  {getLocalReportDraftStatusLabel(draft.status)}
+                </span>
+                {currentRemoteStatus ? (
+                  <span
+                    className={styles.statusBadge}
+                    style={getReportInstructionStatusColors(currentRemoteStatus)}
+                  >
+                    {getReportInstructionStatusLabel(currentRemoteStatus)}
+                  </span>
+                ) : null}
+              </div>
             </div>
 
             <div className={styles.photoCard}>

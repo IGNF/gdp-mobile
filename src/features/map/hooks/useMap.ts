@@ -63,7 +63,7 @@ const USER_LOCATION_OPTIONS: PositionOptions = {
 interface UseMapReturn {
   mapElementRef: React.RefObject<HTMLDivElement | null>;
   map: Map | null;
-  centerOnUserLocation: (animationDuration?: number) => Promise<void>;
+  centerOnUserLocation: (animationDuration?: number, preserveZoom?: boolean) => Promise<void>;
   focusOnCoordinate: (
     longitude: number,
     latitude: number,
@@ -205,28 +205,25 @@ export function useMap(options: UseMapOptions = {}): UseMapReturn {
   );
 
   const animateToPosition = useCallback(
-    async (targetMap: Map, position: Position, animationDuration: number) => {
+    async (targetMap: Map, position: Position, animationDuration: number, preserveZoom = false) => {
       const { longitude, latitude } = position.coords;
-      await animateTo(
-        targetMap,
-        [longitude, latitude],
-        DEFAULT_MAP_FOCUS_ZOOM_ON_USER_LOCATION,
-        animationDuration,
-      );
+      const zoom = preserveZoom
+        ? (targetMap.getView().getZoom() ?? DEFAULT_MAP_FOCUS_ZOOM_ON_USER_LOCATION)
+        : DEFAULT_MAP_FOCUS_ZOOM_ON_USER_LOCATION;
+      await animateTo(targetMap, [longitude, latitude], zoom, animationDuration);
     },
     [animateTo],
   );
 
+  // Recentrage GPS au fil de l'eau (~1×/s en mode locked) : ne touche jamais au zoom,
+  // pour laisser l'utilisateur choisir et garder le sien pendant tout le suivi.
   const centerViewOnPosition = useCallback(
-    (targetMap: Map, position: Position, shouldResetZoom = false) => {
+    (targetMap: Map, position: Position) => {
       const { longitude, latitude } = position.coords;
       const view = targetMap.getView();
 
       runProgrammaticViewportChange(() => {
         view.setCenter(fromLonLat([longitude, latitude]));
-        if (shouldResetZoom) {
-          view.setZoom(DEFAULT_MAP_FOCUS_ZOOM_ON_USER_LOCATION);
-        }
       });
     },
     [runProgrammaticViewportChange],
@@ -352,32 +349,35 @@ export function useMap(options: UseMapOptions = {}): UseMapReturn {
     }
   }, [restoreViewportAfterUserChange]);
 
-  const centerOnUserLocation = useCallback(async (animationDuration: number = 500) => {
-    const currentMap = mapRef.current;
-    if (!currentMap || isLocatingRef.current) {
-      return;
-    }
-
-    isLocatingRef.current = true;
-    setIsLocating(true);
-
-    try {
-      const position = await Gdp_Geolocation.getUsersLocation(USER_LOCATION_OPTIONS);
-
-      if (position) {
-        latestPositionRef.current = position;
-        await animateToPosition(currentMap, position, animationDuration);
-      } else {
-        await animateTo(currentMap, DEFAULT_MAP_CENTER_LON_LAT, DEFAULT_MAP_FOCUS_ZOOM, animationDuration);
+  const centerOnUserLocation = useCallback(
+    async (animationDuration: number = 500, preserveZoom = false) => {
+      const currentMap = mapRef.current;
+      if (!currentMap || isLocatingRef.current) {
+        return;
       }
-    } catch (error) {
-      console.error('Error centering on user location:', error);
-      await animateTo(currentMap, DEFAULT_MAP_CENTER_LON_LAT, DEFAULT_MAP_FOCUS_ZOOM, animationDuration);
-    } finally {
-      isLocatingRef.current = false;
-      setIsLocating(false);
-    }
-  }, [animateTo, animateToPosition]);
+
+      isLocatingRef.current = true;
+      setIsLocating(true);
+
+      try {
+        const position = await Gdp_Geolocation.getUsersLocation(USER_LOCATION_OPTIONS);
+
+        if (position) {
+          latestPositionRef.current = position;
+          await animateToPosition(currentMap, position, animationDuration, preserveZoom);
+        } else {
+          await animateTo(currentMap, DEFAULT_MAP_CENTER_LON_LAT, DEFAULT_MAP_FOCUS_ZOOM, animationDuration);
+        }
+      } catch (error) {
+        console.error('Error centering on user location:', error);
+        await animateTo(currentMap, DEFAULT_MAP_CENTER_LON_LAT, DEFAULT_MAP_FOCUS_ZOOM, animationDuration);
+      } finally {
+        isLocatingRef.current = false;
+        setIsLocating(false);
+      }
+    },
+    [animateTo, animateToPosition],
+  );
 
   useEffect(() => {
     userFollowingModeRef.current = userFollowingMode;
@@ -404,10 +404,10 @@ export function useMap(options: UseMapOptions = {}): UseMapReturn {
       return;
     }
 
-    void centerOnUserLocation(GEOLOCATION_LOCK_RECENTER_ANIMATION_DURATION_MS);
+    void centerOnUserLocation(GEOLOCATION_LOCK_RECENTER_ANIMATION_DURATION_MS, true);
 
     const intervalId = window.setInterval(() => {
-      void centerOnUserLocation(GEOLOCATION_LOCK_RECENTER_ANIMATION_DURATION_MS);
+      void centerOnUserLocation(GEOLOCATION_LOCK_RECENTER_ANIMATION_DURATION_MS, true);
     }, GEOLOCATION_LOCK_RECENTER_INTERVAL_MS);
 
     return () => {
@@ -439,7 +439,7 @@ export function useMap(options: UseMapOptions = {}): UseMapReturn {
           return;
         }
 
-        centerViewOnPosition(currentMap, position, !hasManualViewportOverrideRef.current);
+        centerViewOnPosition(currentMap, position);
       };
 
       watchId = await Gdp_Geolocation.watchUsersLocation(onPositionUpdate, {

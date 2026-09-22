@@ -285,8 +285,9 @@ export function MapPage() {
 
     // Cycle à 3 clics : none → following → locked → none
     if (userFollowingMode === 'none') {
-      // Clic 1 : centrer et activer le suivi (sans recentrage automatique)
-      void centerOnUserLocation();
+      // Clic 1 : centrer (au zoom actuel, choisi par l'utilisateur) et activer le suivi
+      // (sans recentrage automatique)
+      void centerOnUserLocation(undefined, true);
       setUserFollowingMode('following');
     } else if (userFollowingMode === 'following') {
       // Clic 2 : activer le verrouillage (recentrage périodique automatique)

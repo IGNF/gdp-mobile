@@ -10,11 +10,16 @@ import {
   type NonConformReason,
 } from '@/features/report/components/GeodesyPointReportWizard';
 import { useLocalReportDrafts } from '@/features/report/hooks/useLocalReportDrafts';
+import { useSentReportRemoteStatuses } from '@/features/report/hooks/useSentReportRemoteStatuses';
 import {
   getLocalReportDraftStatusAccentRgb,
   getLocalReportDraftStatusColors,
   getLocalReportDraftStatusLabel,
 } from '@/features/report/utils/localReportDraftStatus';
+import {
+  getReportInstructionStatusColors,
+  getReportInstructionStatusLabel,
+} from '@/features/report/utils/reportInstructionStatus';
 import { formatRelativeDayLabel } from '@/shared/utils/date';
 import { joinCSSClassNames } from '@/shared/utils/join';
 import { EXTERNAL_LINKS } from '@/shared/constants/externalLinks';
@@ -40,6 +45,7 @@ export function MyReportsPage() {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
   const { drafts, isLoading } = useLocalReportDrafts();
+  const remoteStatuses = useSentReportRemoteStatuses(drafts);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
 
@@ -119,6 +125,7 @@ export function MyReportsPage() {
               <ul className={styles.reportList}>
                 {filteredDrafts.map((draft) => {
                   const statusColors = getLocalReportDraftStatusColors(draft.status);
+                  const remoteStatus = draft.serverId ? remoteStatuses.get(draft.serverId) : undefined;
                   const reasonLabel = draft.isConform
                     ? 'Conforme'
                     : (draft.nonConformReasons ?? [])
@@ -145,12 +152,22 @@ export function MyReportsPage() {
                             picto={draft.titlePicto}
                             className={styles.reportId}
                           />
-                          <span
-                            className={styles.statusBadge}
-                            style={{ color: statusColors.color, background: statusColors.background }}
-                          >
-                            {getLocalReportDraftStatusLabel(draft.status)}
-                          </span>
+                          <div className={styles.statusBadges}>
+                            <span
+                              className={styles.statusBadge}
+                              style={{ color: statusColors.color, background: statusColors.background }}
+                            >
+                              {getLocalReportDraftStatusLabel(draft.status)}
+                            </span>
+                            {remoteStatus ? (
+                              <span
+                                className={styles.statusBadge}
+                                style={getReportInstructionStatusColors(remoteStatus)}
+                              >
+                                {getReportInstructionStatusLabel(remoteStatus)}
+                              </span>
+                            ) : null}
+                          </div>
                         </div>
                         <p className={styles.reportReason}>
                           <span>{reasonLabel}</span>

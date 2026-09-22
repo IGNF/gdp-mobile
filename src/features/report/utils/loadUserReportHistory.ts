@@ -5,7 +5,8 @@ import {
 } from '@/domain/report/groupReportMappers';
 import {
   GDP_REPORT_COMMUNITY_ID,
-  serializeGdpReportThemeFilters,
+  GDP_REPORT_LEGACY_THEMES,
+  serializeGdpReportLegacyThemeFilters,
 } from '@/features/report/constants/reportApi';
 import { parseReportsTotal } from '@/features/report/utils/parseReportsTotal';
 import { collabApiClient, ensureCollabApiSession } from '@/infra/api';
@@ -22,15 +23,21 @@ export interface UserReportHistoryPage {
 }
 
 /**
- * Historique complet des signalements d'un compte (pas de filtre d'emprise carte,
- * contrairement à `loadReportsInMapBbox`) — inclut notamment les signalements envoyés
- * depuis une version précédente de l'application.
+ * Historique des signalements d'un compte envoyés depuis l'ancienne version de
+ * l'application (thème Espace Collaboratif hérité, ex. « Géodésie ») — pas de filtre
+ * d'emprise carte, contrairement à `loadReportsInMapBbox`. Les signalements envoyés
+ * depuis l'app actuelle (thème `gdp-tools`) sont volontairement exclus : ils vivent dans
+ * `useLocalReportDrafts` / `MyReportsPage`, pas dans cet historique.
  */
 export async function loadUserReportHistory({
   userId,
   page,
   limit,
 }: LoadUserReportHistoryOptions): Promise<UserReportHistoryPage> {
+  if (GDP_REPORT_LEGACY_THEMES.length === 0) {
+    return { reports: [], total: 0 };
+  }
+
   const sessionReady = await ensureCollabApiSession();
   if (!sessionReady) {
     return { reports: [], total: 0 };
@@ -42,7 +49,7 @@ export async function loadUserReportHistory({
     page,
     limit,
     sort: 'id:DESC',
-    attributes: serializeGdpReportThemeFilters(),
+    attributes: serializeGdpReportLegacyThemeFilters(),
   });
 
   const apiReports = (response.data as ApiGroupReportResponse[]) ?? [];
