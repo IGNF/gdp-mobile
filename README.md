@@ -145,4 +145,5 @@ Depuis la racine du monorepo, les mêmes noms marchent pour `dev`, `build`, `bui
 - [Fiche point (carte)](./docs/FICHE_POINT.md)
 - [Mode d'emploi](./docs/MODE_EMPLOI.md)
 - [Configuration des thèmes de signalement](./docs/CONFIGURATION_THEMES.md)
+- [Contrat d’échange des signalements](./docs/CONTRAT_SIGNALEMENTS.md)
 - [News et alertes](./docs/NEWS.md)
