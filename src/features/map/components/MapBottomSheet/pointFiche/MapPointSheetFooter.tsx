@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type PointerEvent } from 'react';
+import { forwardRef, useEffect, useRef, useState, type PointerEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { RiCornerUpRightLine, RiFeedbackLine } from 'react-icons/ri';
 
@@ -19,12 +19,12 @@ export interface MapPointSheetFooterProps {
   onReport: () => void;
 }
 
-export function MapPointSheetFooter({
+export const MapPointSheetFooter = forwardRef<HTMLElement, MapPointSheetFooterProps>(function MapPointSheetFooter({
   canReport,
   reportDisabledReason = null,
   onNavigate,
   onReport,
-}: MapPointSheetFooterProps) {
+}, forwardedRef) {
   const navigate = useNavigate();
   const [isAuthInfoOpen, setIsAuthInfoOpen] = useState(false);
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -49,7 +49,7 @@ export function MapPointSheetFooter({
   }, [isAuthInfoOpen]);
 
   return (
-    <footer className={styles.footer}>
+    <footer ref={forwardedRef} className={styles.footer}>
       <Button
         type="button"
         variant="outline"
@@ -110,4 +110,4 @@ export function MapPointSheetFooter({
       </div>
     </footer>
   );
-}
+});

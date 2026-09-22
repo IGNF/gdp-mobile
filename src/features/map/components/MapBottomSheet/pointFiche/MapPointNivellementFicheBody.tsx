@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 
 import type { MapGeodesyClickAction } from '@/features/map/hooks/useMapGeodesyClick';
 
@@ -6,6 +6,7 @@ import {
   buildPointCarouselItems,
   collectAllPointFields,
   filterUnmappedPointFields,
+  formatObsDateCaption,
   formatSentenceCase,
   readProperty,
   resolveVoieSuivieLabel,
@@ -17,12 +18,15 @@ import { PointCoordinatesSection } from './PointCoordinatesSection';
 import { PointImageCarousel } from './PointImageCarousel';
 import { PartenaireSection } from './PartenaireSection';
 import { UnmappedFieldsDebug } from './UnmappedFieldsDebug';
+import { useMeasuredHeight } from './useMeasuredHeight';
 
 import styles from './MapPointSheet.module.css';
 
 export interface MapPointNivellementFicheBodyProps {
   action: MapGeodesyClickAction;
   snapIndex: number;
+  /** Hauteur du bloc carrousel + légende, pour calculer le seuil d'ouverture dynamique. */
+  onPhotoBlockHeightChange?: (heightPx: number | null) => void;
 }
 
 function FieldCard({
@@ -46,14 +50,23 @@ function FieldCard({
   );
 }
 
-export function MapPointNivellementFicheBody({ action, snapIndex }: MapPointNivellementFicheBodyProps) {
+export function MapPointNivellementFicheBody({
+  action,
+  snapIndex,
+  onPhotoBlockHeightChange,
+}: MapPointNivellementFicheBodyProps) {
   const carouselItems = useMemo(() => buildPointCarouselItems(action), [action]);
+  const [photoBlockRef, photoBlockHeight] = useMeasuredHeight<HTMLDivElement>();
+
+  useEffect(() => {
+    onPhotoBlockHeightChange?.(photoBlockHeight);
+  }, [photoBlockHeight, onPhotoBlockHeightChange]);
   const unmappedFields = useMemo(() => {
     const displayedIds = getDisplayedFieldIds('nivellement', snapIndex);
     return filterUnmappedPointFields(collectAllPointFields(action), displayedIds);
   }, [action, snapIndex]);
 
-  console.log('action', action);  
+ // console.log('action', action);  
   const altitudeSystemRaw =
     readProperty(action, 'cp1_srv') ??
     readProperty(action, 'systeme_altitude');
@@ -63,9 +76,10 @@ export function MapPointNivellementFicheBody({ action, snapIndex }: MapPointNive
   const altitude =
     readProperty(action, 'cp1_coord3') + " m" ;
 
-  const repereTypeComplement = readProperty(action, 'complement');
+  const repereTypeComplement = readProperty(action, 'type_info');
   const repereType = readProperty(action, 'type');
-  const actDate = readProperty(action, 'action_date');
+  const obsDate = readProperty(action, 'obs_date');
+  const obsDateCaption = obsDate ? formatObsDateCaption(obsDate) : null;
   const remark = readProperty(action, 'remarque') ;
   const altitudeType = formatSentenceCase(readProperty(action, 'cp1_altitude_type') ?? '');
   const partenaire = readProperty(action, 'proprio');
@@ -94,9 +108,13 @@ export function MapPointNivellementFicheBody({ action, snapIndex }: MapPointNive
     <>
       {snapIndex >= 1 ? (
         <>
-          <PointImageCarousel items={carouselItems} />
+          <div ref={photoBlockRef}>
+            <PointImageCarousel items={carouselItems} />
+          </div>
 
-          {actDate ? <p className={styles.carouselCaption}>Determiné en {actDate}</p> : null}
+          {/* Non mesurée avec le carrousel : info secondaire, pas déterminante pour le seuil
+              d'ouverture ("la photo est visible") — voir MapPointSheet. */}
+          {obsDateCaption ? <p className={styles.carouselCaption}>{obsDateCaption}</p> : null}
 
           <section>
             <h3 className={styles.sectionTitle}>Repère de nivellement</h3>
@@ -104,7 +122,7 @@ export function MapPointNivellementFicheBody({ action, snapIndex }: MapPointNive
               <FieldCard label="Système d'altitude" value={altitudeSystem} />
               <FieldCard label={altitudeType} value={altitude} />
               <FieldCard label="Complément" value={repereTypeComplement} />
-              <FieldCard label="Type" value={repereType} />
+              <FieldCard label="Type" value={repereType} wide />
             </div>
           </section>
 

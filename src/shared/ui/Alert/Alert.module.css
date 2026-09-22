@@ -14,9 +14,31 @@
 	background-color: rgba(0, 0, 0, 0.5);
 }
 
+.overlayBottom {
+	align-items: flex-end;
+	/* Marge latérale (même valeur que la fiche point, .sheetPointFiche) : la carte reste
+	   visible sur les côtés, ce qui suggère qu'on peut glisser la fenêtre vers le bas
+	   plutôt que de la traiter comme un écran plein. */
+	padding: 0 0.25rem;
+}
+
+.overlayBottom.overlayVisible {
+	background-color: transparent;
+}
+
+/* Non bloquant : seule la carte capte les clics, l'arrière-plan (carte OL, FABs) reste utilisable. */
+.overlayPassthrough {
+	pointer-events: none;
+	background-color: transparent;
+}
+
+.overlayPassthrough .card {
+	pointer-events: auto;
+}
+
 .card {
 	position: relative;
-	background: var(--color-white);
+	background: var(--color-bg-subtle);
 	border-radius: 16px;
 	width: 100%;
 	max-width: 400px;
@@ -32,9 +54,26 @@
 	max-width: 960px;
 }
 
+.cardBottom {
+	width: 100%;
+	max-width: 100%;
+	border-radius: var(--radius-lg);
+	background: var(--color-bg-surface);
+	box-shadow: var(--shadow-lg);
+	padding-bottom: var(--safe-bottom);
+	/* Glisse depuis complètement sous l'écran à l'ouverture : montre que la fenêtre « vient
+	   du bas », pour suggérer qu'on peut la refermer en la faisant glisser dans l'autre sens. */
+	transform: translateY(100%);
+	transition: opacity 0.2s ease, transform 0.3s var(--ease-material, ease-out);
+}
+
 .overlayVisible .card {
 	opacity: 1;
 	transform: scale(1);
+}
+
+.overlayVisible .cardBottom {
+	transform: translateY(0);
 }
 
 .closeButton {
@@ -48,21 +87,69 @@
 	height: 36px;
 	padding: 0;
 	background: none;
-	border: 1px solid var(--color-light-tint);
-	border-radius: 50%;
+	border: 1px solid var(--color-bg-hover);
+	border-radius: var(--radius-circle);
 	cursor: pointer;
 }
 
 .closeIcon {
 	width: 18px;
 	height: 18px;
-	color: var(--color-dark);
+	color: var(--color-text);
+}
+
+.handleArea {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+	min-height: 2.66rem;
+	cursor: grab;
+	touch-action: none;
+}
+
+.handleArea:active {
+	cursor: grabbing;
+}
+
+.handle {
+	width: 2.5rem;
+	height: 0.25rem;
+	border-radius: var(--radius-pill);
+	background: var(--color-bg-disabled);
 }
 
 .content {
 	padding: 24px;
 	padding-top: 20px;
 	overflow-y: auto;
+}
+
+.contentCentered {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	text-align: center;
+}
+
+.iconBadge {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+	width: var(--icon-wrap-lg);
+	height: var(--icon-wrap-lg);
+	margin-bottom: var(--spacing-sm);
+	border-radius: var(--radius-circle);
+}
+
+.iconBadge svg {
+	width: var(--icon-2xl);
+	height: var(--icon-2xl);
+}
+
+.iconBadge svg path {
+	fill: currentColor;
 }
 
 .childrenContainer {

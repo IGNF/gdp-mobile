@@ -60,7 +60,6 @@ export function ReportWizardStepConformity({ isConform, onChange }: ReportWizard
               <span className={joinCSSClassNames(styles.cardLabel, styles.cardLabelConform)}>
                 Conforme
               </span>
-              <span className={styles.cardDescription}>Lorem ipsum dolor sit amet</span>
             </span>
             <span
               className={joinCSSClassNames(styles.radio, styles.radioConform, isConform === true && styles.radioChecked)}
@@ -108,7 +107,6 @@ export function ReportWizardStepConformity({ isConform, onChange }: ReportWizard
               <span className={joinCSSClassNames(styles.cardLabel, styles.cardLabelNonConform)}>
                 Non Conforme
               </span>
-              <span className={styles.cardDescription}>Lorem ipsum dolor sit amet</span>
             </span>
             <span
               className={joinCSSClassNames(

@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 
-import IconClose from '@/shared/assets/icons/icon-close.svg?react';
 import sheetChrome from '@/features/map/styles/mapSheet.module.css';
 import { useBottomSheetSnap } from '@/features/map/hooks/useBottomSheetSnap';
 
@@ -9,12 +8,25 @@ import styles from './MapOverlaySheet.module.css';
 
 const ANIMATION_DURATION_MS = 300;
 
+const DEFAULT_COMPACT_HEIGHT_RATIO = 0.58;
+
 // Hauteurs de la poignée de redimensionnement (mode `draggable`) : une taille compacte à
-// l'ouverture, et une taille étendue alignée sur le plafond CSS de .sheetLarge (min(92vh, 43.5rem)).
-function getDraggableSnapHeights(viewportHeight: number): readonly number[] {
-  const compactHeight = Math.min(Math.round(viewportHeight * 0.58), 560);
-  const expandedHeight = Math.min(Math.round(viewportHeight * 0.92), 696);
-  return [compactHeight, expandedHeight];
+// l'ouverture (part de `compactHeightRatio` de l'écran, 58% par défaut), et une taille étendue
+// alignée sur le plafond CSS de .sheetLarge (min(92vh, 43.5rem)), éventuellement réduite par
+// `maxExpandedHeightPx` (ex. pour ne pas dépasser un repère à l'écran).
+function getDraggableSnapHeights(
+  viewportHeight: number,
+  compactHeightRatio: number,
+  maxExpandedHeightPx?: number,
+): readonly number[] {
+  const compactHeight = Math.min(Math.round(viewportHeight * compactHeightRatio), 560);
+  const uncappedExpandedHeight = Math.min(Math.round(viewportHeight * 0.92), 696);
+  const expandedHeight =
+    maxExpandedHeightPx !== undefined
+      ? Math.min(uncappedExpandedHeight, Math.round(maxExpandedHeightPx))
+      : uncappedExpandedHeight;
+
+  return [Math.min(compactHeight, expandedHeight), expandedHeight];
 }
 
 export interface MapOverlaySheetProps {
@@ -24,13 +36,16 @@ export interface MapOverlaySheetProps {
   titleAlign?: 'left' | 'center';
   titleBadge?: number;
   sheetClassName?: string;
-  showBackButton?: boolean;
   onBack?: () => void;
   children: ReactNode;
   footer?: ReactNode;
   ariaLabel?: string;
   /** Rend la poignée fonctionnelle : glisser pour agrandir/réduire, glisser sous le seuil pour fermer. */
   draggable?: boolean;
+  /** Plafonne la hauteur dépliée (mode `draggable`), ex. pour ne pas couvrir un repère à l'écran. */
+  maxExpandedHeightPx?: number;
+  /** Part de la hauteur d'écran occupée à l'ouverture (mode `draggable`), défaut 0.58. */
+  compactHeightRatio?: number;
 }
 
 export function MapOverlaySheet({
@@ -40,12 +55,12 @@ export function MapOverlaySheet({
   titleAlign = 'center',
   titleBadge,
   sheetClassName,
-  showBackButton = false,
-  onBack,
   children,
   footer,
   ariaLabel,
   draggable = false,
+  maxExpandedHeightPx,
+  compactHeightRatio = DEFAULT_COMPACT_HEIGHT_RATIO,
 }: MapOverlaySheetProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [shouldRender, setShouldRender] = useState(isOpen);
@@ -61,7 +76,10 @@ export function MapOverlaySheet({
     return () => window.removeEventListener('resize', handleResize);
   }, [draggable]);
 
-  const snapHeights = useMemo(() => getDraggableSnapHeights(viewportHeight), [viewportHeight]);
+  const snapHeights = useMemo(
+    () => getDraggableSnapHeights(viewportHeight, compactHeightRatio, maxExpandedHeightPx),
+    [viewportHeight, compactHeightRatio, maxExpandedHeightPx],
+  );
 
   const { setSnapIndex, currentHeight, dragOffset, dragHandleProps } = useBottomSheetSnap({
     snapHeights,
@@ -90,14 +108,6 @@ export function MapOverlaySheet({
   if (!shouldRender) {
     return null;
   }
-
-  const handleBack = () => {
-    if (onBack) {
-      onBack();
-      return;
-    }
-    onClose();
-  };
 
   const isDragging = draggable && dragOffset !== 0;
 
@@ -132,17 +142,10 @@ export function MapOverlaySheet({
           <span className={sheetChrome.handle} />
         </div>
 
-        {(title || showBackButton) && (
+        {(title ) && (
           <header
-            className={`${styles.header} ${titleAlign === 'left' && !showBackButton ? styles.headerTitleLeft : ''}`}
+            className={`${styles.header} ${titleAlign === 'left' }`}
           >
-            {showBackButton ? (
-              <button type="button" className={styles.backButton} onClick={handleBack}>
-                Retour
-              </button>
-            ) : titleAlign === 'left' ? null : (
-              <span className={styles.headerSpacer} />
-            )}
             {title ? (
               <h2 className={titleAlign === 'left' ? styles.titleLeft : styles.title}>
                 <span>{title}</span>
@@ -155,14 +158,6 @@ export function MapOverlaySheet({
             )}
           </header>
         )}
-
-        {!title && !showBackButton ? (
-          <div className={styles.closeOnlyHeader}>
-            <button type="button" className={styles.closeButton} onClick={onClose} aria-label="Fermer">
-              <IconClose className={styles.closeIcon} aria-hidden />
-            </button>
-          </div>
-        ) : null}
 
         <div className={sheetChrome.body} data-scroll-root="true">
           {children}

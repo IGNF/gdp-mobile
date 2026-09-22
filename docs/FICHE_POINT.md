@@ -40,17 +40,18 @@ Gérés par `useBottomSheetSnap` dans `MapBottomSheet`. Hauteurs recalculées au
 | Snap | Index | Hauteur | Contenu visible |
 |------|-------|---------|-----------------|
 | Mini | 0 | auto (~220 px) | Poignée + en-tête + pied de page (pas de corps) |
-| Medium 1 | 1 | ~48 % viewport | Corps snap 1 : carrousel, identité, description… |
-| Medium 2 | 2 | ~68 % viewport | + coordonnées / remarques / partenaire (placeholders partiels) |
-| Full | 3 | ~82 % viewport (max 720 px) | + vue complète (placeholder) |
+| Medium 1 | 1 | ~48 % viewport (plafonné) | Corps snap 1 : carrousel, identité, description… |
+| Medium 2 | 2 | ~68 % viewport (plafonné) | + coordonnées / remarques / partenaire (placeholders partiels) |
+| Full (plein écran) | 3 | 100 % viewport (hors safe-area haut) | + vue complète (placeholder) |
 
 - **Snap 0** : hauteur automatique (`sheetAuto`), pas de scroll corps.
-- **Snaps 1–3** : hauteur fixe, corps scrollable (`data-scroll-root="true"`).
-- Agrandissement : tirer la **poignée** grise en haut du sheet.
+- **Snaps 1–2** ("consultation rapide") : carte flottante à coins arrondis par-dessus la carte, plafonnée pour ne jamais recouvrir la pile de FAB (filtre/couches/légende).
+- **Snap 3** ("consultation complète") : la fiche passe en **plein écran** — coins carrés, pas d'ombre, plus de marge basse, recouvre entièrement la carte et ses FAB (classe `sheetFullscreen`). Le contenu affiché ne change pas (toujours celui du corps `snapIndex >= 2`), seul le conteneur devient plein écran.
+- Agrandissement/réduction : tirer la **poignée** grise en haut du sheet.
 
 ```ts
 // MapBottomSheet.tsx — hauteurs mode point
-[220, 48% vh, 68% vh, min(82% vh, 720)]
+[220, min(48% vh, quickViewMax), min(68% vh, quickViewMax), 100% vh - safeAreaTop]
 ```
 
 ## Shell commun (`MapPointSheet`)
@@ -134,7 +135,7 @@ Quand une fiche repère est ouverte (`selectedPoint !== null`) :
 | Comportement | Détail |
 |--------------|--------|
 | Tabbar | Masquée (`onTabbarVisibleChange(false)`) |
-| Boutons carte (GPS, légende, couches…) | Restent en bas de l'écran (`--map-fab-sheet-offset: 0`), **sous** la fiche (`z-index` sheet > overlays) |
+| Boutons carte (GPS, légende, couches…) | Restent en bas de l'écran (`--map-fab-sheet-offset: 0`), **sous** la fiche (`z-index` sheet > overlays) ; entièrement masqués par la fiche au snap plein écran (3) |
 | Mode navigation | `--map-fab-sheet-offset` = hauteur du sheet recherche/RGP |
 
 Variables CSS sur `.mapPage` :

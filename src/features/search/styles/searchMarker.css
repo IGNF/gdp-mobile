@@ -1,0 +1,33 @@
+.search-marker-pulse {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--color-action-secondary);
+  position: relative;
+  box-shadow: 0 0 0 0 rgba(120, 106, 242, 0.6);
+  animation: search-marker-pulse 1.5s ease-out infinite;
+}
+
+.search-marker-pulse::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 8px;
+  height: 8px;
+  background: var(--color-bg-subtle);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+@keyframes search-marker-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(120, 106, 242, 0.6);
+  }
+  70% {
+    box-shadow: 0 0 0 20px rgba(120, 106, 242, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(120, 106, 242, 0);
+  }
+}

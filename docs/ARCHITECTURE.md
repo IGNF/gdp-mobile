@@ -7,11 +7,10 @@ app/ → features/ → infra/ → platform/ → domain/
          ↓
       shared/ + styles/
 ```
-blabla
 
 | Couche | Rôle |
 |--------|------|
-| `domain/` | Modèles purs, sans React ni réseau |
+| `domain/` | Modèles purs, sans React ni réseau (imports de **types** `@ign/gdp-tools` acceptés) |
 | `infra/` | Auth, API collaboratif, OpenLayers, stockage |
 | `platform/` | Wrappers `@ign/mobile-device` / Capacitor |
 | `features/` | Hooks et composants métier |
@@ -25,7 +24,7 @@ blabla
 - `@ign/mobile-device` : persistance locale (`Storage`) — tokens, profil, préférences carte
 - `collaboratif-client-api` : signalements et communautés
 - `OpenLayers` + `ol-ext` : carte Géoportail
-- `Capacitor` : SSO natif, géolocalisation, métadonnées appareil (phase mobile)
+- `Capacitor` : SSO natif, géolocalisation, métadonnées appareil
 
 ```mermaid
 flowchart TB
@@ -41,7 +40,7 @@ flowchart TB
 
   CC["collaboratif-client-api<br/>signalements · communautés"]
 
-  subgraph cap["Capacitor — phase mobile"]
+  subgraph cap["Capacitor"]
     CAP["Browser · Geolocation · App · Device<br/>SSO natif · position · métadonnées appareil"]
   end
 
@@ -75,7 +74,7 @@ flowchart TB
 flowchart TB
   subgraph identifier["S'identifier"]
     I1["Login / callback SSO<br/>gdp-mobile"] --> I2["@ign/mobile-core<br/>AuthManager · OAuth PKCE"]
-    I2 --> I3["Capacitor Browser<br/>SSO natif · proxy web en dev"]
+    I2 --> I3["SSO : navigateur → Keycloak /auth<br/>/token /revoke via /__sso (web)"]
     I2 --> I4["@ign/mobile-device<br/>Storage — tokens & profil user"]
     I4 --> I5["Session restaurée<br/>carte · signalements · compte"]
     I2 --> I6["collaboratif-client-api<br/>session API signalements"]
@@ -116,20 +115,23 @@ flowchart TB
 
 Notes :
 
-- **Identification** : requise pour signaler et accéder au compte ; la carte reste consultable sans connexion (écrans protégés via `AuthGuard`).
-- **GPS** : bouton de recentrage sur la carte ; wrapper `Gdp_Geolocation` dans `platform/device/` — pas de logique GPS dans `@ign/mobile-core`.
+- **Identification** : requise pour envoyer un signalement et consulter le compte ; la carte reste consultable sans connexion. Pas de garde de route globale : les pages `/reports` s’adaptent à `useAuth()` (brouillons locaux vs signalements serveur). En **web**, `/token` et `/revoke` passent par `/__sso` (Vite en local, Apache `ProxyPass` en qualif) pour rester same-origin ; la page de login Keycloak n’est pas proxifiée. En **natif**, `AuthManager` parle à `VITE_OAUTH_BASE_URL`. Voir [README — Apache qualif](../README.md#apache-sur-le-serveur-de-qualif) et [Dépannage](./DEPANNAGE.md).
+- **GPS** : bouton de recentrage sur la carte ; wrapper dans `platform/device/` — pas de logique GPS dans `@ign/mobile-core`.
 - **Appareil photo** : pas de plugin Capacitor Camera dédié ; en natif, `<input type="file" accept="image/*" capture="environment">` ouvre la caméra ou la galerie. Vérification de l'orientation paysage côté app avant envoi.
 
-## Routes MVP
+## Routes
 
 | Route | Écran |
 |-------|-------|
-| `/` | Redirect → `/map` ou `/welcome` |
-| `/map` | Carte (écran central) — fiche point au clic sur un repère ([détail](./FICHE_POINT.md)) |
-| `/report/geodesy/new` | Signalement repère |
+| `/` | Redirect → `/welcome` (premier lancement), sinon `/login` ou `/map` selon `VITE_AUTH_REQUIRED` |
+| `/welcome` | Onboarding |
 | `/login`, `/auth/callback` | SSO |
+| `/map` | Carte — fiche point au clic ([détail](./FICHE_POINT.md)) ; wizard de signalement en overlay |
+| `/reports` | Mes signalements (brouillons locaux + envoyés si connecté) |
+| `/reports/:id` | Détail d’un brouillon / signalement |
+| `/reports/history`, `/reports/history/:id` | Historique communauté |
 
-Voir `cursor_nouvelle_application_g_od_sie_de.md` pour le plan complet.
+Compte, paramètres, aide, à propos, favoris et communauté sont des **overlays** (`SlideUpPage`) ouverts depuis le menu latéral, pas des routes du router.
 
 ## Documentation métier carte
 

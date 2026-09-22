@@ -11,7 +11,7 @@ import {
 } from '@ign/gdp-tools';
 
 /** Clé API WFS privé Géoplateforme (`.env` : `VITE_GEODESY_WFS_API_KEY`). */
-export const GDP_GEODESY_WFS_API_KEY = import.meta.env.VITE_GEODESY_WFS_API_KEY?.trim() ?? '';
+const GDP_GEODESY_WFS_API_KEY = import.meta.env.VITE_GEODESY_WFS_API_KEY?.trim() ?? '';
 
 /** Mode d'affichage géodésie (alias du profil package). */
 export type GdpGeodesyMode = GeodesyProfile;
@@ -22,7 +22,7 @@ export const GDP_GEODESY_DEFAULT_MODE: GdpGeodesyMode = 'expert';
 export const GDP_GEODESY_SHOW_WFS_LOADING_INDICATOR = true;
 
 /** Champs GEODESIE_DATA affichés dans la fiche repère (ActionSheet). */
-export const GDP_GEODESY_ATTRIBUTE_KEYS = [
+const GDP_GEODESY_ATTRIBUTE_KEYS = [
   'groupe_type',
   'type',
   'nom',
@@ -46,6 +46,12 @@ const wfsApiKeyOption = GDP_GEODESY_WFS_API_KEY || undefined;
  * Année de détermination la plus ancienne du référentiel ( 28/08/2026 )
  */
 export const GDP_GEODESY_MIN_DETERMINATION_YEAR = 1823;
+
+/**
+ * Borne basse de la roue « Vu en place » (vis_date). Un point ne peut pas avoir été vu en
+ * place avant sa détermination : on réutilise la même borne, faute de statistique dédiée.
+ */
+export const GDP_GEODESY_MIN_VIS_YEAR =  1530;
 
 /** Filtres expert GDP — ordre et libellés alignés sur la maquette Figma. */
 export const GDP_GEODESY_EXPERT_WFS_ATTRIBUTE_FILTERS: readonly GeodesyWfsAttributeFilterDefinition[] =
@@ -80,6 +86,20 @@ export const GDP_GEODESY_EXPERT_WFS_ATTRIBUTE_FILTERS: readonly GeodesyWfsAttrib
       property: 'img1_url',
       trueLabel: 'Avec photo',
       falseLabel: 'Sans photo',
+    },
+    {
+      id: 'VIS_DATE_FROM',
+      type: 'date',
+      title: 'Vu en place',
+      property: 'vis_date',
+      operator: 'after',
+    },
+    {
+      id: 'VIS_DATE_TO',
+      type: 'date',
+      title: 'Vu en place',
+      property: 'vis_date',
+      operator: 'before',
     },
     {
       id: 'OBS_DATE_FROM',
@@ -137,7 +157,6 @@ export const GDP_GEODESY_EXPERT_CATALOG = createGeodesyCatalogForProfile(
   createGdpGeodesyProfileOptions(),
 );
 
-export const GDP_GEODESY_CATALOG = GDP_GEODESY_EXPERT_CATALOG;
 
 export function createGdpGeodesyCatalog(
   mode: GdpGeodesyMode,

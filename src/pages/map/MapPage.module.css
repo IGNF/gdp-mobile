@@ -3,7 +3,7 @@
   flex-direction: column;
   height: 100dvh;
   margin-top: calc(-1 * var(--safe-top));
-  background: var(--color-dark);
+
   --map-tabbar-height: calc(6.5rem + var(--safe-bottom));
   --map-sheet-height: 4.5rem;
   --map-fab-sheet-offset: 4.5rem;
@@ -18,13 +18,26 @@
 
 .mapChrome {
   position: absolute;
-  left: 1rem;
-  right: 1rem;
+  left: 0;
+  right: 0;
   bottom: 0;
   z-index: 2;
   display: flex;
   flex-direction: column;
   pointer-events: none;
+}
+
+.mapChromeSearchOpen {
+  top: 0;
+  overflow: hidden;
+  background: var(--color-bg-page);
+  pointer-events: auto;
+}
+
+.mapChromeSearchOpen > :global(nav) {
+  position: relative;
+  z-index: 1;
+  margin-top: auto;
 }
 
 .mapChrome > * {
@@ -58,7 +71,7 @@
   padding: 0;
   border: none;
   border-radius: 50%;
-  background-color: var(--color-white);
+  background-color: var(--color-bg-subtle);
   box-shadow: 0 2px 12px rgba(9, 22, 37, 0.16);
   cursor: pointer;
   pointer-events: auto;
@@ -70,7 +83,7 @@
 }
 
 .mapFabActive {
-  background-color: var(--color-primary);
+  background-color: var(--color-text-primary);
   color: var(--color-white);
 }
 
@@ -80,7 +93,7 @@
 }
 
 .mapFabLocked {
-  background-color: var(--color-primary);
+  background-color: var(--color-text-primary);
   color: var(--color-white);
   animation: pulse-locked 2s ease-in-out infinite;
 }
@@ -105,12 +118,12 @@
 }
 
 .mapFabIcon path {
-  fill: var(--color-dark);
+  fill: var(--color-text);
 }
 
 .mapFabStack {
   position: absolute;
-  top: max(0.75rem, var(--safe-top));
+  top: max(2.5rem, var(--safe-top));
   right: 1rem;
   z-index: 2;
   display: flex;
@@ -127,10 +140,20 @@
 }
 
 .geolocationFab {
-  right: 1rem;
-  bottom: calc(var(--map-tabbar-height) + 0.2rem);
+  right: 1.2rem;
+  bottom: calc(var(--map-tabbar-height) + 0.8rem);
 }
 
+.compassFab {
+  right: 1.2rem;
+  bottom: calc(var(--map-tabbar-height) + 0.8rem + var(--map-fab-size) + 0.5rem);
+}
+
+.compassIcon {
+  width: 1.5rem;
+  height: 1.5rem;
+  transition: transform 0.1s ease-out;
+}
 
 .geolocationIcon {
   width: 1.75rem;
@@ -138,7 +161,7 @@
 }
 
 .geolocationIcon path {
-  fill: var(--color-dark);
+  fill: var(--color-text);
 }
 
 .geolocationLoading {
@@ -151,7 +174,7 @@
 }
 
 .mapTarget :global(.ol-scale-line) {
-  bottom: calc(var(--map-tabbar-height) + 0.2rem);
+  bottom: calc(var(--map-tabbar-height) + 0.8rem);
   left: 1rem;
 }
 

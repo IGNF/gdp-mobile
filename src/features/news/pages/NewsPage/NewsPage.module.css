@@ -1,0 +1,91 @@
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3xs);
+}
+
+.period {
+  margin: 0;
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-tight);
+  color: var(--color-text-secondary);
+}
+
+.card {
+  box-sizing: border-box;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-sm);
+  width: 100%;
+  padding: var(--spacing-sm);
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.iconBadge {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--icon-wrap-sm);
+  height: var(--icon-wrap-sm);
+  border-radius: var(--radius-circle);
+}
+
+.iconBadge svg {
+  width: var(--icon-base);
+  height: var(--icon-base);
+}
+
+.iconBadge svg path {
+  fill: currentColor;
+}
+
+.cardBody {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3xs);
+}
+
+.cardTitle {
+  margin: 0;
+  color: var(--color-text-title);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+}
+
+.cardText {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-relaxed);
+  white-space: pre-wrap;
+}
+
+.cardCta {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  font-size: var(--font-size-sm);
+  margin-top: var(--spacing-3xs);
+  overflow-wrap: anywhere;
+}

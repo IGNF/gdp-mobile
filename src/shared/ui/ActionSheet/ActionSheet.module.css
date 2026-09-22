@@ -23,7 +23,7 @@
   flex-direction: column;
   max-height: 55vh;
   padding-bottom: var(--safe-bottom, 0px);
-  background-color: var(--color-white);
+  background-color: var(--color-bg-subtle);
   border-radius: 16px 16px 0 0;
   box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
   transform: translateY(100%);
@@ -56,15 +56,15 @@
   height: 36px;
   padding: 0;
   background: none;
-  border: 1px solid var(--color-light-tint);
-  border-radius: 50%;
+  border: 1px solid var(--color-bg-hover);
+  border-radius: var(--radius-circle);
   cursor: pointer;
 }
 
 .closeIcon {
   width: 18px;
   height: 18px;
-  color: var(--color-dark);
+  color: var(--color-text);
 }
 
 .content {

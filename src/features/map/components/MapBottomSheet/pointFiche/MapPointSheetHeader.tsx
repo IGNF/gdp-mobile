@@ -6,7 +6,8 @@ import { formatDistanceFromMapCenter, distanceKm } from '@/shared/utils/geo';
 import { joinCSSClassNames } from '@/shared/utils/join';
 import IconCheck from '@/shared/assets/icons/icon-check.svg?react';
 import IconCopy from '@/shared/assets/icons/icon-copy.svg?react';
-import IconHeart from '@/shared/assets/icons/icon-heart.svg?react';
+// Favori désactivé pour cette version — sera réactivé avec la fonctionnalité (cf. bouton commenté ci-dessous).
+// import IconHeart from '@/shared/assets/icons/icon-heart.svg?react';
 
 import { findEtatLabel, findVisitYear, isBonEtatLabel } from './pointFicheUtils';
 
@@ -66,9 +67,11 @@ export function MapPointSheetHeader({ action, referencePosition }: MapPointSheet
             )}
           </button>
         </div>
+        {/* Favori désactivé pour cette version — fonctionnalité prévue pour une version ultérieure.
         <button type="button" className={styles.favoriteButton} aria-label="Favori (à venir)" disabled>
           <IconHeart className={styles.favoriteIcon} aria-hidden />
         </button>
+        */}
       </div>
       {etatLabel || metaParts.length > 0 ? (
         <div className={styles.statusMetaRow}>

@@ -1,13 +1,20 @@
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { Button } from '@/shared/ui/Button';
 import type { ButtonColor, ButtonVariant } from '@/shared/ui/Button';
 import IconClose from '@/shared/assets/icons/icon-close.svg?react';
 import { joinCSSClassNames } from '@/shared/utils/join';
-import typography from '@/shared/styles/typography.module.css';
+import { useDragToDismiss } from './useDragToDismiss';
 import styles from './Alert.module.css';
 
 const ANIMATION_DURATION = 200; // ms, matches CSS transition duration
+
+/**
+ * Attribut à poser sur un élément portalé (ex. une pile de flash messages) pour qu'un clic
+ * dedans ne ferme pas une alerte `nonBlocking` ouverte par ailleurs — sans lui, le clic sur
+ * cet élément serait vu comme « en dehors de la carte » et fermerait l'alerte en même temps.
+ */
+export const ALERT_OUTSIDE_CLICK_IGNORE_ATTRIBUTE = 'data-alert-ignore-outside-click';
 
 export interface AlertButton {
 	label: string;
@@ -26,6 +33,21 @@ export interface AlertProps {
 	children?: ReactNode;
 	buttons?: AlertButton[];
 	size?: 'default' | 'wide';
+	showCloseButton?: boolean;
+	/** Icône affichée dans un badge rond centré au-dessus du titre. */
+	icon?: ReactNode;
+	/** Couleur de fond du badge d'icône (ex. `var(--figma-blue-2)`). */
+	iconBackground?: string;
+	/** Couleur de l'icône elle-même (ex. `var(--figma-blue-5)`). */
+	iconColor?: string;
+	/** 'bottom' ancre la carte en bas de l'écran, façon fenêtre glissante. */
+	placement?: 'center' | 'bottom';
+	/**
+	 * Laisse l'arrière-plan cliquable (la carte reste utilisable) au lieu de le bloquer ;
+	 * un clic en dehors de la carte ferme l'alerte. Réservé aux messages non modaux :
+	 * une confirmation doit rester bloquante.
+	 */
+	nonBlocking?: boolean;
 }
 
 export function Alert({
@@ -36,9 +58,19 @@ export function Alert({
 	children,
 	buttons = [],
 	size = 'default',
+	showCloseButton = true,
+	icon,
+	iconBackground,
+	iconColor,
+	placement = 'center',
+	nonBlocking = false,
 }: AlertProps) {
-	const [isVisible, setIsVisible] = useState(isOpen);
+	// Toujours false au montage (même si isOpen vaut déjà true) : sinon un composant monté
+	// directement ouvert — cas de GdpNewsBanners, qui n'insère l'Alert qu'une fois prête —
+	// démarre avec l'état « visible » et l'animation d'entrée ne joue jamais.
+	const [isVisible, setIsVisible] = useState(false);
 	const [shouldRender, setShouldRender] = useState(isOpen);
+	const cardRef = useRef<HTMLDivElement>(null);
 
 	if (isOpen && !shouldRender) {
 		setShouldRender(true);
@@ -61,34 +93,88 @@ export function Alert({
 		}
 	}, [isOpen]);
 
+	const isBottomSheet = placement === 'bottom';
+	const { offset: dragOffset, dragHandleProps } = useDragToDismiss(
+		onClose,
+		isBottomSheet && showCloseButton
+	);
+
+	// En mode non bloquant l'overlay laisse passer les clics : on écoute donc le document
+	// plutôt que l'overlay pour fermer sur un clic à côté de la carte.
+	useEffect(() => {
+		if (!nonBlocking || !isOpen || !showCloseButton) {
+			return;
+		}
+		const handlePointerDown = (event: PointerEvent) => {
+			const target = event.target as Element | null;
+			if (cardRef.current?.contains(event.target as Node)) {
+				return;
+			}
+			if (target?.closest(`[${ALERT_OUTSIDE_CLICK_IGNORE_ATTRIBUTE}]`)) {
+				return;
+			}
+			onClose();
+		};
+		document.addEventListener('pointerdown', handlePointerDown);
+		return () => document.removeEventListener('pointerdown', handlePointerDown);
+	}, [nonBlocking, isOpen, showCloseButton, onClose]);
+
 	if (!shouldRender) return null;
 
 	const content = (
 		<div
 			className={joinCSSClassNames(
 				styles.overlay,
-				isVisible && styles.overlayVisible
+				isVisible && styles.overlayVisible,
+				isBottomSheet && styles.overlayBottom,
+				nonBlocking && styles.overlayPassthrough
 			)}
-			onClick={onClose}
+			onClick={showCloseButton && !nonBlocking ? onClose : undefined}
 		>
 			<div
+				ref={cardRef}
 				className={joinCSSClassNames(
 					styles.card,
-					size === 'wide' && styles.cardWide
+					size === 'wide' && styles.cardWide,
+					isBottomSheet && styles.cardBottom
 				)}
+				style={
+					isBottomSheet && dragOffset > 0
+						? { transform: `translateY(${dragOffset}px)`, transition: 'none' }
+						: undefined
+				}
 				onClick={(e) => e.stopPropagation()}
 			>
-				<button
-					className={styles.closeButton}
-					onClick={onClose}
-					aria-label="Close"
-				>
-					<IconClose className={styles.closeIcon} />
-				</button>
+				{isBottomSheet ? (
+					showCloseButton ? (
+						<div className={styles.handleArea} {...dragHandleProps}>
+							<span className={styles.handle} aria-hidden />
+						</div>
+					) : null
+				) : showCloseButton ? (
+					<button
+						className={styles.closeButton}
+						onClick={onClose}
+						aria-label="Fermer"
+					>
+						<IconClose className={styles.closeIcon} />
+					</button>
+				) : null}
 
-				<div className={styles.content} data-scroll-root='true'>
-					<h2 className={typography.heading2}>{title}</h2>
-					{subtitle && <p className={typography.body}>{subtitle}</p>}
+				<div
+					className={joinCSSClassNames(styles.content, icon ? styles.contentCentered : undefined)}
+					data-scroll-root='true'
+				>
+					{icon ? (
+						<span
+							className={styles.iconBadge}
+							style={{ background: iconBackground, color: iconColor }}
+						>
+							{icon}
+						</span>
+					) : null}
+					<h2 className="heading-2">{title}</h2>
+					{subtitle && <p className="body">{subtitle}</p>}
 
 					{children && <div className={styles.childrenContainer}>{children}</div>}
 

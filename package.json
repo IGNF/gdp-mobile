@@ -1,7 +1,7 @@
 {
   "name": "gdp-mobile",
   "private": true,
-  "version": "0.0.0",
+  "version": "4.0.1",
   "engines": {
     "node": ">=22.0.0"
   },
@@ -12,13 +12,13 @@
     "build:qualif": "tsc -b && vite build --mode qualif && cp scripts/htaccess-qualif.example dist/.htaccess",
     "build:mobile": "VITE_GEODESY_SOURCE=dist tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview",
+    "lint:css-modules": "node scripts/check-css-modules.js",
+    "knip": "knip",
     "preview:qualif": "vite preview --mode qualif",
     "generate-apk": "bash ./scripts/generate-apk.sh",
+    "run-apk": "bash ./scripts/run-apk.sh",
     "setup-android": "bash ./scripts/setup-android.sh",
-    "capacitor-build": "npm run build:mobile && npx cap sync android",
-    "capacitor-run-android": "npm run capacitor-build && npx cap run android",
-    "open-android": "npx cap open android"
+    "bump:version": "node ./scripts/bump-version.js"
   },
   "dependencies": {
     "@capacitor/app": "^8.0.0",
@@ -28,8 +28,8 @@
     "@capacitor/filesystem": "^8.0.0",
     "@capacitor/geolocation": "^8.2.0",
     "@capacitor/preferences": "^8.0.0",
+    "@fontsource-variable/open-sans": "^5.3.0",
     "@fontsource/fira-sans": "^5.3.0",
-    "@fontsource/open-sans": "^5.3.0",
     "@ign/gdp-tools": "*",
     "@ign/mobile-core": "git+ssh://git@github.com/IGNF/mobile-core.git#main",
     "@ign/mobile-device": "git+ssh://git@github.com/IGNF/mobile-device.git#main",
@@ -49,9 +49,7 @@
     "@eslint/js": "^10.0.1",
     "@types/node": "^24.12.3",
     "@types/ol-ext": "npm:@siedlerchr/types-ol-ext@^3.6.8",
-    "@types/proj4": "^2.5.6",
     "@types/react": "^19.2.14",
-    "@types/react-datepicker": "^6.2.0",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.1",
     "eslint": "^10.3.0",
@@ -59,7 +57,7 @@
     "eslint-plugin-react-refresh": "^0.5.2",
     "globals": "^17.6.0",
     "https-proxy-agent": "^5.0.1",
-    "react-datepicker": "^9.1.0",
+    "knip": "^6.35.1",
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.59.2",
     "vite": "^8.0.12"

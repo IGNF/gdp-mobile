@@ -7,8 +7,6 @@ import { Button } from '@/shared/ui/Button';
 import { Loading } from '@/shared/ui/Loading';
 
 import screen from '@/shared/styles/screen.module.css';
-import typography from '@/shared/styles/typography.module.css';
-
 import styles from './AuthCallbackPage.module.css';
 
 /**
@@ -19,14 +17,13 @@ export function AuthCallbackPage() {
   const [searchParams] = useSearchParams();
   const { setUserFromOAuthCallback } = useAuth();
   const [error, setError] = useState<string | null>(null);
+  const code = searchParams.get('code');
+  const errorParam = searchParams.get('error');
 
   useEffect(() => {
     let cancelled = false;
 
     async function processCallback() {
-      const code = searchParams.get('code');
-      const errorParam = searchParams.get('error');
-
       if (errorParam) {
         setError('La connexion a été refusée ou annulée.');
         return;
@@ -42,7 +39,9 @@ export function AuthCallbackPage() {
 
         if (result.success && result.user) {
           await setUserFromOAuthCallback(result.user);
-          navigate('/map', { replace: true });
+          if (!cancelled) {
+            navigate('/map', { replace: true });
+          }
           return;
         }
 
@@ -63,13 +62,13 @@ export function AuthCallbackPage() {
     return () => {
       cancelled = true;
     };
-  }, [navigate, searchParams, setUserFromOAuthCallback]);
+  }, [code, errorParam, navigate, setUserFromOAuthCallback]);
 
   if (error) {
     return (
       <div className={`${styles.container} ${screen.screenContainer}`}>
-        <h1 className={typography.title}>Erreur de connexion</h1>
-        <p className={typography.error}>{error}</p>
+        <h1 className="page-title">Erreur de connexion</h1>
+        <p className={styles.textError}>{error}</p>
         <Button className={styles.backButton} onClick={() => navigate('/login', { replace: true })}>
           Retour à la connexion
         </Button>
@@ -79,7 +78,7 @@ export function AuthCallbackPage() {
 
   return (
     <div className={`${styles.container} ${screen.screenContainer}`}>
-      <h1 className={typography.title}>Connexion en cours…</h1>
+      <h1 className="page-title">Connexion en cours…</h1>
       <Loading label="Finalisation de l’authentification…" />
     </div>
   );

@@ -4,7 +4,6 @@ import styles from './PageHeader.module.css';
 import IconArrowLeft from '@/shared/assets/icons/icon-arrow-left.svg?react';
 import IconBurger from '@/shared/assets/icons/icon-burger.svg?react';
 import IconClose from '@/shared/assets/icons/icon-close.svg?react';
-import IconSearch from '@/shared/assets/icons/icon-search.svg?react';
 import { joinCSSClassNames } from '@/shared/utils/join';
 
 export interface PageHeaderProps {
@@ -12,13 +11,10 @@ export interface PageHeaderProps {
 	subtitle?: string;
 	showBackButton?: boolean;
 	showCloseButton?: boolean;
-	showSearchButton?: boolean;
-	isSearchActive?: boolean;
 	showMenuButton?: boolean;
 	menuButtonVariant?: 'default' | 'primary';
 	onBack?: () => void;
 	onClose?: () => void;
-	onSearchClick?: () => void;
 	onMenuClick?: () => void;
 }
 
@@ -27,13 +23,10 @@ export function PageHeader({
 	subtitle,
 	showBackButton = false,
 	showCloseButton = true,
-	showSearchButton = false,
-	isSearchActive = false,
 	showMenuButton = false,
 	menuButtonVariant = 'default',
 	onBack,
 	onClose,
-	onSearchClick,
 	onMenuClick,
 }: PageHeaderProps) {
 	const navigate = useNavigate();
@@ -90,17 +83,7 @@ export function PageHeader({
 				{subtitle && <p className={styles.headerSubtitle}>{subtitle}</p>}
 			</div>
 
-			{showSearchButton ? (
-				<button
-					type="button"
-					className={`${styles.headerButton} ${isSearchActive ? styles.headerButtonActive : ''}`}
-					onClick={onSearchClick}
-					aria-label="Rechercher"
-					aria-pressed={isSearchActive}
-				>
-					<IconSearch className={styles.headerIcon} />
-				</button>
-			) : showCloseButton ? (
+			{showCloseButton ? (
 				<button
 					className={styles.headerButton}
 					onClick={handleClose}
