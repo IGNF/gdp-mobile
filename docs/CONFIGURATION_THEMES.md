@@ -17,14 +17,13 @@ VITE_GDP_REPORT_DISPLAY_THEMES="gdp-tools,theme-nivellement,theme-gravimetrie"
 - Ces thèmes sont utilisés pour filtrer les signalements affichés sur la carte
 - Tous les signalements correspondant à l'un de ces thèmes seront visibles
 - Le filtre API sera : `[{community: 96, theme: "gdp-tools"}, {community: 96, theme: "theme-nivellement"}, ...]`
-- La page **« Anciens signalements »** (`/reports/history`) n'utilise PAS cette liste :
-  elle récupère tous les signalements du compte (communauté + auteur) puis ne garde,
-  côté client, que ceux dont le thème (`themeName`, propre à chaque signalement) ne
-  correspond pas à `VITE_GDP_REPORT_SUBMISSION_THEME` (ni à ses alias, voir plus bas). Le
-  filtrage se fait après coup plutôt que via le paramètre `attributes` de `GET /reports`
-  (filtre serveur par thème peu fiable en pratique). Les signalements envoyés depuis l'app
-  actuelle vivent uniquement dans « Mes signalements » (brouillons locaux, `/reports`),
-  jamais dans les deux à la fois.
+- La page **« Anciens signalements »** (`/reports/history`) utilise un sous-ensemble de
+  cette liste : `VITE_GDP_REPORT_DISPLAY_THEMES` moins `VITE_GDP_REPORT_SUBMISSION_THEME`
+  (et ses alias, voir plus bas). Elle ne montre donc que les signalements envoyés depuis
+  l'ancienne version de l'app — ceux envoyés depuis l'app actuelle vivent dans « Mes
+  signalements » (brouillons locaux, `/reports`), jamais dans les deux à la fois. Si cette
+  différence est vide (aucun thème hérité configuré), la page reste vide plutôt que
+  d'interroger l'API sans filtre de thème.
 
 ### `VITE_GDP_REPORT_SUBMISSION_THEME`
 

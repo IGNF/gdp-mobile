@@ -16,16 +16,15 @@ export interface UseUserReportHistoryResult {
 }
 
 /**
- * Historique des signalements envoyés au serveur par le compte connecté depuis une
- * version précédente de l'application (thème hérité, différent du thème de soumission
- * actuel) — contrairement à `useLocalReportDrafts`, qui ne connaît que les brouillons de
- * l'app actuelle stockés sur cet appareil.
+ * Historique des signalements envoyés au serveur par le compte connecté — y compris ceux
+ * envoyés depuis une version précédente de l'application (contrairement à
+ * `useLocalReportDrafts`, qui ne connaît que les brouillons stockés sur cet appareil).
  */
 export function useUserReportHistory(): UseUserReportHistoryResult {
   const { user, isAuthenticated } = useAuth();
   const [reports, setReports] = useState<GroupReport[]>([]);
   const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(false);
+  const [total, setTotal] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [error, setError] = useState<Error | null>(null);
@@ -35,7 +34,7 @@ export function useUserReportHistory(): UseUserReportHistoryResult {
   useEffect(() => {
     if (!isAuthenticated || userId === undefined) {
       setReports([]);
-      setHasMore(false);
+      setTotal(0);
       setPage(1);
       setIsLoading(false);
       setError(null);
@@ -52,7 +51,7 @@ export function useUserReportHistory(): UseUserReportHistoryResult {
         const result = await loadUserReportHistory({ userId, page: 1, limit: HISTORY_PAGE_SIZE });
         if (!cancelled) {
           setReports(result.reports);
-          setHasMore(result.hasMore);
+          setTotal(result.total);
           setPage(1);
         }
       } catch (loadError) {
@@ -76,7 +75,7 @@ export function useUserReportHistory(): UseUserReportHistoryResult {
   }, [isAuthenticated, userId]);
 
   const loadMore = useCallback(() => {
-    if (userId === undefined || isLoadingMore || !hasMore) {
+    if (userId === undefined || isLoadingMore || reports.length >= total) {
       return;
     }
 
@@ -86,7 +85,7 @@ export function useUserReportHistory(): UseUserReportHistoryResult {
     void loadUserReportHistory({ userId, page: nextPage, limit: HISTORY_PAGE_SIZE })
       .then((result) => {
         setReports((current) => [...current, ...result.reports]);
-        setHasMore(result.hasMore);
+        setTotal(result.total);
         setPage(nextPage);
       })
       .catch((loadError: unknown) => {
@@ -97,14 +96,14 @@ export function useUserReportHistory(): UseUserReportHistoryResult {
       .finally(() => {
         setIsLoadingMore(false);
       });
-  }, [userId, page, isLoadingMore, hasMore]);
+  }, [userId, page, isLoadingMore, reports.length, total]);
 
   return {
     reports,
     isLoading,
     isLoadingMore,
     error,
-    hasMore,
+    hasMore: reports.length < total,
     loadMore,
   };
 }
