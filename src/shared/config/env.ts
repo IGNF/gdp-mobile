@@ -29,6 +29,11 @@ interface Config {
   news: {
     feedUrl: string;
   };
+  matomo: {
+    url: string;
+    siteId: string;
+    enabled: boolean;
+  };
 }
 
 const useQualification = env.VITE_USE_QUALIF === 'true';
@@ -82,4 +87,16 @@ export const config: Config = {
         ? 'https://fiches-geodesie.ign.fr/checkinfo-gdp.json'
         : trimEnv(env.VITE_GDP_NEWS_URL),
   },
+  matomo: (() => {
+    const urlFromEnv = trimEnv(env.VITE_MATOMO_URL);
+    const siteIdFromEnv = trimEnv(env.VITE_MATOMO_SITE_ID);
+    const url = urlFromEnv || normalizeUrl('https://matomo.ign.fr');
+    const siteId = siteIdFromEnv || '19';
+
+    return {
+      url,
+      siteId,
+      enabled: url.length > 0 && siteId.length > 0,
+    };
+  })(),
 };
