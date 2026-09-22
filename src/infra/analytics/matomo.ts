@@ -67,13 +67,16 @@ export function trackPageView(pathname: string): void {
     return;
   }
 
+  initMatomo();
+
   const paq = getPaq();
   const title = resolvePageTitle(pathname);
+  const url = window.location.href;
 
   paq.push(['setCustomDimension', 1, Capacitor.getPlatform()]);
-  paq.push(['setCustomUrl', window.location.href]);
-  paq.push(['setDocumentTitle', title]);
-  paq.push(['trackPageView']);
+  paq.push(['setCustomUrl', url]);
+  // Titre seul en argument : le 2e paramètre de trackPageView finit dans `data`, pas dans `url`.
+  paq.push(['trackPageView', title]);
 }
 
 export function trackEvent(category: string, action: string, name?: string, value?: number): void {

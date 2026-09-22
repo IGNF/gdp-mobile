@@ -44,7 +44,7 @@ L’app est une SPA React Router : Matomo ne peut pas compter les changements d�
 | `src/app/router/routes.tsx` | Monte `MatomoPageTracker` sur toutes les routes |
 | `src/features/map/hooks/useMapPageMatomoTracking.ts` | Événements Matomo pour les overlays carte (menu, légende, couches) |
 
-Au premier affichage, le script `matomo.js` est injecté dynamiquement. À chaque navigation, une requête `matomo.php` part avec l’URL courante et un titre lisible.
+Au premier affichage, le script `matomo.js` est injecté dynamiquement. À chaque navigation, une requête `matomo.php` part avec `action_name` (titre) et `url` (URL courante), via `setCustomUrl` puis `trackPageView(title)`.
 
 ## Écrans suivis
 
@@ -100,10 +100,12 @@ Ne pas y mettre de données personnelles (e-mail, identifiant de signalement, co
 
 1. Redémarrer le serveur dev après modification du `.env` (`npm run dev`).
 2. Naviguer entre `/map`, `/reports`, etc.
-3. Onglet **Réseau** du navigateur : filtrer `matomo.php` — une requête par écran.
-4. Matomo → **Visiteurs en temps réel** : vérifier le titre et l’URL.
+3. Onglet **Réseau** du navigateur : filtrer `matomo.php` — une requête par écran, avec `action_name=Carte` (ou autre titre).
+4. Matomo → **Visiteurs en temps réel** ou **Comportement → Titres des pages** : vérifier le titre et l’URL.
 
 En dev local, les visites remontent sur le site configuré (par défaut le site prod `19`) : limiter les tests ou utiliser un site de test.
+
+**localhost** : certaines instances Matomo n’affichent pas (ou filtrent) les hits dont l’URL est `localhost` dans les rapports agrégés. Si `action_name` apparaît dans l’onglet Réseau mais pas dans **Titres des pages**, tester sur [qualif](http://sgm.ign.fr/qlf-gdp/map) ou vérifier avec l’admin Matomo.
 
 ## Web et APK
 
