@@ -31,6 +31,7 @@ import type { LocalReportDraft } from '@/domain/report/localReportDraft';
 import { useLocalReportDrafts } from '@/features/report/hooks/useLocalReportDrafts';
 import { useMap } from '@/features/map/hooks/useMap';
 import { useMapGeodesyClick } from '@/features/map/hooks/useMapGeodesyClick';
+import { useMapPageMatomoTracking } from '@/features/map/hooks/useMapPageMatomoTracking';
 import { useMapClickSelectionMarker } from '@/features/map/hooks/useMapClickSelectionMarker';
 import { usePersistedMapLayers } from '@/features/map/hooks/usePersistedMapLayers';
 import { useReportMapLayers } from '@/features/map/hooks/useReportMapLayers';
@@ -163,6 +164,9 @@ export function MapPage() {
     };
   }, [isTabbarVisible]);
   const [activeOverlay, setActiveOverlay] = useState<LeftMenuOverlayRoute | null>(null);
+
+  useMapPageMatomoTracking({ activeOverlay, isLegendOpen, isLayersPanelOpen });
+
   const [geodesyMode, setGeodesyMode] = useState<GdpGeodesyMode>(GDP_GEODESY_DEFAULT_MODE);
   const [wfsClusterPreferences, setWfsClusterPreferences] = useState<GdpWfsClusterPreferences>(
     DEFAULT_GDP_WFS_CLUSTER_PREFERENCES,
