@@ -18,4 +18,6 @@ export interface RefreshResult {
   success: boolean;
   tokens?: AuthTokens;
   error?: Error;
+  /** Échec réseau / serveur : le refresh token n'a pas été refusé, la session reste potentiellement valide. */
+  transient?: boolean;
 }

@@ -27,6 +27,9 @@ const OAUTH_CODE_VERIFIER_KEY = 'temp_code_verifier';
 /** Après une déconnexion explicite, force une saisie SSO (évite un SSO « fantôme »). */
 const OAUTH_FORCE_LOGIN_KEY = 'gdp_oauth_force_login';
 const REVOKE_TIMEOUT_MS = 2500;
+/** Timeouts natifs du refresh : évite de bloquer le démarrage en zone blanche. */
+const REFRESH_CONNECT_TIMEOUT_MS = 10000;
+const REFRESH_READ_TIMEOUT_MS = 20000;
 
 let authManagerInstance: AuthManager | null = null;
 let authManagerTokenBaseUrl: string | null = null;
@@ -395,7 +398,24 @@ export function handleOAuthCallback(code: string): Promise<AuthResult> {
   return promise;
 }
 
-export async function refreshAccessToken(): Promise<RefreshResult> {
+/** Déduplique les rafraîchissements concurrents : un refresh token Keycloak est à usage unique. */
+let inflightRefresh: Promise<RefreshResult> | null = null;
+
+export function refreshAccessToken(): Promise<RefreshResult> {
+  if (inflightRefresh) {
+    return inflightRefresh;
+  }
+
+  const promise = performRefreshAccessToken().finally(() => {
+    if (inflightRefresh === promise) {
+      inflightRefresh = null;
+    }
+  });
+  inflightRefresh = promise;
+  return promise;
+}
+
+async function performRefreshAccessToken(): Promise<RefreshResult> {
   try {
     const refreshToken = await Storage.get(storageKey('refresh_token'));
 
@@ -414,25 +434,33 @@ export async function refreshAccessToken(): Promise<RefreshResult> {
       };
     }
 
-    const result = await getAuthManager().refreshAccessToken(refreshToken);
+    const outcome = await requestTokenRefresh(refreshToken);
 
-    if (!result.success || !result.tokens) {
+    if (outcome.kind === 'transient') {
       return {
         success: false,
-        error: authError(result.error?.message ?? 'Échec du rafraîchissement du jeton', result.error),
+        transient: true,
+        error: authError('Serveur d’authentification injoignable', outcome.cause),
       };
     }
 
-    await storeTokens(result.tokens);
-    syncCollabApiClient(result.tokens);
+    if (outcome.kind === 'rejected') {
+      return {
+        success: false,
+        error: authError('Jeton de rafraîchissement refusé'),
+      };
+    }
+
+    await storeTokens(outcome.tokens);
+    syncCollabApiClient(outcome.tokens);
 
     return {
       success: true,
       tokens: {
-        accessToken: result.tokens.accessToken,
-        refreshToken: result.tokens.refreshToken,
-        expiresIn: result.tokens.expiresIn,
-        refreshExpiresIn: result.tokens.refreshExpiresIn,
+        accessToken: outcome.tokens.accessToken,
+        refreshToken: outcome.tokens.refreshToken,
+        expiresIn: outcome.tokens.expiresIn,
+        refreshExpiresIn: outcome.tokens.refreshExpiresIn,
       },
     };
   } catch (error) {
@@ -440,6 +468,61 @@ export async function refreshAccessToken(): Promise<RefreshResult> {
       success: false,
       error: authError('Échec du rafraîchissement du jeton', error),
     };
+  }
+}
+
+type TokenRefreshOutcome =
+  | { kind: 'success'; tokens: CoreAuthTokens }
+  | { kind: 'rejected' }
+  | { kind: 'transient'; cause?: unknown };
+
+/** Statuts /token après lesquels le refresh token n'a pas été invalidé (réseau, proxy, Keycloak indisponible). */
+function isTransientTokenStatus(status: number): boolean {
+  return status === 0 || status === 408 || status === 429 || status >= 500;
+}
+
+/**
+ * Appel /token direct (plutôt que AuthManager.refreshAccessToken) pour distinguer
+ * un refus Keycloak (invalid_grant) d'une coupure réseau : AuthManager renvoie la même erreur.
+ */
+async function requestTokenRefresh(refreshToken: string): Promise<TokenRefreshOutcome> {
+  try {
+    const response = await CapacitorHttp.post({
+      url: `${resolveOAuthTokenBaseUrl()}/token`,
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      data: new URLSearchParams({
+        grant_type: 'refresh_token',
+        client_id: config.oAuth.clientId,
+        refresh_token: refreshToken,
+      }).toString(),
+      connectTimeout: REFRESH_CONNECT_TIMEOUT_MS,
+      readTimeout: REFRESH_READ_TIMEOUT_MS,
+    });
+
+    if (response.status < 200 || response.status >= 300) {
+      return isTransientTokenStatus(response.status) ? { kind: 'transient' } : { kind: 'rejected' };
+    }
+
+    const data = response.data as Record<string, unknown> | null;
+    if (!data || typeof data.access_token !== 'string') {
+      return { kind: 'transient' };
+    }
+
+    return {
+      kind: 'success',
+      tokens: {
+        accessToken: data.access_token,
+        refreshToken: typeof data.refresh_token === 'string' ? data.refresh_token : undefined,
+        idToken: typeof data.id_token === 'string' ? data.id_token : undefined,
+        expiresIn: typeof data.expires_in === 'number' ? data.expires_in : undefined,
+        refreshExpiresIn:
+          typeof data.refresh_expires_in === 'number' ? data.refresh_expires_in : undefined,
+      },
+    };
+  } catch (error) {
+    return { kind: 'transient', cause: error };
   }
 }
 
@@ -516,7 +599,8 @@ export async function restoreSession(): Promise<boolean> {
     }
 
     const refreshResult = await refreshAccessToken();
-    return refreshResult.success;
+    // Hors ligne : on garde la session, le refresh sera retenté au prochain appel API.
+    return refreshResult.success || refreshResult.transient === true;
   } catch {
     return false;
   }
