@@ -74,3 +74,19 @@ export function buildGdpWizardComment(
   const extraBlock = extras.join('\n');
   return trimmed ? `${trimmed}\n\n${extraBlock}` : extraBlock;
 }
+
+/**
+ * Libellé du motif d'après la valeur `etat` d'un signalement `gdp-tools` lu sur le serveur
+ * (inverse de `resolveGdpReportEtatValue`) — utilisé quand aucun brouillon local ne porte
+ * les motifs saisis dans le wizard (signalement envoyé depuis un autre appareil).
+ */
+export function resolveGdpReportReasonLabelFromEtat(etat: string | undefined): string {
+  if (etat === 'BON ETAT') {
+    return 'Conforme';
+  }
+
+  const reason = (Object.keys(ETAT_BY_NON_CONFORM_REASON) as NonConformReason[]).find(
+    (key) => ETAT_BY_NON_CONFORM_REASON[key] === etat,
+  );
+  return reason ? NON_CONFORM_REASON_LABELS[reason] : 'Non conforme';
+}

@@ -24,7 +24,8 @@ export function ReportHistoryDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const location = useLocation();
-  const cameFromMap = (location.state as { from?: string } | null)?.from === 'map';
+  const from = (location.state as { from?: string } | null)?.from;
+  const cameFromMap = from === 'map';
   const [report, setReport] = useState<GroupReport | null | undefined>(undefined);
   const [photoFailed, setPhotoFailed] = useState(false);
   const [isPhotoLightboxOpen, setIsPhotoLightboxOpen] = useState(false);
@@ -88,7 +89,8 @@ export function ReportHistoryDetailPage() {
       return;
     }
 
-    navigate('/reports/history');
+    // Signalement `gdp-tools` sans brouillon local, ouvert depuis la liste principale.
+    navigate(from === 'reports' ? '/reports' : '/reports/history');
   };
 
   return (

@@ -1,9 +1,12 @@
 import { useMemo, useState, type CSSProperties } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GeodesyPointTitle } from '@ign/gdp-tools/react';
+import type { GeodesyPointTitlePicto } from '@ign/gdp-tools';
+import type { ReportStatus } from '@ign/mobile-core';
 
 import { BottomTabbar } from '@/app/components/BottomTabbar';
-import type { LocalReportDraftStatus } from '@/domain/report/localReportDraft';
+import type { GroupReport } from '@/domain/report/groupReportModels';
+import type { LocalReportDraft, LocalReportDraftStatus } from '@/domain/report/localReportDraft';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import {
   NON_CONFORM_REASON_LABELS,
@@ -11,6 +14,8 @@ import {
 } from '@/features/report/components/GeodesyPointReportWizard';
 import { useLocalReportDrafts } from '@/features/report/hooks/useLocalReportDrafts';
 import { useSentReportRemoteStatuses } from '@/features/report/hooks/useSentReportRemoteStatuses';
+import { useUserServerReports } from '@/features/report/hooks/useUserServerReports';
+import { resolveGdpReportReasonLabelFromEtat } from '@/features/report/utils/gdpWizardThemeAttributes';
 import {
   getLocalReportDraftStatusAccentRgb,
   getLocalReportDraftStatusColors,
@@ -41,32 +46,91 @@ const FILTERS: Array<{ value: StatusFilter; label: string }> = [
   { value: 'sent', label: 'Envoyés' },
 ];
 
+/** Carte de la liste, commune aux brouillons locaux et aux signalements lus sur le serveur. */
+interface ReportListItem {
+  key: string;
+  path: string;
+  searchLabel: string;
+  title: string;
+  titlePicto?: GeodesyPointTitlePicto;
+  status: LocalReportDraftStatus;
+  remoteStatus?: ReportStatus;
+  reasonLabel: string;
+  createdAt: Date;
+  commune?: string;
+  voieSuivie?: string;
+}
+
+function draftToListItem(
+  draft: LocalReportDraft,
+  remoteStatuses: Map<number, ReportStatus>,
+): ReportListItem {
+  return {
+    key: draft.id,
+    path: `/reports/${draft.id}`,
+    searchLabel: `ID_${draft.geodesyId ?? draft.title}`,
+    title: draft.title,
+    titlePicto: draft.titlePicto,
+    status: draft.status,
+    remoteStatus: draft.serverId ? remoteStatuses.get(draft.serverId) : undefined,
+    reasonLabel: draft.isConform
+      ? 'Conforme'
+      : (draft.nonConformReasons ?? [])
+          .map((reason) => NON_CONFORM_REASON_LABELS[reason as NonConformReason])
+          .join(', ') || 'Non conforme',
+    createdAt: new Date(draft.createdAt),
+    commune: draft.commune,
+    voieSuivie: draft.voieSuivie,
+  };
+}
+
+/** Signalement `gdp-tools` envoyé sans brouillon sur cet appareil (autre appareil, stockage vidé…). */
+function serverReportToListItem(report: GroupReport): ReportListItem {
+  const geodesyId = report.themeAttributes.id?.trim();
+
+  return {
+    key: `server-${report.id}`,
+    path: `/reports/history/${report.id}`,
+    searchLabel: `ID_${geodesyId || report.id}`,
+    title: geodesyId || `Signalement #${report.id}`,
+    status: 'sent',
+    remoteStatus: report.status,
+    reasonLabel: resolveGdpReportReasonLabelFromEtat(report.themeAttributes.etat),
+    createdAt: report.createdAt,
+  };
+}
+
 export function MyReportsPage() {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
   const { drafts, isLoading } = useLocalReportDrafts();
   const remoteStatuses = useSentReportRemoteStatuses(drafts);
+  const { currentReports: serverReports, isLoading: isLoadingServerReports } = useUserServerReports();
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
 
-  const filteredDrafts = useMemo(() => {
+  const items = useMemo(() => {
+    const draftServerIds = new Set(drafts.map((draft) => draft.serverId));
+
+    return [
+      ...drafts.map((draft) => draftToListItem(draft, remoteStatuses)),
+      ...serverReports
+        .filter((report) => !draftServerIds.has(report.id))
+        .map(serverReportToListItem),
+    ].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  }, [drafts, remoteStatuses, serverReports]);
+
+  const filteredItems = useMemo(() => {
     const query = search.trim().toLowerCase();
 
-    return drafts.filter((draft) => {
-      if (statusFilter !== 'all' && draft.status !== statusFilter) {
+    return items.filter((item) => {
+      if (statusFilter !== 'all' && item.status !== statusFilter) {
         return false;
       }
 
-      if (query) {
-        const idLabel = `ID_${draft.geodesyId ?? draft.title}`.toLowerCase();
-        if (!idLabel.includes(query)) {
-          return false;
-        }
-      }
-
-      return true;
+      return !query || item.searchLabel.toLowerCase().includes(query);
     });
-  }, [drafts, search, statusFilter]);
+  }, [items, search, statusFilter]);
 
   return (
     <div className={styles.page}>
@@ -117,39 +181,33 @@ export function MyReportsPage() {
               ))}
             </div>
 
-            {isLoading ? (
+            {isLoading || (isLoadingServerReports && items.length === 0) ? (
               <p className={styles.empty}>Chargement…</p>
-            ) : filteredDrafts.length === 0 ? (
+            ) : filteredItems.length === 0 ? (
               <p className={styles.empty}>Aucun signalement.</p>
             ) : (
               <ul className={styles.reportList}>
-                {filteredDrafts.map((draft) => {
-                  const statusColors = getLocalReportDraftStatusColors(draft.status);
-                  const remoteStatus = draft.serverId ? remoteStatuses.get(draft.serverId) : undefined;
-                  const reasonLabel = draft.isConform
-                    ? 'Conforme'
-                    : (draft.nonConformReasons ?? [])
-                        .map((reason) => NON_CONFORM_REASON_LABELS[reason as NonConformReason])
-                        .join(', ') || 'Non conforme';
-                  const createdAt = new Date(draft.createdAt);
+                {filteredItems.map((item) => {
+                  const statusColors = getLocalReportDraftStatusColors(item.status);
+                  const { remoteStatus } = item;
 
                   return (
-                    <li key={draft.id}>
+                    <li key={item.key}>
                       <button
                         type="button"
                         className={styles.reportCard}
                         style={{
                           '--report-card-hover-color': statusColors.color,
                           '--report-card-hover-rgb': getLocalReportDraftStatusAccentRgb(
-                            draft.status,
+                            item.status,
                           ),
                         } as CSSProperties}
-                        onClick={() => navigate(`/reports/${draft.id}`)}
+                        onClick={() => navigate(item.path, { state: { from: 'reports' } })}
                       >
                         <div className={styles.reportCardHeader}>
                           <GeodesyPointTitle
-                            title={draft.title}
-                            picto={draft.titlePicto}
+                            title={item.title}
+                            picto={item.titlePicto}
                             className={styles.reportId}
                           />
                           <div className={styles.statusBadges}>
@@ -157,7 +215,7 @@ export function MyReportsPage() {
                               className={styles.statusBadge}
                               style={{ color: statusColors.color, background: statusColors.background }}
                             >
-                              {getLocalReportDraftStatusLabel(draft.status)}
+                              {getLocalReportDraftStatusLabel(item.status)}
                             </span>
                             {remoteStatus ? (
                               <span
@@ -170,26 +228,26 @@ export function MyReportsPage() {
                           </div>
                         </div>
                         <p className={styles.reportReason}>
-                          <span>{reasonLabel}</span>
+                          <span>{item.reasonLabel}</span>
                           <span className={styles.reportReasonSeparator}>·</span>
                           <span className={styles.reportDateInline}>
                             <IconCalendar className={styles.reportMetaIcon} aria-hidden />
-                            {formatRelativeDayLabel(createdAt)}
+                            {formatRelativeDayLabel(item.createdAt)}
                           </span>
                         </p>
-                        {draft.voieSuivie || draft.commune ? (
+                        {item.voieSuivie || item.commune ? (
                           <div className={styles.reportLocationRow}>
                             <IconLocation className={styles.reportMetaIcon} aria-hidden />
                             <span className={styles.reportLocationText}>
-                              {draft.commune ? (
-                                <span className={styles.reportCommuneText}>{draft.commune}</span>
+                              {item.commune ? (
+                                <span className={styles.reportCommuneText}>{item.commune}</span>
                               ) : null}
-                              {draft.commune && draft.voieSuivie ? (
+                              {item.commune && item.voieSuivie ? (
                                 <span className={styles.reportLocationSeparator}>,</span>
                               ) : null}
-                              {draft.voieSuivie ? (
-                                <span className={styles.reportVoieText} title={draft.voieSuivie}>
-                                  {draft.voieSuivie}
+                              {item.voieSuivie ? (
+                                <span className={styles.reportVoieText} title={item.voieSuivie}>
+                                  {item.voieSuivie}
                                 </span>
                               ) : null}
                             </span>
