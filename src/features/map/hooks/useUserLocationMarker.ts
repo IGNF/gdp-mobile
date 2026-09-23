@@ -1,12 +1,15 @@
 import { useEffect } from 'react';
 
 import Feature from 'ol/Feature';
+import { asArray } from 'ol/color';
 import Point from 'ol/geom/Point';
+import { circular } from 'ol/geom/Polygon';
+import type Polygon from 'ol/geom/Polygon';
 import VectorLayer from 'ol/layer/Vector';
 import type Map from 'ol/Map';
 import { fromLonLat } from 'ol/proj';
 import VectorSource from 'ol/source/Vector';
-import { Icon, Style } from 'ol/style';
+import { Fill, Icon, Stroke, Style } from 'ol/style';
 
 import { Gdp_Geolocation, type CallbackID, type WatchPositionCallback } from '@/platform/device/geolocation';
 import {
@@ -17,6 +20,11 @@ import { getColorCode } from '@/shared/utils/color';
 
 const USER_LOCATION_MARKER_FALLBACK_COLOR = '#26a581';
 const USER_LOCATION_MARKER_CONTRAST_FALLBACK = '#ffffff';
+/** Même vert que le bouton de géolocalisation actif (`.mapFabActive` / `.mapFabLocked`). */
+const USER_LOCATION_ACCURACY_FALLBACK_COLOR = '#26a581';
+const USER_LOCATION_ACCURACY_FILL_OPACITY = 0.15;
+/** Nombre de sommets du polygone approchant le cercle d'incertitude. */
+const USER_LOCATION_ACCURACY_CIRCLE_VERTICES = 64;
 
 function createUserLocationIconSrc(color: string, contrast: string): string {
   const markerSvg = `
@@ -41,6 +49,15 @@ function createUserLocationStyle(color: string, contrast: string): Style {
   });
 }
 
+function createUserLocationAccuracyStyle(color: string): Style {
+  const [red, green, blue] = asArray(color);
+
+  return new Style({
+    fill: new Fill({ color: [red, green, blue, USER_LOCATION_ACCURACY_FILL_OPACITY] }),
+    stroke: new Stroke({ color, width: 1 }),
+  });
+}
+
 interface UseUserLocationMarkerOptions {
   map: Map | null;
   isMapReady: boolean;
@@ -62,8 +79,12 @@ export function useUserLocationMarker({
       getColorCode('primary') || getColorCode('action-primary') || USER_LOCATION_MARKER_FALLBACK_COLOR;
     const contrast = getColorCode('white') || USER_LOCATION_MARKER_CONTRAST_FALLBACK;
 
-    const source = new VectorSource<Feature<Point>>();
+    const accuracyColor =
+      getColorCode('text-primary') || USER_LOCATION_ACCURACY_FALLBACK_COLOR;
+
+    const source = new VectorSource<Feature<Point | Polygon>>();
     const feature = new Feature<Point>();
+    const accuracyFeature = new Feature<Polygon>();
     let watchId: CallbackID | null = null;
     let cancelled = false;
 
@@ -85,14 +106,27 @@ export function useUserLocationMarker({
         return;
       }
 
-      const { longitude, latitude } = position.coords;
+      const { longitude, latitude, accuracy } = position.coords;
       feature.setGeometry(new Point(fromLonLat([longitude, latitude])));
+
+      // Cercle géodésique (rayon en mètres) reprojeté : reste juste en Web Mercator, où un
+      // mètre au sol ne vaut pas une unité de carte hors de l'équateur.
+      accuracyFeature.setGeometry(
+        Number.isFinite(accuracy) && accuracy > 0
+          ? circular([longitude, latitude], accuracy, USER_LOCATION_ACCURACY_CIRCLE_VERTICES).transform(
+              'EPSG:4326',
+              'EPSG:3857',
+            )
+          : undefined,
+      );
     };
 
     // Overlay non géré : reste au-dessus des fonds / WFS, y compris pendant le recentrage.
     markerLayer.setMap(map);
     feature.setStyle(createUserLocationStyle(userLocationColor, contrast));
-    source.addFeature(feature);
+    accuracyFeature.setStyle(createUserLocationAccuracyStyle(accuracyColor));
+    // Disque ajouté en premier : dessiné sous la flèche.
+    source.addFeatures([accuracyFeature, feature]);
 
     void (async () => {
       const initialPosition = await Gdp_Geolocation.getUsersLocation({
