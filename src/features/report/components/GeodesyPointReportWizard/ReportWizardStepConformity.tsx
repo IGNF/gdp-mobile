@@ -71,7 +71,6 @@ export function ReportWizardStepConformity({ isConform, onChange }: ReportWizard
             className={joinCSSClassNames(styles.criteriaWrapper, isConformExpanded && styles.criteriaWrapperExpanded)}
           >
             <div className={styles.criteria}>
-              <p className={styles.criteriaTitle}>Critères de conformité</p>
               <ul className={styles.criteriaList}>
                 {CONFORMITY_CRITERIA.map((criterion, index) => (
                   <li key={index} className={styles.criteriaItem}>
@@ -125,7 +124,6 @@ export function ReportWizardStepConformity({ isConform, onChange }: ReportWizard
             )}
           >
             <div className={styles.criteria}>
-              <p className={styles.criteriaTitle}>Motifs de non-conformité</p>
               <ul className={styles.criteriaList}>
                 {NON_CONFORMITY_CRITERIA.map((criterion, index) => (
                   <li key={index} className={styles.criteriaItem}>

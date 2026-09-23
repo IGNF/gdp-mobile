@@ -160,18 +160,17 @@
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  padding: 0.75rem 0.875rem;
+  /* Padding vertical nul replié : sinon il reste ~1.5rem visibles (et le 1er critère dépasse). */
+  padding: 0 0.875rem;
   border-radius: 0.625rem;
   background: var(--color-bg-subtle);
   min-height: 0;
   overflow: hidden;
+  transition: padding 0.25s ease;
 }
 
-.criteriaTitle {
-  margin: 0;
-  font-size: 0.8125rem;
-  font-weight: 700;
-  color: var(--color-text);
+.criteriaWrapperExpanded .criteria {
+  padding-block: 0.75rem;
 }
 
 .criteriaList {
