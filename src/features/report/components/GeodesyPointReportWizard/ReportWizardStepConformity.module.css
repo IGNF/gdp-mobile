@@ -2,16 +2,19 @@
   display: flex;
   flex-direction: column;
   padding: 1rem 0 0;
-  --color-non-conform: var(--color-danger);
-  --color-non-conform-shade: var(--color-danger-emphasis);
-  --color-non-conform-rgb: var(--color-danger-rgb);
+  --color-conform: var(--color-report-conform);
+  --color-conform-rgb: var(--color-report-conform-rgb);
+  --color-non-conform: var(--color-report-non-conform);
+  --color-non-conform-rgb: var(--color-report-non-conform-rgb);
 }
 
+/* Figma « Headings/H3 bold ». */
 .question {
   margin: 0;
-  font-size: 1.25rem;
+  font-size: 1rem;
   font-weight: 700;
-  color: var(--color-text);
+  line-height: normal;
+  color: var(--color-text-title);
 }
 
 .subtitle {
@@ -40,7 +43,7 @@
 }
 
 .cardSelectedConform {
-  border-color: var(--color-text-primary);
+  border-color: var(--color-conform);
 }
 
 .cardSelectedNonConform {
@@ -49,8 +52,8 @@
 
 .cardConform:hover,
 .cardConform:focus-visible {
-  border-color: var(--color-text-primary);
-  box-shadow: 0 2px 10px rgba(var(--color-primary-rgb), 0.18);
+  border-color: var(--color-conform);
+  box-shadow: 0 2px 10px rgba(var(--color-conform-rgb), 0.18);
 }
 
 .cardNonConform:hover,
@@ -65,32 +68,11 @@
   gap: 0.75rem;
 }
 
+/* Icônes Figma (cercle + coche / croix inclus, couleurs d'origine du SVG). */
 .stateIcon {
   flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 2rem;
-  height: 2rem;
-  border-radius: 50%;
-  border: 2px solid currentColor;
-}
-
-.stateIconConform {
-  color: var(--color-text-primary);
-}
-
-.stateIconNonConform {
-  color: var(--color-non-conform);
-}
-
-.stateIconSvg {
-  width: 1rem;
-  height: 1rem;
-}
-
-.stateIconSvg path {
-  fill: currentColor;
+  width: 2.5rem;
+  height: 2.5rem;
 }
 
 .cardText {
@@ -103,15 +85,15 @@
 
 .cardLabel {
   font-size: 1.1875rem;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .cardLabelConform {
-  color: var(--color-text-primary);
+  color: var(--color-conform);
 }
 
 .cardLabelNonConform {
-  color: var(--color-non-conform-shade);
+  color: var(--color-non-conform);
 }
 
 .radio {
@@ -136,7 +118,7 @@
 }
 
 .radioConform {
-  color: var(--color-text-primary);
+  color: var(--color-conform);
 }
 
 .radioNonConform {
@@ -194,7 +176,7 @@
   width: 0.875rem;
   height: 0.875rem;
   flex-shrink: 0;
-  color: var(--color-text-primary);
+  color: var(--color-conform);
 }
 
 .criteriaIconNonConform {

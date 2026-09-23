@@ -5,11 +5,13 @@
   padding: 1rem 0 0;
 }
 
+/* Figma « Headings/H3 bold », comme la question de la 1re étape. */
 .title {
   margin: 0;
-  font-size: 1.0625rem;
+  font-size: 1rem;
   font-weight: 700;
-  color: var(--color-text);
+  line-height: normal;
+  color: var(--color-text-title);
 }
 
 .subtitle {
@@ -137,13 +139,15 @@
   color: var(--color-text-secondary);
 }
 
+/* Figma « Appli - H2 ». */
 .cardValue {
   margin: 0;
   display: flex;
   align-items: center;
   gap: 0.375rem;
   font-size: 0.9375rem;
-  font-weight: 700;
+  font-weight: 600;
+  line-height: normal;
   color: var(--color-text);
 }
 
@@ -155,11 +159,11 @@
 }
 
 .cardValueIconConform {
-  color: var(--color-text-primary);
+  color: var(--color-report-conform);
 }
 
 .cardValueIconNonConform {
-  color: var(--color-danger);
+  color: var(--color-report-non-conform);
 }
 
 .cardValueIconSvg {

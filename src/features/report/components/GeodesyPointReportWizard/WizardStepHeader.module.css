@@ -12,11 +12,13 @@
   gap: 0.75rem;
 }
 
+/* Figma « Appli - H1 ». */
 .title {
   margin: 0;
   font-size: 1.0625rem;
-  font-weight: 700;
-  color: var(--color-text);
+  font-weight: 600;
+  line-height: normal;
+  color: var(--color-text-title);
 }
 
 .stepCounter {

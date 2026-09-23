@@ -3,6 +3,8 @@ import { useState } from 'react';
 import { joinCSSClassNames } from '@/shared/utils/join';
 import IconCheck from '@/shared/assets/icons/icon-check.svg?react';
 import IconClose from '@/shared/assets/icons/icon-close.svg?react';
+import IconConforme from '@/shared/assets/icons/icon-conforme.svg?react';
+import IconNonConforme from '@/shared/assets/icons/icon-non-conforme.svg?react';
 
 import styles from './ReportWizardStepConformity.module.css';
 
@@ -53,9 +55,7 @@ export function ReportWizardStepConformity({ isConform, onChange }: ReportWizard
           onBlur={() => setHoveredCard((current) => (current === 'conform' ? null : current))}
         >
           <div className={styles.cardRow}>
-            <span className={joinCSSClassNames(styles.stateIcon, styles.stateIconConform)}>
-              <IconCheck className={styles.stateIconSvg} aria-hidden />
-            </span>
+            <IconConforme className={styles.stateIcon} aria-hidden />
             <span className={styles.cardText}>
               <span className={joinCSSClassNames(styles.cardLabel, styles.cardLabelConform)}>
                 Conforme
@@ -99,9 +99,7 @@ export function ReportWizardStepConformity({ isConform, onChange }: ReportWizard
           onBlur={() => setHoveredCard((current) => (current === 'nonConform' ? null : current))}
         >
           <div className={styles.cardRow}>
-            <span className={joinCSSClassNames(styles.stateIcon, styles.stateIconNonConform)}>
-              <IconClose className={styles.stateIconSvg} aria-hidden />
-            </span>
+            <IconNonConforme className={styles.stateIcon} aria-hidden />
             <span className={styles.cardText}>
               <span className={joinCSSClassNames(styles.cardLabel, styles.cardLabelNonConform)}>
                 Non Conforme

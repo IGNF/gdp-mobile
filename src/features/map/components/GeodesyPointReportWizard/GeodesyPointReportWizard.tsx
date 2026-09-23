@@ -218,7 +218,8 @@ function GeodesyPointReportWizardContent({ isOpen, context, onClose }: GeodesyPo
 
   const { currentHeight, dragHandleProps } = useBottomSheetSnap({
     snapHeights,
-    initialIndex: 0,
+    // Ouverture au 2e cran (80 % de la hauteur d'écran) ; le 1er cran (62 %) reste accessible au glisser.
+    initialIndex: 1,
     enabled: isOpen,
   });
 
