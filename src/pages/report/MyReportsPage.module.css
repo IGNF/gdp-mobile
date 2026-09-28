@@ -2,7 +2,12 @@
   display: flex;
   flex-direction: column;
   min-height: 100dvh;
-  background: var(--color-bg-subtle);
+  background: var(--color-bg-page);
+}
+
+/* `.page` en préfixe : doit l'emporter sur le fond par défaut de PageHeader. */
+.page .pageHeader {
+  background-color: var(--color-bg-page-header);
 }
 
 .main {
@@ -15,14 +20,27 @@
 }
 
 .searchWrap {
-  position: relative;
   display: flex;
   align-items: center;
+  gap: 0.5rem;
+  /* Maquette : 344px = pleine largeur de l'écran de référence, hors marges. */
+  width: 100%;
+  height: 3.0625rem; /* 49px */
+  padding: 0 0.5rem;
+  box-sizing: border-box;
+  border-radius: 5px;
+  background: var(--color-bg-surface);
+  box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.2);
+}
+
+/* Le champ n'a plus de contour propre : le focus s'affiche sur le conteneur. */
+.searchWrap:focus-within {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 1px;
 }
 
 .searchIcon {
-  position: absolute;
-  left: 0.875rem;
+  flex-shrink: 0;
   width: 1.125rem;
   height: 1.125rem;
   color: var(--color-text-secondary);
@@ -34,15 +52,16 @@
 }
 
 .searchInput {
-  width: 100%;
-  padding: 0.75rem 0.875rem 0.75rem 2.5rem;
-  border: 1px solid var(--color-border);
-  border-radius: 0.75rem;
-  background: var(--color-fiche-surface);
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  padding: 0;
+  border: none;
+  outline: none;
+  background: transparent;
   font: inherit;
   font-size: 0.9375rem;
   color: var(--color-text);
-  box-sizing: border-box;
 }
 
 .searchInput::placeholder {
@@ -65,7 +84,7 @@
   padding: 0.5rem 0.875rem;
   border: 1px solid var(--color-border);
   border-radius: 999px;
-  background: var(--color-fiche-surface);
+  background: var(--color-bg-surface);
   font-size: 0.8125rem;
   font-weight: 600;
   color: var(--color-text-secondary);
@@ -131,11 +150,16 @@
   padding: 1rem 2.25rem 1rem 1rem;
   border: none;
   border-radius: 1rem;
-  background: var(--color-fiche-surface);
+  background: var(--color-bg-surface);
   box-shadow: 0 1px 10px rgba(0, 0, 0, 0.05);
   text-align: left;
   cursor: pointer;
   transition: box-shadow 0.15s ease;
+}
+
+/* Liste « Signalements » : lignes (titre, position modifiée, adresse) un peu plus aérées. */
+.reportCardSpaced {
+  gap: 0.5rem;
 }
 
 .reportCard:hover,
@@ -151,9 +175,28 @@
 }
 
 .reportId {
-  font-size: 0.9375rem;
+  font-family: var(--font-family-heading);
+  font-size: 1rem;
   font-weight: 700;
-  color: var(--color-text);
+  line-height: 1rem;
+  color: var(--color-text-title);
+}
+
+.reportTitleGroup {
+  display: flex;
+  flex-wrap: wrap;
+  /* Pas `baseline` : le titre commence par le picto (image), sa ligne de base serait le bas de l'image. */
+  align-items: center;
+  column-gap: 0.5rem;
+  min-width: 0;
+}
+
+/* Date discrète, à côté du titre. */
+.reportDate {
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--color-text-secondary-label);
+  white-space: nowrap;
 }
 
 .statusBadge {
@@ -173,16 +216,6 @@
   margin: 0;
   font-size: 0.875rem;
   color: var(--color-text-secondary);
-}
-
-.reportReasonSeparator {
-  color: var(--color-text-secondary);
-}
-
-.reportDateInline {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3125rem;
 }
 
 .reportMeta {
@@ -262,7 +295,7 @@
   padding: 0.5rem 1rem;
   border: 1px solid var(--color-border);
   border-radius: 999px;
-  background: var(--color-fiche-surface);
+  background: var(--color-bg-surface);
   font-size: 0.8125rem;
   font-weight: 600;
   color: var(--color-text-primary);

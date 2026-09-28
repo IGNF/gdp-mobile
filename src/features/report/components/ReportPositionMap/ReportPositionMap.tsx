@@ -65,7 +65,10 @@ export interface ReportPositionMapProps {
   readOnly?: boolean;
   /** Bouton de sélection du fond de carte (Photos aériennes / Plan IGN / SCAN 25). */
   showLayerSwitcher?: boolean;
-  /** Bouton d'agrandissement en plein écran. */
+  /**
+   * Bouton d'agrandissement en plein écran. La vue plein écran reprend le mode de la mini-carte :
+   * lecture seule (consultation) ou déplacement du repère (formulaire de signalement).
+   */
   showFullscreenButton?: boolean;
   /** Fond de carte initial — sert à synchroniser la vue plein écran avec la mini-carte. */
   initialBasemap?: string;
@@ -382,7 +385,10 @@ export function ReportPositionMap({
           {!readOnly && canResetPosition && onResetPosition ? (
             <button
               type="button"
-              className={styles.resetButton}
+              className={joinCSSClassNames(
+                styles.resetButton,
+                showFullscreenButton && styles.resetButtonBesideFullscreen,
+              )}
               onClick={handleResetPosition}
             >
               Annuler
@@ -437,8 +443,12 @@ export function ReportPositionMap({
                 <ReportPositionMap
                   longitude={longitude}
                   latitude={latitude}
-                  onPositionChange={() => {}}
-                  readOnly
+                  initialLongitude={initialLongitude}
+                  initialLatitude={initialLatitude}
+                  canResetPosition={canResetPosition}
+                  onPositionChange={onPositionChange}
+                  onResetPosition={onResetPosition}
+                  readOnly={readOnly}
                   showLayerSwitcher={showLayerSwitcher}
                   initialBasemap={activeBasemap}
                   initialGeodesyVisible={isGeodesyVisible}

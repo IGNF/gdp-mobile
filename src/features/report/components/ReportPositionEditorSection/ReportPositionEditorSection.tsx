@@ -42,6 +42,8 @@ export function ReportPositionEditorSection({ form, isOpen, onToggle }: ReportPo
             canResetPosition={form.canResetPosition}
             onPositionChange={form.setPosition}
             onResetPosition={form.resetPositionToInitial}
+            showLayerSwitcher
+            showFullscreenButton
           />
           <Button type="button" fullWidth onClick={onToggle}>
             Confirmer la position
