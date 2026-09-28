@@ -18,7 +18,6 @@ interface Config {
   isQualification: boolean;
   authRequired: boolean;
   geodesy: {
-    wfsApiKey: string;
     geoportailScanApiKey: string;
   };
   report: {
@@ -70,7 +69,6 @@ export const config: Config = {
     };
   })(),
   geodesy: {
-    wfsApiKey: trimEnv(env.VITE_GEODESY_WFS_API_KEY),
     geoportailScanApiKey: trimEnv(env.VITE_GEOPORTAIL_SCAN_API_KEY) || 'ign_scan_ws',
   },
   report: {

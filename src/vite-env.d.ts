@@ -11,7 +11,6 @@ interface ImportMetaEnv {
   readonly VITE_OAUTH_WEB_REDIRECT_URI?: string;
   readonly VITE_USE_QUALIF?: string;
   readonly VITE_AUTH_REQUIRED?: string;
-  readonly VITE_GEODESY_WFS_API_KEY?: string;
   readonly VITE_GEOPORTAIL_SCAN_API_KEY?: string;
   readonly VITE_GDP_REPORT_COMMUNITY_ID?: string;
   readonly VITE_GDP_REPORT_DISPLAY_THEMES?: string;

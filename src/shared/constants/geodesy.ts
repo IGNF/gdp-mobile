@@ -10,9 +10,6 @@ import {
   type GeodesyWfsAttributeFilterValues,
 } from '@ign/gdp-tools';
 
-/** Clé API WFS privé Géoplateforme (`.env` : `VITE_GEODESY_WFS_API_KEY`). */
-const GDP_GEODESY_WFS_API_KEY = import.meta.env.VITE_GEODESY_WFS_API_KEY?.trim() ?? '';
-
 /** Mode d'affichage géodésie (alias du profil package). */
 export type GdpGeodesyMode = GeodesyProfile;
 
@@ -39,8 +36,6 @@ const GDP_GEODESY_ATTRIBUTE_KEYS = [
   'url_pdf',
   'maj_date',
 ] as const;
-
-const wfsApiKeyOption = GDP_GEODESY_WFS_API_KEY || undefined;
 
 /**
  * Année de détermination la plus ancienne du référentiel ( 28/08/2026 )
@@ -136,7 +131,6 @@ function createGdpGeodesyProfileOptions(
   clusterPreferences: GdpWfsClusterPreferences = DEFAULT_GDP_WFS_CLUSTER_PREFERENCES,
 ) {
   return {
-    wfsApiKey: wfsApiKeyOption,
     attributeKeys: GDP_GEODESY_ATTRIBUTE_KEYS,
     wfsAttributeFilters: GDP_GEODESY_EXPERT_WFS_ATTRIBUTE_FILTERS,
     wfsCluster: {
@@ -166,7 +160,7 @@ export function createGdpGeodesyCatalog(
 }
 
 export function getGdpGeodesyDefaultActive(mode: GdpGeodesyMode): readonly GeodesyLayerId[] {
-  return defaultGeodesyActiveLayerIdsForProfile(mode, { wfsApiKey: wfsApiKeyOption });
+  return defaultGeodesyActiveLayerIdsForProfile(mode);
 }
 
 export function getGdpGeodesyDefaultWfsAttributeFilterValues(
