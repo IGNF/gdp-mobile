@@ -5,6 +5,11 @@
   "engines": {
     "node": ">=22.0.0"
   },
+  "author": "IGN",
+  "license": "GPLv3",
+  "keywords": [
+    "ecosystem:capacitor"
+  ],
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -18,7 +23,9 @@
     "generate-apk": "bash ./scripts/generate-apk.sh",
     "run-apk": "bash ./scripts/run-apk.sh",
     "setup-android": "bash ./scripts/setup-android.sh",
-    "bump:version": "node ./scripts/bump-version.js"
+    "bump:version": "node ./scripts/bump-version.js",
+    "deps:prod": "node ./scripts/write-prod-dependencies.js",
+    "deps:prod:check": "node ./scripts/write-prod-dependencies.js --check"
   },
   "dependencies": {
     "@capacitor/app": "^8.0.0",

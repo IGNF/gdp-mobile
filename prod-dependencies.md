@@ -1,0 +1,23 @@
+| Name                           | License type | Link                                                                               | Installed version | Author                                         |
+| :----------------------------- | :----------- | :--------------------------------------------------------------------------------- | :---------------- | :--------------------------------------------- |
+| @capacitor/app                 | MIT          | https://github.com/ionic-team/capacitor-plugins.git                                | 8.1.1             | Ionic <hi@ionicframework.com>                  |
+| @capacitor/browser             | MIT          | https://github.com/ionic-team/capacitor-plugins.git                                | 8.0.4             | Ionic <hi@ionicframework.com>                  |
+| @capacitor/core                | MIT          | https://github.com/ionic-team/capacitor.git                                        | 8.5.2             | Ionic Team <hi@ionic.io> (https://ionic.io)    |
+| @capacitor/device              | MIT          | https://github.com/ionic-team/capacitor-plugins.git                                | 8.0.3             | Ionic <hi@ionicframework.com>                  |
+| @capacitor/filesystem          | MIT          | https://github.com/ionic-team/capacitor-filesystem.git                             | 8.1.3             | Outsystems                                     |
+| @capacitor/geolocation         | MIT          | https://github.com/ionic-team/capacitor-geolocation.git                            | 8.2.2             | Outsystems                                     |
+| @capacitor/preferences         | MIT          | https://github.com/ionic-team/capacitor-plugins.git                                | 8.0.1             | Ionic <hi@ionicframework.com>                  |
+| @fontsource-variable/open-sans | OFL-1.1      | https://github.com/fontsource/font-files.git                                       | 5.3.0             | Google Inc.                                    |
+| @fontsource/fira-sans          | OFL-1.1      | https://github.com/fontsource/font-files.git                                       | 5.3.0             | Google Inc.                                    |
+| @ign/gdp-tools                 | GPLv3        |                                                                                    | 0.1.0             | IGN                                            |
+| @ign/mobile-core               | IGN          | https://github.com/IGNF/mobile-core.git                                            | 1.0.2             | IGN                                            |
+| @ign/mobile-device             | IGN          | https://github.com/IGNF/mobile-device.git                                          | 1.0.0             | IGN                                            |
+| collaboratif-client-api        | Propriétaire | ssh://git@gitlab.dockerforge.ign.fr:10022/collaboratif/collaboratif-client-api.git | 2.0.0             | mjacopucci                                     |
+| ol                             | BSD-2-Clause | https://github.com/openlayers/openlayers.git                                       | 10.10.0           |                                                |
+| ol-ext                         | BSD-3-Clause | https://github.com/Viglino/ol-ext.git                                              | 4.0.38            | Jean-Marc Viglino (https://github.com/Viglino) |
+| proj4                          | MIT          | https://github.com/proj4js/proj4js.git                                             | 2.22.0            |                                                |
+| react                          | MIT          | https://github.com/react/react.git                                                 | 19.3.0            |                                                |
+| react-dom                      | MIT          | https://github.com/react/react.git                                                 | 19.3.0            |                                                |
+| react-icons                    | MIT          | https://github.com/react-icons/react-icons.git                                     | 5.7.0             | Goran Gajic                                    |
+| react-router-dom               | MIT          | https://github.com/remix-run/react-router.git                                      | 7.18.4            | Remix Software <hello@remix.run>               |
+| vite-plugin-svgr               | MIT          | https://github.com/pd4d10/vite-plugin-svgr.git                                     | 5.2.0             | Rongjian Zhang                                 |

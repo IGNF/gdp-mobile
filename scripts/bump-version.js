@@ -10,6 +10,7 @@ import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { writeProdDependencies } from './write-prod-dependencies.js';
 
 const APP_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const PACKAGE_JSON = path.join(APP_DIR, 'package.json');
@@ -122,8 +123,11 @@ try {
     console.log(`iOS : MARKETING_VERSION=${version} CURRENT_PROJECT_VERSION=${version}`);
   }
 
+  const prodDependencies = writeProdDependencies();
+  console.log('prod-dependencies.md : régénéré');
+
   const gitRoot = gitRootFrom(APP_DIR);
-  const toStage = [PACKAGE_JSON, ANDROID_GRADLE, IOS_PBXPROJ].filter(
+  const toStage = [PACKAGE_JSON, ANDROID_GRADLE, IOS_PBXPROJ, prodDependencies].filter(
     (file) => fs.existsSync(file) && !isIgnored(gitRoot, file),
   );
 

@@ -12,7 +12,7 @@ export const FAQ_ITEMS: readonly FaqItem[] = [
   {
     question: 'Comment créer un signalement ?',
     answer:
-      'Rendez-vous dans le menu Carte, puis appuyez sur le bouton de téléchargement. Sélectionnez la zone souhaitée et confirmez.',
+      'Rendez-vous sur la Carte, puis sélectionner le point à signaler. Vérifier les informations et ensuite, sélectionner le type de signalement et confirmer.',
   },
   {
     question: 'Où sont stockés mes brouillons ?',
