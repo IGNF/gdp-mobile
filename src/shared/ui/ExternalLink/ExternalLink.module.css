@@ -12,5 +12,9 @@
 	width: var(--icon-lg);
 	height: var(--icon-lg);
 	vertical-align: middle;
+	flex-shrink: 0;
 }
 
+.icon path {
+	fill: currentColor;
+}

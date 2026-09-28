@@ -1,6 +1,6 @@
 import type { AnchorHTMLAttributes, ReactNode } from 'react';
 import styles from './ExternalLink.module.css';
-import ExternalLinkIcon from '@/shared/assets/icons/icon-external-link.svg';
+import IconExternalLink from '@/shared/assets/icons/icon-external-link.svg?react';
 import { joinCSSClassNames } from '@/shared/utils/join';
 
 export interface ExternalLinkProps extends AnchorHTMLAttributes<HTMLAnchorElement> {
@@ -30,11 +30,7 @@ export function ExternalLink({
     >
       {children}
       {showIcon && (
-        <img
-          src={ExternalLinkIcon}
-          alt=""
-          className={styles.icon}
-        />
+        <IconExternalLink className={styles.icon} aria-hidden />
       )}
     </a>
   );
