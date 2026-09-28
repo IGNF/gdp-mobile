@@ -76,13 +76,6 @@ const menuGroups: MenuGroup[] = [
     ],
   },
   {
-    id: 'mesFavoris',
-    title: 'Mes favoris',
-    icon: IconStar,
-    authVisibility: 'authenticated',
-    items: [{ id: 'mesFavoris', label: 'Mes favoris', route: '/favorites' }],
-  },
-  {
     id: 'parametres',
     title: 'Paramètres',
     icon: IconSettings,

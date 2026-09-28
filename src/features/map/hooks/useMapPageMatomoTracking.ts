@@ -6,7 +6,6 @@ import { trackEvent, trackOverlayOpen } from '@/infra/analytics/matomo';
 const MENU_OVERLAY_LABELS: Record<Exclude<LeftMenuOverlayRoute, '/logout'>, string> = {
   '/my-account': 'Mon compte',
   '/settings': 'Paramètres',
-  '/favorites': 'Mes favoris',
   '/community': 'Communauté',
   '/help': 'Aide',
   '/about': 'À propos',
