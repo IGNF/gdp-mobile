@@ -1,9 +1,11 @@
+import type { FunctionComponent, SVGProps } from 'react';
+
 import { joinCSSClassNames } from '@/shared/utils/join';
-import IconCamera from '@/shared/assets/icons/icon-camera.svg?react';
-import IconAlertCircle from '@/shared/assets/icons/icon-alert-circle.svg?react';
-import IconDelete from '@/shared/assets/icons/icon-delete.svg?react';
-import IconSearch from '@/shared/assets/icons/icon-search.svg?react';
-import IconLocation from '@/shared/assets/icons/icon-location.svg?react';
+import IconPhotoNotFound from '@/shared/assets/icons/icon-photo-not-found.svg?react';
+import IconPointDammaged from '@/shared/assets/icons/icon-point-dammaged.svg?react';
+import IconPointLost from '@/shared/assets/icons/icon-point-lost.svg?react';
+import IconPointNotFound from '@/shared/assets/icons/icon-point-not-found.svg?react';
+import IconPointWrongPosition from '@/shared/assets/icons/icon-point-wrong-position.svg?react';
 
 import styles from './ReportWizardStepNonConformReason.module.css';
 
@@ -17,7 +19,7 @@ export type NonConformReason =
 interface NonConformReasonOption {
   value: NonConformReason;
   label: string;
-  Icon: typeof IconCamera;
+  Icon: FunctionComponent<SVGProps<SVGSVGElement>>;
 }
 
 interface NonConformReasonGroup {
@@ -31,17 +33,17 @@ const NON_CONFORM_REASON_GROUPS: NonConformReasonGroup[] = [
     title: 'Des informations sur le point sont-elles incorrectes ?',
     exclusive: false,
     options: [
-      { value: 'photoNonConforme', label: 'Photo non conforme ou absente', Icon: IconCamera },
-      { value: 'malPositionne', label: 'Mal positionné', Icon: IconLocation },
+      { value: 'photoNonConforme', label: 'Photo non conforme ou absente', Icon: IconPhotoNotFound },
+      { value: 'malPositionne', label: 'Mal positionné', Icon: IconPointWrongPosition },
     ],
   },
   {
     title: "Quel est l'état du point ?",
     exclusive: true,
     options: [
-      { value: 'mauvaisEtat', label: 'Mauvais état', Icon: IconAlertCircle },
-      { value: 'detruit', label: 'Détruit', Icon: IconDelete },
-      { value: 'nonRetrouve', label: 'Non retrouvé', Icon: IconSearch },
+      { value: 'mauvaisEtat', label: 'Mauvais état', Icon: IconPointDammaged },
+      { value: 'detruit', label: 'Détruit', Icon: IconPointLost },
+      { value: 'nonRetrouve', label: 'Non retrouvé', Icon: IconPointNotFound },
     ],
   },
 ];
