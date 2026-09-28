@@ -1,0 +1,99 @@
+name: Android Deploy
+
+permissions:
+  contents: read
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+
+jobs:
+  deploy:
+    name: Build and Deploy Android App
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Make envfile
+        run: |
+          set -euo pipefail
+          touch .env
+          [ -n "${{ secrets.VITE_SECRET }}" ] && echo "VITE_SECRET=${{ secrets.VITE_SECRET }}" >> .env || true
+          [ -n "${{ secrets.VITE_BASE_API_URL }}" ] && echo "VITE_BASE_API_URL=${{ secrets.VITE_BASE_API_URL }}" >> .env || true
+          [ -n "${{ secrets.VITE_OAUTH_CLIENT_ID }}" ] && echo "VITE_OAUTH_CLIENT_ID=${{ secrets.VITE_OAUTH_CLIENT_ID }}" >> .env || true
+          [ -n "${{ secrets.VITE_OAUTH_BASE_URL }}" ] && echo "VITE_OAUTH_BASE_URL=${{ secrets.VITE_OAUTH_BASE_URL }}" >> .env || true
+          [ -n "${{ secrets.VITE_OAUTH_ANDROID_REDIRECT_URI }}" ] && echo "VITE_OAUTH_ANDROID_REDIRECT_URI=${{ secrets.VITE_OAUTH_ANDROID_REDIRECT_URI }}" >> .env || true
+          [ -n "${{ secrets.VITE_GEOPORTAIL_SCAN_API_KEY }}" ] && echo "VITE_GEOPORTAIL_SCAN_API_KEY=${{ secrets.VITE_GEOPORTAIL_SCAN_API_KEY }}" >> .env || true
+          [ -n "${{ secrets.VITE_GDP_REPORT_COMMUNITY_ID }}" ] && echo "VITE_GDP_REPORT_COMMUNITY_ID=${{ secrets.VITE_GDP_REPORT_COMMUNITY_ID }}" >> .env || true
+          [ -n "${{ secrets.VITE_GDP_REPORT_DISPLAY_THEMES }}" ] && echo "VITE_GDP_REPORT_DISPLAY_THEMES=${{ secrets.VITE_GDP_REPORT_DISPLAY_THEMES }}" >> .env || true
+          [ -n "${{ secrets.VITE_GDP_REPORT_SUBMISSION_THEME }}" ] && echo "VITE_GDP_REPORT_SUBMISSION_THEME=${{ secrets.VITE_GDP_REPORT_SUBMISSION_THEME }}" >> .env || true
+          [ -n "${{ secrets.VITE_GDP_NEWS_URL }}" ] && echo "VITE_GDP_NEWS_URL=${{ secrets.VITE_GDP_NEWS_URL }}" >> .env || true
+          [ -n "${{ secrets.VITE_MATOMO_URL }}" ] && echo "VITE_MATOMO_URL=${{ secrets.VITE_MATOMO_URL }}" >> .env || true
+          [ -n "${{ secrets.VITE_MATOMO_SITE_ID }}" ] && echo "VITE_MATOMO_SITE_ID=${{ secrets.VITE_MATOMO_SITE_ID }}" >> .env || true
+          [ -n "${{ secrets.VITE_AUTH_REQUIRED }}" ] && echo "VITE_AUTH_REQUIRED=${{ secrets.VITE_AUTH_REQUIRED }}" >> .env || true
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build web bundle
+        run: npm run build:mobile
+
+      - name: Capacitor sync (Android)
+        run: npx cap sync android
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Read application id
+        run: |
+          set -euo pipefail
+          pkg=$(sed -n 's/.*applicationId[[:space:]]*"\([^"]*\)".*/\1/p' android/app/build.gradle | head -n1)
+          if [[ -z "$pkg" ]]; then
+            echo "applicationId introuvable dans android/app/build.gradle"
+            exit 1
+          fi
+          echo "PACKAGE_NAME=$pkg" >> "$GITHUB_ENV"
+
+      - name: Build Android App Bundle
+        run: cd android && ./gradlew --no-daemon bundleRelease
+
+      - name: Sign Android App Bundle
+        id: sign_aab
+        uses: r0adkll/sign-android-release@v1
+        with:
+          releaseDirectory: android/app/build/outputs/bundle/release
+          signingKeyBase64: ${{ secrets.SIGNING_KEY }}
+          alias: ${{ secrets.ALIAS }}
+          keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
+          keyPassword: ${{ secrets.KEY_PASSWORD }}
+        env:
+          BUILD_TOOLS_VERSION: "34.0.0"
+
+      - name: Upload signed bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-signed-aab
+          path: ${{ steps.sign_aab.outputs.signedReleaseFile }}
+          retention-days: 3
+
+      - name: Deploy to Play Store (internal track)
+        if: ${{ vars.ANDROID_DEPLOY_TO_PLAY == 'true' }}
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
+          packageName: ${{ env.PACKAGE_NAME }}
+          releaseFiles: ${{ steps.sign_aab.outputs.signedReleaseFile }}
+          track: internal
+          status: completed
+          inAppUpdatePriority: 5
