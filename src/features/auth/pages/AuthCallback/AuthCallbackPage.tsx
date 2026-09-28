@@ -2,7 +2,11 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import { useAuth } from '@/features/auth/hooks/useAuth';
-import { handleOAuthCallback } from '@/infra/auth/authService';
+import {
+  consumeOAuthCallbackRetry,
+  handleOAuthCallback,
+  isStaleOAuthCallbackError,
+} from '@/infra/auth/authService';
 import { Button } from '@/shared/ui/Button';
 import { Loading } from '@/shared/ui/Loading';
 
@@ -11,12 +15,15 @@ import styles from './AuthCallbackPage.module.css';
 
 /**
  * Callback OAuth web : lit ?code= dans l’URL et échange le code contre des jetons.
+ * Si le code n’est plus échangeable (page restaurée, rechargée…), relance une fois le SSO
+ * automatiquement plutôt que d’enfermer l’utilisateur sur l’écran d’erreur.
  */
 export function AuthCallbackPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { setUserFromOAuthCallback } = useAuth();
+  const { setUserFromOAuthCallback, loginWithOAuth } = useAuth();
   const [error, setError] = useState<string | null>(null);
+  const [isRetrying, setIsRetrying] = useState(false);
   const code = searchParams.get('code');
   const errorParam = searchParams.get('error');
 
@@ -49,6 +56,11 @@ export function AuthCallbackPage() {
           return;
         }
 
+        if (isStaleOAuthCallbackError(result.error) && consumeOAuthCallbackRetry()) {
+          await loginWithOAuth();
+          return;
+        }
+
         setError(result.error?.message ?? 'Échec de la finalisation de la connexion.');
       } catch {
         if (!cancelled) {
@@ -62,15 +74,30 @@ export function AuthCallbackPage() {
     return () => {
       cancelled = true;
     };
-  }, [code, errorParam, navigate, setUserFromOAuthCallback]);
+  }, [code, errorParam, navigate, setUserFromOAuthCallback, loginWithOAuth]);
+
+  const handleRetry = async () => {
+    setIsRetrying(true);
+    try {
+      const result = await loginWithOAuth();
+      if (!result.success && result.error?.message !== 'OAuth redirect') {
+        setError(result.error?.message ?? 'Échec de la connexion');
+      }
+    } finally {
+      setIsRetrying(false);
+    }
+  };
 
   if (error) {
     return (
       <div className={`${styles.container} ${screen.screenContainer}`}>
         <h1 className="page-title">Erreur de connexion</h1>
         <p className={styles.textError}>{error}</p>
-        <Button className={styles.backButton} onClick={() => navigate('/login', { replace: true })}>
-          Retour à la connexion
+        <Button className={styles.backButton} loading={isRetrying} onClick={() => void handleRetry()}>
+          Réessayer la connexion
+        </Button>
+        <Button className={styles.backButton} variant="outline" onClick={() => navigate('/map', { replace: true })}>
+          Retour à la carte
         </Button>
       </div>
     );
