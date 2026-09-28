@@ -1,5 +1,6 @@
+import { App, type URLOpenListenerEvent } from '@capacitor/app';
 import { Browser } from '@capacitor/browser';
-import { Capacitor, CapacitorHttp } from '@capacitor/core';
+import { Capacitor, CapacitorHttp, type PluginListenerHandle } from '@capacitor/core';
 import { AuthManager, type AuthTokens as CoreAuthTokens } from '@ign/mobile-core';
 import { Storage } from '@ign/mobile-device';
 
@@ -27,6 +28,12 @@ const OAUTH_CODE_VERIFIER_KEY = 'temp_code_verifier';
 /** Après une déconnexion explicite, force une saisie SSO (évite un SSO « fantôme »). */
 const OAUTH_FORCE_LOGIN_KEY = 'gdp_oauth_force_login';
 const REVOKE_TIMEOUT_MS = 2500;
+/**
+ * Délai laissé au retour `appUrlOpen` après `browserFinished` : quand Keycloak a déjà une
+ * session (« Se souvenir de moi »), il redirige instantanément et l’onglet se ferme parfois
+ * avant que l’app ne reçoive le code.
+ */
+const NATIVE_BROWSER_FINISHED_GRACE_MS = 2000;
 /** Horodatage de la dernière relance SSO automatique depuis le callback (anti-boucle). */
 const OAUTH_CALLBACK_RETRY_KEY = 'gdp_oauth_callback_retry_at';
 const OAUTH_CALLBACK_RETRY_WINDOW_MS = 60_000;
@@ -92,6 +99,135 @@ async function redirectWebOAuthLogin(redirectUri: string): Promise<void> {
   }
 
   window.location.href = `${config.oAuth.ssoBaseUrl}/auth?${params.toString()}`;
+}
+
+async function completeOAuthCode(code: string, redirectUri: string): Promise<AuthResult> {
+  const result = await getAuthManager().completeOAuthCallback(code, redirectUri);
+
+  if (!result.success) {
+    return {
+      success: false,
+      user: null,
+      error: authError(formatOAuthExchangeFailure(result.error), result.error),
+    };
+  }
+
+  if (!result.user || !result.tokens?.accessToken) {
+    return {
+      success: false,
+      user: null,
+      error: authError('Informations utilisateur ou jeton manquants après connexion'),
+    };
+  }
+
+  return persistSuccessfulAuth(result.tokens, result.user as AppUser);
+}
+
+/**
+ * Flux OAuth natif (navigateur in-app + deep link), à la place de `AuthManager.loginWithOAuth` :
+ * - `state` propre à chaque tentative : Capacitor conserve un `appUrlOpen` reçu sans écouteur
+ *   et le rejoue à l’écouteur suivant. Sans ce contrôle, la tentative N+1 échangeait le code
+ *   de la tentative N avec un nouveau vérificateur PKCE (« Token exchange failed » en boucle).
+ * - `browserFinished` n’est un abandon qu’après un délai de grâce (voir constante).
+ */
+async function loginWithNativeOAuth(redirectUri: string): Promise<AuthResult> {
+  const codeVerifier = generateCodeVerifier();
+  const codeChallenge = await generateCodeChallengeFromVerifier(codeVerifier);
+  const state = generateCodeVerifier();
+  // Clé lue par `AuthManager.completeOAuthCallback`.
+  localStorage.setItem(OAUTH_CODE_VERIFIER_KEY, codeVerifier);
+
+  const authUrl = `${config.oAuth.ssoBaseUrl}/auth?${new URLSearchParams({
+    client_id: config.oAuth.clientId,
+    redirect_uri: redirectUri,
+    response_type: 'code',
+    scope: 'openid profile email',
+    code_challenge: codeChallenge,
+    code_challenge_method: 'S256',
+    state,
+  }).toString()}`;
+
+  return new Promise<AuthResult>((resolve) => {
+    const listeners: PluginListenerHandle[] = [];
+    let settled = false;
+    let handlingCallback = false;
+    let browserFinishedTimer: number | undefined;
+
+    const settle = (result: AuthResult) => {
+      if (settled) {
+        return;
+      }
+      settled = true;
+      window.clearTimeout(browserFinishedTimer);
+      listeners.forEach((listener) => void listener.remove());
+      resolve(result);
+    };
+
+    const fail = (message: string) => {
+      localStorage.removeItem(OAUTH_CODE_VERIFIER_KEY);
+      settle({ success: false, user: null, error: authError(message) });
+    };
+
+    const handleAppUrlOpen = async ({ url }: URLOpenListenerEvent) => {
+      if (settled || handlingCallback || !url.startsWith(redirectUri.split('?')[0])) {
+        return;
+      }
+
+      const callbackUrl = new URL(url);
+      if (callbackUrl.searchParams.get('state') !== state) {
+        // Retour d’une tentative précédente, rejoué par Capacitor : on l’ignore.
+        return;
+      }
+
+      handlingCallback = true;
+      window.clearTimeout(browserFinishedTimer);
+
+      if (callbackUrl.searchParams.get('error')) {
+        fail('La connexion a été refusée ou annulée.');
+        return;
+      }
+
+      const code = callbackUrl.searchParams.get('code');
+      if (!code) {
+        fail('Code d’autorisation absent dans l’URL de retour.');
+        return;
+      }
+
+      try {
+        settle(await completeOAuthCode(code, redirectUri));
+      } catch (error) {
+        localStorage.removeItem(OAUTH_CODE_VERIFIER_KEY);
+        settle({ success: false, user: null, error: authError('Échec du callback OAuth', error) });
+      }
+    };
+
+    const handleBrowserFinished = () => {
+      if (settled || handlingCallback) {
+        return;
+      }
+      window.clearTimeout(browserFinishedTimer);
+      browserFinishedTimer = window.setTimeout(() => {
+        if (!handlingCallback) {
+          fail('Connexion annulée.');
+        }
+      }, NATIVE_BROWSER_FINISHED_GRACE_MS);
+    };
+
+    void (async () => {
+      try {
+        listeners.push(await App.addListener('appUrlOpen', (event) => void handleAppUrlOpen(event)));
+        listeners.push(await Browser.addListener('browserFinished', handleBrowserFinished));
+        await Browser.open({ url: authUrl });
+      } catch (error) {
+        localStorage.removeItem(OAUTH_CODE_VERIFIER_KEY);
+        settle({
+          success: false,
+          user: null,
+          error: authError('Impossible d’ouvrir la page de connexion', error),
+        });
+      }
+    })();
+  });
 }
 
 async function revokeOAuthToken(token: string | null): Promise<void> {
@@ -323,29 +459,7 @@ export async function loginWithOAuth(): Promise<AuthResult> {
       return { success: false, user: null, error: authError('OAuth redirect') };
     }
 
-    const result = await getAuthManager().loginWithOAuth(redirectUri);
-
-    if (!result.success) {
-      if (result.error?.message === 'OAuth redirect') {
-        return { success: false, user: null, error: result.error };
-      }
-
-      return {
-        success: false,
-        user: null,
-        error: authError(result.error?.message ?? 'Échec de la connexion OAuth', result.error),
-      };
-    }
-
-    if (!result.user || !result.tokens?.accessToken) {
-      return {
-        success: false,
-        user: null,
-        error: authError('Informations utilisateur ou jeton manquants après connexion'),
-      };
-    }
-
-    return persistSuccessfulAuth(result.tokens, result.user as AppUser);
+    return await loginWithNativeOAuth(redirectUri);
   } catch (error) {
     const message =
       error instanceof Error && error.message
