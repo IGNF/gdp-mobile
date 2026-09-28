@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { BottomTabbar } from '@/app/components/BottomTabbar';
 import { getGroupReportSummaryLabel } from '@/domain/report/groupReportMappers';
+import { GDP_REPORT_LEGACY_THEME } from '@/features/report/constants/reportApi';
 import { useUserReportHistory } from '@/features/report/hooks/useUserReportHistory';
 import { formatRelativeDayLabel } from '@/shared/utils/date';
 import { getStatusColors, getStatusLabel } from '@/shared/utils/reportStatus';
@@ -12,9 +13,12 @@ import IconCalendar from '@/shared/assets/icons/icon-calendar.svg?react';
 
 import styles from './MyReportsPage.module.css';
 
+/** Les signalements `gdp-tools` (nouvelle app) sont listés sur la page « Signalements ». */
+const LEGACY_REPORT_THEMES = [GDP_REPORT_LEGACY_THEME];
+
 export function ReportHistoryPage() {
   const navigate = useNavigate();
-  const { reports, isLoading, isLoadingMore, error, hasMore, loadMore } = useUserReportHistory();
+  const { reports, isLoading, isLoadingMore, error, hasMore, loadMore } = useUserReportHistory(LEGACY_REPORT_THEMES);
 
   return (
     <div className={styles.page}>

@@ -14,6 +14,8 @@ interface LoadUserReportHistoryOptions {
   userId: number;
   page: number;
   limit: number;
+  /** Thèmes filtrés (défaut : thèmes d'affichage GDP). */
+  themes?: readonly string[];
 }
 
 export interface UserReportHistoryPage {
@@ -30,6 +32,7 @@ export async function loadUserReportHistory({
   userId,
   page,
   limit,
+  themes,
 }: LoadUserReportHistoryOptions): Promise<UserReportHistoryPage> {
   const sessionReady = await ensureCollabApiSession();
   if (!sessionReady) {
@@ -42,7 +45,7 @@ export async function loadUserReportHistory({
     page,
     limit,
     sort: 'id:DESC',
-    attributes: serializeGdpReportThemeFilters(),
+    attributes: serializeGdpReportThemeFilters(themes),
   });
 
   const apiReports = (response.data as ApiGroupReportResponse[]) ?? [];

@@ -20,6 +20,7 @@
 	font-size: var(--font-size-2xl);
 	font-weight: var(--font-weight-semibold);
 	font-family: var(--font-family-heading);
+	line-height: normal;
 	color: var(--color-text-title);
 	margin: 0;
 }
@@ -47,6 +48,13 @@
 	border: 1px solid var(--color-bg-hover);
 	border-radius: var(--radius-circle);
 	cursor: pointer;
+}
+
+.headerBackButton {
+	border: none;
+	border-radius: 100px;
+	background: var(--color-bg-surface);
+	box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.1);
 }
 
 .headerIcon {

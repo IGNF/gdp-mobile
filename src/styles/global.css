@@ -187,6 +187,8 @@
 
   /* ── Backgrounds ── */
   --color-bg-page: var(--figma-gray-3);
+  /* Bandeau de titre (PageHeader) sur les pages à fond --color-bg-page. */
+  --color-bg-page-header: #F4F6F8;
   --color-bg-surface: var(--color-white);
   --color-bg-white: var(--color-white);
   --color-bg-subtle: var(--figma-gray-2);

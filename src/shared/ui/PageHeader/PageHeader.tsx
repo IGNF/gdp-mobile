@@ -16,6 +16,7 @@ export interface PageHeaderProps {
 	onBack?: () => void;
 	onClose?: () => void;
 	onMenuClick?: () => void;
+	className?: string;
 }
 
 export function PageHeader({
@@ -28,6 +29,7 @@ export function PageHeader({
 	onBack,
 	onClose,
 	onMenuClick,
+	className,
 }: PageHeaderProps) {
 	const navigate = useNavigate();
 
@@ -48,10 +50,10 @@ export function PageHeader({
 	};
 
 	return (
-		<header className={styles.header}>
+		<header className={joinCSSClassNames(styles.header, className)}>
 			{showBackButton ? (
 				<button
-					className={styles.headerButton}
+					className={joinCSSClassNames(styles.headerButton, styles.headerBackButton)}
 					onClick={handleBack}
 					aria-label="Back"
 				>
