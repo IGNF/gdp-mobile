@@ -114,10 +114,7 @@ export function MyAccountPage({ isOpen, onClose }: MyAccountPageProps) {
             </section>
 
             {/* Note en bas */}
-            <p className={styles.footerNote}>
-              Pour personnaliser votre compte, rendez-vous sur votre{' '}
-              <ExternalLink href={ssoAccountUrl}>compte Géoplateforme</ExternalLink>
-              . Pour modifier vos autres informations, rendez-vous sur{' '}
+            <p className={styles.footerNote}>Pour modifier votre profil, rendez-vous sur{' '}
               <ExternalLink href={EXTERNAL_LINKS.ESPACE_COLLABORATIF}>
                 l'espace collaboratif
               </ExternalLink>

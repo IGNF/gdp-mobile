@@ -14,7 +14,6 @@ import { LogoutPage } from '@/features/auth/pages/Logout';
 import { MyAccountPage } from '@/features/auth/pages/MyAccount';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { CommunityPage } from '@/features/community/pages/CommunityPage';
-import { FavoritesPage } from '@/features/favorites/pages/FavoritesPage';
 import { HelpPage } from '@/features/help/pages/HelpPage';
 import { SettingsPage } from '@/features/settings/pages/SettingsPage';
 import { LegendPage } from '@/features/legend/pages/LegendPage';
@@ -724,10 +723,6 @@ export function MapPage() {
       />
       <SettingsPage
         isOpen={activeOverlay === '/settings'}
-        onClose={() => setActiveOverlay(null)}
-      />
-      <FavoritesPage
-        isOpen={activeOverlay === '/favorites'}
         onClose={() => setActiveOverlay(null)}
       />
       <CommunityPage

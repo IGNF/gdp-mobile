@@ -46,6 +46,17 @@ function parsePlatforms(value: unknown): GdpNewsPlatform[] {
   return platforms.length > 0 ? platforms : ['web', 'android', 'ios'];
 }
 
+function parseSeverity(value: unknown): { severity: GdpNewsSeverity; severityLabel?: string } | null {
+  const raw = asTrimmedString(value);
+  if (!raw) {
+    return null;
+  }
+  if (SEVERITIES.has(raw as GdpNewsSeverity)) {
+    return { severity: raw as GdpNewsSeverity };
+  }
+  return { severity: 'warning', severityLabel: raw };
+}
+
 function parseCta(value: unknown): GdpNewsCta | undefined {
   if (!isRecord(value)) {
     return undefined;
@@ -70,9 +81,9 @@ function parseItem(value: unknown): GdpNewsItem | null {
   const body = asTrimmedString(value.body);
   const startsAt = parseIsoDate(value.startsAt);
   const endsAt = parseIsoDate(value.endsAt);
-  const severity = asTrimmedString(value.severity);
+  const parsedSeverity = parseSeverity(value.severity);
 
-  if (!id || !title || !body || !startsAt || !endsAt || !severity || !SEVERITIES.has(severity as GdpNewsSeverity)) {
+  if (!id || !title || !body || !startsAt || !endsAt || !parsedSeverity) {
     return null;
   }
 
@@ -85,7 +96,8 @@ function parseItem(value: unknown): GdpNewsItem | null {
     body,
     startsAt,
     endsAt,
-    severity: severity as GdpNewsSeverity,
+    severity: parsedSeverity.severity,
+    severityLabel: parsedSeverity.severityLabel,
     platforms: parsePlatforms(value.platforms),
     audience: audienceRaw && AUDIENCES.has(audienceRaw as GdpNewsAudience)
       ? (audienceRaw as GdpNewsAudience)
