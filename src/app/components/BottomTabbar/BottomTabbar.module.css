@@ -8,7 +8,7 @@
 	background-color: var(--color-bg-subtle);
 	margin: 0 auto calc(var(--spacing-xl) + var(--safe-bottom));
 	border-radius: var(--radius-pill);
-	box-shadow: var(--shadow-md);
+	box-shadow: 0 0 40px 2px rgba(0, 0, 0, 0.20);
 	height: 4.5rem;
 }
 
@@ -27,7 +27,13 @@
 	gap: var(--spacing-xs);
 	fill: var(--color-text);
 }
+.tabSearch {
+	margin-right: var(--spacing-md);
+}
 
+.tabMAP {
+	margin-left: var(--spacing-md);
+}
 .tab.active {
 	border-radius: var(--radius-pill);
 	background: var(--color-bg-primary-pressed);

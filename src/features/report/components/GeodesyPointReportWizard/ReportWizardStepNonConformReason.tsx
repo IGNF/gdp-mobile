@@ -1,9 +1,11 @@
+import type { FunctionComponent, SVGProps } from 'react';
+
 import { joinCSSClassNames } from '@/shared/utils/join';
-import IconCamera from '@/shared/assets/icons/icon-camera.svg?react';
-import IconAlertCircle from '@/shared/assets/icons/icon-alert-circle.svg?react';
-import IconDelete from '@/shared/assets/icons/icon-delete.svg?react';
-import IconSearch from '@/shared/assets/icons/icon-search.svg?react';
-import IconLocation from '@/shared/assets/icons/icon-location.svg?react';
+import IconPhotoNotFound from '@/shared/assets/icons/icon-photo-not-found.svg?react';
+import IconPointDammaged from '@/shared/assets/icons/icon-point-dammaged.svg?react';
+import IconPointLost from '@/shared/assets/icons/icon-point-lost.svg?react';
+import IconPointNotFound from '@/shared/assets/icons/icon-point-not-found.svg?react';
+import IconPointWrongPosition from '@/shared/assets/icons/icon-point-wrong-position.svg?react';
 
 import styles from './ReportWizardStepNonConformReason.module.css';
 
@@ -17,7 +19,7 @@ export type NonConformReason =
 interface NonConformReasonOption {
   value: NonConformReason;
   label: string;
-  Icon: typeof IconCamera;
+  Icon: FunctionComponent<SVGProps<SVGSVGElement>>;
 }
 
 interface NonConformReasonGroup {
@@ -31,17 +33,17 @@ const NON_CONFORM_REASON_GROUPS: NonConformReasonGroup[] = [
     title: 'Des informations sur le point sont-elles incorrectes ?',
     exclusive: false,
     options: [
-      { value: 'photoNonConforme', label: 'Photo non conforme ou absente', Icon: IconCamera },
-      { value: 'malPositionne', label: 'Mal positionné', Icon: IconLocation },
+      { value: 'photoNonConforme', label: 'Photo non conforme ou absente', Icon: IconPhotoNotFound },
+      { value: 'malPositionne', label: 'Mal positionné', Icon: IconPointWrongPosition },
     ],
   },
   {
     title: "Quel est l'état du point ?",
     exclusive: true,
     options: [
-      { value: 'mauvaisEtat', label: 'Mauvais état', Icon: IconAlertCircle },
-      { value: 'detruit', label: 'Détruit', Icon: IconDelete },
-      { value: 'nonRetrouve', label: 'Non retrouvé', Icon: IconSearch },
+      { value: 'mauvaisEtat', label: 'Mauvais état', Icon: IconPointDammaged },
+      { value: 'detruit', label: 'Détruit', Icon: IconPointLost },
+      { value: 'nonRetrouve', label: 'Non retrouvé', Icon: IconPointNotFound },
     ],
   },
 ];
@@ -53,12 +55,22 @@ export const NON_CONFORM_REASON_LABELS: Record<NonConformReason, string> = Objec
 export interface ReportWizardStepNonConformReasonProps {
   reasons: NonConformReason[];
   onChange: (reasons: NonConformReason[]) => void;
+  /** Un point géodésique est par définition bien positionné : seul un repère de nivellement peut être déplacé. */
+  allowPositionReason?: boolean;
 }
 
 export function ReportWizardStepNonConformReason({
   reasons,
   onChange,
+  allowPositionReason = true,
 }: ReportWizardStepNonConformReasonProps) {
+  const groups = allowPositionReason
+    ? NON_CONFORM_REASON_GROUPS
+    : NON_CONFORM_REASON_GROUPS.map((group) => ({
+        ...group,
+        options: group.options.filter((option) => option.value !== 'malPositionne'),
+      }));
+
   const toggleReason = (group: NonConformReasonGroup, value: NonConformReason) => {
     const isSelected = reasons.includes(value);
 
@@ -74,7 +86,7 @@ export function ReportWizardStepNonConformReason({
 
   return (
     <div className={styles.step}>
-      {NON_CONFORM_REASON_GROUPS.map((group) => (
+      {groups.map((group) => (
         <div key={group.title} className={styles.group}>
           <p className={styles.groupTitle}>{group.title}</p>
           <div

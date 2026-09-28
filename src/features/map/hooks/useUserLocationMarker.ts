@@ -15,8 +15,10 @@ import {
 } from '@/shared/constants/map';
 import { getColorCode } from '@/shared/utils/color';
 
-function createUserLocationIconSrc(color: string): string {
-  const contrast = getColorCode('white');
+const USER_LOCATION_MARKER_FALLBACK_COLOR = '#26a581';
+const USER_LOCATION_MARKER_CONTRAST_FALLBACK = '#ffffff';
+
+function createUserLocationIconSrc(color: string, contrast: string): string {
   const markerSvg = `
     <svg xmlns="http://www.w3.org/2000/svg" width="42" height="42" viewBox="0 0 42 42">
       <path d="M21 3 L34 35 L21 28 L8 35 Z" fill="${color}" stroke="${contrast}" stroke-width="3" stroke-linejoin="round"/>
@@ -27,11 +29,13 @@ function createUserLocationIconSrc(color: string): string {
   return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(markerSvg)}`;
 }
 
-function createUserLocationStyle(color: string): Style {
+function createUserLocationStyle(color: string, contrast: string): Style {
   return new Style({
     image: new Icon({
-      src: createUserLocationIconSrc(color),
+      src: createUserLocationIconSrc(color, contrast),
       anchor: [0.5, 0.5],
+      width: 42,
+      height: 42,
       rotateWithView: true,
     }),
   });
@@ -40,18 +44,23 @@ function createUserLocationStyle(color: string): Style {
 interface UseUserLocationMarkerOptions {
   map: Map | null;
   isMapReady: boolean;
+  /** Affiche le curseur uniquement quand le suivi de position est actif. */
+  enabled?: boolean;
 }
 
-export function useUserLocationMarker({ map, isMapReady }: UseUserLocationMarkerOptions): void {
+export function useUserLocationMarker({
+  map,
+  isMapReady,
+  enabled = true,
+}: UseUserLocationMarkerOptions): void {
   useEffect(() => {
-    if (!map || !isMapReady) {
+    if (!map || !isMapReady || !enabled) {
       return;
     }
 
-    const userLocationColor = getColorCode('tertiary');
-    if (!userLocationColor) {
-      return;
-    }
+    const userLocationColor =
+      getColorCode('primary') || getColorCode('action-primary') || USER_LOCATION_MARKER_FALLBACK_COLOR;
+    const contrast = getColorCode('white') || USER_LOCATION_MARKER_CONTRAST_FALLBACK;
 
     const source = new VectorSource<Feature<Point>>();
     const feature = new Feature<Point>();
@@ -60,6 +69,9 @@ export function useUserLocationMarker({ map, isMapReady }: UseUserLocationMarker
 
     const markerLayer = new VectorLayer({
       source,
+      className: 'ol-layer gdp-user-location',
+      updateWhileAnimating: true,
+      updateWhileInteracting: true,
       properties: {
         name: USER_LOCATION_LAYER_NAME,
         title: 'Position utilisateur',
@@ -69,7 +81,7 @@ export function useUserLocationMarker({ map, isMapReady }: UseUserLocationMarker
     });
 
     const updateMarkerPosition: WatchPositionCallback = (position) => {
-      if (!position) {
+      if (!position || cancelled) {
         return;
       }
 
@@ -77,11 +89,22 @@ export function useUserLocationMarker({ map, isMapReady }: UseUserLocationMarker
       feature.setGeometry(new Point(fromLonLat([longitude, latitude])));
     };
 
-    map.addLayer(markerLayer);
-    feature.setStyle(createUserLocationStyle(userLocationColor));
+    // Overlay non géré : reste au-dessus des fonds / WFS, y compris pendant le recentrage.
+    markerLayer.setMap(map);
+    feature.setStyle(createUserLocationStyle(userLocationColor, contrast));
     source.addFeature(feature);
 
     void (async () => {
+      const initialPosition = await Gdp_Geolocation.getUsersLocation({
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 1000,
+      });
+
+      if (!cancelled) {
+        updateMarkerPosition(initialPosition);
+      }
+
       watchId = await Gdp_Geolocation.watchUsersLocation(updateMarkerPosition, {
         enableHighAccuracy: true,
         timeout: 10000,
@@ -101,7 +124,7 @@ export function useUserLocationMarker({ map, isMapReady }: UseUserLocationMarker
         void Gdp_Geolocation.clearWatch(watchId);
       }
 
-      map.removeLayer(markerLayer);
+      markerLayer.setMap(null);
     };
-  }, [isMapReady, map]);
+  }, [enabled, isMapReady, map]);
 }

@@ -166,6 +166,12 @@
   --color-navy-emphasis: var(--figma-blue-10);
   --color-bg-navy-subtle: var(--figma-blue-1);
 
+  /* ── Formulaire de signalement : état conforme / non conforme (icônes Figma) ── */
+  --color-report-conform: #229574;
+  --color-report-conform-rgb: 34, 149, 116;
+  --color-report-non-conform: #ce0500;
+  --color-report-non-conform-rgb: 206, 5, 0;
+
   /* ── Texte gray ── */
   --color-text: var(--figma-gray-11);
   --color-text-title: var(--figma-gray-12);
@@ -193,7 +199,7 @@
   --color-border: var(--figma-gray-5);
   --color-border-strong: var(--figma-gray-8);
   --color-border-subtle: var(--figma-gray-3);
-  --color-divider: var(--figma-gray-4);
+  --color-divider: #D9D9D9;
 
   --color-border-active: var(--figma-green-5);
 
@@ -391,6 +397,7 @@ a:hover {
   --icon-wrap-xs: 2rem;   /* 32px - icône de base */
   --icon-wrap-sm: 2.25rem;   /* 36px - icône de base */
   --icon-wrap-md: 2.5rem;   /* 40px - icône de base */
+  --icon-wrap-lg: 3.5rem;   /* 56px - badge d'icône mis en avant (ex. carte news) */
 
   --icon-color-8: var(--figma-green-8);
   --icon-color-1: var(--figma-green-1);

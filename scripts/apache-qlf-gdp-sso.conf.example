@@ -1,0 +1,38 @@
+# Extrait du VirtualHost Apache (cadillac2 / sgm.ign.fr) — fichier type qlf-gdp.conf
+#
+# Modules : alias, rewrite, headers, setenvif, proxy, proxy_http, ssl.
+# Le .htaccess du dist (SPA) ne configure PAS ce proxy.
+#
+# /auth (login Keycloak) : le navigateur va chez sso.geopf.fr, pas ici.
+# /token et /revoke : l’app POSTe sur /qlf-gdp/__sso/… (same-origin).
+#
+# Ne pas utiliser RequestHeader unset … early dans <Location> (Apache 2.4
+# l’ignore : Origin part vers Keycloak → 403 Invalid origin).
+# Ne pas laisser RequestHeader set Host hors du SetEnvIf GDP_SSO
+# (sinon Host est réécrit pour toute l’appli).
+
+# Fichiers statiques : contenu de gdp-mobile/dist/
+Alias /qlf-gdp /var/www/intranet/qlf-gdp
+
+<Directory /var/www/intranet/qlf-gdp>
+    Options -Indexes +FollowSymLinks
+    AllowOverride FileInfo
+    Require all granted
+
+    RewriteEngine On
+    RewriteBase /qlf-gdp/
+    RewriteRule ^index\.html$ - [L]
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule . /qlf-gdp/index.html [L]
+</Directory>
+
+SSLProxyEngine On
+
+ProxyPass /qlf-gdp/__sso/ https://sso.geopf.fr/realms/geoplateforme/protocol/openid-connect/
+ProxyPassReverse /qlf-gdp/__sso/ https://sso.geopf.fr/realms/geoplateforme/protocol/openid-connect/
+
+SetEnvIf Request_URI "^/qlf-gdp/__sso/" GDP_SSO
+RequestHeader set Host "sso.geopf.fr" env=GDP_SSO
+RequestHeader unset Origin env=GDP_SSO
+RequestHeader unset Referer env=GDP_SSO

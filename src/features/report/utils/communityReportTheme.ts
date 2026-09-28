@@ -36,7 +36,7 @@ function readCommunityThemeAttributeName(raw: Record<string, unknown>): string |
   return null;
 }
 
-export function normalizeCommunityThemeAttribute(raw: unknown): CommunityThemeAttribute | null {
+function normalizeCommunityThemeAttribute(raw: unknown): CommunityThemeAttribute | null {
   if (!isRecord(raw)) {
     return null;
   }
@@ -61,7 +61,7 @@ export function normalizeCommunityThemeAttribute(raw: unknown): CommunityThemeAt
   };
 }
 
-export function normalizeCommunityThemeAttributes(raw: unknown): CommunityThemeAttribute[] {
+function normalizeCommunityThemeAttributes(raw: unknown): CommunityThemeAttribute[] {
   if (!Array.isArray(raw)) {
     return [];
   }
@@ -203,13 +203,6 @@ export function extractThemeConfigsFromCommunity(
   return configs;
 }
 
-export function listGdpCommunityThemeNamesFromConfigs(
-  configs: CommunityThemeConfig[],
-): string[] {
-  return configs
-    .filter((entry) => entry.communityId === GDP_REPORT_COMMUNITY_ID)
-    .map((entry) => entry.theme);
-}
 
 export function extractCommunityReportThemeFromConfigs(
   configs: CommunityThemeConfig[],
@@ -275,14 +268,3 @@ export function validateThemeAttributeValue(
   return undefined;
 }
 
-export function getThemeAttributeListOptions(
-  attribute: CommunityThemeAttribute,
-): readonly { value: string; label: string }[] {
-  return [
-    { value: '', label: 'Sélectionner…' },
-    ...(attribute.values ?? []).map((optionValue) => ({
-      value: optionValue,
-      label: optionValue,
-    })),
-  ];
-}

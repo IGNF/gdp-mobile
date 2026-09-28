@@ -13,7 +13,7 @@ export function formatDate(date: Date): string {
   return DATE_FORMATTER.format(date);
 }
 
-export function formatTime(date: Date): string {
+function formatTime(date: Date): string {
   return TIME_FORMATTER.format(date);
 }
 

@@ -2,7 +2,6 @@ import LayerGroup from 'ol/layer/Group';
 import ol_layer_Geoportail from 'ol-ext/layer/Geoportail';
 import {
   DEFAULT_GEOPORTAIL_LAYERS,
-  GEOPORTAIL_API_KEY,
   GEOPORTAIL_LAYER_TITLES,
   GEOPORTAIL_LAYERS,
   GEOPORTAIL_PRIVATE_SCAN_API_KEY,
@@ -32,12 +31,6 @@ interface GeoportailCapability {
   maxZoom?: number;
 }
 
-interface GeoportailEndpointConfig {
-  server: string;
-  gppKey: string;
-}
-
-const GEOPORTAIL_PROXY_SERVER = 'https://wxs.ign.fr/proxy/';
 
 // Type augmentation for missing static property in type definitions
 const GeoportailClass = ol_layer_Geoportail as typeof ol_layer_Geoportail & {
@@ -78,28 +71,6 @@ function patchPrivateScanCapabilities(): void {
 
 patchPrivateScanCapabilities();
 
-function getGeoportailEndpointConfig(url: string): GeoportailEndpointConfig {
-  const serverUrl = url.split('?')[0];
-
-  if (serverUrl.includes('data.geopf.fr/private')) {
-    return {
-      server: GEOPORTAIL_PRIVATE_WMTS_SERVER,
-      gppKey: GEOPORTAIL_PRIVATE_SCAN_API_KEY,
-    };
-  }
-
-  if (serverUrl.includes('data.geopf.fr')) {
-    return {
-      server: 'https://data.geopf.fr/wmts',
-      gppKey: GEOPORTAIL_PUBLIC_GPF_KEY,
-    };
-  }
-
-  return {
-    server: GEOPORTAIL_PROXY_SERVER,
-    gppKey: GEOPORTAIL_API_KEY,
-  };
-}
 
 function getDefaultGeoportailLayerConfig(
   layerName: string,
@@ -121,7 +92,7 @@ let geoportailCapabilitiesPromise: Promise<void> | null = null;
  * Une seule requête GetCapabilities partagée (même en StrictMode / cartes multiples).
  * Ne bloque pas l’affichage : les defaults ol-ext suffisent en attendant.
  */
-export function initGeoportailCapabilities(): Promise<void> {
+function initGeoportailCapabilities(): Promise<void> {
   if (!geoportailCapabilitiesPromise) {
     geoportailCapabilitiesPromise = (async () => {
       const [publicCapabilities, privateCapabilities] = await Promise.all([
@@ -150,7 +121,7 @@ export function preloadGeoportailCapabilities(): void {
   });
 }
 
-export function createGeoportailLayer(config: GeoportailLayerConfig): ol_layer_Geoportail {
+function createGeoportailLayer(config: GeoportailLayerConfig): ol_layer_Geoportail {
   const { name, visible = false, opacity = 1 } = config;
   const capability = GeoportailClass.capabilities[name];
   const server = config.server ?? capability?.server;
@@ -191,7 +162,7 @@ export function createGeoportailLayer(config: GeoportailLayerConfig): ol_layer_G
   return layer;
 }
 
-export function getGeoportailLayerTitle(layerName: string): string {
+function getGeoportailLayerTitle(layerName: string): string {
   return GEOPORTAIL_LAYER_TITLES[layerName] ?? layerName;
 }
 
@@ -233,4 +204,3 @@ export function getGeoportailLayerGroup(map: import('ol/Map').default): LayerGro
   return group instanceof LayerGroup ? group : null;
 }
 
-export { GEOPORTAIL_API_KEY, getGeoportailEndpointConfig };

@@ -2,7 +2,6 @@ import type { GdpRgp2DispoState } from '@ign/gdp-tools';
 
 import type { NearestRgpStation } from '@/features/map/hooks/useNearestRgpStations';
 import { Loading } from '@/shared/ui/Loading';
-import IconArrowLeft from '@/shared/assets/icons/icon-arrow-left.svg?react';
 import IconCheck from '@/shared/assets/icons/icon-check.svg?react';
 import IconClose from '@/shared/assets/icons/icon-close.svg?react';
 import IconReset from '@/shared/assets/icons/icon-reset.svg?react';
@@ -17,7 +16,6 @@ export interface BrowseRgpStationsListProps {
   isReloading: boolean;
   lastLoadedAt: Date | null;
   error: string | null;
-  onBack: () => void;
   onRefresh: () => void;
   onSelectStation: (longitude: number, latitude: number) => void;
 }
@@ -49,19 +47,11 @@ export function BrowseRgpStationsList({
   isReloading,
   lastLoadedAt,
   error,
-  onBack,
   onRefresh,
   onSelectStation,
 }: BrowseRgpStationsListProps) {
   return (
     <div className={styles.browseRgpPanel}>
-      <header className={styles.browseRgpHeader}>
-        <button type="button" className={styles.browseRgpBackButton} onClick={onBack} aria-label="Retour">
-          <IconArrowLeft className={styles.browseRgpBackIcon} aria-hidden />
-        </button>
-        <h2 className={styles.browseRgpTitle}>Stations RGP</h2>
-      </header>
-
       <div className={styles.rgpUpdateRow}>
         <p className={styles.rgpUpdateText}>
           {lastLoadedAt

@@ -11,13 +11,17 @@ import Cluster from 'ol/source/Cluster';
 import VectorSource from 'ol/source/Vector';
 
 import type { GroupReport } from '@/domain/report/groupReportModels';
+import type { LocalReportDraft } from '@/domain/report/localReportDraft';
 import {
   createGroupReportMapFeatures,
+  createLocalReportDraftMapFeatures,
   getGroupReportFromMapFeature,
+  getLocalReportDraftFromMapFeature,
 } from '@/features/map/utils/reportMapFeatures';
 import { loadReportsInMapBbox } from '@/features/map/utils/loadReportsInMapBbox';
-import { styleReportMapFeature } from '@/features/map/utils/reportStatusMapMarkerStyle';
+import { styleLocalReportDraftMapFeature, styleReportMapFeature } from '@/features/map/utils/reportStatusMapMarkerStyle';
 import {
+  MY_LOCAL_DRAFTS_MAP_LAYER_NAME,
   MY_REPORTS_MAP_LAYER_NAME,
   REPORT_MAP_CLUSTER_DISTANCE,
   REPORT_MAP_LAYER_GROUP_NAME,
@@ -32,7 +36,9 @@ interface UseReportMapLayersOptions {
   isAuthenticated: boolean;
   userId: number | undefined;
   visibility: ReportMapLayerVisibility;
+  localDrafts: readonly LocalReportDraft[];
   onReportSelect: (report: GroupReport) => void;
+  onLocalDraftSelect: (draft: LocalReportDraft) => void;
 }
 
 function findReportLayerGroup(map: OlMap): LayerGroup | null {
@@ -60,6 +66,13 @@ function getReportLayerByName(map: OlMap, layerName: string): VectorLayer<Vector
   return null;
 }
 
+function clearClusteredLayerSource(layer: VectorLayer<VectorSource> | null): void {
+  const clusterSource = layer?.getSource();
+  if (clusterSource instanceof Cluster) {
+    clusterSource.getSource()?.clear(true);
+  }
+}
+
 function deduplicateFeatures(features: Feature[]): Feature[] {
   const byId = new globalThis.Map<string, Feature>();
 
@@ -78,10 +91,14 @@ export function useReportMapLayers({
   isAuthenticated,
   userId,
   visibility,
+  localDrafts,
   onReportSelect,
+  onLocalDraftSelect,
 }: UseReportMapLayersOptions): void {
   const onReportSelectRef = useRef(onReportSelect);
   onReportSelectRef.current = onReportSelect;
+  const onLocalDraftSelectRef = useRef(onLocalDraftSelect);
+  onLocalDraftSelectRef.current = onLocalDraftSelect;
 
   useEffect(() => {
     if (!map || !isMapReady) {
@@ -105,13 +122,30 @@ export function useReportMapLayers({
       zIndex: REPORT_MAP_LAYER_Z_INDEX,
     });
 
+    const localDraftsSource = new VectorSource<Feature>();
+    const localDraftsClusterSource = new Cluster({
+      source: localDraftsSource,
+      distance: REPORT_MAP_CLUSTER_DISTANCE,
+    });
+
+    const localDraftsLayer = new VectorLayer({
+      source: localDraftsClusterSource,
+      style: (feature) => styleLocalReportDraftMapFeature(feature as Feature),
+      properties: {
+        name: MY_LOCAL_DRAFTS_MAP_LAYER_NAME,
+        title: 'Mes brouillons',
+        displayInLayerSwitcher: false,
+      },
+      zIndex: REPORT_MAP_LAYER_Z_INDEX,
+    });
+
     const reportLayerGroup = new LayerGroup({
       properties: {
         name: REPORT_MAP_LAYER_GROUP_NAME,
         title: 'Signalements',
         displayInLayerSwitcher: false,
       },
-      layers: [myReportsLayer],
+      layers: [myReportsLayer, localDraftsLayer],
       zIndex: REPORT_MAP_LAYER_Z_INDEX,
     });
 
@@ -128,21 +162,20 @@ export function useReportMapLayers({
     }
 
     const myReportsLayer = getReportLayerByName(map, MY_REPORTS_MAP_LAYER_NAME);
+    const localDraftsLayer = getReportLayerByName(map, MY_LOCAL_DRAFTS_MAP_LAYER_NAME);
     const reportLayerGroup = findReportLayerGroup(map);
 
-    if (!myReportsLayer || !reportLayerGroup) {
+    if (!myReportsLayer || !localDraftsLayer || !reportLayerGroup) {
       return;
     }
 
     myReportsLayer.setVisible(visibility.myReports);
+    localDraftsLayer.setVisible(visibility.myReports);
     reportLayerGroup.setVisible(visibility.myReports);
 
     if (!visibility.myReports) {
-      const clusterSource = myReportsLayer.getSource();
-      if (clusterSource instanceof Cluster) {
-        const innerSource = clusterSource.getSource();
-        innerSource?.clear(true);
-      }
+      clearClusteredLayerSource(myReportsLayer);
+      clearClusteredLayerSource(localDraftsLayer);
     }
   }, [isMapReady, map, visibility.myReports]);
 
@@ -205,6 +238,26 @@ export function useReportMapLayers({
   }, [isAuthenticated, isMapReady, map, userId, visibility.myReports]);
 
   useEffect(() => {
+    if (!map || !isMapReady || !visibility.myReports) {
+      return;
+    }
+
+    const localDraftsLayer = getReportLayerByName(map, MY_LOCAL_DRAFTS_MAP_LAYER_NAME);
+    const clusterSource = localDraftsLayer?.getSource();
+    if (!(clusterSource instanceof Cluster)) {
+      return;
+    }
+
+    const source = clusterSource.getSource();
+    if (!source) {
+      return;
+    }
+
+    source.clear(true);
+    source.addFeatures(deduplicateFeatures(createLocalReportDraftMapFeatures(localDrafts)));
+  }, [isMapReady, localDrafts, map, visibility.myReports]);
+
+  useEffect(() => {
     if (!map || !isMapReady) {
       return;
     }
@@ -219,7 +272,7 @@ export function useReportMapLayers({
         return;
       }
 
-      const hit = { feature: null as Feature | null };
+      const hit = { feature: null as Feature | null, layerName: null as string | null };
 
       map.forEachFeatureAtPixel(
         event.pixel,
@@ -228,11 +281,13 @@ export function useReportMapLayers({
             return undefined;
           }
 
-          if (layer.get('name') !== MY_REPORTS_MAP_LAYER_NAME) {
+          const layerName = layer.get('name');
+          if (layerName !== MY_REPORTS_MAP_LAYER_NAME && layerName !== MY_LOCAL_DRAFTS_MAP_LAYER_NAME) {
             return undefined;
           }
 
           hit.feature = featureLike as Feature;
+          hit.layerName = layerName;
           return true;
         },
         {
@@ -271,6 +326,15 @@ export function useReportMapLayers({
       }
 
       const targetFeature = clusteredFeatures?.[0] ?? selectedFeature;
+
+      if (hit.layerName === MY_LOCAL_DRAFTS_MAP_LAYER_NAME) {
+        const draft = getLocalReportDraftFromMapFeature(targetFeature);
+        if (draft) {
+          onLocalDraftSelectRef.current(draft);
+        }
+        return;
+      }
+
       const report = getGroupReportFromMapFeature(targetFeature);
       if (report) {
         onReportSelectRef.current(report);

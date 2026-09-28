@@ -18,7 +18,7 @@ export interface SelectVisibleNewsParams extends SelectCurrentNewsParams {
   persistedDismissedIds: ReadonlySet<string>;
 }
 
-export function isNewsItemActive(item: GdpNewsItem, now: Date): boolean {
+function isNewsItemActive(item: GdpNewsItem, now: Date): boolean {
   const start = Date.parse(item.startsAt);
   const end = Date.parse(item.endsAt);
   if (Number.isNaN(start) || Number.isNaN(end)) {

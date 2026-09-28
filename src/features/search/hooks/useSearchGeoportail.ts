@@ -6,6 +6,7 @@ import SearchGeoportail from 'ol-ext/control/SearchGeoportail';
 import type { Options as SearchGeoportailOptions } from 'ol-ext/control/SearchGeoportail';
 import type { SearchEvent } from 'ol-ext/control/Search';
 import 'ol-ext/control/Search.css';
+import '@/features/search/styles/searchMarker.css';
 
 import {
   DEFAULT_MAP_SEARCH_ZOOM,
@@ -18,7 +19,8 @@ import { fromLonLat } from 'ol/proj';
 
 interface UseSearchGeoportailOptions {
   map: Map | null;
-  addressContainerRef: React.RefObject<HTMLDivElement | null>;
+  /** Conteneur DOM actuel — à passer via callback ref, pas un `useRef` (le nœud peut être remonté). */
+  addressContainer: HTMLElement | null;
   isOpen: boolean;
   placeholder?: string;
   onFocus?: () => void;
@@ -26,7 +28,6 @@ interface UseSearchGeoportailOptions {
 }
 
 export interface UseSearchGeoportailReturn {
-  clearMarker: () => void;
   selectHistoryEntry: (entry: AddressSearchHistoryEntry) => void;
 }
 
@@ -40,7 +41,7 @@ function clearAutocompleteList(container: HTMLElement | null, selector: string) 
 
 export function useSearchGeoportail({
   map,
-  addressContainerRef,
+  addressContainer,
   isOpen,
   placeholder = 'Rechercher une adresse',
   onFocus,
@@ -87,12 +88,12 @@ export function useSearchGeoportail({
   );
 
   useEffect(() => {
-    if (!map || !isOpen || !addressContainerRef.current) {
+    if (!map || !isOpen || !addressContainer) {
       return;
     }
 
     const addressOptions: SearchGeoportailOptions = {
-      target: addressContainerRef.current,
+      target: addressContainer,
       apiKey: GEOPORTAIL_API_KEY,
       className: SEARCH_GEOPORTAIL_CLASS_NAME,
       placeholder,
@@ -106,7 +107,7 @@ export function useSearchGeoportail({
     addressSearch.set('copy', null);
     addressSearch.setMap(map);
 
-    const container = addressContainerRef.current;
+    const container = addressContainer;
     const input = container.querySelector<HTMLInputElement>('input.search');
 
     const hideAutocomplete = () => {
@@ -165,7 +166,7 @@ export function useSearchGeoportail({
       addressSearch.setMap(null as unknown as Map);
       clearMarker();
     };
-  }, [addressContainerRef, clearMarker, isOpen, map, onFocus, onSelect, placeholder, showMarkerAtCoordinate]);
+  }, [addressContainer, clearMarker, isOpen, map, onFocus, onSelect, placeholder, showMarkerAtCoordinate]);
 
   const selectHistoryEntry = useCallback(
     (entry: AddressSearchHistoryEntry) => {
@@ -176,7 +177,7 @@ export function useSearchGeoportail({
       const coordinate = fromLonLat([entry.longitude, entry.latitude]);
       showMarkerAtCoordinate(coordinate);
 
-      const input = addressContainerRef.current?.querySelector<HTMLInputElement>('input.search');
+      const input = addressContainer?.querySelector<HTMLInputElement>('input.search');
       if (input) {
         input.value = entry.subtitle ? `${entry.title}, ${entry.subtitle}` : entry.title;
         input.blur();
@@ -184,8 +185,8 @@ export function useSearchGeoportail({
 
       onSelect?.();
     },
-    [addressContainerRef, map, onSelect, showMarkerAtCoordinate],
+    [addressContainer, map, onSelect, showMarkerAtCoordinate],
   );
 
-  return { clearMarker, selectHistoryEntry };
+  return { selectHistoryEntry };
 }

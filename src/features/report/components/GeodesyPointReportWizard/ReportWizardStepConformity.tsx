@@ -3,6 +3,8 @@ import { useState } from 'react';
 import { joinCSSClassNames } from '@/shared/utils/join';
 import IconCheck from '@/shared/assets/icons/icon-check.svg?react';
 import IconClose from '@/shared/assets/icons/icon-close.svg?react';
+import IconConforme from '@/shared/assets/icons/icon-conforme.svg?react';
+import IconNonConforme from '@/shared/assets/icons/icon-non-conforme.svg?react';
 
 import styles from './ReportWizardStepConformity.module.css';
 
@@ -53,14 +55,11 @@ export function ReportWizardStepConformity({ isConform, onChange }: ReportWizard
           onBlur={() => setHoveredCard((current) => (current === 'conform' ? null : current))}
         >
           <div className={styles.cardRow}>
-            <span className={joinCSSClassNames(styles.stateIcon, styles.stateIconConform)}>
-              <IconCheck className={styles.stateIconSvg} aria-hidden />
-            </span>
+            <IconConforme className={styles.stateIcon} aria-hidden />
             <span className={styles.cardText}>
               <span className={joinCSSClassNames(styles.cardLabel, styles.cardLabelConform)}>
                 Conforme
               </span>
-              <span className={styles.cardDescription}>Lorem ipsum dolor sit amet</span>
             </span>
             <span
               className={joinCSSClassNames(styles.radio, styles.radioConform, isConform === true && styles.radioChecked)}
@@ -72,7 +71,6 @@ export function ReportWizardStepConformity({ isConform, onChange }: ReportWizard
             className={joinCSSClassNames(styles.criteriaWrapper, isConformExpanded && styles.criteriaWrapperExpanded)}
           >
             <div className={styles.criteria}>
-              <p className={styles.criteriaTitle}>Critères de conformité</p>
               <ul className={styles.criteriaList}>
                 {CONFORMITY_CRITERIA.map((criterion, index) => (
                   <li key={index} className={styles.criteriaItem}>
@@ -101,14 +99,11 @@ export function ReportWizardStepConformity({ isConform, onChange }: ReportWizard
           onBlur={() => setHoveredCard((current) => (current === 'nonConform' ? null : current))}
         >
           <div className={styles.cardRow}>
-            <span className={joinCSSClassNames(styles.stateIcon, styles.stateIconNonConform)}>
-              <IconClose className={styles.stateIconSvg} aria-hidden />
-            </span>
+            <IconNonConforme className={styles.stateIcon} aria-hidden />
             <span className={styles.cardText}>
               <span className={joinCSSClassNames(styles.cardLabel, styles.cardLabelNonConform)}>
                 Non Conforme
               </span>
-              <span className={styles.cardDescription}>Lorem ipsum dolor sit amet</span>
             </span>
             <span
               className={joinCSSClassNames(
@@ -127,7 +122,6 @@ export function ReportWizardStepConformity({ isConform, onChange }: ReportWizard
             )}
           >
             <div className={styles.criteria}>
-              <p className={styles.criteriaTitle}>Motifs de non-conformité</p>
               <ul className={styles.criteriaList}>
                 {NON_CONFORMITY_CRITERIA.map((criterion, index) => (
                   <li key={index} className={styles.criteriaItem}>

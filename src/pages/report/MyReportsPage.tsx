@@ -77,7 +77,8 @@ export function MyReportsPage() {
             <p className="body">
               Vous n'êtes pas connecté. Connectez-vous pour consulter vos signalements.
             </p>
-            <Button type="button" fullWidth onClick={() => navigate('/login')}>
+
+            <Button type="button" className={styles.actionButton} fullWidth onClick={() => navigate('/login')}>
               Se connecter
             </Button>
           </div>

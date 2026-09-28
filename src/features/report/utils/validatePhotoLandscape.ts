@@ -34,7 +34,7 @@ async function readImageDimensions(
 }
 
 /** Largeur >= hauteur (createImageBitmap tient compte de l’orientation EXIF). */
-export async function isLandscapePhoto(file: File): Promise<boolean> {
+async function isLandscapePhoto(file: File): Promise<boolean> {
   const dimensions = await readImageDimensions(file);
   if (!dimensions) {
     return true;
@@ -54,4 +54,4 @@ export async function validatePhotoLandscape(
   return { valid: false, message: LANDSCAPE_REQUIRED_MESSAGE };
 }
 
-export { LANDSCAPE_REQUIRED_MESSAGE };
+

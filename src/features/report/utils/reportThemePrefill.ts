@@ -1,6 +1,7 @@
 import type { GeodesyPointReportContext } from '@ign/gdp-tools';
 import {
   buildGeodesyPointReportPrefillMap,
+  coerceGeodesyPointReportListValue,
   normalizeGeodesyPointReportAttributeName,
   resolveGeodesyPointReportPrefillValue,
   shouldShowGeodesyPointReportThemeAttribute,
@@ -10,19 +11,9 @@ import type { CommunityThemeAttribute, CommunityThemeConfig } from '@/domain/com
 import { mergeThemeAttributeValues } from '@/features/report/utils/communityReportTheme';
 
 function matchThemeListValue(attribute: CommunityThemeAttribute, value: string): string {
-  if (attribute.type !== 'list' || !attribute.values?.length) {
-    return value;
-  }
-
-  const exact = attribute.values.find((option) => option === value);
-  if (exact) {
-    return exact;
-  }
-
-  const insensitive = attribute.values.find(
-    (option) => option.toLowerCase() === value.toLowerCase(),
+  return (
+    coerceGeodesyPointReportListValue(attribute.name, value, attribute.values ?? []) ?? value
   );
-  return insensitive ?? value;
 }
 
 function resolveThemeAttributePrefillValue(

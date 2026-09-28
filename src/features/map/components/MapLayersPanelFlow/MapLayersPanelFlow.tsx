@@ -460,5 +460,3 @@ export function MapLayersPanelFlow({
     </>
   );
 }
-
-export { countActiveMapGeodesyFilters } from '@/features/map/components/MapGeodesyFiltersPanel';

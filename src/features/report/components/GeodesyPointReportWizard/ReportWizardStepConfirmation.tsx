@@ -9,11 +9,15 @@ const RAY_ANGLES = [0, 45, 90, 135, 180, 225, 270, 315];
 export interface ReportWizardStepConfirmationProps {
   onSendLater: () => void;
   onSendNow: () => void;
+  isSubmitting?: boolean;
+  submitError?: string | null;
 }
 
 export function ReportWizardStepConfirmation({
   onSendLater,
   onSendNow,
+  isSubmitting = false,
+  submitError = null,
 }: ReportWizardStepConfirmationProps) {
   return (
     <div className={styles.step}>
@@ -36,12 +40,13 @@ export function ReportWizardStepConfirmation({
         Votre signalement a été sauvegardé localement. Voulez-vous l&apos;envoyer maintenant ?
         Retrouvez-le dans la page « signalements ».
       </p>
+      {submitError ? <p className={styles.errorText}>{submitError}</p> : null}
 
       <div className={styles.actions}>
-        <Button type="button" variant="outline" fullWidth onClick={onSendLater}>
+        <Button type="button" variant="outline" fullWidth onClick={onSendLater} disabled={isSubmitting}>
           Envoyer plus tard
         </Button>
-        <Button type="button" fullWidth onClick={onSendNow}>
+        <Button type="button" fullWidth onClick={onSendNow} loading={isSubmitting}>
           Envoyer maintenant
         </Button>
       </div>

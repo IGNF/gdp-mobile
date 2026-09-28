@@ -6,7 +6,7 @@ import { GEODESY_REPORT_THEME } from '@/features/report/constants/geodesyReportA
 export const GDP_REPORT_COMMUNITY_ID = Number(config.report.communityId) || 96;
 
 /** Thèmes à afficher sur la carte (filtre GET /reports). */
-export const GDP_REPORT_DISPLAY_THEMES = config.report.displayThemes.length > 0
+const GDP_REPORT_DISPLAY_THEMES = config.report.displayThemes.length > 0
   ? config.report.displayThemes
   : [GEODESY_REPORT_THEME];
 

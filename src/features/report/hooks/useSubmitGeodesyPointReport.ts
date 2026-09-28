@@ -1,6 +1,7 @@
 import {
   buildGeodesyReportAttachmentsBody,
   GEODESY_POINT_REPORT_PHOTO_SLOTS,
+  GDP_POINT_REPORT_THEME_ATTRIBUTE_KEYS,
   mapGeodesyPointReportToApiBody,
   type GeodesyPointReportContext,
   type GeodesyPointReportPhotoRole,
@@ -104,20 +105,21 @@ export function useSubmitGeodesyPointReport() {
           return null;
         }
 
-        const themeConfigs = await fetchGdpCommunityThemeConfigs();
+        const themeConfigs = await fetchGdpCommunityThemeConfigs({ forceRefresh: true });
         const theme = extractGeodesyReportThemeFromConfigs(themeConfigs);
         const themeName = GDP_REPORT_SUBMISSION_THEME;
         const deviceInfo = await getReportSubmissionDeviceInfo();
         const body = mapGeodesyPointReportToApiBody(reportContext, {
           communityId: GDP_REPORT_COMMUNITY_ID,
           theme: themeName,
-          comment: buildGeodesyReportSubmissionComment(comment, themeName, deviceInfo),
+          comment: buildGeodesyReportSubmissionComment(comment, deviceInfo),
           themeAttributes: buildGeodesyPointReportThemeAttributesForSubmit(
             reportContext,
             theme,
             formThemeAttributes,
             themeName,
           ),
+          attributeKeys: GDP_POINT_REPORT_THEME_ATTRIBUTE_KEYS,
         });
 
         const response = await collabApiClient.report.add(body);

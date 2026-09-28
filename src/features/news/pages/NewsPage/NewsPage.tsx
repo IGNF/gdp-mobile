@@ -1,6 +1,7 @@
 import type { GdpNewsItem } from '@/domain/news/models';
-import { GdpNewsBanner } from '@/features/news/components/GdpNewsBanner/GdpNewsBanner';
+import { NEWS_SEVERITY_VISUALS } from '@/features/news/utils/newsSeverityVisuals';
 import { formatDate } from '@/shared/utils/date';
+import { ExternalLink } from '@/shared/ui/ExternalLink';
 import { Loading } from '@/shared/ui/Loading';
 import { PageHeader } from '@/shared/ui/PageHeader';
 import { SlideUpPage } from '@/shared/ui/SlideUpPage';
@@ -47,10 +48,27 @@ export function NewsPage({ isOpen, onClose, items, isLoading = false, level = 1 
           <ul className={styles.list}>
             {items.map((item) => {
               const period = formatNewsPeriod(item.startsAt, item.endsAt);
+              const visual = NEWS_SEVERITY_VISUALS[item.severity];
               return (
                 <li key={item.id} className={styles.item}>
                   {period ? <p className={styles.period}>{period}</p> : null}
-                  <GdpNewsBanner item={item} />
+                  <div className={styles.card}>
+                    <span
+                      className={styles.iconBadge}
+                      style={{ background: visual.background, color: visual.color }}
+                    >
+                      <visual.Icon aria-hidden />
+                    </span>
+                    <div className={styles.cardBody}>
+                      <p className={styles.cardTitle}>{item.title}</p>
+                      <p className={styles.cardText}>{item.body}</p>
+                      {item.cta ? (
+                        <ExternalLink href={item.cta.url} className={styles.cardCta}>
+                          {item.cta.label}
+                        </ExternalLink>
+                      ) : null}
+                    </div>
+                  </div>
                 </li>
               );
             })}

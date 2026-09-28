@@ -1,5 +1,6 @@
 # Fallback SPA pour déploiement sous un sous-chemin (ex. /qlf-gdp/)
 # Copié en dist/.htaccess par npm run build:qualif
+# Ne configure pas le proxy OAuth /__sso (VirtualHost uniquement, voir apache-qlf-gdp-sso.conf.example).
 
 <IfModule mod_rewrite.c>
   RewriteEngine On
