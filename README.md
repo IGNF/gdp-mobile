@@ -65,6 +65,8 @@ Le `.htaccess` copié dans `dist/` ne gère que le fallback SPA ; le proxy OAuth
 | `VITE_GDP_REPORT_DISPLAY_THEMES` | Thèmes à afficher                    |
 | `VITE_GDP_REPORT_SUBMISSION_THEME` | Thème pour les signalements        |
 | `VITE_GDP_NEWS_URL`              | JSON news / alertes ([docs/NEWS.md](./docs/NEWS.md)) |
+| `VITE_MATOMO_URL`                | Serveur Matomo ([docs/MATOMO.md](./docs/MATOMO.md)) |
+| `VITE_MATOMO_SITE_ID`            | Site Matomo (prod : `19`) |
 
 
 ## Déploiement avec tag 
@@ -145,4 +147,6 @@ Depuis la racine du monorepo, les mêmes noms marchent pour `dev`, `build`, `bui
 - [Fiche point (carte)](./docs/FICHE_POINT.md)
 - [Mode d'emploi](./docs/MODE_EMPLOI.md)
 - [Configuration des thèmes de signalement](./docs/CONFIGURATION_THEMES.md)
+- [Contrat d’échange des signalements](./docs/CONTRAT_SIGNALEMENTS.md)
 - [News et alertes](./docs/NEWS.md)
+- [Statistiques Matomo](./docs/MATOMO.md)

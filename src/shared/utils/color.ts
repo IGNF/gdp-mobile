@@ -1,14 +1,14 @@
-/** Lit une variable `--color-{name}` définie dans `src/styles/global.css`. */
-export function getColorCode(colorName: string): string {
-  const raw = getComputedStyle(document.documentElement)
-    .getPropertyValue(`--color-${colorName}`)
-    .trim();
-
+/**
+ * Résout une valeur CSS de couleur (ex. `var(--color-primary)`, `rgba(var(--color-danger-rgb), 0.14)`)
+ * en couleur calculée. Nécessaire pour les marqueurs OpenLayers : ce sont des SVG en data-URI,
+ * où `var(--…)` n'est pas résolu.
+ */
+export function resolveCssColor(value: string): string {
+  const raw = value.trim();
   if (!raw) {
     return '';
   }
 
-  // Les marqueurs OpenLayers sont des SVG en data-URI : `var(--…)` n'y est pas résolu.
   if (!raw.includes('var(')) {
     return raw;
   }
@@ -20,4 +20,17 @@ export function getColorCode(colorName: string): string {
   probe.remove();
 
   return resolved || raw;
+}
+
+/** Lit une variable `--color-{name}` définie dans `src/styles/global.css`. */
+export function getColorCode(colorName: string): string {
+  const raw = getComputedStyle(document.documentElement)
+    .getPropertyValue(`--color-${colorName}`)
+    .trim();
+
+  if (!raw) {
+    return '';
+  }
+
+  return resolveCssColor(raw);
 }

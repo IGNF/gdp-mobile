@@ -27,6 +27,11 @@ const OAUTH_CODE_VERIFIER_KEY = 'temp_code_verifier';
 /** Après une déconnexion explicite, force une saisie SSO (évite un SSO « fantôme »). */
 const OAUTH_FORCE_LOGIN_KEY = 'gdp_oauth_force_login';
 const REVOKE_TIMEOUT_MS = 2500;
+/** Horodatage de la dernière relance SSO automatique depuis le callback (anti-boucle). */
+const OAUTH_CALLBACK_RETRY_KEY = 'gdp_oauth_callback_retry_at';
+const OAUTH_CALLBACK_RETRY_WINDOW_MS = 60_000;
+/** Nom d’erreur : code OAuth inutilisable (vérificateur PKCE absent, code déjà consommé ou expiré). */
+const STALE_OAUTH_CALLBACK_ERROR = 'StaleOAuthCallback';
 
 let authManagerInstance: AuthManager | null = null;
 let authManagerTokenBaseUrl: string | null = null;
@@ -241,6 +246,46 @@ async function clearStoredAuthState(): Promise<void> {
   await Promise.all(keys.map((key) => Storage.remove(storageKey(key))));
 }
 
+function staleOAuthCallbackError(message: string, cause?: unknown): Error {
+  const error = authError(message, cause);
+  error.name = STALE_OAUTH_CALLBACK_ERROR;
+  return error;
+}
+
+/**
+ * Le callback a échoué parce que le code reçu n’est plus échangeable (onglet restauré,
+ * rechargement, retour arrière…) : relancer le SSO suffit, Keycloak renvoie un code neuf
+ * sans ressaisie si sa session (« Se souvenir de moi ») est encore valide.
+ */
+export function isStaleOAuthCallbackError(error: Error | undefined): boolean {
+  return error?.name === STALE_OAUTH_CALLBACK_ERROR;
+}
+
+/**
+ * Autorise une seule relance SSO automatique par fenêtre de 60 s, pour ne pas boucler
+ * si l’échec n’est pas dû à un code périmé (ex. URI de redirection mal configurée).
+ */
+export function consumeOAuthCallbackRetry(): boolean {
+  try {
+    const lastRetryAt = Number(sessionStorage.getItem(OAUTH_CALLBACK_RETRY_KEY));
+    if (lastRetryAt && Date.now() - lastRetryAt < OAUTH_CALLBACK_RETRY_WINDOW_MS) {
+      return false;
+    }
+    sessionStorage.setItem(OAUTH_CALLBACK_RETRY_KEY, String(Date.now()));
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function resetOAuthCallbackRetry(): void {
+  try {
+    sessionStorage.removeItem(OAUTH_CALLBACK_RETRY_KEY);
+  } catch {
+    // sessionStorage indisponible : rien à nettoyer.
+  }
+}
+
 function authError(message: string, cause?: unknown): Error {
   const error = new Error(message);
   if (cause instanceof Error) {
@@ -334,7 +379,9 @@ async function exchangeAuthorizationCode(code: string): Promise<AuthResult> {
       return {
         success: false,
         user: null,
-        error: authError('Session OAuth expirée. Relancez la connexion depuis la page de login.'),
+        error: staleOAuthCallbackError(
+          'Session OAuth expirée. Relancez la connexion depuis la page de login.',
+        ),
       };
     }
 
@@ -349,7 +396,7 @@ async function exchangeAuthorizationCode(code: string): Promise<AuthResult> {
       return {
         success: false,
         user: null,
-        error: authError(formatOAuthExchangeFailure(result.error), result.error),
+        error: staleOAuthCallbackError(formatOAuthExchangeFailure(result.error), result.error),
       };
     }
 
@@ -382,6 +429,9 @@ export function handleOAuthCallback(code: string): Promise<AuthResult> {
 
   const promise = exchangeAuthorizationCode(code)
     .then((result) => {
+      if (result.success) {
+        resetOAuthCallbackRetry();
+      }
       lastOAuthCallback = { code, result };
       return result;
     })
@@ -516,6 +566,10 @@ export async function restoreSession(): Promise<boolean> {
     }
 
     const refreshResult = await refreshAccessToken();
+    if (!refreshResult.success && refreshResult.error?.message === 'Session expirée') {
+      // Jetons périmés : on les oublie pour ne plus tenter de les restaurer à chaque ouverture.
+      await clearStoredAuthState();
+    }
     return refreshResult.success;
   } catch {
     return false;

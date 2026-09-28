@@ -1,0 +1,152 @@
+.stack {
+	position: fixed;
+	right: var(--spacing-md);
+	/* Au-dessus de la tabbar (hauteur 4.5rem + marge basse var(--spacing-xl)). */
+	bottom: calc(var(--safe-bottom) + 4.5rem + var(--spacing-xl) + var(--spacing-sm));
+	z-index: 1300;
+	display: flex;
+	flex-direction: column-reverse;
+	align-items: flex-end;
+	gap: var(--spacing-2xs);
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	max-width: min(20rem, calc(100vw - 2 * var(--spacing-md)));
+}
+
+/* Case qui s'effondre à la fermeture : c'est ce rétrécissement qui fait « descendre »
+   naturellement l'item empilé au-dessus, sans animation JS dédiée. */
+.slot {
+	display: grid;
+	grid-template-rows: 1fr;
+	max-width: 100%;
+	transition: grid-template-rows 0.25s var(--ease-material, ease-out);
+}
+
+.slotExiting {
+	grid-template-rows: 0fr;
+}
+
+.slotInner {
+	overflow: hidden;
+	min-width: 0;
+	min-height: 0;
+}
+
+.toast {
+	display: flex;
+	align-items: center;
+	gap: var(--spacing-4xs);
+	max-width: 100%;
+	padding: var(--spacing-2xs);
+	padding-left: var(--spacing-sm);
+	border-radius: var(--radius-pill);
+	background: rgba(255, 255, 255, 0.94);
+	box-shadow: var(--shadow-lg);
+	animation: toastIn 0.2s var(--ease-material, ease-out);
+	transition: opacity 0.25s var(--ease-material, ease-out), transform 0.25s var(--ease-material, ease-out);
+}
+
+.slotExiting .toast {
+	opacity: 0;
+	transform: translateX(120%);
+}
+
+.body {
+	display: flex;
+	align-items: center;
+	gap: var(--spacing-xs);
+	flex: 1 1 auto;
+	min-width: 0;
+	overflow: hidden;
+	padding: var(--spacing-xs) 0;
+	border: none;
+	background: none;
+	font: inherit;
+	text-align: left;
+	cursor: pointer;
+}
+
+.iconBadge {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+	width: var(--icon-wrap-xs);
+	height: var(--icon-wrap-xs);
+	border-radius: var(--radius-circle);
+}
+
+.iconBadge svg {
+	width: var(--icon-base);
+	height: var(--icon-base);
+}
+
+.iconBadge svg path {
+	fill: currentColor;
+}
+
+.message {
+	flex: 1 1 auto;
+	min-width: 0;
+	overflow: hidden;
+	color: var(--color-text);
+	font-size: var(--font-size-base);
+	font-weight: var(--font-weight-semibold);
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+.closeButton {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+	width: 1.75rem;
+	height: 1.75rem;
+	padding: 0;
+	border: none;
+	border-radius: var(--radius-circle);
+	background: none;
+	color: var(--color-text-secondary);
+	cursor: pointer;
+}
+
+.closeButton:hover {
+	background: var(--color-bg-hover);
+}
+
+.closeIcon {
+	width: 0.875rem;
+	height: 0.875rem;
+}
+
+.closeIcon path {
+	fill: currentColor;
+}
+
+@keyframes toastIn {
+	from {
+		opacity: 0;
+		transform: translateY(0.5rem);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.slot {
+		transition: none;
+	}
+
+	.toast {
+		animation: none;
+		transition: none;
+	}
+
+	.slotExiting .toast {
+		opacity: 0;
+	}
+}

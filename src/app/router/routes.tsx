@@ -1,6 +1,7 @@
-import { createBrowserRouter, Navigate } from 'react-router-dom';
+import { createBrowserRouter, Navigate, Outlet } from 'react-router-dom';
 
 import { isWelcomeSeen } from '@/features/welcome/hooks/useFirstRun';
+import { MatomoPageTracker } from '@/infra/analytics/MatomoPageTracker';
 import { config } from '@/shared/config/env';
 
 import { AuthCallbackPage } from '@/features/auth/pages/AuthCallback/AuthCallbackPage';
@@ -31,43 +32,57 @@ function HomeRedirect() {
   return <Navigate to={homeRedirectPath()} replace />;
 }
 
+function AppLayout() {
+  return (
+    <>
+      <MatomoPageTracker />
+      <Outlet />
+    </>
+  );
+}
+
 export const router = createBrowserRouter(
   [
     {
-      path: '/',
-      element: <HomeRedirect />,
-    },
-    {
-      path: '/welcome',
-      element: <WelcomePage />,
-    },
-    {
-      path: '/login',
-      element: <LoginPage />,
-    },
-    {
-      path: '/auth/callback',
-      element: <AuthCallbackPage />,
-    },
-    {
-      path: '/map',
-      element: <MapPage />,
-    },
-    {
-      path: '/reports',
-      element: <MyReportsPage />,
-    },
-    {
-      path: '/reports/history',
-      element: <ReportHistoryPage />,
-    },
-    {
-      path: '/reports/history/:id',
-      element: <ReportHistoryDetailPage />,
-    },
-    {
-      path: '/reports/:id',
-      element: <ReportDetailPage />,
+      element: <AppLayout />,
+      children: [
+        {
+          path: '/',
+          element: <HomeRedirect />,
+        },
+        {
+          path: '/welcome',
+          element: <WelcomePage />,
+        },
+        {
+          path: '/login',
+          element: <LoginPage />,
+        },
+        {
+          path: '/auth/callback',
+          element: <AuthCallbackPage />,
+        },
+        {
+          path: '/map',
+          element: <MapPage />,
+        },
+        {
+          path: '/reports',
+          element: <MyReportsPage />,
+        },
+        {
+          path: '/reports/history',
+          element: <ReportHistoryPage />,
+        },
+        {
+          path: '/reports/history/:id',
+          element: <ReportHistoryDetailPage />,
+        },
+        {
+          path: '/reports/:id',
+          element: <ReportDetailPage />,
+        },
+      ],
     },
   ],
   { basename: routerBasename() },

@@ -114,8 +114,6 @@ export function useGdpNews() {
     isLoading,
     items: visibleItems,
     currentItems,
-    banners: visibleItems.filter((item) => item.display !== 'modal'),
-    modal: visibleItems.find((item) => item.display === 'modal') ?? null,
     dismiss,
   };
 }

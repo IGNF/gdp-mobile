@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
   isGeodesyLayerReportingEnabled,
@@ -27,8 +27,11 @@ import { countActiveMapGeodesyFilters } from '@/features/map/components/MapGeode
 import type { MapLayerGroupId } from '@/features/map/types/mapLayerGroups';
 import type { GeodesyPointReportMapContext } from '@/domain/report/geodesyPointMapContext';
 import type { GroupReport } from '@/domain/report/groupReportModels';
+import type { LocalReportDraft } from '@/domain/report/localReportDraft';
+import { useLocalReportDrafts } from '@/features/report/hooks/useLocalReportDrafts';
 import { useMap } from '@/features/map/hooks/useMap';
 import { useMapGeodesyClick } from '@/features/map/hooks/useMapGeodesyClick';
+import { useMapPageMatomoTracking } from '@/features/map/hooks/useMapPageMatomoTracking';
 import { useMapClickSelectionMarker } from '@/features/map/hooks/useMapClickSelectionMarker';
 import { usePersistedMapLayers } from '@/features/map/hooks/usePersistedMapLayers';
 import { useReportMapLayers } from '@/features/map/hooks/useReportMapLayers';
@@ -69,7 +72,6 @@ import styles from './MapPage.module.css';
 
 interface MapFocusReportState {
   focusReport?: {
-    id: number;
     longitude: number;
     latitude: number;
   };
@@ -86,11 +88,7 @@ function isMapFocusReportState(value: unknown): value is MapFocusReportState {
     return false;
   }
 
-  return (
-    typeof focus.id === 'number' &&
-    typeof focus.longitude === 'number' &&
-    typeof focus.latitude === 'number'
-  );
+  return typeof focus.longitude === 'number' && typeof focus.latitude === 'number';
 }
 
 interface OpenReportPointState {
@@ -119,8 +117,7 @@ export function MapPage() {
   const location = useLocation();
   const { user, isAuthenticated, logout } = useAuth();
   const {
-    banners: newsBanners,
-    modal: newsModal,
+    items: newsItems,
     currentItems: currentNews,
     isLoading: isNewsLoading,
     dismiss: dismissNews,
@@ -143,6 +140,8 @@ export function MapPage() {
   const [layersPanelFocus, setLayersPanelFocus] = useState<MapLayerGroupId | null>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLegendOpen, setIsLegendOpen] = useState(false);
+  const legendFabRef = useRef<HTMLButtonElement>(null);
+  const [legendMaxSheetHeight, setLegendMaxSheetHeight] = useState<number | undefined>(undefined);
   const [sheetHeight, setSheetHeight] = useState(0);
   const [fabSheetOffset, setFabSheetOffset] = useState(0);
   const [isTabbarHiddenByPoint, setIsTabbarHiddenByPoint] = useState(false);
@@ -165,6 +164,9 @@ export function MapPage() {
     };
   }, [isTabbarVisible]);
   const [activeOverlay, setActiveOverlay] = useState<LeftMenuOverlayRoute | null>(null);
+
+  useMapPageMatomoTracking({ activeOverlay, isLegendOpen, isLayersPanelOpen });
+
   const [geodesyMode, setGeodesyMode] = useState<GdpGeodesyMode>(GDP_GEODESY_DEFAULT_MODE);
   const [wfsClusterPreferences, setWfsClusterPreferences] = useState<GdpWfsClusterPreferences>(
     DEFAULT_GDP_WFS_CLUSTER_PREFERENCES,
@@ -229,13 +231,28 @@ export function MapPage() {
 
   const handleReportMapSelect = useCallback(
     (report: GroupReport) => {
-      if (report.longitude === null || report.latitude === null) {
-        return;
-      }
-
-      void focusOnCoordinate(report.longitude, report.latitude, GROUP_REPORT_MAP_FOCUS_ZOOM);
+      navigate(`/reports/history/${report.id}`, { state: { from: 'map' } });
     },
-    [focusOnCoordinate],
+    [navigate],
+  );
+
+  const { drafts: localReportDrafts, refetch: refetchLocalReportDrafts } = useLocalReportDrafts();
+  const notSentLocalReportDrafts = useMemo(
+    () => localReportDrafts.filter((draft) => draft.status === 'not_sent'),
+    [localReportDrafts],
+  );
+
+  useEffect(() => {
+    if (reportMapLayers.myReports) {
+      void refetchLocalReportDrafts();
+    }
+  }, [reportMapLayers.myReports, refetchLocalReportDrafts]);
+
+  const handleLocalDraftMapSelect = useCallback(
+    (draft: LocalReportDraft) => {
+      navigate(`/reports/${draft.id}`, { state: { from: 'map' } });
+    },
+    [navigate],
   );
 
   useReportMapLayers({
@@ -244,7 +261,9 @@ export function MapPage() {
     isAuthenticated,
     userId: user?.id,
     visibility: reportMapLayers,
+    localDrafts: notSentLocalReportDrafts,
     onReportSelect: handleReportMapSelect,
+    onLocalDraftSelect: handleLocalDraftMapSelect,
   });
 
   // Fermer couches / filtres / légende au clic carte (comme recherche & signalements).
@@ -420,6 +439,24 @@ export function MapPage() {
     setIsLegendOpen((current) => !current);
   };
 
+  // Plafonne la fiche légende dépliée pour ne pas couvrir le bouton qui l'ouvre.
+  useEffect(() => {
+    if (!isLegendOpen) {
+      return;
+    }
+
+    const updateLegendMaxSheetHeight = () => {
+      const top = legendFabRef.current?.getBoundingClientRect().top;
+      if (top !== undefined) {
+        setLegendMaxSheetHeight(Math.max(0, window.innerHeight - top));
+      }
+    };
+
+    updateLegendMaxSheetHeight();
+    window.addEventListener('resize', updateLegendMaxSheetHeight);
+    return () => window.removeEventListener('resize', updateLegendMaxSheetHeight);
+  }, [isLegendOpen]);
+
   const handleCloseLayersPanel = () => {
     setIsLayersPanelOpen(false);
     setLayersPanelFocus(null);
@@ -492,11 +529,7 @@ export function MapPage() {
         <div ref={mapElementRef} className={styles.mapTarget} />
 
         <div className={styles.mapOverlays}>
-          <GdpNewsBanners
-            banners={newsBanners}
-            modal={newsModal}
-            onDismiss={dismissNews}
-          />
+          <GdpNewsBanners items={newsItems} onDismiss={dismissNews} />
 
           <button
             type="button"
@@ -530,6 +563,7 @@ export function MapPage() {
               <IconLayers className={styles.mapFabIcon} aria-hidden />
             </button>
             <button
+              ref={legendFabRef}
               type="button"
               className={`${styles.mapFab} ${isLegendOpen ? styles.mapFabActive : ''}`}
               aria-label="Légende"
@@ -673,7 +707,11 @@ export function MapPage() {
         onClose={() => setReportWizardContext(null)}
       />
 
-      <LegendPage isOpen={isLegendOpen} onClose={() => setIsLegendOpen(false)} />
+      <LegendPage
+        isOpen={isLegendOpen}
+        onClose={() => setIsLegendOpen(false)}
+        maxExpandedHeight={legendMaxSheetHeight}
+      />
 
       <MyAccountPage
         isOpen={activeOverlay === '/my-account'}

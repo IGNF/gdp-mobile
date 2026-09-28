@@ -13,8 +13,6 @@ import styles from './ReportWizardStepMedia.module.css';
 const PHOTO_INSTRUCTIONS = [
   'Cadrez le point dans son environnement',
   'Assurez une bonne luminosité',
-  'Lorem ipsum dolor sit amet',
-  'Lorem ipsum dolor sit amet',
 ];
 
 export interface ReportWizardStepMediaProps {

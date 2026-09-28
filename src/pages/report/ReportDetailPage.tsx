@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
 import { BottomTabbar } from '@/app/components/BottomTabbar';
 import type { LocalReportDraft } from '@/domain/report/localReportDraft';
@@ -42,6 +42,8 @@ import styles from './ReportDetailPage.module.css';
 export function ReportDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
+  const cameFromMap = (location.state as { from?: string } | null)?.from === 'map';
   const [draft, setDraft] = useState<LocalReportDraft | null | undefined>(undefined);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const { submitGeodesyPointReport, isSubmitting } = useSubmitGeodesyPointReport();
@@ -130,13 +132,24 @@ export function ReportDetailPage() {
     });
   };
 
+  const handleBack = () => {
+    if (cameFromMap && draft) {
+      navigate('/map', {
+        state: { focusReport: { longitude: draft.longitude, latitude: draft.latitude } },
+      });
+      return;
+    }
+
+    navigate('/reports');
+  };
+
   return (
     <div className={styles.page}>
       <PageHeader
         title="Détail du signalement"
         showBackButton
         showCloseButton={false}
-        onBack={() => navigate('/reports')}
+        onBack={handleBack}
       />
 
       <main className={styles.main}>

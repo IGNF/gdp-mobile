@@ -136,3 +136,4 @@ Compte, paramètres, aide, à propos, favoris et communauté sont des **overlays
 ## Documentation métier carte
 
 - [Fiche point](./FICHE_POINT.md) — bottom sheet, snaps, variantes géodésie/nivellement, carrousel, mode debug champs
+- [Contrat d’échange des signalements](./CONTRAT_SIGNALEMENTS.md) — payload EspaceCo (appli **4.0.1**)

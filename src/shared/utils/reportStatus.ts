@@ -1,20 +1,6 @@
 import { ReportStatus } from '@ign/mobile-core';
 
 
-const STATUS_COLOR_TOKEN_MAP: Record<ReportStatus, string> = {
-  [ReportStatus.Pending]: 'warning',
-  [ReportStatus.Pending_Qualification]: 'warning',
-  [ReportStatus.Pending_Entry]: 'warning-shade',
-  [ReportStatus.Pending_Validation]: 'warning-tint',
-  [ReportStatus.Valid]: 'primary',
-  [ReportStatus.Valid_Already_Treated]: 'primary-shade',
-  [ReportStatus.Reject]: 'danger',
-  [ReportStatus.Reject_Irrelevant]: 'danger-shade',
-  [ReportStatus.Submit]: 'secondary',
-  [ReportStatus.Cluster]: 'medium',
-  [ReportStatus.Draft]: 'medium',
-};
-
 const STATUS_LABELS: Record<ReportStatus, string> = {
   [ReportStatus.Draft]: 'Brouillon',
   [ReportStatus.Cluster]: 'Regroupé',
@@ -30,10 +16,6 @@ const STATUS_LABELS: Record<ReportStatus, string> = {
 };
 
 
-
-export function getStatusColorToken(status: ReportStatus | string): string {
-  return STATUS_COLOR_TOKEN_MAP[status as ReportStatus] ?? 'medium';
-}
 
 export function getStatusLabel(status: ReportStatus | string): string {
   return STATUS_LABELS[status as ReportStatus] ?? status;

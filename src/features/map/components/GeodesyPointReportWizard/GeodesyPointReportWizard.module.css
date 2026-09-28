@@ -17,6 +17,13 @@
   pointer-events: auto;
 }
 
+/* Tout le formulaire de signalement en Fira Sans (en-tête « Signaler », étapes, pied) —
+   y compris les contrôles, qui n'héritent pas de la police par défaut. */
+.sheet,
+.sheet :is(button, input, textarea, select) {
+  font-family: var(--font-family-heading);
+}
+
 .sheet {
   position: fixed;
   left: 0;
