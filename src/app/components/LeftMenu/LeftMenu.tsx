@@ -10,7 +10,6 @@ import IconSettings from '@/shared/assets/icons/icon-settings.svg?react';
 import IconHelp from '@/shared/assets/icons/icon-help.svg?react';
 import IconInfo from '@/shared/assets/icons/icon-info.svg?react';
 import IconUser from '@/shared/assets/icons/icon-user.svg?react';
-import IconStar from '@/shared/assets/icons/icon-heart.svg?react';
 import IconTeam from '@/shared/assets/icons/icon-team.svg?react';
 import IconDisconnect from '@/shared/assets/icons/icon-deconnect.svg?react';
 import IconSend from '@/shared/assets/icons/icon-send.svg?react';
