@@ -93,8 +93,7 @@ Côté web, le serveur qui héberge le JSON doit autoriser CORS pour l’origine
 5. Une news affichée sur la carte pendant la session n’est plus réaffichée en y revenant (navigation interne). Une fermeture explicite a le même effet. `showOnce` : masquage définitif sur l’appareil.
 6. Une seule news est affichée à la fois, dans une fenêtre glissante depuis le bas de l’écran (style `Alert`). S’il y en a plusieurs, la plus sévère est montrée en premier (`error`, puis `warning`, puis `info`) ; fermer celle-ci fait apparaître la suivante.
 7. La fenêtre n’est jamais bloquante : la carte reste utilisable derrière elle (points, FABs, tabbar). Elle se ferme de trois façons : glisser la poignée vers le bas, cliquer sur la carte en arrière-plan, ou le bouton « J’ai compris ».
-8. À la fermeture, un **flash message** reprenant le titre apparaît 5 s en bas à droite (ou jusqu’à la croix cliquée) ; un clic dessus rouvre la fenêtre. C’est le seul chemin de retour immédiat vers un message fermé : toute nouvelle fenêtre ouverte automatiquement doit en faire autant. Contrairement à la fenêtre elle-même, ces flashs s’empilent : le premier fermé reste au plus près du coin, ceux fermés ensuite s’empilent au-dessus et descendent d’un cran quand celui du bas disparaît.
-9. Le menu **Aide** affiche un badge `News` s’il existe au moins une actualité encore valide. La liste se consulte depuis un lien **Actualités** dans la page d’aide (y compris les items déjà fermés sur la carte).
+8. Le menu **Aide** affiche un badge `News` s’il existe au moins une actualité encore valide. La liste se consulte depuis un lien **Actualités** dans la page d’aide (y compris les items déjà fermés sur la carte).
 
 ## Conseils de rédaction
 
