@@ -38,7 +38,7 @@ Côté web, le serveur qui héberge le JSON doit autoriser CORS pour l’origine
 | Champ | Type | Obligatoire | Description |
 |---|---|---|---|
 | `id` | string | oui | Identifiant stable. Sert à mémoriser les news déjà fermées (`showOnce`). Ne pas réutiliser un `id` pour un autre message. |
-| `severity` | `"info"` \| `"warning"` \| `"error"` | oui | Niveau : information, avertissement, alerte bloquante (style). |
+| `severity` | `"info"` \| `"warning"` \| `"error"` | oui | Niveau : information, avertissement, alerte bloquante (style). Une autre valeur est acceptée : le style reste celui de `warning`, et la pastille du fil d’aide affiche ce texte. |
 | `title` | string | oui | Titre court. |
 | `body` | string | oui | Texte (pas de HTML). Les retours à la ligne sont conservés. |
 | `startsAt` | string ISO 8601 | oui | Début d’affichage (inclus), fuseau explicite recommandé (`+02:00`). |
@@ -94,7 +94,7 @@ Côté web, le serveur qui héberge le JSON doit autoriser CORS pour l’origine
 6. Une seule news est affichée à la fois, dans une fenêtre glissante depuis le bas de l’écran (style `Alert`). S’il y en a plusieurs, la plus sévère est montrée en premier (`error`, puis `warning`, puis `info`) ; fermer celle-ci fait apparaître la suivante.
 7. La fenêtre n’est jamais bloquante : la carte reste utilisable derrière elle (points, FABs, tabbar). Elle se ferme de trois façons : glisser la poignée vers le bas, cliquer sur la carte en arrière-plan, ou le bouton « J’ai compris ».
 8. À la fermeture, un **flash message** reprenant le titre apparaît 5 s en bas à droite (ou jusqu’à la croix cliquée) ; un clic dessus rouvre la fenêtre. C’est le seul chemin de retour immédiat vers un message fermé : toute nouvelle fenêtre ouverte automatiquement doit en faire autant. Contrairement à la fenêtre elle-même, ces flashs s’empilent : le premier fermé reste au plus près du coin, ceux fermés ensuite s’empilent au-dessus et descendent d’un cran quand celui du bas disparaît.
-9. Le menu **Aide** affiche un badge `News` s’il existe au moins une actualité encore valide. La liste se consulte depuis un lien **Actualités** dans la page d’aide (y compris les items déjà fermés sur la carte).
+9. Le menu **Aide** affiche un badge `News` s’il existe au moins une actualité encore valide. Le fil s’affiche dans la page d’aide, sous les questions fréquentes (y compris les items déjà fermés sur la carte).
 
 ## Conseils de rédaction
 

@@ -11,6 +11,8 @@ export interface GdpNewsCta {
 export interface GdpNewsItem {
   id: string;
   severity: GdpNewsSeverity;
+  /** Texte d’origine quand `severity` n’est pas une valeur connue. La pastille l’affiche, avec le style warning. */
+  severityLabel?: string;
   title: string;
   body: string;
   startsAt: string;
