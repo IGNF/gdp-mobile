@@ -166,6 +166,12 @@
   --color-navy-emphasis: var(--figma-blue-10);
   --color-bg-navy-subtle: var(--figma-blue-1);
 
+  /* ── Formulaire de signalement : état conforme / non conforme (icônes Figma) ── */
+  --color-report-conform: #229574;
+  --color-report-conform-rgb: 34, 149, 116;
+  --color-report-non-conform: #ce0500;
+  --color-report-non-conform-rgb: 206, 5, 0;
+
   /* ── Texte gray ── */
   --color-text: var(--figma-gray-11);
   --color-text-title: var(--figma-gray-12);

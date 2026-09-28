@@ -81,11 +81,13 @@
   fill: currentColor;
 }
 
+/* Figma « Headings/H3 bold », comme la question de la 1re étape. */
 .title {
   margin: 0;
-  font-size: 1.0625rem;
+  font-size: 1rem;
   font-weight: 700;
-  color: var(--color-text);
+  line-height: normal;
+  color: var(--color-text-title);
 }
 
 .body {
