@@ -13,6 +13,8 @@ export interface GroupReport {
   createdAt: Date;
   modifiedAt?: Date;
   authorName?: string;
+  /** Commune déduite par l'Espace collaboratif de la position du signalement. */
+  communeTitle?: string;
   /**
    * URLs des pièces jointes (photos) du signalement (`attachments[].uri` /
    * `attachments[].download_uri`) — URLs absolues et publiques, utilisables directement

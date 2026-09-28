@@ -18,6 +18,7 @@ export interface ApiGroupReportResponse {
   opening_date?: string;
   updating_date?: string;
   author?: { id: number; username: string };
+  commune?: { title?: string } | null;
   attributes?: ApiThemeAttributeBlock[] | string;
   /** Forme non documentée côté API (collaboratif-client-api ne la type pas) — extraction défensive. */
   attachments?: unknown[];
@@ -137,6 +138,7 @@ export function mapApiReportToGroupReport(apiReport: ApiGroupReportResponse): Gr
     createdAt: apiReport.opening_date ? new Date(apiReport.opening_date) : new Date(),
     modifiedAt: apiReport.updating_date ? new Date(apiReport.updating_date) : undefined,
     authorName: apiReport.author?.username,
+    communeTitle: apiReport.commune?.title || undefined,
     photoUrls: normalizeAttachmentUrls(apiReport.attachments),
   };
 }

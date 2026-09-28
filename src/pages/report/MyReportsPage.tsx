@@ -3,18 +3,18 @@ import { useNavigate } from 'react-router-dom';
 import { GeodesyPointTitle } from '@ign/gdp-tools/react';
 
 import { BottomTabbar } from '@/app/components/BottomTabbar';
+import type { GeodesyPointRef } from '@ign/gdp-tools';
+
 import type { LocalReportDraftStatus } from '@/domain/report/localReportDraft';
 import { useAuth } from '@/features/auth/hooks/useAuth';
-import {
-  NON_CONFORM_REASON_LABELS,
-  type NonConformReason,
-} from '@/features/report/components/GeodesyPointReportWizard';
+import { GDP_REPORT_SUBMISSION_THEME } from '@/features/report/constants/reportApi';
 import { useLocalReportDrafts } from '@/features/report/hooks/useLocalReportDrafts';
+import { useReportGeodesyPoints } from '@/features/report/hooks/useReportGeodesyPoints';
+import { useUserReportHistory } from '@/features/report/hooks/useUserReportHistory';
 import {
-  getLocalReportDraftStatusAccentRgb,
-  getLocalReportDraftStatusColors,
-  getLocalReportDraftStatusLabel,
-} from '@/features/report/utils/localReportDraftStatus';
+  buildReportListItems,
+  readGroupReportPointRef,
+} from '@/features/report/utils/reportListItems';
 import { formatRelativeDayLabel } from '@/shared/utils/date';
 import { joinCSSClassNames } from '@/shared/utils/join';
 import { EXTERNAL_LINKS } from '@/shared/constants/externalLinks';
@@ -22,13 +22,15 @@ import { Button } from '@/shared/ui/Button';
 import { ExternalLink } from '@/shared/ui/ExternalLink';
 import { PageHeader } from '@/shared/ui/PageHeader';
 import IconAngleRight from '@/shared/assets/icons/icon-angle-right.svg?react';
-import IconCalendar from '@/shared/assets/icons/icon-calendar.svg?react';
 import IconLocation from '@/shared/assets/icons/icon-location.svg?react';
 import IconSearch from '@/shared/assets/icons/icon-search.svg?react';
 
 import styles from './MyReportsPage.module.css';
 
 type StatusFilter = 'all' | LocalReportDraftStatus;
+
+/** Signalements envoyés par cette version de l'app (les anciens, thème `Géodésie`, sont dans l'historique). */
+const SENT_REPORT_THEMES = [GDP_REPORT_SUBMISSION_THEME];
 
 const FILTERS: Array<{ value: StatusFilter; label: string }> = [
   { value: 'all', label: 'Tous' },
@@ -39,33 +41,47 @@ const FILTERS: Array<{ value: StatusFilter; label: string }> = [
 export function MyReportsPage() {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
-  const { drafts, isLoading } = useLocalReportDrafts();
+  const { drafts, isLoading: isLoadingDrafts } = useLocalReportDrafts();
+  const serverHistory = useUserReportHistory(SENT_REPORT_THEMES);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
 
-  const filteredDrafts = useMemo(() => {
+  const serverReports = serverHistory.isLoaded ? serverHistory.reports : null;
+
+  // Seuls les signalements sans brouillon local sur cet appareil ont besoin du WFS.
+  const pointRefs = useMemo(() => {
+    const localServerIds = new Set(drafts.map((draft) => draft.serverId));
+    return (serverReports ?? [])
+      .filter((report) => !localServerIds.has(report.id))
+      .map(readGroupReportPointRef)
+      .filter((ref): ref is GeodesyPointRef => ref !== null);
+  }, [drafts, serverReports]);
+  const points = useReportGeodesyPoints(pointRefs);
+
+  const items = useMemo(
+    () => buildReportListItems(drafts, serverReports, points),
+    [drafts, serverReports, points],
+  );
+
+  const filteredItems = useMemo(() => {
     const query = search.trim().toLowerCase();
 
-    return drafts.filter((draft) => {
-      if (statusFilter !== 'all' && draft.status !== statusFilter) {
+    return items.filter((item) => {
+      if (statusFilter !== 'all' && item.filterStatus !== statusFilter) {
         return false;
       }
 
-      if (query) {
-        const idLabel = `ID_${draft.geodesyId ?? draft.title}`.toLowerCase();
-        if (!idLabel.includes(query)) {
-          return false;
-        }
-      }
-
-      return true;
+      return !query || item.searchLabel.toLowerCase().includes(query);
     });
-  }, [drafts, search, statusFilter]);
+  }, [items, search, statusFilter]);
+
+  const isLoading = isLoadingDrafts || (serverHistory.isLoading && items.length === 0);
 
   return (
     <div className={styles.page}>
       <PageHeader
-        title="Signalements"
+        title="Mes Signalements"
+        className={styles.pageHeader}
         showBackButton
         showCloseButton={false}
         onBack={() => navigate('/map')}
@@ -113,78 +129,84 @@ export function MyReportsPage() {
 
             {isLoading ? (
               <p className={styles.empty}>Chargement…</p>
-            ) : filteredDrafts.length === 0 ? (
+            ) : filteredItems.length === 0 ? (
               <p className={styles.empty}>Aucun signalement.</p>
             ) : (
               <ul className={styles.reportList}>
-                {filteredDrafts.map((draft) => {
-                  const statusColors = getLocalReportDraftStatusColors(draft.status);
-                  const reasonLabel = draft.isConform
-                    ? 'Conforme'
-                    : (draft.nonConformReasons ?? [])
-                        .map((reason) => NON_CONFORM_REASON_LABELS[reason as NonConformReason])
-                        .join(', ') || 'Non conforme';
-                  const createdAt = new Date(draft.createdAt);
-
-                  return (
-                    <li key={draft.id}>
-                      <button
-                        type="button"
-                        className={styles.reportCard}
-                        style={{
-                          '--report-card-hover-color': statusColors.color,
-                          '--report-card-hover-rgb': getLocalReportDraftStatusAccentRgb(
-                            draft.status,
-                          ),
-                        } as CSSProperties}
-                        onClick={() => navigate(`/reports/${draft.id}`)}
-                      >
-                        <div className={styles.reportCardHeader}>
+                {filteredItems.map((item) => (
+                  <li key={item.key}>
+                    <button
+                      type="button"
+                      className={joinCSSClassNames(styles.reportCard, styles.reportCardSpaced)}
+                      style={{
+                        '--report-card-hover-color': item.statusColors.color,
+                        '--report-card-hover-rgb': item.accentRgb,
+                      } as CSSProperties}
+                      onClick={() => navigate(item.detailPath, { state: { from: 'reports' } })}
+                    >
+                      <div className={styles.reportCardHeader}>
+                        <span className={styles.reportTitleGroup}>
                           <GeodesyPointTitle
-                            title={draft.title}
-                            picto={draft.titlePicto}
+                            title={item.title}
+                            picto={item.titlePicto}
                             className={styles.reportId}
                           />
-                          <span
-                            className={styles.statusBadge}
-                            style={{ color: statusColors.color, background: statusColors.background }}
-                          >
-                            {getLocalReportDraftStatusLabel(draft.status)}
+                          <span className={styles.reportDate}>
+                            {formatRelativeDayLabel(item.createdAt)}
+                          </span>
+                        </span>
+                        <span
+                          className={styles.statusBadge}
+                          style={{ color: item.statusColors.color, background: item.statusColors.background }}
+                        >
+                          {item.statusLabel}
+                        </span>
+                      </div>
+                      {item.positionModified ? (
+                        <p className={styles.reportReason}>Position modifiée</p>
+                      ) : null}
+                      {item.voieSuivie || item.commune ? (
+                        <div className={styles.reportLocationRow}>
+                          <IconLocation className={styles.reportMetaIcon} aria-hidden />
+                          <span className={styles.reportLocationText}>
+                            {item.commune ? (
+                              <span className={styles.reportCommuneText}>{item.commune}</span>
+                            ) : null}
+                            {item.commune && item.voieSuivie ? (
+                              <span className={styles.reportLocationSeparator}>,</span>
+                            ) : null}
+                            {item.voieSuivie ? (
+                              <span className={styles.reportVoieText} title={item.voieSuivie}>
+                                {item.voieSuivie}
+                              </span>
+                            ) : null}
                           </span>
                         </div>
-                        <p className={styles.reportReason}>
-                          <span>{reasonLabel}</span>
-                          <span className={styles.reportReasonSeparator}>·</span>
-                          <span className={styles.reportDateInline}>
-                            <IconCalendar className={styles.reportMetaIcon} aria-hidden />
-                            {formatRelativeDayLabel(createdAt)}
-                          </span>
-                        </p>
-                        {draft.voieSuivie || draft.commune ? (
-                          <div className={styles.reportLocationRow}>
-                            <IconLocation className={styles.reportMetaIcon} aria-hidden />
-                            <span className={styles.reportLocationText}>
-                              {draft.commune ? (
-                                <span className={styles.reportCommuneText}>{draft.commune}</span>
-                              ) : null}
-                              {draft.commune && draft.voieSuivie ? (
-                                <span className={styles.reportLocationSeparator}>,</span>
-                              ) : null}
-                              {draft.voieSuivie ? (
-                                <span className={styles.reportVoieText} title={draft.voieSuivie}>
-                                  {draft.voieSuivie}
-                                </span>
-                              ) : null}
-                            </span>
-                          </div>
-                        ) : null}
-                        <IconAngleRight className={styles.reportChevron} aria-hidden />
-                      </button>
-                    </li>
-                  );
-                })}
+                      ) : null}
+                      <IconAngleRight className={styles.reportChevron} aria-hidden />
+                    </button>
+                  </li>
+                ))}
               </ul>
             )}
+
+            {serverHistory.error ? (
+              <p className={styles.empty}>
+                Signalements envoyés indisponibles pour le moment : seuls ceux de cet appareil sont affichés.
+              </p>
+            ) : null}
+
+            {serverHistory.hasMore ? (
+              <Button
+                type="button"
+                variant="outline"
+                fullWidth
+                onClick={serverHistory.loadMore}
+                loading={serverHistory.isLoadingMore}
+              >
+                Charger plus
+              </Button>
+            ) : null}
 
             <button
               type="button"

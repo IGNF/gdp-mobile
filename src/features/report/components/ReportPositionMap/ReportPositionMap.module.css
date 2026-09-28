@@ -33,6 +33,11 @@
   cursor: pointer;
 }
 
+/* Le bouton plein écran occupe le coin haut droit (2.25rem + marges) : « Annuler » passe à sa gauche. */
+.resetButtonBesideFullscreen {
+  right: calc(0.5rem + 2.25rem + 0.5rem);
+}
+
 .resetButton:active {
   background: var(--color-bg-subtle);
 }

@@ -11,6 +11,18 @@ const ETAT_BY_NON_CONFORM_REASON: Partial<Record<NonConformReason, string>> = {
   malPositionne: 'PRESUME DEPLACE',
 };
 
+/** Valeur `etat` d'un repère conforme. */
+export const GDP_REPORT_CONFORM_ETAT = 'BON ETAT';
+
+/** Inverse de l'envoi : valeur `etat` serveur → motif wizard (undefined si inconnue). */
+export function resolveNonConformReasonFromGdpEtat(
+  etat: string | undefined,
+): NonConformReason | undefined {
+  const normalized = etat?.trim().toUpperCase();
+  const match = Object.entries(ETAT_BY_NON_CONFORM_REASON).find(([, value]) => value === normalized);
+  return match?.[0] as NonConformReason | undefined;
+}
+
 const EXCLUSIVE_ETAT_REASONS: readonly NonConformReason[] = [
   'nonRetrouve',
   'detruit',
@@ -25,7 +37,7 @@ function resolveGdpReportEtatValue(params: {
   nonConformReasons: readonly NonConformReason[];
 }): string | undefined {
   if (params.isConform) {
-    return 'BON ETAT';
+    return GDP_REPORT_CONFORM_ETAT;
   }
 
   for (const reason of EXCLUSIVE_ETAT_REASONS) {

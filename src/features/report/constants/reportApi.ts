@@ -13,15 +13,20 @@ const GDP_REPORT_DISPLAY_THEMES = config.report.displayThemes.length > 0
 /** Thème utilisé lors de la création d'un signalement. */
 export const GDP_REPORT_SUBMISSION_THEME = config.report.submissionTheme || GEODESY_REPORT_THEME;
 
+/** Thème des signalements envoyés par l'ancienne application (page « Anciens signalements »). */
+export const GDP_REPORT_LEGACY_THEME = 'Géodésie';
+
 export interface GdpReportThemeFilter {
   community: number;
   theme: string;
 }
 
 /** Filtre API `GET /reports` (signalements repère géodésique). */
-export function serializeGdpReportThemeFilters(): string {
+export function serializeGdpReportThemeFilters(
+  themes: readonly string[] = GDP_REPORT_DISPLAY_THEMES,
+): string {
   return JSON.stringify(
-    GDP_REPORT_DISPLAY_THEMES.map((theme) => ({
+    themes.map((theme) => ({
       community: GDP_REPORT_COMMUNITY_ID,
       theme,
     })),

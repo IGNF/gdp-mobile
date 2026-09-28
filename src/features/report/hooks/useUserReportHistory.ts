@@ -11,6 +11,8 @@ export interface UseUserReportHistoryResult {
   isLoading: boolean;
   isLoadingMore: boolean;
   error: Error | null;
+  /** True dès que la première page a été chargée avec succès. */
+  isLoaded: boolean;
   hasMore: boolean;
   loadMore: () => void;
 }
@@ -20,14 +22,17 @@ export interface UseUserReportHistoryResult {
  * envoyés depuis une version précédente de l'application (contrairement à
  * `useLocalReportDrafts`, qui ne connaît que les brouillons stockés sur cet appareil).
  */
-export function useUserReportHistory(): UseUserReportHistoryResult {
+export function useUserReportHistory(themes?: readonly string[]): UseUserReportHistoryResult {
   const { user, isAuthenticated } = useAuth();
+  // Clé stable : un nouveau tableau à chaque rendu ne doit pas relancer le chargement.
+  const themesKey = themes?.join(',');
   const [reports, setReports] = useState<GroupReport[]>([]);
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [error, setError] = useState<Error | null>(null);
+  const [isLoaded, setIsLoaded] = useState(false);
 
   const userId = user?.id;
 
@@ -38,21 +43,30 @@ export function useUserReportHistory(): UseUserReportHistoryResult {
       setPage(1);
       setIsLoading(false);
       setError(null);
+      setIsLoaded(false);
       return;
     }
 
     let cancelled = false;
+    const themeList = themesKey ? themesKey.split(',') : undefined;
 
     const load = async () => {
       setIsLoading(true);
       setError(null);
+      setIsLoaded(false);
 
       try {
-        const result = await loadUserReportHistory({ userId, page: 1, limit: HISTORY_PAGE_SIZE });
+        const result = await loadUserReportHistory({
+          userId,
+          page: 1,
+          limit: HISTORY_PAGE_SIZE,
+          themes: themeList,
+        });
         if (!cancelled) {
           setReports(result.reports);
           setTotal(result.total);
           setPage(1);
+          setIsLoaded(true);
         }
       } catch (loadError) {
         if (!cancelled) {
@@ -72,7 +86,7 @@ export function useUserReportHistory(): UseUserReportHistoryResult {
     return () => {
       cancelled = true;
     };
-  }, [isAuthenticated, userId]);
+  }, [isAuthenticated, userId, themesKey]);
 
   const loadMore = useCallback(() => {
     if (userId === undefined || isLoadingMore || reports.length >= total) {
@@ -82,7 +96,12 @@ export function useUserReportHistory(): UseUserReportHistoryResult {
     const nextPage = page + 1;
     setIsLoadingMore(true);
 
-    void loadUserReportHistory({ userId, page: nextPage, limit: HISTORY_PAGE_SIZE })
+    void loadUserReportHistory({
+      userId,
+      page: nextPage,
+      limit: HISTORY_PAGE_SIZE,
+      themes: themesKey ? themesKey.split(',') : undefined,
+    })
       .then((result) => {
         setReports((current) => [...current, ...result.reports]);
         setTotal(result.total);
@@ -96,13 +115,14 @@ export function useUserReportHistory(): UseUserReportHistoryResult {
       .finally(() => {
         setIsLoadingMore(false);
       });
-  }, [userId, page, isLoadingMore, reports.length, total]);
+  }, [userId, page, isLoadingMore, reports.length, total, themesKey]);
 
   return {
     reports,
     isLoading,
     isLoadingMore,
     error,
+    isLoaded,
     hasMore: reports.length < total,
     loadMore,
   };
