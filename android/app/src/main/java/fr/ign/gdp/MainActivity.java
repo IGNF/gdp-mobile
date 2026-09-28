@@ -1,4 +1,4 @@
-package fr.ign.gdp;
+package fr.ign.canex;
 
 import com.getcapacitor.BridgeActivity;
 

@@ -117,9 +117,9 @@ Pour seulement produire le fichier (clé USB, mail, etc.) :
 npm run generate-apk
 ```
 
-APK : `gdp-mobile/android/app/build/outputs/apk/debug/app-debug.apk`. Identifiant `fr.ign.gdp` : cohabite avec l’ancienne app `fr.ign.canex`.
+APK : `gdp-mobile/android/app/build/outputs/apk/debug/app-debug.apk`. Identifiant `fr.ign.canex` : cohabite avec l’ancienne app `fr.ign.canex`.
 
-Inspecter la WebView (bundle `dist`, pas Vite) : `chrome://inspect/#devices` → **WebView in fr.ign.gdp**.
+Inspecter la WebView (bundle `dist`, pas Vite) : `chrome://inspect/#devices` → **WebView in fr.ign.canex**.
 
 ## Scripts (`gdp-mobile`)
 

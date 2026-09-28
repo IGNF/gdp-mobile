@@ -63,8 +63,8 @@ export const config: Config = {
       clientId: trimEnv(env.VITE_OAUTH_CLIENT_ID),
       ssoBaseUrl,
       baseUrl: ssoBaseUrl,
-      androidRedirectUri: trimEnv(env.VITE_OAUTH_ANDROID_REDIRECT_URI) || 'fr.ign.gdp://auth/callback',
-      iosRedirectUri: trimEnv(env.VITE_OAUTH_IOS_REDIRECT_URI) || 'fr.ign.gdp://auth/callback',
+      androidRedirectUri: trimEnv(env.VITE_OAUTH_ANDROID_REDIRECT_URI) || 'fr.ign.canex://auth/callback',
+      iosRedirectUri: trimEnv(env.VITE_OAUTH_IOS_REDIRECT_URI) || 'fr.ign.canex://auth/callback',
       webRedirectUri: trimEnv(env.VITE_OAUTH_WEB_REDIRECT_URI) || 'http://localhost:5173/auth/callback',
     };
   })(),

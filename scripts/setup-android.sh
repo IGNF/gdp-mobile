@@ -34,7 +34,7 @@ cd "${APP_DIR}"
 if [[ ! -d "${APP_DIR}/android" ]]; then
   echo "Ajout de la plateforme Android Capacitor…"
   npx cap add android
-  echo "Attention : android/ était absent. Vérifiez le manifeste OAuth (fr.ign.gdp) et les icônes lanceur."
+  echo "Attention : android/ était absent. Vérifiez le manifeste OAuth (fr.ign.canex) et les icônes lanceur."
 fi
 
 echo ""
