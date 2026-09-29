@@ -4,6 +4,11 @@ import type { Style } from 'ol/style';
 import { Icon, Style as OlStyle, Text, Fill, Stroke } from 'ol/style';
 
 import type { LocalReportDraftStatus } from '@/domain/report/localReportDraft';
+import {
+  areClusteredFeaturesAtSamePoint,
+  clusterSamePointKey,
+  getClusteredSubFeatures,
+} from '@/features/map/utils/reportClusterSpiderfy';
 import { getLocalReportDraftStatusColors } from '@/features/report/utils/localReportDraftStatus';
 import { getColorCode, resolveCssColor } from '@/shared/utils/color';
 import { getStatusColors } from '@/shared/utils/reportStatus';
@@ -108,14 +113,77 @@ function createReportClusterMapMarkerStyle(count: number): OlStyle {
   return style;
 }
 
-export function styleReportMapFeature(feature: Feature): Style {
-  const clusteredFeatures = feature.get('features') as Feature[] | undefined;
-  if (Array.isArray(clusteredFeatures) && clusteredFeatures.length > 1) {
+/**
+ * Icône « pile » (pin + badge nombre) — plusieurs signalements faits sur exactement le même
+ * point. Distincte de la pastille de cluster ({@link createReportClusterMapMarkerStyle}, ronde
+ * et sans forme de pin), qui elle ne regroupe que des points proches mais distincts.
+ */
+function createStackedPinMarkerSvg(color: string, count: number): string {
+  const label = count > 9 ? '9+' : String(count);
+  return `
+    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="48" viewBox="0 0 40 48">
+      <defs>
+        <filter id="stackPinShadow" x="-25%" y="-10%" width="150%" height="150%">
+          <feDropShadow dx="0" dy="1.2" stdDeviation="1.4" flood-opacity="0.35"/>
+        </filter>
+      </defs>
+      <g filter="url(#stackPinShadow)">
+        <path
+          d="M18 46 C18 46 4 30.5 4 18 A14 14 0 1 1 32 18 C32 30.5 18 46 18 46 Z"
+          fill="${color}"
+        />
+        <circle cx="18" cy="17.5" r="9.5" fill="#ffffff"/>
+      </g>
+      <circle cx="30" cy="8" r="8" fill="#ffffff" stroke="${color}" stroke-width="1.5"/>
+      <text x="30" y="11" text-anchor="middle" font-family="system-ui, sans-serif" font-size="9" font-weight="700" fill="${color}">${label}</text>
+    </svg>
+  `;
+}
+
+const stackedMarkerStyleCache = new Map<number, OlStyle>();
+
+/** Couleur neutre : un « même point » peut regrouper des signalements de statuts différents. */
+function resolveStackedMarkerColor(): string {
+  return getColorCode('secondary') || getColorCode('medium') || '#4A7FB5';
+}
+
+function createStackedReportMarkerStyle(count: number): OlStyle {
+  const cached = stackedMarkerStyleCache.get(count);
+  if (cached) {
+    return cached;
+  }
+
+  const style = new OlStyle({
+    image: new Icon({
+      src: encodeMarkerSvg(createStackedPinMarkerSvg(resolveStackedMarkerColor(), count)),
+      // Le badge élargit le canevas à droite : l'ancre reste sur la pointe du pin (x=18 sur 40).
+      anchor: [18 / 40, 1],
+      rotateWithView: false,
+    }),
+  });
+
+  stackedMarkerStyleCache.set(count, style);
+  return style;
+}
+
+/**
+ * @param hiddenClusterKey Clé (voir {@link clusterSamePointKey}) du cluster « même point »
+ * actuellement éclaté (spiderfy) : son marqueur pile est masqué, remplacé par les satellites.
+ */
+export function styleReportMapFeature(feature: Feature, hiddenClusterKey: string | null = null): Style | undefined {
+  const clusteredFeatures = getClusteredSubFeatures(feature);
+  if (clusteredFeatures.length > 1) {
+    if (areClusteredFeaturesAtSamePoint(clusteredFeatures)) {
+      const key = clusterSamePointKey('server', feature);
+      if (key && key === hiddenClusterKey) {
+        return undefined;
+      }
+      return createStackedReportMarkerStyle(clusteredFeatures.length);
+    }
     return createReportClusterMapMarkerStyle(clusteredFeatures.length);
   }
 
-  const targetFeature = clusteredFeatures?.[0] ?? feature;
-  const status = targetFeature.get('status') ?? ReportStatus.Pending;
+  const status = clusteredFeatures[0].get('status') ?? ReportStatus.Pending;
   return createReportStatusMapMarkerStyle(status);
 }
 
@@ -145,13 +213,41 @@ export function createLocalReportDraftMapMarkerStyle(status: LocalReportDraftSta
   return style;
 }
 
-export function styleLocalReportDraftMapFeature(feature: Feature): Style {
-  const clusteredFeatures = feature.get('features') as Feature[] | undefined;
-  if (Array.isArray(clusteredFeatures) && clusteredFeatures.length > 1) {
+/** @param hiddenClusterKey Voir {@link styleReportMapFeature}. */
+export function styleLocalReportDraftMapFeature(
+  feature: Feature,
+  hiddenClusterKey: string | null = null,
+): Style | undefined {
+  const clusteredFeatures = getClusteredSubFeatures(feature);
+  if (clusteredFeatures.length > 1) {
+    if (areClusteredFeaturesAtSamePoint(clusteredFeatures)) {
+      const key = clusterSamePointKey('local', feature);
+      if (key && key === hiddenClusterKey) {
+        return undefined;
+      }
+      return createStackedReportMarkerStyle(clusteredFeatures.length);
+    }
     return createReportClusterMapMarkerStyle(clusteredFeatures.length);
   }
 
-  const targetFeature = clusteredFeatures?.[0] ?? feature;
-  const status = (targetFeature.get('status') as LocalReportDraftStatus | undefined) ?? 'not_sent';
+  const status = (clusteredFeatures[0].get('status') as LocalReportDraftStatus | undefined) ?? 'not_sent';
   return createLocalReportDraftMapMarkerStyle(status);
+}
+
+/** Marqueur d'un signalement individuel « éclaté » (spiderfy) hors de son cluster même-point. */
+export function styleSpiderfySatelliteFeature(feature: Feature): Style {
+  if (feature.get('reportSource') === 'local') {
+    const status = (feature.get('status') as LocalReportDraftStatus | undefined) ?? 'not_sent';
+    return createLocalReportDraftMapMarkerStyle(status);
+  }
+
+  const status = feature.get('status') ?? ReportStatus.Pending;
+  return createReportStatusMapMarkerStyle(status);
+}
+
+/** Trait discret reliant un satellite éclaté (spiderfy) à son point d'origine. */
+export function styleSpiderfyLegFeature(): Style {
+  return new OlStyle({
+    stroke: new Stroke({ color: 'rgba(74, 127, 181, 0.55)', width: 1.5, lineDash: [2, 3] }),
+  });
 }
