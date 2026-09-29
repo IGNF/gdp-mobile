@@ -340,14 +340,26 @@ export function MapPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [focusOnCoordinate, isMapReady, location.state, mapClick.openPointAtCoordinate, navigate]);
 
+  // Un seul traitement par signal `openSearch` (comparaison de référence sur `location.state`) :
+  // les resets d'état passent pendant le rendu, `navigate` (effet de bord réel) reste dans
+  // l'effet. État (pas ref) pour mémoriser le signal déjà traité : les refs ne se
+  // lisent/modifient pas pendant le rendu.
+  const [handledOpenSearchState, setHandledOpenSearchState] = useState<unknown>(undefined);
+  if (location.state?.openSearch && handledOpenSearchState !== location.state) {
+    setHandledOpenSearchState(location.state);
+    setIsLayersPanelOpen(false);
+    setIsLegendOpen(false);
+    setForceExpandSearch(true);
+  }
+
   useEffect(() => {
-    if (location.state?.openSearch) {
-      setIsLayersPanelOpen(false);
-      setIsLegendOpen(false);
-      setForceExpandSearch(true);
-      navigate('/map', { replace: true, state: null });
-      setTimeout(() => setForceExpandSearch(false), 100);
+    if (!location.state?.openSearch) {
+      return;
     }
+
+    navigate('/map', { replace: true, state: null });
+    const timer = setTimeout(() => setForceExpandSearch(false), 100);
+    return () => clearTimeout(timer);
   }, [location.state, navigate]);
 
   useEffect(() => {

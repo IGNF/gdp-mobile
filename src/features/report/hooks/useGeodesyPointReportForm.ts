@@ -3,7 +3,7 @@ import {
   isGeodesyPointReportPositionEditable,
   type GeodesyPointReportContext,
 } from '@ign/gdp-tools';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import type { ReportPhoto } from '@/domain/report/models';
 import { useGeodesyReportTheme } from '@/features/report/hooks/useGeodesyReportTheme';
@@ -14,6 +14,7 @@ import {
 import { validateThemeAttributeValue } from '@/features/report/utils/communityReportTheme';
 import { compressPhotoFile } from '@/features/report/utils/compressPhoto';
 import { validatePhotoLandscape } from '@/features/report/utils/validatePhotoLandscape';
+import { useLatestRef } from '@/shared/hooks/useLatestRef';
 
 function revokePhotoPreview(photo: ReportPhoto | undefined): void {
   if (photo?.previewUrl) {
@@ -72,19 +73,29 @@ export function useGeodesyPointReportForm(options: UseGeodesyPointReportFormOpti
   const [isPhotoProcessing, setIsPhotoProcessing] = useState(false);
   const [errors, setErrors] = useState<GeodesyPointReportFormErrors>({});
 
-  const photo1Ref = useRef(photo1);
-  const photo2Ref = useRef(photo2);
-  photo1Ref.current = photo1;
-  photo2Ref.current = photo2;
+  const photo1Ref = useLatestRef(photo1);
+  const photo2Ref = useLatestRef(photo2);
 
-  useEffect(() => {
+  // Resynchronise sur le repère cliqué quand il change (préremplissage thème + position),
+  // pendant le rendu plutôt que dans un effet — pas de resynchronisation externe ici.
+  const [prevPrefilledThemeAttributes, setPrevPrefilledThemeAttributes] = useState(prefilledThemeAttributes);
+  if (prevPrefilledThemeAttributes !== prefilledThemeAttributes) {
+    setPrevPrefilledThemeAttributes(prefilledThemeAttributes);
     setThemeAttributesState(prefilledThemeAttributes);
-  }, [prefilledThemeAttributes]);
+  }
 
-  useEffect(() => {
+  const [prevContextPosition, setPrevContextPosition] = useState({
+    longitude: reportContext.longitude,
+    latitude: reportContext.latitude,
+  });
+  if (
+    prevContextPosition.longitude !== reportContext.longitude ||
+    prevContextPosition.latitude !== reportContext.latitude
+  ) {
+    setPrevContextPosition({ longitude: reportContext.longitude, latitude: reportContext.latitude });
     setLongitude(reportContext.longitude);
     setLatitude(reportContext.latitude);
-  }, [reportContext.latitude, reportContext.longitude]);
+  }
 
   const setPosition = useCallback((position: { longitude: number; latitude: number }) => {
     setLongitude(position.longitude);
@@ -149,7 +160,7 @@ export function useGeodesyPointReportForm(options: UseGeodesyPointReportFormOpti
         setIsPhotoProcessing(false);
       }
     })();
-  }, []);
+  }, [photo1Ref, photo2Ref]);
 
   const validateThemeAttributes = useCallback((): boolean => {
     const themeAttributeErrors: Record<string, string | undefined> = {};

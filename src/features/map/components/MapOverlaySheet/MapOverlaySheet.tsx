@@ -88,7 +88,12 @@ export function MapOverlaySheet({
     onDismiss: onClose,
   });
 
-  useEffect(() => {
+  // Transition isOpen : reset d'état pendant le rendu (pas de resynchronisation externe ici).
+  // Le minuteur qui enchaîne l'animation (translateY → visible, ou l'inverse) reste un effet :
+  // c'est un vrai timer, et son callback (différé) n'est pas concerné par la règle.
+  const [wasOpen, setWasOpen] = useState(isOpen);
+  if (isOpen !== wasOpen) {
+    setWasOpen(isOpen);
     if (isOpen) {
       setShouldRender(true);
       // Repart toujours de translateY(110%) pour rejouer le glissé vers le haut.
@@ -96,14 +101,20 @@ export function MapOverlaySheet({
       if (draggable) {
         setSnapIndex(0);
       }
+    } else {
+      setIsVisible(false);
+    }
+  }
+
+  useEffect(() => {
+    if (isOpen) {
       const timer = window.setTimeout(() => setIsVisible(true), 20);
       return () => window.clearTimeout(timer);
     }
 
-    setIsVisible(false);
     const timer = window.setTimeout(() => setShouldRender(false), ANIMATION_DURATION_MS);
     return () => window.clearTimeout(timer);
-  }, [isOpen, draggable, setSnapIndex]);
+  }, [isOpen]);
 
   if (!shouldRender) {
     return null;

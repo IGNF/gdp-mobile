@@ -56,11 +56,23 @@ export function useUserStats(): UseUserStatsResult {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
+  // Compte déconnecté : état vidé pendant le rendu plutôt que dans l'effet ci-dessous, qui
+  // n'a alors plus qu'à charger les données (une vraie resynchronisation avec l'API/le
+  // stockage local). Se stabilise dès que c'est fait (comparaison de référence).
+  if (!isAuthenticated || user?.id === undefined) {
+    if (stats !== EMPTY_STATS) {
+      setStats(EMPTY_STATS);
+    }
+    if (isLoading) {
+      setIsLoading(false);
+    }
+    if (error !== null) {
+      setError(null);
+    }
+  }
+
   useEffect(() => {
     if (!isAuthenticated || user?.id === undefined) {
-      setStats(EMPTY_STATS);
-      setIsLoading(false);
-      setError(null);
       return;
     }
 

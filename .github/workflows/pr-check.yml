@@ -7,8 +7,16 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v7
-    - name: Install modules
-      run: npm i
-    - name: Run ESLint
-      run: npx eslint ./src/
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+      - uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+      - name: Known hosts (GitHub)
+        run: ssh-keyscan github.com >> ~/.ssh/known_hosts
+      - name: Install modules
+        run: npm install
+      - name: Run ESLint
+        run: npm run lint

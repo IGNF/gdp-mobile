@@ -9,9 +9,7 @@ const leftMenuOverlayRoutes = [
 
 export type LeftMenuOverlayRoute = (typeof leftMenuOverlayRoutes)[number];
 
-const leftMenuNavigateRoutes = ['/login'] as const;
-
-export type LeftMenuNavigateRoute = (typeof leftMenuNavigateRoutes)[number];
+export type LeftMenuNavigateRoute = '/login';
 
 export type LeftMenuRoute = LeftMenuOverlayRoute | LeftMenuNavigateRoute;
 

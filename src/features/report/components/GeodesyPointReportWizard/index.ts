@@ -2,14 +2,10 @@ export { WizardStepHeader } from './WizardStepHeader';
 export type { WizardStepHeaderProps } from './WizardStepHeader';
 export { ReportWizardStepConformity } from './ReportWizardStepConformity';
 export type { ReportWizardStepConformityProps } from './ReportWizardStepConformity';
-export {
-  ReportWizardStepNonConformReason,
-  NON_CONFORM_REASON_LABELS,
-} from './ReportWizardStepNonConformReason';
-export type {
-  ReportWizardStepNonConformReasonProps,
-  NonConformReason,
-} from './ReportWizardStepNonConformReason';
+export { ReportWizardStepNonConformReason } from './ReportWizardStepNonConformReason';
+export type { ReportWizardStepNonConformReasonProps } from './ReportWizardStepNonConformReason';
+export { NON_CONFORM_REASON_LABELS } from './nonConformReasons';
+export type { NonConformReason } from './nonConformReasons';
 export { ReportWizardStepMedia } from './ReportWizardStepMedia';
 export type { ReportWizardStepMediaProps } from './ReportWizardStepMedia';
 export { ReportWizardStepSummary } from './ReportWizardStepSummary';

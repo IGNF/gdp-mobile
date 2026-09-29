@@ -158,12 +158,23 @@ export function MapLayersPanelFlow({
     }));
   }, [geodesyCatalog]);
 
+  // Date du dernier chargement RGP en cache : lecture pure (aucune mutation), sûre pendant
+  // le rendu. Rafraîchie à chaque ouverture, avant de lancer le rechargement (effet ci-dessous,
+  // qui reste un effet : appel réseau réel).
+  const [wasOpenForRgp, setWasOpenForRgp] = useState(isOpen);
+  if (isOpen !== wasOpenForRgp) {
+    setWasOpenForRgp(isOpen);
+    if (isOpen && RGP_ANNEX_LAYER) {
+      setRgpLastLoadedAt(
+        getGeodesyAnnexFeaturesLastLoadedAt({ definition: RGP_ANNEX_LAYER, catalog: geodesyCatalog }),
+      );
+    }
+  }
+
   useEffect(() => {
     if (!isOpen || !RGP_ANNEX_LAYER) {
       return;
     }
-
-    refreshRgpLastLoadedAt();
 
     void loadGeodesyAnnexFeatures({ definition: RGP_ANNEX_LAYER, catalog: geodesyCatalog })
       .then(() => {
@@ -174,23 +185,24 @@ export function MapLayersPanelFlow({
       });
   }, [geodesyCatalog, isOpen, refreshRgpLastLoadedAt]);
 
-  useEffect(() => {
+  // Bascule liste/filtres/infos selon `isOpen` et `focusGroupId`, pendant le rendu (dérivé de
+  // props, pas de resynchronisation externe) : ne rejoue qu'à un vrai changement de l'un des deux.
+  const [prevFocusState, setPrevFocusState] = useState({ isOpen, focusGroupId });
+  if (prevFocusState.isOpen !== isOpen || prevFocusState.focusGroupId !== focusGroupId) {
+    setPrevFocusState({ isOpen, focusGroupId });
+
     if (!isOpen) {
       setActiveInfoLayerId(null);
       setShowFilters(false);
       setIsRgpReloadConfirmOpen(false);
-      return;
-    }
-
-    if (focusGroupId === 'geodesy-filters') {
+    } else if (focusGroupId === 'geodesy-filters') {
       setShowFilters(true);
       setActiveInfoLayerId(null);
-      return;
+    } else {
+      // Retour liste couches (ex. clic FAB couches depuis les filtres).
+      setShowFilters(false);
     }
-
-    // Retour liste couches (ex. clic FAB couches depuis les filtres).
-    setShowFilters(false);
-  }, [focusGroupId, isOpen]);
+  }
 
   const wfsLayerIds = useMemo(
     () => geodesyUiLayers.filter((layer) => isWfsLayerId(geodesyCatalog, layer.id)).map((layer) => layer.id),

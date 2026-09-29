@@ -320,6 +320,5 @@ export function usePointFicheSheetDrag({
     restingHeight: baseHeight,
     dragOffset,
     dragHandleProps,
-    isDragging: isDraggingRef.current,
   };
 }

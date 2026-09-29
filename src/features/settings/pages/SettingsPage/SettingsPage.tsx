@@ -34,16 +34,30 @@ export function SettingsPage({ isOpen, onClose }: SettingsPageProps) {
     () => localStorage.getItem(WELCOME_SEEN_STORAGE_KEY) === 'true',
   );
 
+  // Rouvre le panneau : lecture localStorage pure et synchrone pendant le rendu ; `loadStats`
+  // (vrai appel réseau/cache) reste dans un effet.
+  const [wasOpen, setWasOpen] = useState(isOpen);
+  if (isOpen !== wasOpen) {
+    setWasOpen(isOpen);
+    if (isOpen) {
+      setWelcomeSeen(localStorage.getItem(WELCOME_SEEN_STORAGE_KEY) === 'true');
+    }
+  }
+
   useEffect(() => {
     if (isOpen) {
       void loadStats();
-      setWelcomeSeen(localStorage.getItem(WELCOME_SEEN_STORAGE_KEY) === 'true');
     }
   }, [isOpen, loadStats]);
 
+  // Non ouvert / déconnecté : compteur vidé pendant le rendu plutôt que dans l'effet ci-dessous,
+  // qui n'a alors plus qu'à charger le compteur (une vraie resynchronisation avec le stockage).
+  if ((!isOpen || !isAuthenticated || user?.id === undefined) && viewedSheetsCount !== 0) {
+    setViewedSheetsCount(0);
+  }
+
   useEffect(() => {
     if (!isOpen || !isAuthenticated || user?.id === undefined) {
-      setViewedSheetsCount(0);
       return;
     }
 

@@ -117,7 +117,6 @@ export function useSubmitGeodesyPointReport() {
             reportContext,
             theme,
             formThemeAttributes,
-            themeName,
           ),
           attributeKeys: GDP_POINT_REPORT_THEME_ATTRIBUTE_KEYS,
         });

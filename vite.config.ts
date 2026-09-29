@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import path from 'path'
 import createHttpsProxyAgent from 'https-proxy-agent'
@@ -6,23 +6,50 @@ import { defineConfig, loadEnv, type ViteDevServer } from 'vite'
 import react from '@vitejs/plugin-react'
 import svgr from 'vite-plugin-svgr'
 
-const repoRoot = path.resolve(__dirname, '..')
-const requireFromWorkspace = createRequire(path.join(repoRoot, 'package.json'))
+const appRoot = __dirname
+const requireFromApp = createRequire(path.join(appRoot, 'package.json'))
 
-function resolveWorkspacePackageDir(packageName: string): string {
-  return path.dirname(requireFromWorkspace.resolve(`${packageName}/package.json`))
+/** Monorepo local : préférer la résolution racine (évite un stub git incomplet dans gdp-mobile/node_modules). */
+function createPackageResolver(): NodeRequire {
+  const monorepoPkgJson = path.resolve(appRoot, '..', 'package.json')
+  if (existsSync(monorepoPkgJson)) {
+    const monorepoRequire = createRequire(monorepoPkgJson)
+    try {
+      monorepoRequire.resolve('@ign/gdp-tools')
+      return monorepoRequire
+    } catch {
+      /* dépôt gdp-mobile seul */
+    }
+  }
+  return requireFromApp
 }
 
-const capacitorGeolocationRoot = resolveWorkspacePackageDir('@capacitor/geolocation')
-const capacitorCoreRoot = resolveWorkspacePackageDir('@capacitor/core')
-const capacitorDeviceRoot = resolveWorkspacePackageDir('@capacitor/device')
-const capacitorBrowserRoot = resolveWorkspacePackageDir('@capacitor/browser')
-const capacitorFilesystemRoot = resolveWorkspacePackageDir('@capacitor/filesystem')
-const capacitorPreferencesRoot = resolveWorkspacePackageDir('@capacitor/preferences')
-const capacitorAppRoot = resolveWorkspacePackageDir('@capacitor/app')
+const packageResolver = createPackageResolver()
 
-const geodesyPackageRoot = path.resolve(__dirname, '../gdp-tools')
-const useGeodesySourceAlias = process.env.VITE_GEODESY_SOURCE !== 'dist'
+function resolveInstalledPackageDir(packageName: string): string {
+  let dir = path.dirname(packageResolver.resolve(packageName))
+  while (dir !== path.dirname(dir)) {
+    const pkgJsonPath = path.join(dir, 'package.json')
+    if (existsSync(pkgJsonPath)) {
+      const pkg = JSON.parse(readFileSync(pkgJsonPath, 'utf8')) as { name?: string }
+      if (pkg.name === packageName) {
+        return dir
+      }
+    }
+    dir = path.dirname(dir)
+  }
+  throw new Error(`Répertoire npm introuvable pour ${packageName}`)
+}
+
+const capacitorGeolocationRoot = resolveInstalledPackageDir('@capacitor/geolocation')
+const capacitorCoreRoot = resolveInstalledPackageDir('@capacitor/core')
+const capacitorDeviceRoot = resolveInstalledPackageDir('@capacitor/device')
+const capacitorBrowserRoot = resolveInstalledPackageDir('@capacitor/browser')
+const capacitorFilesystemRoot = resolveInstalledPackageDir('@capacitor/filesystem')
+const capacitorPreferencesRoot = resolveInstalledPackageDir('@capacitor/preferences')
+const capacitorAppRoot = resolveInstalledPackageDir('@capacitor/app')
+const gdpToolsRoot = resolveInstalledPackageDir('@ign/gdp-tools')
+
 const appPackage = JSON.parse(
   readFileSync(path.join(__dirname, 'package.json'), 'utf8'),
 ) as { version?: string }
@@ -169,26 +196,30 @@ export default defineConfig(({ mode }) => {
       __APP_VERSION__: JSON.stringify(appVersion),
     },
     resolve: {
-      alias: {
-        '@': path.resolve(__dirname, './src'),
-        '@capacitor/geolocation': path.join(capacitorGeolocationRoot, 'dist/esm/index.js'),
-        '@capacitor/core': path.join(capacitorCoreRoot, 'dist/index.js'),
-        '@capacitor/device': path.join(capacitorDeviceRoot, 'dist/esm/index.js'),
-        '@capacitor/browser': path.join(capacitorBrowserRoot, 'dist/esm/index.js'),
-        '@capacitor/filesystem': path.join(capacitorFilesystemRoot, 'dist/esm/index.js'),
-        '@capacitor/preferences': path.join(capacitorPreferencesRoot, 'dist/esm/index.js'),
-        '@capacitor/app': path.join(capacitorAppRoot, 'dist/esm/index.js'),
-        ...(useGeodesySourceAlias
-          ? {
-              '@ign/gdp-tools': path.resolve(geodesyPackageRoot, 'src'),
-              '@ign/gdp-tools/react': path.resolve(geodesyPackageRoot, 'src/react.ts'),
-            }
-          : {}),
-      },
+      alias: [
+        { find: '@ign/gdp-tools/react', replacement: path.join(gdpToolsRoot, 'dist/react.js') },
+        { find: '@ign/gdp-tools', replacement: path.join(gdpToolsRoot, 'dist/index.js') },
+        { find: '@', replacement: path.resolve(__dirname, './src') },
+        {
+          find: '@capacitor/geolocation',
+          replacement: path.join(capacitorGeolocationRoot, 'dist/esm/index.js'),
+        },
+        { find: '@capacitor/core', replacement: path.join(capacitorCoreRoot, 'dist/index.js') },
+        { find: '@capacitor/device', replacement: path.join(capacitorDeviceRoot, 'dist/esm/index.js') },
+        { find: '@capacitor/browser', replacement: path.join(capacitorBrowserRoot, 'dist/esm/index.js') },
+        {
+          find: '@capacitor/filesystem',
+          replacement: path.join(capacitorFilesystemRoot, 'dist/esm/index.js'),
+        },
+        {
+          find: '@capacitor/preferences',
+          replacement: path.join(capacitorPreferencesRoot, 'dist/esm/index.js'),
+        },
+        { find: '@capacitor/app', replacement: path.join(capacitorAppRoot, 'dist/esm/index.js') },
+      ],
       dedupe: ['ol', 'react', 'react-dom'],
     },
     optimizeDeps: {
-      exclude: ['@ign/gdp-tools'],
       include: [
         '@capacitor/geolocation',
         '@capacitor/core',
@@ -208,9 +239,6 @@ export default defineConfig(({ mode }) => {
       },
     },
     server: {
-      fs: {
-        allow: [geodesyPackageRoot, path.resolve(__dirname, '..')],
-      },
       proxy: {
         [oauthProxyMount]: {
           target: oauthSsoTarget,

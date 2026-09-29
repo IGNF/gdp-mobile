@@ -14,9 +14,7 @@
     "jsx": "react-jsx",
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"],
-      "@ign/gdp-tools": ["../gdp-tools/src/index.ts"],
-      "@ign/gdp-tools/react": ["../gdp-tools/src/react.ts"]
+      "@/*": ["src/*"]
     },
     "strict": true,
     "noUnusedLocals": true,
@@ -24,9 +22,5 @@
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": [
-    "src",
-    "../gdp-tools/src/ol-ext-overlays.d.ts",
-    "../gdp-tools/src/vite-env.d.ts"
-  ]
+  "include": ["src"]
 }

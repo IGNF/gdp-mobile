@@ -38,10 +38,6 @@ function resolvePageTitle(pathname: string): string {
   return pathname;
 }
 
-export function isMatomoEnabled(): boolean {
-  return config.matomo.enabled;
-}
-
 export function initMatomo(): void {
   if (!config.matomo.enabled || initStarted) {
     return;

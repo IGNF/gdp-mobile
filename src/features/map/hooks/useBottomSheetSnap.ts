@@ -37,9 +37,19 @@ export function useBottomSheetSnap({
 
   const snapHeightsKey = snapHeights.join(',');
 
-  useEffect(() => {
+  // Resynchronise sur le snap initial quand il change (ex. jeu de hauteurs recalculé), pendant
+  // le rendu plutôt que dans un effet — pas de resynchronisation avec un système externe ici.
+  const [prevResetKey, setPrevResetKey] = useState({ initialIndex, snapHeightsKey });
+  if (prevResetKey.initialIndex !== initialIndex || prevResetKey.snapHeightsKey !== snapHeightsKey) {
+    setPrevResetKey({ initialIndex, snapHeightsKey });
     setSnapIndex(initialIndex);
     setDragOffset(0);
+  }
+
+  // `dragOffsetRef` ne se lit/modifie pas pendant le rendu : reset dans un effet, sur les
+  // mêmes dépendances externes que le reset d'état ci-dessus (pas sur une valeur dérivée du
+  // rendu — elle serait déjà retombée à `false` une fois le re-rendu du `setState` commité).
+  useEffect(() => {
     dragOffsetRef.current = 0;
   }, [initialIndex, snapHeightsKey]);
 
@@ -185,6 +195,5 @@ export function useBottomSheetSnap({
     currentHeight,
     dragOffset,
     dragHandleProps,
-    isDragging: isDraggingRef.current,
   };
 }

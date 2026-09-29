@@ -240,7 +240,13 @@ function GeodesyPointReportWizardContent({ isOpen, context, onClose }: GeodesyPo
     return () => window.clearTimeout(timer);
   }, [isOpen]);
 
-  useEffect(() => {
+  // Réinitialise le formulaire à l'ouverture (transition false → true), pendant le rendu
+  // plutôt que dans un effet : pas de resynchronisation avec un système externe ici, juste
+  // une remise à zéro déclenchée par le changement de `isOpen`. État (pas ref) pour mémoriser
+  // la valeur précédente : les refs ne se lisent/modifient pas pendant le rendu.
+  const [wasOpen, setWasOpen] = useState(isOpen);
+  if (isOpen !== wasOpen) {
+    setWasOpen(isOpen);
     if (isOpen) {
       setStep(0);
       setIsConform(null);
@@ -248,7 +254,7 @@ function GeodesyPointReportWizardContent({ isOpen, context, onClose }: GeodesyPo
       setSavedDraft(null);
       setSubmitError(null);
     }
-  }, [isOpen]);
+  }
 
   if (!shouldRender) {
     return null;
@@ -397,11 +403,12 @@ function GeodesyPointReportWizardContent({ isOpen, context, onClose }: GeodesyPo
 export function GeodesyPointReportWizard({ isOpen, context, onClose }: GeodesyPointReportWizardProps) {
   const [stickyContext, setStickyContext] = useState<GeodesyPointReportMapContext | null>(context);
 
-  useEffect(() => {
-    if (context) {
-      setStickyContext(context);
-    }
-  }, [context]);
+  // Garde le dernier contexte non nul (le point reste affiché pendant la fermeture animée
+  // du panneau, après que `context` soit déjà repassé à `null`) — état dérivé du rendu, pas
+  // de resynchronisation avec un système externe.
+  if (context && context !== stickyContext) {
+    setStickyContext(context);
+  }
 
   if (!stickyContext) {
     return null;

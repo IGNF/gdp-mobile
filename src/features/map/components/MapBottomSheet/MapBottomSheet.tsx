@@ -13,6 +13,7 @@ import { useAddressSearchHistory } from '@/features/search/hooks/useAddressSearc
 import type { AddressSearchHistoryEntry } from '@/features/search/utils/addressSearchHistory';
 import { useSearchGeoportail } from '@/features/search/hooks/useSearchGeoportail';
 import type { UserFollowingMode } from '@/features/map/hooks/useMap';
+import { useLatestRef } from '@/shared/hooks/useLatestRef';
 import { openExternalNavigation } from '@/shared/utils/externalNavigation';
 
 import sheetChrome from '@/features/map/styles/mapSheet.module.css';
@@ -95,12 +96,8 @@ export function MapBottomSheet({
   onSearchPanelStateChange,
 }: MapBottomSheetProps) {
   const [searchContainer, setSearchContainer] = useState<HTMLDivElement | null>(null);
-  const searchContainerRef = useRef<HTMLDivElement>(null);
+  const searchContainerRef = useLatestRef(searchContainer);
 
-  searchContainerRef.current = searchContainer;
-
-  const browseSnapIndexRef = useRef(0);
-  const browseViewRef = useRef<BrowsePanelView>('search');
   const pendingBrowseViewRef = useRef<BrowsePanelView | null>(null);
   const browseSwitchTimeoutRef = useRef<number | null>(null);
   const isPointMode = selectedPoint !== null;
@@ -113,7 +110,7 @@ export function MapBottomSheet({
   // Hauteur de fiche nécessaire pour l'en-tête + le pied de page seuls (plancher d'ouverture) —
   // mesurée pour que --safe-bottom soit toujours pris en compte (pied de page jamais rogné).
   const [measuredFloorHeight, setMeasuredFloorHeight] = useState<number | null>(null);
-  browseViewRef.current = browseView;
+  const browseViewRef = useLatestRef(browseView);
 
   const sheetRef = useRef<HTMLElement>(null);
   useEffect(() => {
@@ -161,7 +158,7 @@ export function MapBottomSheet({
 
   
   const isSheetAuto = isBrowseCollapsed  && dragOffset === 0;
-  browseSnapIndexRef.current = isPointMode ? 0 : browseSnap.snapIndex;
+  const browseSnapIndexRef = useLatestRef(isPointMode ? 0 : browseSnap.snapIndex);
 
   useEffect(() => {
     if (isBrowseCollapsed && !pendingBrowseViewRef.current) {
@@ -187,16 +184,24 @@ export function MapBottomSheet({
     expandBrowseSheet();
   }, [expandBrowseSheet]);
 
-  const collapseBrowseSheet = useCallback(() => {
+  // Partie DOM/timer de la fermeture (sans mise à jour d'état) : réutilisée telle quelle par
+  // `collapseBrowseSheet` (gestionnaires d'évènements) et par les effets ci-dessous qui
+  // réagissent à `collapseBrowseSearch`/`forceCloseSearch` (dont le reset d'état, lui, passe
+  // par le rendu — voir plus bas).
+  const runBrowseCollapseSideEffects = useCallback(() => {
     if (browseSwitchTimeoutRef.current !== null) {
       window.clearTimeout(browseSwitchTimeoutRef.current);
       browseSwitchTimeoutRef.current = null;
     }
     pendingBrowseViewRef.current = null;
+    searchContainerRef.current?.querySelector<HTMLInputElement>('input.search')?.blur();
+  }, [searchContainerRef]);
+
+  const collapseBrowseSheet = useCallback(() => {
+    runBrowseCollapseSideEffects();
     setSnapIndex(0);
     setBrowseView('search');
-    searchContainerRef.current?.querySelector<HTMLInputElement>('input.search')?.blur();
-  }, [setSnapIndex]);
+  }, [runBrowseCollapseSideEffects, setSnapIndex]);
 
   /** Ouvre une vue browse ; si une autre vue est déjà ouverte, rejoue le glissé haut. */
   const openBrowseView = useCallback(
@@ -227,16 +232,28 @@ export function MapBottomSheet({
       setBrowseView(view);
       expandBrowseSheet();
     },
-    [expandBrowseSheet, isPointMode, setSnapIndex],
+    [browseSnapIndexRef, browseViewRef, expandBrowseSheet, isPointMode, setSnapIndex],
   );
 
-  useEffect(() => {
-    if (!collapseBrowseSearch || isPointMode) {
-      return;
+  // Signal « replier la recherche » (parent : panneau couches/filtres ouvert). Reset d'état
+  // pendant le rendu (un seul déclenchement par passage à `true`, cf. `handledCollapseRequest`) ;
+  // la partie DOM/timer, elle, reste dans un effet (aucun `setState` dedans, donc rien à
+  // déplacer pour elle).
+  const collapseRequested = collapseBrowseSearch && !isPointMode;
+  const [handledCollapseRequest, setHandledCollapseRequest] = useState(false);
+  if (collapseRequested !== handledCollapseRequest) {
+    setHandledCollapseRequest(collapseRequested);
+    if (collapseRequested) {
+      setSnapIndex(0);
+      setBrowseView('search');
     }
+  }
 
-    collapseBrowseSheet();
-  }, [collapseBrowseSearch, collapseBrowseSheet, isPointMode]);
+  useEffect(() => {
+    if (collapseRequested) {
+      runBrowseCollapseSideEffects();
+    }
+  }, [collapseRequested, runBrowseCollapseSideEffects]);
 
   useEffect(() => {
     if (forceExpandSearch && !isPointMode) {
@@ -244,11 +261,23 @@ export function MapBottomSheet({
     }
   }, [forceExpandSearch, isPointMode, openBrowseView]);
 
-  useEffect(() => {
-    if (forceCloseSearch && !isPointMode) {
-      collapseBrowseSheet();
+  // Même principe que `collapseRequested` ci-dessus, pour l'autre signal de fermeture (bouton
+  // recherche de la tabbar).
+  const closeRequested = forceCloseSearch && !isPointMode;
+  const [handledCloseRequest, setHandledCloseRequest] = useState(false);
+  if (closeRequested !== handledCloseRequest) {
+    setHandledCloseRequest(closeRequested);
+    if (closeRequested) {
+      setSnapIndex(0);
+      setBrowseView('search');
     }
-  }, [forceCloseSearch, isPointMode, collapseBrowseSheet]);
+  }
+
+  useEffect(() => {
+    if (closeRequested) {
+      runBrowseCollapseSideEffects();
+    }
+  }, [closeRequested, runBrowseCollapseSideEffects]);
 
   useEffect(() => {
     const isSearchOpen = isBrowseExpanded && (browseView === 'search' || browseView === 'rgp');
@@ -270,7 +299,7 @@ export function MapBottomSheet({
     return () => {
       map.un('singleclick', handleMapClick);
     };
-  }, [collapseBrowseSheet, isMapReady, isPointMode, map]);
+  }, [browseSnapIndexRef, collapseBrowseSheet, isMapReady, isPointMode, map]);
 
   const { entries: historyEntries, refresh: refreshSearchHistory } = useAddressSearchHistory(isBrowseExpanded);
 

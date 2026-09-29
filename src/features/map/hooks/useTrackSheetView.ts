@@ -11,6 +11,9 @@ export function useTrackSheetView() {
   const { user } = useAuth();
 
   const trackSheetView = useCallback(
+    // Avertissement propre au futur compilateur React (non activé dans ce projet — aucun
+    // `babel-plugin-react-compiler` dans la config) : sans effet sur le comportement actuel.
+    // eslint-disable-next-line react-hooks/preserve-manual-memoization
     (sheetId: string | number) => {
       if (user?.id === undefined) {
         return;
