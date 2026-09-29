@@ -8,14 +8,16 @@ En cas de blocage : [Dépannage](./docs/DEPANNAGE.md).
 
 ## Installation initiale
 
-Prérequis : Node.js ≥ 22, accès SSH GitHub IGNF (`mobile-core`, `mobile-device`, `collaboratif-client-api`).
+Prérequis : Node.js ≥ 22, accès SSH GitHub IGNF (`gdp-tools`, `mobile-core`, `mobile-device`, `collaboratif-client-api`).
 
-Depuis la racine du monorepo `geodesie-de-poche/` :
+Depuis `gdp-mobile/` (dépôt GitHub) ou la racine du monorepo local `geodesie-de-poche/` :
 
 ```bash
-cp gdp-mobile/.env.dist gdp-mobile/.env   # puis renseigner les variables
+cp .env.dist .env   # puis renseigner les variables (gdp-mobile/.env en monorepo)
 npm install
 ```
+
+`@ign/gdp-tools` est une dépendance Git (`package.json`), consommée via le **`dist/` versionné** dans le repo (comme `@ign/mobile-core`).
 
 ## Run en dev (local)
 
@@ -23,7 +25,7 @@ npm install
 npm run dev
 ```
 
-Ouvre l’app sur [http://localhost:5173](http://localhost:5173) (`gdp-tools` en watch + Vite).
+Ouvre l’app sur [http://localhost:5173](http://localhost:5173). En monorepo local : `gdp-tools` en watch met à jour `dist/` ; sinon Vite utilise le `dist` installé dans `node_modules`.
 
 ## Déploiement en qualif
 
@@ -128,7 +130,7 @@ Inspecter la WebView (bundle `dist`, pas Vite) : `chrome://inspect/#devices` →
 | `npm run dev` | Serveur Vite (local) |
 | `npm run build` | Build web à la racine `/` |
 | `npm run build:qualif` | Build qualification (`/qlf-gdp/`) |
-| `npm run build:mobile` | Build web pour l’APK (`gdp-tools` en `dist`) — appelé par `generate-apk` / `run-apk` |
+| `npm run build:mobile` | Alias de `build` — appelé par `generate-apk` / `run-apk` |
 | `npm run preview:qualif` | Aperçu local du build qualif |
 | `npm run setup-android` | Première config Android |
 | `npm run generate-apk` | Produit le fichier APK debug |

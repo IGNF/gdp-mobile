@@ -35,9 +35,15 @@ export function ReportDetailPage() {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const { submitGeodesyPointReport, isSubmitting } = useSubmitGeodesyPointReport();
 
+  // Identifiant absent : introuvable, pendant le rendu plutôt que dans l'effet ci-dessous
+  // (qui n'a alors plus qu'à charger le brouillon, une vraie resynchronisation avec le
+  // stockage local).
+  if (!id && draft !== null) {
+    setDraft(null);
+  }
+
   useEffect(() => {
     if (!id) {
-      setDraft(null);
       return;
     }
 

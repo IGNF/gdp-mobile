@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import { FAQ_ITEMS } from '@/features/help/content/faq';
 import IconClose from '@/shared/assets/icons/icon-close.svg?react';
@@ -13,11 +13,11 @@ export interface FaqListProps {
 export function FaqList({ active }: FaqListProps) {
   const [openQuestion, setOpenQuestion] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (!active) {
-      setOpenQuestion(null);
-    }
-  }, [active]);
+  // Ferme la question ouverte pendant le rendu plutôt que dans un effet (pas de
+  // resynchronisation avec un système externe ici) : se stabilise dès que c'est fait.
+  if (!active && openQuestion !== null) {
+    setOpenQuestion(null);
+  }
 
   return (
     <section className={styles.list}>

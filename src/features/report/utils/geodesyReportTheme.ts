@@ -78,7 +78,6 @@ export function buildGeodesyPointReportThemeAttributesForSubmit(
   context: GeodesyPointReportContext,
   theme: CommunityThemeConfig | null,
   formThemeAttributes: Record<string, string>,
-  _themeName: string = GEODESY_REPORT_THEME,
 ): Record<string, string> {
   const themeAttributeNames = [...getGeodesyThemeAttributeNames(theme, context)];
 

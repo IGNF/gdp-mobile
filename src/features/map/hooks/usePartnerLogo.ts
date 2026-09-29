@@ -30,31 +30,44 @@ export function usePartnerLogo(partnerId: string | null | undefined): UsePartner
   });
   const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    if (!partnerId) {
-      setLogoUrl(null);
-      setIsLoading(false);
-      return;
-    }
+  // Resynchronise sur le partenaire à chaque changement, pendant le rendu :
+  // `buildPartnerLogoUrl`/`resolvePartnerLogoDisplayUrl` sont des lectures pures (URL calculée /
+  // cache mémoire), sûres pendant le rendu. Seul le préchargement réseau (logo non caché) reste
+  // un effet ci-dessous.
+  const [prevPartnerId, setPrevPartnerId] = useState(partnerId);
+  if (prevPartnerId !== partnerId) {
+    setPrevPartnerId(partnerId);
 
     const originalUrl = buildPartnerLogoUrl(partnerId);
     if (!originalUrl) {
       setLogoUrl(null);
       setIsLoading(false);
+    } else {
+      const cachedUrl = resolvePartnerLogoDisplayUrl(originalUrl);
+      if (cachedUrl.startsWith('blob:')) {
+        setLogoUrl(cachedUrl);
+        setIsLoading(false);
+      } else {
+        setIsLoading(true);
+      }
+    }
+  }
+
+  useEffect(() => {
+    if (!partnerId) {
       return;
     }
 
-    // Vérifier si déjà en cache (synchrone)
-    const cachedUrl = resolvePartnerLogoDisplayUrl(originalUrl);
-    if (cachedUrl.startsWith('blob:')) {
-      // Déjà en cache
-      setLogoUrl(cachedUrl);
-      setIsLoading(false);
+    const originalUrl = buildPartnerLogoUrl(partnerId);
+    if (!originalUrl) {
       return;
     }
 
-    // Précharger l'image
-    setIsLoading(true);
+    // Déjà en cache (voir le bloc de rendu ci-dessus) : rien à précharger.
+    if (resolvePartnerLogoDisplayUrl(originalUrl).startsWith('blob:')) {
+      return;
+    }
+
     let cancelled = false;
 
     void prefetchPartnerLogoById(partnerId).then((blobUrl) => {

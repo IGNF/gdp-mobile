@@ -1,7 +1,7 @@
 import {
   NON_CONFORM_REASON_LABELS,
   type NonConformReason,
-} from '@/features/report/components/GeodesyPointReportWizard/ReportWizardStepNonConformReason';
+} from '@/features/report/components/GeodesyPointReportWizard/nonConformReasons';
 
 /** Valeurs liste EspaceCo / codes RN (`rn_etat_code`). */
 const ETAT_BY_NON_CONFORM_REASON: Partial<Record<NonConformReason, string>> = {

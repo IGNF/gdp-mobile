@@ -1,16 +1,18 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
-import {
-  countActiveGeodesyWfsAttributeFilters,
-  createDefaultGeodesyWfsAttributeFilterValues,
-  type GeodesyWfsAttributeFilterDefinition,
-  type GeodesyWfsAttributeFilterValues,
+import type {
+  GeodesyWfsAttributeFilterDefinition,
+  GeodesyWfsAttributeFilterValues,
 } from '@ign/gdp-tools';
 
 import { MapOverlaySheet } from '@/features/map/components/MapOverlaySheet';
 import { Button } from '@/shared/ui/Button';
 
 import { GdpGeodesyFiltersForm } from './GdpGeodesyFiltersForm';
+import {
+  countActiveMapGeodesyFilters,
+  createDefaultMapGeodesyFilterValues,
+} from './mapGeodesyFiltersUtils';
 
 import styles from './MapGeodesyFiltersPanel.module.css';
 
@@ -31,12 +33,16 @@ export function MapGeodesyFiltersPanel({
   onChange,
 }: MapGeodesyFiltersPanelProps) {
   const [draftValues, setDraftValues] = useState(values);
-
-  useEffect(() => {
+  // Réinitialise le brouillon à l'ouverture (transition false → true), pendant le rendu
+  // plutôt que dans un effet : pas de resynchronisation externe, juste une remise à zéro
+  // déclenchée par le changement de `isOpen`.
+  const [wasOpen, setWasOpen] = useState(isOpen);
+  if (isOpen !== wasOpen) {
+    setWasOpen(isOpen);
     if (isOpen) {
       setDraftValues(values);
     }
-  }, [isOpen, values]);
+  }
 
   if (!filters.length) {
     return null;
@@ -79,35 +85,4 @@ export function MapGeodesyFiltersPanel({
       </div>
     </MapOverlaySheet>
   );
-}
-
-function isActiveDateFilterValue(value: boolean | string | null | undefined): boolean {
-  return typeof value === 'string' && value.trim() !== '';
-}
-
-// Chaque paire FROM/TO forme un seul filtre visuellement (une paire de cellules "Du"/"Au"),
-// mais compte pour 2 côté gdp-tools (une par id) : on déduit 1 par paire active pour refléter
-// un seul filtre dans le badge.
-const DATE_RANGE_FILTER_PAIRS: ReadonlyArray<readonly [string, string]> = [
-  ['OBS_DATE_FROM', 'OBS_DATE_TO'],
-  ['VIS_DATE_FROM', 'VIS_DATE_TO'],
-];
-
-export function countActiveMapGeodesyFilters(
-  filters: readonly GeodesyWfsAttributeFilterDefinition[],
-  values: GeodesyWfsAttributeFilterValues,
-): number {
-  const baseCount = countActiveGeodesyWfsAttributeFilters(filters, values);
-
-  const activeRangePairs = DATE_RANGE_FILTER_PAIRS.filter(
-    ([fromId, toId]) => isActiveDateFilterValue(values[fromId]) && isActiveDateFilterValue(values[toId]),
-  ).length;
-
-  return baseCount - activeRangePairs;
-}
-
-function createDefaultMapGeodesyFilterValues(
-  filters: readonly GeodesyWfsAttributeFilterDefinition[],
-): GeodesyWfsAttributeFilterValues {
-  return createDefaultGeodesyWfsAttributeFilterValues(filters);
 }

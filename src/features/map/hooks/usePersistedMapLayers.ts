@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import type { GeodesyLayerVisibility, GeodesyWfsAttributeFilterValues } from '@ign/gdp-tools';
 
@@ -9,6 +9,7 @@ import {
 } from '@/infra/persistence/mapViewportStore';
 import type { GdpGeodesyMode, GdpWfsClusterPreferences } from '@/shared/constants/geodesy';
 import type { ReportMapLayerVisibility } from '@/shared/constants/reportMapLayers';
+import { useLatestRef } from '@/shared/hooks/useLatestRef';
 
 const LAYER_SAVE_DEBOUNCE_MS = 300;
 
@@ -44,18 +45,12 @@ export function usePersistedMapLayers({
   onReportMapLayersChange,
 }: UsePersistedMapLayersOptions) {
   const [isHydrated, setIsHydrated] = useState(false);
-  const onBasemapChangeRef = useRef(onBasemapChange);
-  const onGeodesyModeChangeRef = useRef(onGeodesyModeChange);
-  const onGeodesyVisibilityChangeRef = useRef(onGeodesyVisibilityChange);
-  const onGeodesyWfsAttributeFilterValuesChangeRef = useRef(onGeodesyWfsAttributeFilterValuesChange);
-  const onWfsClusterPreferencesChangeRef = useRef(onWfsClusterPreferencesChange);
-  const onReportMapLayersChangeRef = useRef(onReportMapLayersChange);
-  onBasemapChangeRef.current = onBasemapChange;
-  onGeodesyModeChangeRef.current = onGeodesyModeChange;
-  onGeodesyVisibilityChangeRef.current = onGeodesyVisibilityChange;
-  onGeodesyWfsAttributeFilterValuesChangeRef.current = onGeodesyWfsAttributeFilterValuesChange;
-  onWfsClusterPreferencesChangeRef.current = onWfsClusterPreferencesChange;
-  onReportMapLayersChangeRef.current = onReportMapLayersChange;
+  const onBasemapChangeRef = useLatestRef(onBasemapChange);
+  const onGeodesyModeChangeRef = useLatestRef(onGeodesyModeChange);
+  const onGeodesyVisibilityChangeRef = useLatestRef(onGeodesyVisibilityChange);
+  const onGeodesyWfsAttributeFilterValuesChangeRef = useLatestRef(onGeodesyWfsAttributeFilterValuesChange);
+  const onWfsClusterPreferencesChangeRef = useLatestRef(onWfsClusterPreferencesChange);
+  const onReportMapLayersChangeRef = useLatestRef(onReportMapLayersChange);
 
   useEffect(() => {
     let cancelled = false;
@@ -78,7 +73,14 @@ export function usePersistedMapLayers({
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [
+    onBasemapChangeRef,
+    onGeodesyModeChangeRef,
+    onGeodesyVisibilityChangeRef,
+    onGeodesyWfsAttributeFilterValuesChangeRef,
+    onReportMapLayersChangeRef,
+    onWfsClusterPreferencesChangeRef,
+  ]);
 
   useEffect(() => {
     if (!isMapReady || !isHydrated) {

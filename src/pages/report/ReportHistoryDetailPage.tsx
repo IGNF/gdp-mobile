@@ -21,11 +21,18 @@ export function ReportHistoryDetailPage() {
   const from = (location.state as { from?: string } | null)?.from;
   const cameFromMap = from === 'map';
   const [report, setReport] = useState<GroupReport | null | undefined>(undefined);
+  const reportId = Number(id);
+  const hasValidId = Boolean(id) && Number.isFinite(reportId);
+
+  // Identifiant absent/invalide : introuvable, pendant le rendu plutôt que dans l'effet
+  // ci-dessous (qui n'a alors plus qu'à charger le signalement, une vraie resynchronisation
+  // avec l'API).
+  if (!hasValidId && report !== null) {
+    setReport(null);
+  }
 
   useEffect(() => {
-    const reportId = Number(id);
-    if (!id || !Number.isFinite(reportId)) {
-      setReport(null);
+    if (!hasValidId) {
       return;
     }
 
@@ -55,7 +62,7 @@ export function ReportHistoryDetailPage() {
     return () => {
       cancelled = true;
     };
-  }, [id]);
+  }, [hasValidId, reportId]);
 
   const handleViewOnMap = () => {
     if (!report || report.longitude === null || report.latitude === null) {

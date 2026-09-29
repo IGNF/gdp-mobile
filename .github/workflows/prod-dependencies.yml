@@ -16,6 +16,11 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      - uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+      - name: Known hosts (GitHub)
+        run: ssh-keyscan github.com >> ~/.ssh/known_hosts
       - name: Installer les dépendances
         run: npm install
       - name: Vérifier prod-dependencies.md

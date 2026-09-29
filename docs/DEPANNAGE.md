@@ -2,6 +2,12 @@
 
 Complément du [README](../README.md) (déploiement qualif et Apache : section *Déploiement en qualif*).
 
+## CI GitHub : `npm install` échoue (deps Git)
+
+Les workflows `CI` et `Dépendances de production` installent `@ign/gdp-tools`, `@ign/mobile-core`, etc. via SSH. Si l’install Git échoue en CI, vérifier la clé deploy / secret SSH déjà utilisé pour les autres deps IGNF (`webfactory/ssh-agent`, `ssh-keyscan github.com` si configuré dans les workflows).
+
+`@ign/gdp-tools` doit livrer un **`dist/` versionné** dans son dépôt Git (même modèle que `@ign/mobile-core`).
+
 ## Proxy IGN (502 OAuth en dev web)
 
 Le navigateur atteint Keycloak sans proxy. Vite (`/__sso`) parle en Node : sans `HTTPS_PROXY`, `/token` fait `bad_gateway` / `ECONNREFUSED`.

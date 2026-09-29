@@ -1,5 +1,2 @@
-export {
-  MapGeodesyFiltersPanel,
-  countActiveMapGeodesyFilters,
-  type MapGeodesyFiltersPanelProps,
-} from './MapGeodesyFiltersPanel';
+export { MapGeodesyFiltersPanel, type MapGeodesyFiltersPanelProps } from './MapGeodesyFiltersPanel';
+export { countActiveMapGeodesyFilters } from './mapGeodesyFiltersUtils';

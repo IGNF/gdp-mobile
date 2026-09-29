@@ -153,6 +153,10 @@ export function useNearestRgpStations({
       return;
     }
 
+    // Chargement déclenché par la carte (montage / déplacement), pas par une prop qui change :
+    // rien à dériver pendant le rendu ici. `refresh` marque `isLoading` avant d'attendre la
+    // réponse — le pattern même que la doc React donne pour un fetch dans un effet.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     void refresh();
 
     const handleMoveEnd = () => {

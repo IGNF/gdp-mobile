@@ -1,9 +1,7 @@
-import { createBrowserRouter, Navigate, Outlet } from 'react-router-dom';
+import { createBrowserRouter } from 'react-router-dom';
 
-import { isWelcomeSeen } from '@/features/welcome/hooks/useFirstRun';
-import { MatomoPageTracker } from '@/infra/analytics/MatomoPageTracker';
-import { config } from '@/shared/config/env';
-
+import { AppLayout } from '@/app/router/AppLayout';
+import { HomeRedirect } from '@/app/router/HomeRedirect';
 import { AuthCallbackPage } from '@/features/auth/pages/AuthCallback/AuthCallbackPage';
 import { LoginPage } from '@/features/auth/pages/Login/LoginPage';
 import { WelcomePage } from '@/features/welcome/pages/WelcomePage';
@@ -19,26 +17,6 @@ function routerBasename(): string | undefined {
     return undefined;
   }
   return base.replace(/\/$/, '');
-}
-
-function homeRedirectPath(): string {
-  if (!isWelcomeSeen()) {
-    return '/welcome';
-  }
-  return config.authRequired ? '/login' : '/map';
-}
-
-function HomeRedirect() {
-  return <Navigate to={homeRedirectPath()} replace />;
-}
-
-function AppLayout() {
-  return (
-    <>
-      <MatomoPageTracker />
-      <Outlet />
-    </>
-  );
 }
 
 export const router = createBrowserRouter(

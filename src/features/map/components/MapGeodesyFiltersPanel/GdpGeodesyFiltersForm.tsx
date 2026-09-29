@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import {
   getGeodesyWfsMultiChoiceSelectedValues,
   type GeodesyWfsAttributeFilterDefinition,
@@ -217,12 +217,15 @@ function YearPickerSheet({
   onValidate: (year: number) => void;
 }) {
   const [pendingYear, setPendingYear] = useState(initialValue);
-
-  useEffect(() => {
+  // Réinitialise l'année en cours de sélection à l'ouverture (transition false → true),
+  // pendant le rendu plutôt que dans un effet.
+  const [wasOpen, setWasOpen] = useState(isOpen);
+  if (isOpen !== wasOpen) {
+    setWasOpen(isOpen);
     if (isOpen) {
       setPendingYear(initialValue);
     }
-  }, [isOpen, initialValue]);
+  }
 
   return (
     <ActionSheet

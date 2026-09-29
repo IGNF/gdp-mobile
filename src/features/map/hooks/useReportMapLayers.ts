@@ -21,6 +21,7 @@ import {
   getLocalReportDraftFromMapFeature,
 } from '@/features/map/utils/reportMapFeatures';
 import { loadReportsInMapBbox } from '@/features/map/utils/loadReportsInMapBbox';
+import { useLatestRef } from '@/shared/hooks/useLatestRef';
 import {
   areClusteredFeaturesAtSamePoint,
   clusterCenterCoordinate,
@@ -115,10 +116,8 @@ export function useReportMapLayers({
   onReportSelect,
   onLocalDraftSelect,
 }: UseReportMapLayersOptions): void {
-  const onReportSelectRef = useRef(onReportSelect);
-  onReportSelectRef.current = onReportSelect;
-  const onLocalDraftSelectRef = useRef(onLocalDraftSelect);
-  onLocalDraftSelectRef.current = onLocalDraftSelect;
+  const onReportSelectRef = useLatestRef(onReportSelect);
+  const onLocalDraftSelectRef = useLatestRef(onLocalDraftSelect);
   // Clé (voir `clusterSamePointKey`) du cluster « même point » actuellement éclaté (spiderfy),
   // ou `null`. Un `ref` : lu en direct par les fonctions de style à chaque rendu OpenLayers,
   // sans dépendre d'un re-render React.
@@ -506,5 +505,5 @@ export function useReportMapLayers({
       map.un('singleclick', handleMapClick);
       map.un('movestart', handleMoveStart);
     };
-  }, [isMapReady, map, visibility.myReports]);
+  }, [isMapReady, map, onLocalDraftSelectRef, onReportSelectRef, visibility.myReports]);
 }

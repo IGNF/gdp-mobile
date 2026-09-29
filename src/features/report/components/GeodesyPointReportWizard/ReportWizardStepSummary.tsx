@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 import { ReportPositionEditorSection } from '@/features/report/components/ReportPositionEditorSection';
 import type { UseGeodesyPointReportFormReturn } from '@/features/report/hooks/useGeodesyPointReportForm';
-import { NON_CONFORM_REASON_LABELS, type NonConformReason } from '@/features/report/components/GeodesyPointReportWizard/ReportWizardStepNonConformReason';
+import { NON_CONFORM_REASON_LABELS, type NonConformReason } from '@/features/report/components/GeodesyPointReportWizard/nonConformReasons';
 import { joinCSSClassNames } from '@/shared/utils/join';
 import IconArticle from '@/shared/assets/icons/icon-article.svg?react';
 import IconCamera from '@/shared/assets/icons/icon-camera.svg?react';

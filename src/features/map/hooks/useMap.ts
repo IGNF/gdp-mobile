@@ -300,7 +300,7 @@ export function useMap(options: UseMapOptions = {}): UseMapReturn {
       return;
     }
 
-    let position: Position | null = null;
+    let position: Position | null;
     try {
       position = await getLatestPosition();
     } catch (error) {

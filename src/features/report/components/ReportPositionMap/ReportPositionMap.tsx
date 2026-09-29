@@ -27,6 +27,7 @@ import {
   GEOPORTAIL_LAYERS,
   REPORT_POSITION_MAP_DEFAULT_ZOOM,
 } from '@/shared/constants/map';
+import { useLatestRef } from '@/shared/hooks/useLatestRef';
 import { Loading } from '@/shared/ui/Loading';
 import { getColorCode } from '@/shared/utils/color';
 import { joinCSSClassNames } from '@/shared/utils/join';
@@ -122,10 +123,8 @@ export function ReportPositionMap({
   const geoportailGroupRef = useRef<LayerGroup | null>(null);
   const markerFeatureRef = useRef<Feature<Point> | null>(null);
   const hasCenteredOnPositionRef = useRef(false);
-  const onPositionChangeRef = useRef(onPositionChange);
-  onPositionChangeRef.current = onPositionChange;
-  const readOnlyRef = useRef(readOnly);
-  readOnlyRef.current = readOnly;
+  const onPositionChangeRef = useLatestRef(onPositionChange);
+  const readOnlyRef = useLatestRef(readOnly);
 
   const [activeBasemap, setActiveBasemap] = useState(
     () => initialBasemap ?? GEOPORTAIL_LAYERS.ORTHOPHOTOS,
@@ -236,7 +235,12 @@ export function ReportPositionMap({
       markerFeatureRef.current = null;
       geoportailGroupRef.current = null;
     };
-  }, []);
+    // Création de la carte OpenLayers une seule fois, au montage : `longitude`/`latitude`/
+    // `initialBasemap` ne servent qu'à son centre/fond de carte initial (délibérément non
+    // réactif — un changement de position ultérieur est géré par l'effet suivant, qui déplace
+    // le marqueur sans recréer la carte).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [onPositionChangeRef, readOnlyRef]);
 
   useEffect(() => {
     const map = mapRef.current;

@@ -7,8 +7,6 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 APP_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
-REPO_ROOT="$(cd "${APP_DIR}/.." && pwd)"
-
 # shellcheck source=resolve-java-home.sh
 source "${SCRIPT_DIR}/resolve-java-home.sh"
 
@@ -51,11 +49,9 @@ else
   printf '  %s\n' ${DEVICE_IDS}
 fi
 
-echo "Building @ign/gdp-tools…"
-npm run build -w @ign/gdp-tools --prefix "${REPO_ROOT}"
-
 echo "Building gdp-mobile web assets (dist)…"
-npm run build:mobile -w gdp-mobile --prefix "${REPO_ROOT}"
+cd "${APP_DIR}"
+npm run build:mobile
 
 echo "Install et lancement sur le téléphone…"
 cd "${APP_DIR}"

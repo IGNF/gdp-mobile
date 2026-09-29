@@ -1,20 +1,18 @@
 #!/bin/bash
 
-# Build APK debug Android pour Géodésie de poche (monorepo-aware).
+# Build APK debug Android pour Géodésie de poche.
 
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 APP_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
-REPO_ROOT="$(cd "${APP_DIR}/.." && pwd)"
-
 # shellcheck source=resolve-java-home.sh
 source "${SCRIPT_DIR}/resolve-java-home.sh"
 
 if [[ ! -d "${APP_DIR}/android" ]]; then
   echo "Erreur : le projet Android Capacitor est absent."
   echo "Exécutez une fois : npm run setup-android"
-  echo "  (depuis gdp-mobile ou la racine du monorepo)"
+  echo "  (depuis gdp-mobile/)"
   exit 1
 fi
 
@@ -28,11 +26,9 @@ if [[ "${NODE_MAJOR}" -lt 22 ]]; then
   exit 1
 fi
 
-echo "Building @ign/gdp-tools…"
-npm run build -w @ign/gdp-tools --prefix "${REPO_ROOT}"
-
 echo "Building gdp-mobile web assets (dist)…"
-npm run build:mobile -w gdp-mobile --prefix "${REPO_ROOT}"
+cd "${APP_DIR}"
+npm run build:mobile
 
 echo "Syncing Capacitor with Android…"
 cd "${APP_DIR}"

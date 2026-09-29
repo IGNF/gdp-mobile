@@ -12,13 +12,15 @@ export function useAddressSearchHistory(isActive: boolean) {
     setEntries(readAddressSearchHistory());
   }, []);
 
-  useEffect(() => {
-    if (!isActive) {
-      return;
+  // Recharge à l'activation, pendant le rendu : lecture localStorage pure et synchrone, sûre
+  // pendant le rendu (pas de resynchronisation externe ici).
+  const [wasActive, setWasActive] = useState(isActive);
+  if (isActive !== wasActive) {
+    setWasActive(isActive);
+    if (isActive) {
+      setEntries(readAddressSearchHistory());
     }
-
-    refresh();
-  }, [isActive, refresh]);
+  }
 
   useEffect(() => {
     if (!isActive) {

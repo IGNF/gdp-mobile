@@ -36,14 +36,25 @@ export function useUserReportHistory(themes?: readonly string[]): UseUserReportH
 
   const userId = user?.id;
 
-  useEffect(() => {
-    if (!isAuthenticated || userId === undefined) {
+  // Déconnecté : état vidé pendant le rendu plutôt que dans l'effet ci-dessous, qui n'a alors
+  // plus qu'à charger l'historique (une vraie resynchronisation avec l'API). Un seul
+  // déclenchement par passage à « non prêt » (cf. `wasReady`).
+  const isReady = isAuthenticated && userId !== undefined;
+  const [wasReady, setWasReady] = useState(isReady);
+  if (isReady !== wasReady) {
+    setWasReady(isReady);
+    if (!isReady) {
       setReports([]);
       setTotal(0);
       setPage(1);
       setIsLoading(false);
       setError(null);
       setIsLoaded(false);
+    }
+  }
+
+  useEffect(() => {
+    if (!isAuthenticated || userId === undefined) {
       return;
     }
 

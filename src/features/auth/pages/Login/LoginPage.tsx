@@ -19,11 +19,11 @@ export function LoginPage() {
     () => !isAuthLoading,
   );
 
-  useEffect(() => {
-    if (!isAuthLoading) {
-      setHasInitialAuthCheckCompleted(true);
-    }
-  }, [isAuthLoading]);
+  // Bascule pendant le rendu plutôt que dans un effet : c'est un verrou à sens unique
+  // (une fois vrai, il reste vrai), pas une resynchronisation avec un système externe.
+  if (!isAuthLoading && !hasInitialAuthCheckCompleted) {
+    setHasInitialAuthCheckCompleted(true);
+  }
 
   useEffect(() => {
     if (hasInitialAuthCheckCompleted && isAuthenticated) {

@@ -19,9 +19,14 @@ export function useUserLocation(options: UseUserLocationOptions = {}): UserLocat
   const { enabled = true } = options;
   const [userLocation, setUserLocation] = useState<UserLocation | null>(null);
 
+  // Désactivé : position vidée pendant le rendu plutôt que dans l'effet ci-dessous, qui n'a
+  // alors plus qu'à démarrer le suivi GPS (une vraie resynchronisation avec la plateforme).
+  if (!enabled && userLocation !== null) {
+    setUserLocation(null);
+  }
+
   useEffect(() => {
     if (!enabled) {
-      setUserLocation(null);
       return;
     }
 

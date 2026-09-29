@@ -11,8 +11,6 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 APP_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
-REPO_ROOT="$(cd "${APP_DIR}/.." && pwd)"
-
 # shellcheck source=resolve-java-home.sh
 source "${SCRIPT_DIR}/resolve-java-home.sh"
 
@@ -25,11 +23,9 @@ fi
 
 ensure_java_home
 
-echo "Installation des dépendances npm (monorepo)…"
-cd "${REPO_ROOT}"
-npm install
-
+echo "Installation des dépendances npm…"
 cd "${APP_DIR}"
+npm install
 
 if [[ ! -d "${APP_DIR}/android" ]]; then
   echo "Ajout de la plateforme Android Capacitor…"
@@ -39,5 +35,4 @@ fi
 
 echo ""
 echo "Projet Android prêt."
-echo "  Depuis la racine du monorepo : npm run generate-apk"
-echo "  Depuis gdp-mobile            : npm run generate-apk"
+echo "  npm run generate-apk"
