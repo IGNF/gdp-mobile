@@ -107,6 +107,6 @@ En dev local, les visites remontent sur le site configuré (par défaut le site 
 
 ## Web et APK
 
-Le même code s’exécute dans le navigateur et dans la WebView Capacitor (`fr.ign.gdp`). La dimension plateforme permet de les distinguer dans Matomo.
+Le même code s’exécute dans le navigateur et dans la WebView Capacitor (`fr.ign.canex`). La dimension plateforme permet de les distinguer dans Matomo.
 
 Pour tester l’APK avec le serveur Vite : `npm run dev` + `adb reverse tcp:5173 tcp:5173`, puis ouvrir `http://localhost:5173` sur le téléphone.
