@@ -3,7 +3,8 @@
   flex-direction: column;
   align-items: center;
   gap: 0.75rem;
-  padding: 2rem 0.5rem 1rem;
+  /* Pas de retrait latéral : les boutons font toute la largeur du panneau (350px Figma). */
+  padding: 2rem 0 1rem;
   text-align: center;
 }
 
@@ -81,21 +82,25 @@
   fill: currentColor;
 }
 
-/* Figma « Headings/H3 bold », comme la question de la 1re étape. */
+/* Figma « Appli - H1 » : Fira Sans SemiBold 17px. */
 .title {
   margin: 0;
-  font-size: 1rem;
-  font-weight: 700;
+  font-family: var(--font-family-heading);
+  font-size: 1.0625rem;
+  font-weight: var(--font-weight-semibold);
   line-height: normal;
-  color: var(--color-text-title);
+  color: var(--color-text-primary-emphasis);
 }
 
+/* Figma « Appli - H3 » : Open Sans SemiBold 14px. */
 .body {
   margin: 0;
   max-width: 22rem;
-  font-size: 0.875rem;
-  line-height: 1.45;
-  color: var(--color-text-secondary);
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  line-height: normal;
+  color: var(--color-text);
 }
 
 .errorText {
@@ -110,7 +115,23 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.625rem;
+  /* Figma : 18px entre les boutons. */
+  gap: 1.125rem;
   width: 100%;
   margin-top: 0.75rem;
+}
+
+/*
+ * `Button` a `flex: 1 0 0` : dans cette colonne, ça écrase sa hauteur de 44px.
+ * Le panneau force aussi Fira Sans sur ses boutons, alors que le Figma est en Open Sans.
+ * Sélecteur à deux classes pour passer devant `.sheet :is(button)`.
+ */
+.step .actions > button {
+  flex: none;
+  font-family: var(--font-family-base);
+}
+
+/* Figma : bouton secondaire à bordure grise et libellé vert (le variant outline met une bordure verte). */
+.sendLater {
+  border-color: var(--color-border-button-secondary);
 }
