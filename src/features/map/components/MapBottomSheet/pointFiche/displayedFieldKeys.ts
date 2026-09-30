@@ -4,6 +4,7 @@ export const POINT_FICHE_HEADER_FIELD_KEYS = ['etat', 'ETAT', 'vis_date', 'VIS_D
 export const GEODESY_FICHE_SNAP1_FIELD_KEYS = [
   'img1_url',
   'img2_url',
+  'groupe_img1_url',
   'groupe_croquis1_url',
   'obs_date',
   'nom',
@@ -45,6 +46,7 @@ export const GEODESY_FICHE_SNAP2_FIELD_KEYS = [
 export const NIVELLEMENT_FICHE_SNAP1_FIELD_KEYS = [
   'img1_url',
   'img2_url',
+  'groupe_img1_url',
   'groupe_croquis1_url',
   'obs_date',
   'type',

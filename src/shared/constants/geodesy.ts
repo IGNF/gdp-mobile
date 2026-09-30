@@ -31,21 +31,11 @@ const GDP_GEODESY_ATTRIBUTE_KEYS = [
   'commune',
   'expl_gps',
   'localisation',
+  'groupe_img1_url',
   'groupe_croquis1_url',
   'url_pdf',
   'maj_date',
 ] as const;
-
-/**
- * Photos du site (groupe) masquées : en base, certaines ne correspondent pas au bon site
- * et induisent en erreur. Exclues de la fiche et du carrousel.
- */
-const GDP_GEODESY_EXCLUDED_ATTRIBUTE_KEYS = [1, 2].flatMap((n) => [
-  `groupe_img${n}`,
-  `groupe_img${n}_date`,
-  `groupe_img${n}_azim`,
-  `groupe_img${n}_url`,
-]);
 
 /**
  * Année de détermination la plus ancienne du référentiel ( 28/08/2026 )
@@ -142,7 +132,6 @@ function createGdpGeodesyProfileOptions(
 ) {
   return {
     attributeKeys: GDP_GEODESY_ATTRIBUTE_KEYS,
-    excludedKeys: GDP_GEODESY_EXCLUDED_ATTRIBUTE_KEYS,
     wfsAttributeFilters: GDP_GEODESY_EXPERT_WFS_ATTRIBUTE_FILTERS,
     wfsCluster: {
       enabled: clusterPreferences.enabled,
