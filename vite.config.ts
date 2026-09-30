@@ -160,7 +160,7 @@ function createOauthProxyAgent(
     return undefined
   }
 
-  let hostname = ''
+  let hostname: string
   try {
     hostname = new URL(ssoTarget).hostname
   } catch {
@@ -255,7 +255,11 @@ export default defineConfig(({ mode }) => {
           configure: (proxy) => {
             proxy.on('error', (err, _req, res) => {
               console.error('[vite oauth proxy]', err.message);
-              const socket = res as { writeHead?: Function; end?: Function; headersSent?: boolean };
+              const socket = res as {
+                writeHead?: (statusCode: number, headers?: Record<string, string>) => void
+                end?: (chunk?: string) => void
+                headersSent?: boolean
+              }
               if (socket && typeof socket.writeHead === 'function' && !socket.headersSent) {
                 socket.writeHead(502, { 'Content-Type': 'application/json' });
                 socket.end?.(

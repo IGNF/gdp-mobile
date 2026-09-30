@@ -19,12 +19,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
-            <!-- OAuth redirect (fr.ign.gdp://auth/callback) -->
+            <!-- OAuth redirect (fr.ign.canex://auth/callback) -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="fr.ign.gdp" android:host="auth" android:path="/callback" />
+                <data android:scheme="fr.ign.canex" android:host="auth" android:path="/callback" />
             </intent-filter>
         </activity>
 
