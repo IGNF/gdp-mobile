@@ -38,7 +38,7 @@ L’appareil doit être en état `device` (pas `unauthorized`, pas `offline`). L
 | -------------------------------------------- | ----- |
 | `adb devices` → `unauthorized`               | Débrancher/rebrancher ; accepter la popup ; révoquer les autorisations USB (*Options développeur*) puis reconnecter |
 | `adb devices` → liste vide                   | Changer de câble ou de port ; activer *Débogage USB* ; sur Linux, règles udev ci-dessous |
-| ADB OK mais pas de **WebView in fr.ign.gdp** | L’app doit être **ouverte** ; utiliser l’APK **debug** (`npm run generate-apk`, pas release) ; redémarrer l’app |
+| ADB OK mais pas de **WebView in fr.ign.canex** | L’app doit être **ouverte** ; utiliser l’APK **debug** (`npm run generate-apk`, pas release) ; redémarrer l’app |
 | Page `chrome://inspect` vide                 | Utiliser **Google Chrome** ; cocher *Discover USB devices* ; `adb kill-server && adb start-server` puis `adb devices` |
 
 **Linux — règles udev** (si `adb devices` ne voit rien sans `sudo`) :

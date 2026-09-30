@@ -1,7 +1,7 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'fr.ign.gdp',
+  appId: 'fr.ign.canex',
   appName: 'Géodésie de poche',
   webDir: 'dist',
   android: {

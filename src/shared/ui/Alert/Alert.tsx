@@ -14,7 +14,7 @@ const ANIMATION_DURATION = 200; // ms, matches CSS transition duration
  * dedans ne ferme pas une alerte `nonBlocking` ouverte par ailleurs — sans lui, le clic sur
  * cet élément serait vu comme « en dehors de la carte » et fermerait l'alerte en même temps.
  */
-export const ALERT_OUTSIDE_CLICK_IGNORE_ATTRIBUTE = 'data-alert-ignore-outside-click';
+const ALERT_OUTSIDE_CLICK_IGNORE_ATTRIBUTE = 'data-alert-ignore-outside-click';
 
 export interface AlertButton {
 	label: string;

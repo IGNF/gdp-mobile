@@ -2,7 +2,7 @@ import { Capacitor } from '@capacitor/core';
 
 import { config } from '@/shared/config/env';
 
-const DEFAULT_MOBILE_REDIRECT_URI = 'fr.ign.gdp://auth/callback';
+const DEFAULT_MOBILE_REDIRECT_URI = 'fr.ign.canex://auth/callback';
 
 export function getRedirectUri(): string {
   switch (Capacitor.getPlatform()) {
