@@ -10,7 +10,7 @@
 | @fontsource-variable/open-sans | OFL-1.1      | https://github.com/fontsource/font-files.git                                       | 5.3.0             | Google Inc.                                    |
 | @fontsource/fira-sans          | OFL-1.1      | https://github.com/fontsource/font-files.git                                       | 5.3.0             | Google Inc.                                    |
 | @ign/gdp-tools                 | GPLv3        | https://github.com/IGNF/gdp-tools.git                                              | 0.1.0             | IGN                                            |
-| @ign/mobile-core               | IGN          | https://github.com/IGNF/mobile-core.git                                            | 1.0.3             | IGN                                            |
+| @ign/mobile-core               | IGN          | https://github.com/IGNF/mobile-core.git                                            | 1.0.2             | IGN                                            |
 | @ign/mobile-device             | IGN          | https://github.com/IGNF/mobile-device.git                                          | 1.0.0             | IGN                                            |
 | collaboratif-client-api        | Propriétaire | ssh://git@gitlab.dockerforge.ign.fr:10022/collaboratif/collaboratif-client-api.git | 2.0.0             | mjacopucci                                     |
 | ol                             | BSD-2-Clause | https://github.com/openlayers/openlayers.git                                       | 10.10.0           |                                                |
