@@ -203,22 +203,12 @@ a.groupHeader {
 	position: relative;
 }
 
-.standaloneItems::before {
-	content: '';
-	position: absolute;
-	top: 0;
-	left: var(--spacing-md);
-	right: var(--spacing-md);
-	border-top: 1px solid var(--color-border);
-}
-
 .standaloneItem {
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	gap: var(--spacing-sm);
 	width: 100%;
-	padding: var(--spacing-md);
 	background: none;
 	border: none;
 	border-top: 1px solid var(--color-border);
@@ -228,6 +218,7 @@ a.groupHeader {
 	font-family: var(--font-family-heading);
 	font-size: var(--font-size-lg);
 	font-weight: var(--font-weight-bold);
+	margin: 0 auto calc(var(--spacing-xl) + var(--safe-bottom));
 }
 
 .standaloneItem:hover {
@@ -245,6 +236,7 @@ a.groupHeader {
 	color: var(--color-white);
 	font-weight: var(--font-weight-semibold);
 	padding: var(--spacing-s) var(--spacing-xl);
+	margin: 0 auto calc(var(--spacing-xl) + var(--safe-bottom));
 }
 
 .standaloneItemPrimary:hover {
