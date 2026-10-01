@@ -1,7 +1,7 @@
 {
   "name": "gdp-mobile",
   "private": true,
-  "version": "4.0.5",
+  "version": "4.0.6",
   "engines": {
     "node": ">=22.0.0"
   },
