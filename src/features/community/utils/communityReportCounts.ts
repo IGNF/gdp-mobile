@@ -18,6 +18,15 @@ async function readPaginatedTotal(response: ApiResponse): Promise<number> {
   return parseReportsTotal(response.headers?.['content-range'], pageCount);
 }
 
+/** Applique le jeton OAuth s’il existe, sans bloquer les appels publics. */
+async function syncCollabApiSessionIfPresent(): Promise<void> {
+  try {
+    await ensureCollabApiSession();
+  } catch {
+    // session absente ou expirée : GET /reports peut rester accessible
+  }
+}
+
 function buildReportCountQueryParams(options: FetchCommunityReportCountOptions): Record<string, unknown> {
   const themes = options.themes.length > 0 ? options.themes : getGdpCommunityReportThemes();
 
@@ -35,10 +44,7 @@ function buildReportCountQueryParams(options: FetchCommunityReportCountOptions):
 export async function fetchCommunityReportCount(
   options: FetchCommunityReportCountOptions,
 ): Promise<number> {
-  const sessionReady = await ensureCollabApiSession();
-  if (!sessionReady) {
-    return 0;
-  }
+  await syncCollabApiSessionIfPresent();
 
   const response = await collabApiClient.report.getAll(buildReportCountQueryParams(options));
 
@@ -56,7 +62,7 @@ export async function fetchCommunityReportCountSafe(
   }
 }
 
-/** Nombre de membres ; `null` si l’API refuse l’accès ou la session est absente. */
+/** Nombre de membres ; `null` si non connecté, refus API ou session absente. */
 export async function fetchCommunityMembersCount(): Promise<number | null> {
   const sessionReady = await ensureCollabApiSession();
   if (!sessionReady) {
