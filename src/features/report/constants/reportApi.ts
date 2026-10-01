@@ -6,15 +6,30 @@ import { GEODESY_REPORT_THEME } from '@/features/report/constants/geodesyReportA
 export const GDP_REPORT_COMMUNITY_ID = Number(config.report.communityId) || 96;
 
 /** Thèmes à afficher sur la carte (filtre GET /reports). */
-const GDP_REPORT_DISPLAY_THEMES = config.report.displayThemes.length > 0
-  ? config.report.displayThemes
-  : [GEODESY_REPORT_THEME];
+export const GDP_REPORT_DISPLAY_THEMES =
+  config.report.displayThemes.length > 0
+    ? config.report.displayThemes
+    : [GEODESY_REPORT_THEME];
 
 /** Thème utilisé lors de la création d'un signalement. */
 export const GDP_REPORT_SUBMISSION_THEME = config.report.submissionTheme || GEODESY_REPORT_THEME;
 
 /** Thème des signalements envoyés par l'ancienne application (page « Anciens signalements »). */
 export const GDP_REPORT_LEGACY_THEME = 'Géodésie';
+
+/** Thèmes pris en compte par GDP (stats communauté, carte, historique) — pas les autres thèmes EspaceCo (ex. pof). */
+export function getGdpCommunityReportThemes(): readonly string[] {
+  const names = new Set<string>();
+
+  for (const theme of GDP_REPORT_DISPLAY_THEMES) {
+    names.add(theme);
+  }
+
+  names.add(GDP_REPORT_SUBMISSION_THEME);
+  names.add(GDP_REPORT_LEGACY_THEME);
+
+  return Array.from(names).filter((name) => name.length > 0);
+}
 
 export interface GdpReportThemeFilter {
   community: number;
