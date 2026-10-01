@@ -16,6 +16,8 @@ import { collabApiClient, ensureCollabApiSession } from '@/infra/api';
 
 export const COMMUNITY_THEME_FILTER_ALL = '__all__';
 
+const DEFAULT_COMMUNITY_TITLE = 'Géodésie';
+
 const TRACKED_STATUSES: ReportStatus[] = [
   ReportStatus.Submit,
   ReportStatus.Pending,
@@ -35,16 +37,18 @@ export interface CommunityStatusCount {
 
 export interface CommunityStatsSnapshot {
   communityName: string;
-  /** Présentation communauté (HTML IGN). */
+  /** Présentation communauté (HTML IGN), réservée aux utilisateurs connectés. */
   communityDescriptionHtml: string;
   themeOptions: string[];
   reportsTotal: number;
+  /** Renseigné seulement si connecté (sinon `null`). */
   membersCount: number | null;
   statusCounts: CommunityStatusCount[];
 }
 
 interface UseCommunityStatsOptions {
   enabled: boolean;
+  isAuthenticated: boolean;
   themeFilter: string;
 }
 
@@ -59,7 +63,6 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === 'object' && !Array.isArray(value);
 }
 
-/** Texte éditorial communauté (HTML fourni par l’Espace collaboratif). */
 function readCommunityText(data: unknown): { name: string; descriptionHtml: string } {
   if (!isRecord(data)) {
     return { name: '', descriptionHtml: '' };
@@ -87,18 +90,13 @@ function resolveThemesForFilter(themeFilter: string): readonly string[] {
   return gdpThemes.includes(themeFilter) ? [themeFilter] : gdpThemes;
 }
 
-async function loadCommunityProfile(): Promise<{
+async function loadAuthenticatedCommunityProfile(): Promise<{
   name: string;
   descriptionHtml: string;
-  themeOptions: string[];
 }> {
   const sessionReady = await ensureCollabApiSession();
   if (!sessionReady) {
-    return {
-      name: '',
-      descriptionHtml: '',
-      themeOptions: buildThemeOptions(),
-    };
+    return { name: '', descriptionHtml: '' };
   }
 
   const response = await getCollabApiCached(
@@ -107,17 +105,12 @@ async function loadCommunityProfile(): Promise<{
     { ttlMs: GDP_COMMUNITY_THEME_CACHE_TTL_MS },
   );
 
-  const { name, descriptionHtml } = readCommunityText(response.data);
-
-  return {
-    name,
-    descriptionHtml,
-    themeOptions: buildThemeOptions(),
-  };
+  return readCommunityText(response.data);
 }
 
 export function useCommunityStats({
   enabled,
+  isAuthenticated,
   themeFilter,
 }: UseCommunityStatsOptions): UseCommunityStatsResult {
   const [stats, setStats] = useState<CommunityStatsSnapshot | null>(null);
@@ -141,12 +134,19 @@ export function useCommunityStats({
       setError(null);
 
       try {
-        const profile = await loadCommunityProfile();
         const themes = resolveThemesForFilter(themeFilter);
+        const themeOptions = buildThemeOptions();
 
-        const [reportsTotal, membersCount, statusTotals] = await Promise.all([
+        const authenticatedExtrasPromise = isAuthenticated
+          ? Promise.all([
+              loadAuthenticatedCommunityProfile(),
+              fetchCommunityMembersCount(),
+            ])
+          : Promise.resolve([{ name: '', descriptionHtml: '' }, null] as const);
+
+        const [authenticatedExtras, reportsTotal, statusTotals] = await Promise.all([
+          authenticatedExtrasPromise,
           fetchCommunityReportCount({ themes }),
-          fetchCommunityMembersCount(),
           Promise.all(
             TRACKED_STATUSES.map((status) =>
               fetchCommunityReportCountSafe({ themes, status }),
@@ -154,18 +154,23 @@ export function useCommunityStats({
           ),
         ]);
 
+        const [profile, membersCount] = authenticatedExtras;
+
         const statusCounts: CommunityStatusCount[] = TRACKED_STATUSES.map((status, index) => ({
           status,
           count: statusTotals[index] ?? 0,
         })).filter((entry) => entry.count > 0);
 
+        const communityName =
+          isAuthenticated && profile.name ? profile.name : DEFAULT_COMMUNITY_TITLE;
+
         if (!cancelled) {
           setStats({
-            communityName: profile.name,
-            communityDescriptionHtml: profile.descriptionHtml,
-            themeOptions: profile.themeOptions,
+            communityName,
+            communityDescriptionHtml: isAuthenticated ? profile.descriptionHtml : '',
+            themeOptions,
             reportsTotal,
-            membersCount,
+            membersCount: isAuthenticated ? membersCount : null,
             statusCounts,
           });
         }
@@ -189,7 +194,7 @@ export function useCommunityStats({
     return () => {
       cancelled = true;
     };
-  }, [enabled, themeFilter, reloadToken]);
+  }, [enabled, isAuthenticated, themeFilter, reloadToken]);
 
   return { stats, isLoading, error, reload };
 }

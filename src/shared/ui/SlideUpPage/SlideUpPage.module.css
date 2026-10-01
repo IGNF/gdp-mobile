@@ -12,7 +12,10 @@
 }
 
 .slideUpPageInner {
+	box-sizing: border-box;
 	min-height: 100%;
+	min-height: 100dvh;
+	height: auto;
 	background-color: var(--color-bg-page);
 }
 
@@ -42,10 +45,15 @@
 	.slideUpPage {
 		display: flex;
 		justify-content: left;
+		/* Ne pas étirer le panneau à 100vh : la hauteur suit le contenu, le scroll reste sur .slideUpPage */
+		align-items: flex-start;
 	}
+
 	.slideUpPageInner {
+		flex: 0 0 auto;
 		width: 100%;
 		max-width: 42.5rem;
+		min-height: 100%;
 		border-radius: var(--radius-lg) var(--radius-lg) 0 0;
 		box-shadow: var(--shadow-lg);
 	}
