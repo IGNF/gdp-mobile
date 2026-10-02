@@ -26,19 +26,36 @@
   pointer-events: auto;
 }
 
+/* Variante « bande » (en test) : bande opaque pleine largeur, du bas de l'écran jusqu'au-dessus
+   de la barre d'onglets. La liste défile au-dessus et n'est jamais à moitié cachée par la barre.
+   Pour revenir à la barre flottante : `.tabbarFloat` dans le TSX, et remettre sous `.main`
+   `padding-bottom: calc(4.5rem + var(--spacing-xl) + var(--safe-bottom) + 1rem)`. */
+.tabbarBand {
+  flex-shrink: 0;
+  display: flex;
+  padding-top: 0.75rem;
+  background: var(--color-bg-page);
+}
+
 /* `.page` en préfixe : doit l'emporter sur le fond par défaut de PageHeader. */
 .page .pageHeader {
   background-color: var(--color-bg-page-header);
 }
 
 .main {
+  /* Hauteur du fondu en bas de la liste, au-dessus de la bande de la barre d'onglets. */
+  --list-fade-height: 1.5rem;
+
   flex: 1;
   overflow: auto;
-  /* Hauteur + marge basse de la barre d'onglets flottante (BottomTabbar.module.css), + 1rem. */
-  padding: 1rem 1rem calc(4.5rem + var(--spacing-xl) + var(--safe-bottom) + 1rem);
+  /* Marge basse = hauteur du fondu : en fin de défilement, le dernier élément est net. */
+  padding: 1rem 1rem var(--list-fade-height);
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  /* Les cellules s'estompent en approchant de la bande au lieu d'y être coupées net. */
+  -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - var(--list-fade-height)), transparent);
+  mask-image: linear-gradient(to bottom, #000 calc(100% - var(--list-fade-height)), transparent);
 }
 
 /* `.main` défile : ses enfants gardent leur taille au lieu d'être écrasés quand la liste
