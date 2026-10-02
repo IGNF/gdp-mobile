@@ -13,7 +13,7 @@ export const EXTERNAL_LINKS = {
   CONDITIONS_UTILISATION: 'https://www.ign.fr/institut/conditions-utilisation',
   DONNEES_PERSONNELLES: 'https://www.ign.fr/institut/politique-de-confidentialite-donnees-caractere-personnel-collectees-par-lapplication-cartes-ign',
   ACCESSIBILITE: 'https://www.ign.fr/declaration-daccessibilite-rgaa',
-  CODE_SOURCE: 'https://github.com/ignfr/geodesie-de-poche',
+  CODE_SOURCE: 'https://github.com/IGNF/gdp-mobile',
   LICENCES_OPENSOURCE: 'https://github.com/IGNF/gdp-mobile/blob/main/prod-dependencies.md',
 } as const;
 
