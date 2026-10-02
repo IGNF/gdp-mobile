@@ -106,6 +106,31 @@ export function isBonEtatLabel(etatLabel: string): boolean {
   return normalizeLabel(etatLabel) === 'BON ETAT';
 }
 
+/** Mots des valeurs `etat` serveur (sans accents, ex. « NON RETROUVE ») → orthographe accentuée. */
+const ETAT_ACCENTED_WORDS: Record<string, string> = {
+  ETAT: 'ÉTAT',
+  DETRUIT: 'DÉTRUIT',
+  RETROUVE: 'RETROUVÉ',
+  PRESUME: 'PRÉSUMÉ',
+  DEPLACE: 'DÉPLACÉ',
+  MENACE: 'MENACÉ',
+  VISITE: 'VISITÉ',
+};
+
+/** Restaure les accents d'un libellé d'état en conservant sa casse (« BON ETAT » → « BON ÉTAT »). */
+export function formatEtatLabel(etatLabel: string): string {
+  return etatLabel.replace(/\p{L}+/gu, (word) => {
+    const accented = ETAT_ACCENTED_WORDS[normalizeLabel(word)];
+    if (!accented || accented.length !== word.length) {
+      return word;
+    }
+
+    return Array.from(accented, (char, index) =>
+      word[index] === word[index].toLowerCase() ? char.toLowerCase() : char,
+    ).join('');
+  });
+}
+
 function isScalarPropertyValue(value: unknown): value is string | number | boolean {
   return (
     typeof value === 'string' ||

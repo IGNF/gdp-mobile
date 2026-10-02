@@ -9,7 +9,7 @@ import IconCopy from '@/shared/assets/icons/icon-copy.svg?react';
 // Favori désactivé pour cette version — sera réactivé avec la fonctionnalité (cf. bouton commenté ci-dessous).
 // import IconHeart from '@/shared/assets/icons/icon-heart.svg?react';
 
-import { findEtatLabel, findVisitYear, isBonEtatLabel } from './pointFicheUtils';
+import { findEtatLabel, findVisitYear, formatEtatLabel, isBonEtatLabel } from './pointFicheUtils';
 
 import styles from './MapPointSheet.module.css';
 
@@ -82,7 +82,7 @@ export function MapPointSheetHeader({ action, referencePosition }: MapPointSheet
                 isBonEtatLabel(etatLabel) && styles.statusBadgeGood,
               )}
             >
-              {etatLabel}
+              {formatEtatLabel(etatLabel)}
             </span>
           ) : null}
 
