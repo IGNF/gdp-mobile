@@ -8,8 +8,14 @@ import type {
 import { MapOverlaySheet } from '@/features/map/components/MapOverlaySheet';
 import { Button } from '@/shared/ui/Button';
 
+import {
+  trackGeodesyFiltersApplied,
+  trackGeodesyFiltersResetDraft,
+} from '@/infra/analytics/matomo';
+
 import { GdpGeodesyFiltersForm } from './GdpGeodesyFiltersForm';
 import {
+  buildGeodesyFiltersMatomoSummary,
   countActiveMapGeodesyFilters,
   createDefaultMapGeodesyFilterValues,
 } from './mapGeodesyFiltersUtils';
@@ -52,9 +58,12 @@ export function MapGeodesyFiltersPanel({
 
   const handleReset = () => {
     setDraftValues(createDefaultMapGeodesyFilterValues(filters));
+    trackGeodesyFiltersResetDraft();
   };
 
   const handleApply = () => {
+    const activeCount = countActiveMapGeodesyFilters(filters, draftValues);
+    trackGeodesyFiltersApplied(buildGeodesyFiltersMatomoSummary(filters, draftValues), activeCount);
     onChange(draftValues);
     onClose();
   };

@@ -1,6 +1,7 @@
 import {
   countActiveGeodesyWfsAttributeFilters,
   createDefaultGeodesyWfsAttributeFilterValues,
+  getGeodesyWfsMultiChoiceSelectedValues,
   type GeodesyWfsAttributeFilterDefinition,
   type GeodesyWfsAttributeFilterValues,
 } from '@ign/gdp-tools';
@@ -34,4 +35,97 @@ export function createDefaultMapGeodesyFilterValues(
   filters: readonly GeodesyWfsAttributeFilterDefinition[],
 ): GeodesyWfsAttributeFilterValues {
   return createDefaultGeodesyWfsAttributeFilterValues(filters);
+}
+
+const MATOMO_SUMMARY_MAX_LENGTH = 150;
+
+const DATE_RANGE_MATOMO_SECTIONS: ReadonlyArray<{
+  fromId: string;
+  toId: string;
+  title: string;
+}> = [
+  { fromId: 'VIS_DATE_FROM', toId: 'VIS_DATE_TO', title: 'Vu en place' },
+  { fromId: 'OBS_DATE_FROM', toId: 'OBS_DATE_TO', title: 'Année de détermination' },
+];
+
+function appendDateRangeSummary(
+  parts: string[],
+  values: GeodesyWfsAttributeFilterValues,
+  fromId: string,
+  toId: string,
+  title: string,
+): void {
+  const from = values[fromId];
+  const to = values[toId];
+  const fromYear = typeof from === 'string' ? from.trim() : '';
+  const toYear = typeof to === 'string' ? to.trim() : '';
+
+  if (!fromYear && !toYear) {
+    return;
+  }
+
+  parts.push(`${title}: ${fromYear || '…'}–${toYear || '…'}`);
+}
+
+/** Résumé lisible pour Matomo (sans identifiants de points). */
+export function buildGeodesyFiltersMatomoSummary(
+  filters: readonly GeodesyWfsAttributeFilterDefinition[],
+  values: GeodesyWfsAttributeFilterValues,
+): string {
+  const parts: string[] = [];
+
+  for (const filter of filters) {
+    if (filter.type === 'date') {
+      continue;
+    }
+
+    const value = values[filter.id];
+
+    if (filter.type === 'multiChoice') {
+      if (value === null || value === undefined) {
+        continue;
+      }
+
+      const selected = getGeodesyWfsMultiChoiceSelectedValues(filter, value);
+      if (selected.size === filter.options.length) {
+        continue;
+      }
+
+      const labels = filter.options
+        .filter((option) => selected.has(option.value))
+        .map((option) => option.label);
+
+      if (labels.length > 0) {
+        parts.push(`${filter.title}: ${labels.join(', ')}`);
+      }
+      continue;
+    }
+
+    if (value === null || value === undefined) {
+      continue;
+    }
+
+    if (filter.type === 'choice') {
+      const option = filter.options.find((entry) => entry.value === value);
+      parts.push(`${filter.title}: ${option?.label ?? String(value)}`);
+      continue;
+    }
+
+    if (filter.type === 'boolean') {
+      parts.push(`${filter.title}: ${value ? filter.trueLabel : filter.falseLabel}`);
+    }
+  }
+
+  for (const section of DATE_RANGE_MATOMO_SECTIONS) {
+    appendDateRangeSummary(parts, values, section.fromId, section.toId, section.title);
+  }
+
+  if (parts.length === 0) {
+    return 'Par défaut';
+  }
+
+  const summary = parts.join(' · ');
+  return summary.length > MATOMO_SUMMARY_MAX_LENGTH
+    ? `${summary.slice(0, MATOMO_SUMMARY_MAX_LENGTH - 1)}…`
+    : summary;
 }
