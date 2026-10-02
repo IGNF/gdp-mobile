@@ -81,7 +81,7 @@ export function ReportHistoryPage() {
         )}
       </main>
 
-      <div className={styles.tabbarFloat}>
+      <div className={styles.tabbarBand}>
         <BottomTabbar activeTab="signalements" />
       </div>
     </div>
