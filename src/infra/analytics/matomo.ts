@@ -63,6 +63,8 @@ export function trackPageView(pathname: string): void {
     return;
   }
 
+  initMatomo();
+
   const paq = getPaq();
   const title = resolvePageTitle(pathname);
 
@@ -77,10 +79,24 @@ export function trackEvent(category: string, action: string, name?: string, valu
     return;
   }
 
+  initMatomo();
+
   const paq = getPaq();
   paq.push(['trackEvent', category, action, name, value]);
 }
 
 export function trackOverlayOpen(scope: 'Menu' | 'Carte', name: string): void {
   trackEvent(scope, 'Ouverture', name);
+}
+
+export function trackLayerVisibilityChange(layerLabel: string, visible: boolean): void {
+  trackEvent('Couche', visible ? 'Activer' : 'Masquer', layerLabel);
+}
+
+export function trackLayerReload(layerLabel: string): void {
+  trackEvent('Couche', 'Recharger', layerLabel);
+}
+
+export function trackMiniMapBasemapChange(basemapLabel: string): void {
+  trackEvent('Couche', 'Changer fond', `${basemapLabel} (mini-carte)`);
 }
