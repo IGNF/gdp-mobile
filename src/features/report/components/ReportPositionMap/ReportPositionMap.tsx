@@ -18,6 +18,10 @@ import { Icon, Style } from 'ol/style';
 import 'ol/ol.css';
 
 import {
+  trackLayerVisibilityChange,
+  trackMiniMapBasemapChange,
+} from '@/infra/analytics/matomo';
+import {
   createGeoportailLayerGroup,
   preloadGeoportailCapabilities,
   setActiveGeoportailLayer,
@@ -291,6 +295,7 @@ export function ReportPositionMap({
     if (geoportailGroupRef.current) {
       setActiveGeoportailLayer(geoportailGroupRef.current, name);
     }
+    trackMiniMapBasemapChange(BASEMAP_LABELS[name] ?? name);
     setIsLayerPickerOpen(false);
   };
 
@@ -301,7 +306,10 @@ export function ReportPositionMap({
     popup: false,
   });
   const isGeodesyVisible = geodesy.visibility[GEODESY_TOGGLE_LAYER_ID] ?? false;
-  const handleToggleGeodesy = () => geodesy.toggleLayer(GEODESY_TOGGLE_LAYER_ID);
+  const handleToggleGeodesy = () => {
+    trackLayerVisibilityChange('Géodésie (mini-carte)', !isGeodesyVisible);
+    geodesy.toggleLayer(GEODESY_TOGGLE_LAYER_ID);
+  };
 
   useEffect(() => {
     if (!isFullscreenOpen) {

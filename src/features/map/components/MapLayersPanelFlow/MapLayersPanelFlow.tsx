@@ -27,6 +27,7 @@ import type { MapLayerSheetItem } from '@/features/map/types/mapLayerSheet';
 import { GEOPORTAIL_LAYERS } from '@/shared/constants/map';
 import type { GdpGeodesyMode } from '@/shared/constants/geodesy';
 import type { ReportMapLayerVisibility } from '@/shared/constants/reportMapLayers';
+import { trackLayerReload, trackLayerVisibilityChange } from '@/infra/analytics/matomo';
 import { Alert } from '@/shared/ui/Alert';
 import { formatDateTime } from '@/shared/utils/date';
 import legendSignalement from '@/shared/assets/legends/legend-signalement.png';
@@ -74,6 +75,32 @@ const BASEMAP_SHEET_LAYERS = [
       "La carte topographique représente avec précision le relief, symbolisé par des courbes de niveaux, ainsi que les détails du terrain : routes, sentiers, constructions, bois, arbre isolé, rivière, source...<br>En France, la carte topographique de base est réalisée par l'IGN. Le SCAN 25 Touristique comprend les pictogrammes du thème tourisme de la carte de base."
   },
 ] as const;
+
+const RGP_LAYER_MATOMO_LABEL = 'Réseau GNSS permanent';
+
+function resolveLayerSheetMatomoLabel(layerId: string): string | null {
+  switch (layerId) {
+    case 'reports':
+      return 'Mes signalements';
+    case 'geodesy-wfs':
+      return 'Géodésie';
+    case 'geodesy-annex-rgp':
+      return RGP_LAYER_MATOMO_LABEL;
+    default:
+      if (layerId.startsWith('basemap:')) {
+        const basemapId = layerId.slice('basemap:'.length);
+        return BASEMAP_SHEET_LAYERS.find((layer) => layer.id === basemapId)?.title ?? null;
+      }
+      return null;
+  }
+}
+
+function trackLayerSheetVisibility(layerId: string, visible: boolean): void {
+  const label = resolveLayerSheetMatomoLabel(layerId);
+  if (label) {
+    trackLayerVisibilityChange(label, visible);
+  }
+}
 
 export interface MapLayersPanelFlowProps {
   isOpen: boolean;
@@ -339,6 +366,7 @@ export function MapLayersPanelFlow({
         ...reportMapLayers,
         myReports: visible,
       });
+      trackLayerSheetVisibility(layerId, visible);
       return;
     }
 
@@ -359,6 +387,7 @@ export function MapLayersPanelFlow({
       } else {
         setWfsVisibility(false);
       }
+      trackLayerSheetVisibility(layerId, visible);
       return;
     }
 
@@ -372,6 +401,7 @@ export function MapLayersPanelFlow({
       } else {
         setAnnexVisibility(false);
       }
+      trackLayerSheetVisibility(layerId, visible);
       return;
     }
 
@@ -380,8 +410,10 @@ export function MapLayersPanelFlow({
       if (visible) {
         onActiveBasemapChange(basemapId);
         onGeoservicesVisibleChange(true);
+        trackLayerSheetVisibility(layerId, true);
       } else if (activeBasemap === basemapId) {
         onGeoservicesVisibleChange(false);
+        trackLayerSheetVisibility(layerId, false);
       }
     }
   };
@@ -401,6 +433,7 @@ export function MapLayersPanelFlow({
     try {
       await reloadGeodesyAnnexLayerOnMap(map, 'GDP_RGP2');
       refreshRgpLastLoadedAt();
+      trackLayerReload(RGP_LAYER_MATOMO_LABEL);
       setIsRgpReloadConfirmOpen(false);
     } catch (error) {
       console.error('[gdp-mobile] RGP reload failed:', error);

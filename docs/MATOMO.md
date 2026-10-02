@@ -75,6 +75,21 @@ Dans Matomo : **Comportement → Événements**, filtrer par catégorie `Menu` o
 
 Les liens externes du menu (ex. « Je donne mon avis ») passent par `enableLinkTracking` (clics sortants).
 
+## Couches carte (panneau Couches, mini-carte signalement)
+
+Les changements de couches ne passent pas par React Router : événements Matomo catégorie **`Couche`**, déclenchés uniquement par une **action utilisateur** (pas la restauration des préférences au chargement).
+
+| Action | Nom (exemples) | Déclencheur |
+|---|---|---|
+| `Activer` / `Masquer` | Mes signalements, Géodésie, Réseau GNSS permanent, Plan IGN, … | Panneau **Couches** sur `/map` (`MapLayersPanelFlow`) |
+| `Recharger` | Réseau GNSS permanent | Bouton recharger RGP (après succès) |
+| `Changer fond` | `Plan IGN (mini-carte)`, … | Sélecteur de fond sur la mini-carte (`ReportPositionMap`) |
+| `Activer` / `Masquer` | `Géodésie (mini-carte)` | Case à cocher Géodésie sur la mini-carte |
+
+Helpers : `trackLayerVisibilityChange`, `trackLayerReload`, `trackMiniMapBasemapChange` dans `src/infra/analytics/matomo.ts`.
+
+Dans Matomo : **Comportement → Événements**, catégorie `Couche`.
+
 ## Dimension personnalisée (plateforme)
 
 Avant chaque page vue, la dimension **1** reçoit la plateforme Capacitor : `web`, `android` ou `ios`.
@@ -86,13 +101,20 @@ Cette dimension doit être créée dans l’administration Matomo du site concer
 Pour tracer une action ponctuelle :
 
 ```ts
-import { trackEvent, trackOverlayOpen } from '@/infra/analytics/matomo';
+import {
+  trackEvent,
+  trackLayerReload,
+  trackLayerVisibilityChange,
+  trackMiniMapBasemapChange,
+  trackOverlayOpen,
+} from '@/infra/analytics/matomo';
 
 trackEvent('Signalement', 'Envoi');
 trackOverlayOpen('Menu', 'Paramètres');
+trackLayerVisibilityChange('Géodésie', true);
 ```
 
-Signatures : `trackEvent(category, action, name?, value?)`, `trackOverlayOpen(scope, name)`.
+Signatures : `trackEvent`, `trackOverlayOpen`, `trackLayerVisibilityChange`, `trackLayerReload`, `trackMiniMapBasemapChange`.
 
 Ne pas y mettre de données personnelles (e-mail, identifiant de signalement, coordonnées).
 
