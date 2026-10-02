@@ -25,7 +25,9 @@
 
 .photoSourceRow {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  /* Colonnes égales selon le nombre de sources (galerie seule sur le web). */
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
   gap: 0.75rem;
 }
 

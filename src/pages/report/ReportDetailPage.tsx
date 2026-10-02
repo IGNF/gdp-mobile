@@ -166,23 +166,25 @@ export function ReportDetailPage() {
             variant="outline"
             color="danger"
             fullWidth
+            className={styles.footerButton}
             onClick={() => {
               void handleDelete();
             }}
           >
-            <IconDelete className={styles.actionIcon} aria-hidden />
+            <IconDelete className={styles.footerButtonIcon} aria-hidden />
             Supprimer
           </Button>
           <Button
             type="button"
             fullWidth
+            className={styles.footerButton}
             loading={isSubmitting}
             disabled={Boolean(draft.serverId)}
             onClick={() => {
               void handleSend();
             }}
           >
-            <IconSend className={styles.actionIcon} aria-hidden />
+            <IconSend className={styles.footerButtonIcon} aria-hidden />
             {draft.serverId ? 'Envoyé' : 'Envoyer'}
           </Button>
         </div>

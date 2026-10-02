@@ -4,8 +4,26 @@
   /* Hauteur fixe (pas `min-height`) : sans elle, la page grandit avec son contenu au lieu
      que `.main` défile seul, et la barre d'onglets suit le dernier élément au lieu de
      rester fixée en bas (cf. `.mapPage` dans MapPage.module.css, même principe). */
-  height: 100dvh;
+  /* `- safe-top` : #root a déjà `padding-top: var(--safe-top)` (global.css) ; sans ça la page
+     dépasse l'écran de cette hauteur et la barre d'onglets perd son écart `--safe-bottom`. */
+  height: calc(100dvh - var(--safe-top));
+  position: relative;
   background: var(--color-bg-page);
+}
+
+/* Barre d'onglets flottante : posée au-dessus de `.main`, qui défile dessous sans lui
+   réserver de place (cf. `.main`, marge basse pour pouvoir dégager le dernier élément). */
+.tabbarFloat {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  pointer-events: none;
+}
+
+.tabbarFloat > * {
+  pointer-events: auto;
 }
 
 /* `.page` en préfixe : doit l'emporter sur le fond par défaut de PageHeader. */
@@ -16,10 +34,18 @@
 .main {
   flex: 1;
   overflow: auto;
-  padding: 1rem 1rem calc(1rem + var(--safe-bottom));
+  /* Hauteur + marge basse de la barre d'onglets flottante (BottomTabbar.module.css), + 1rem. */
+  padding: 1rem 1rem calc(4.5rem + var(--spacing-xl) + var(--safe-bottom) + 1rem);
   display: flex;
   flex-direction: column;
   gap: 1rem;
+}
+
+/* `.main` défile : ses enfants gardent leur taille au lieu d'être écrasés quand la liste
+   déborde (barre de recherche aplatie, filtres coupés). `.page` en préfixe pour primer sur
+   `flex: 1 0 0` de .button (Button.module.css), qui écraserait aussi « Charger plus ». */
+.page .main > * {
+  flex: 0 0 auto;
 }
 
 .searchWrap {
@@ -183,6 +209,19 @@
   font-weight: 700;
   line-height: 1rem;
   color: var(--color-text-title);
+  /* Le CSS de GeodesyPointTitle (@ign/gdp-tools) n'est pas exporté par le paquet : on
+     reproduit ici l'espacement picto / texte. */
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.reportId img {
+  flex: none;
+  width: 1.5rem;
+  height: 1.5rem;
+  object-fit: contain;
 }
 
 .reportTitleGroup {
