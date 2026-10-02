@@ -4,12 +4,29 @@
   gap: 24px;
 }
 
+.titleAPropos {
+  color: var(--figma-green-6);
+  text-align: center;
+  margin: 0;
+  padding: 0;
+  font-family: "Fira Sans";
+  font-size: 1.25rem;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+
+}
+
+.logo {
+  margin-bottom: 0;
+}
 .version {
   margin: -12px 0 0;
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-normal);
   color: var(--color-text-secondary);
   text-align: center;
+  line-height: normal;
 }
 
 .section {
@@ -19,8 +36,101 @@
 }
 
 .sectionTitle {
+  color: var(--gray-10, #2A2826);
+
+  /* Headings/H3 bold */
+  font-family: "Fira Sans";
+  font-size: 1rem;
+  font-style: normal;
+  font-weight: 700;
+  line-height: normal;
+}
+
+.legal {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.legalTrigger {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  width: 100%;
   margin: 0;
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--color-text);
+  padding: 16px 18px;
+  border: 0;
+  border-radius: var(--radius-xl);
+  background: var(--color-bg-surface);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.legalLabel {
+  flex: 1;
+  margin: 0;
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-gray-10);
+}
+
+.legalPlus,
+.legalClose {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+}
+
+.legalPlus {
+  font-size: 22px;
+  font-weight: var(--font-weight-normal);
+  line-height: 1;
+  color: var(--color-text-gray-10);
+}
+
+.legalClose {
+  border-radius: var(--radius-circle);
+  background: var(--color-bg-primary-subtle);
+}
+
+.legalIcon {
+  width: 12px;
+  height: 12px;
+}
+
+.legalIcon path {
+  fill: var(--color-text-gray-10);
+}
+
+.legalPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0;
+  padding: var(--spacing-md);
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-primary-subtle);
+  color: var(--color-text-gray-10);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-normal);
+  line-height: 1.4;
+}
+
+.legalPanel p {
+  margin: 0;
+}
+
+.legalHeading {
+  font-weight: var(--font-weight-bold);
+}
+
+.legalList {
+  margin: 0;
+  padding-left: 1.25rem;
 }
