@@ -1,0 +1,8 @@
+<svg id="boussole" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <!-- Fond du bouton -->
+  <circle cx="64" cy="64" r="60" fill="#ffffff"/>
+  <!-- Aiguille : triangle isocèle, ratio base/hauteur 28/58, pointant vers le Nord -->
+  <polygon points="64,20 77.39,75.48 50.61,75.48" fill="#1e8467"/>
+  <!-- Lettre N, centrée sous l'aiguille -->
+  <polygon points="52.52,107.04 52.52,82.17 57.78,82.17 70.22,100.83 70.22,82.17 75.48,82.17 75.48,107.04 70.22,107.04 57.78,88.39 57.78,107.04" fill="#2d3436"/>
+</svg>
