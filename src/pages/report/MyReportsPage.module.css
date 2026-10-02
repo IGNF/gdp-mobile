@@ -22,6 +22,13 @@
   gap: 1rem;
 }
 
+/* `.main` défile : ses enfants gardent leur taille au lieu d'être écrasés quand la liste
+   déborde (barre de recherche aplatie, filtres coupés). `.page` en préfixe pour primer sur
+   `flex: 1 0 0` de .button (Button.module.css), qui écraserait aussi « Charger plus ». */
+.page .main > * {
+  flex: 0 0 auto;
+}
+
 .searchWrap {
   display: flex;
   align-items: center;
@@ -183,6 +190,19 @@
   font-weight: 700;
   line-height: 1rem;
   color: var(--color-text-title);
+  /* Le CSS de GeodesyPointTitle (@ign/gdp-tools) n'est pas exporté par le paquet : on
+     reproduit ici l'espacement picto / texte. */
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.reportId img {
+  flex: none;
+  width: 1.5rem;
+  height: 1.5rem;
+  object-fit: contain;
 }
 
 .reportTitleGroup {
