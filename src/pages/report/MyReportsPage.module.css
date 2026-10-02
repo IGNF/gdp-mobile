@@ -5,7 +5,23 @@
      que `.main` défile seul, et la barre d'onglets suit le dernier élément au lieu de
      rester fixée en bas (cf. `.mapPage` dans MapPage.module.css, même principe). */
   height: 100dvh;
+  position: relative;
   background: var(--color-bg-page);
+}
+
+/* Barre d'onglets flottante : posée au-dessus de `.main`, qui défile dessous sans lui
+   réserver de place (cf. `.main`, marge basse pour pouvoir dégager le dernier élément). */
+.tabbarFloat {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  pointer-events: none;
+}
+
+.tabbarFloat > * {
+  pointer-events: auto;
 }
 
 /* `.page` en préfixe : doit l'emporter sur le fond par défaut de PageHeader. */
@@ -16,7 +32,8 @@
 .main {
   flex: 1;
   overflow: auto;
-  padding: 1rem 1rem calc(1rem + var(--safe-bottom));
+  /* Hauteur + marge basse de la barre d'onglets flottante (BottomTabbar.module.css), + 1rem. */
+  padding: 1rem 1rem calc(4.5rem + var(--spacing-xl) + var(--safe-bottom) + 1rem);
   display: flex;
   flex-direction: column;
   gap: 1rem;

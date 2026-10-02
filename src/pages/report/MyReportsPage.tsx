@@ -224,7 +224,9 @@ export function MyReportsPage() {
         )}
       </main>
 
-      <BottomTabbar activeTab="signalements" />
+      <div className={styles.tabbarFloat}>
+        <BottomTabbar activeTab="signalements" />
+      </div>
     </div>
   );
 }
