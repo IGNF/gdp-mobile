@@ -4,7 +4,9 @@
   /* Hauteur fixe (pas `min-height`) : sans elle, la page grandit avec son contenu au lieu
      que `.main` défile seul, et la barre d'onglets suit le dernier élément au lieu de
      rester fixée en bas (cf. `.mapPage` dans MapPage.module.css, même principe). */
-  height: 100dvh;
+  /* `- safe-top` : #root a déjà `padding-top: var(--safe-top)` (global.css) ; sans ça la page
+     dépasse l'écran de cette hauteur et la barre d'onglets perd son écart `--safe-bottom`. */
+  height: calc(100dvh - var(--safe-top));
   position: relative;
   background: var(--color-bg-page);
 }
