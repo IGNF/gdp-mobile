@@ -90,6 +90,21 @@ Helpers : `trackLayerVisibilityChange`, `trackLayerReload`, `trackMiniMapBasemap
 
 Dans Matomo : **Comportement → Événements**, catégorie `Couche`.
 
+## Filtres géodésie (mode expert)
+
+Le panneau **Filtres** (`MapGeodesyFiltersPanel`) n’envoie des événements qu’au clic **Appliquer** ou **Réinitialiser** (brouillon), pas à la restauration des préférences au chargement.
+
+| Catégorie | Action | Nom (3ᵉ arg.) | Valeur (4ᵉ arg.) |
+|---|---|---|---|
+| `Filtre géodésie` | `Appliquer` | Résumé lisible ou `Par défaut` | Nombre de filtres actifs (badge) |
+| `Filtre géodésie` | `Réinitialiser` | `Brouillon` | — |
+
+Exemple de nom : `Type de point: RBF · Origine: IGN · Photo: Avec photo`.
+
+Helpers : `trackGeodesyFiltersApplied`, `trackGeodesyFiltersResetDraft` ; résumé : `buildGeodesyFiltersMatomoSummary` dans `mapGeodesyFiltersUtils.ts`.
+
+Dans Matomo : **Comportement → Événements**, catégorie `Filtre géodésie`.
+
 ## Dimension personnalisée (plateforme)
 
 Avant chaque page vue, la dimension **1** reçoit la plateforme Capacitor : `web`, `android` ou `ios`.
@@ -104,6 +119,7 @@ Pour tracer une action ponctuelle :
 import {
   trackEvent,
   trackLayerReload,
+  trackGeodesyFiltersApplied,
   trackLayerVisibilityChange,
   trackMiniMapBasemapChange,
   trackOverlayOpen,
@@ -114,7 +130,7 @@ trackOverlayOpen('Menu', 'Paramètres');
 trackLayerVisibilityChange('Géodésie', true);
 ```
 
-Signatures : `trackEvent`, `trackOverlayOpen`, `trackLayerVisibilityChange`, `trackLayerReload`, `trackMiniMapBasemapChange`.
+Signatures : `trackEvent`, `trackOverlayOpen`, `trackLayerVisibilityChange`, `trackLayerReload`, `trackMiniMapBasemapChange`, `trackGeodesyFiltersApplied`, `trackGeodesyFiltersResetDraft`.
 
 Ne pas y mettre de données personnelles (e-mail, identifiant de signalement, coordonnées).
 

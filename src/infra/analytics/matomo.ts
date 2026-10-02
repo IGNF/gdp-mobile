@@ -100,3 +100,11 @@ export function trackLayerReload(layerLabel: string): void {
 export function trackMiniMapBasemapChange(basemapLabel: string): void {
   trackEvent('Couche', 'Changer fond', `${basemapLabel} (mini-carte)`);
 }
+
+export function trackGeodesyFiltersApplied(summary: string, activeCount: number): void {
+  trackEvent('Filtre géodésie', 'Appliquer', summary, activeCount);
+}
+
+export function trackGeodesyFiltersResetDraft(): void {
+  trackEvent('Filtre géodésie', 'Réinitialiser', 'Brouillon');
+}
