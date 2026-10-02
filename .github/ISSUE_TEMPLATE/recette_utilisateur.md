@@ -1,178 +1,108 @@
-name: Recette terrain
-description: Compte-rendu d'une sortie de test
-title: "Recette — "
-labels: ["recette"]
-body:
-  - type: markdown
-    attributes:
-      value: |
-        Une recette correspond à une sortie.
-        Indiquez ce que vous avez constaté.
-        Si un test est KO, ouvrez ensuite un ticket Anomalie pour le décrire.
-  - type: input
-    id: date
-    attributes:
-      label: Date de la sortie
-      placeholder: "2 octobre 2026"
-    validations:
-      required: true
-  - type: input
-    id: lieu
-    attributes:
-      label: Lieu
-      placeholder: "Forêt de Fontainebleau"
-    validations:
-      required: true
-  - type: dropdown
-    id: profil
-    attributes:
-      label: Profil de la personne
-      options:
-        - Randonneur
-        - Professionnel
-        - Grand public
-        - Autre
-    validations:
-      required: true
-  - type: dropdown
-    id: mode-appli
-    attributes:
-      label: Affichage des repères dans l'appli
-      options:
-        - Grand public
-        - Expert
-        - Je ne sais pas
-    validations:
-      required: true
-  - type: input
-    id: telephone
-    attributes:
-      label: Modèle du téléphone
-      placeholder: "Samsung Galaxy A54"
-    validations:
-      required: true
-  - type: input
-    id: systeme
-    attributes:
-      label: Version du téléphone
-      description: Android ou iOS, et le numéro. Exemple, Réglages du téléphone, À propos.
-      placeholder: "Android 14"
-    validations:
-      required: true
-  - type: input
-    id: version-appli
-    attributes:
-      label: Version de l'application
-      description: Menu de l'appli, À propos.
-      placeholder: "1.2.0"
-    validations:
-      required: true
-  - type: input
-    id: batterie-debut
-    attributes:
-      label: Batterie au départ (%)
-      placeholder: "80"
-    validations:
-      required: true
-  - type: input
-    id: batterie-fin
-    attributes:
-      label: Batterie à l'arrivée (%)
-      placeholder: "62"
-    validations:
-      required: true
-  - type: input
-    id: duree
-    attributes:
-      label: Durée de la sortie
-      placeholder: "1 h 30"
-    validations:
-      required: true
-  - type: dropdown
-    id: ecran
-    attributes:
-      label: L'écran est-il resté allumé ?
-      options:
-        - Oui
-        - Non
-        - Je ne sais pas
-    validations:
-      required: true
-  - type: dropdown
-    id: gps
-    attributes:
-      label: Le GPS était-il activé ?
-      options:
-        - Oui
-        - Non
-    validations:
-      required: true
-  - type: markdown
-    attributes:
-      value: "## Tests à effectuer"
-  - type: dropdown
-    id: test-carte
-    attributes:
-      label: La carte s'ouvre et des repères s'affichent
-      options: [OK, KO, Pas fait]
-    validations:
-      required: true
-  - type: dropdown
-    id: test-gps
-    attributes:
-      label: Le GPS recentre la carte
-      options: [OK, KO, Pas fait]
-    validations:
-      required: true
-  - type: dropdown
-    id: test-fiche
-    attributes:
-      label: La fiche d'un repère s'ouvre
-      options: [OK, KO, Pas fait]
-    validations:
-      required: true
-  - type: dropdown
-    id: test-fond
-    attributes:
-      label: On change le fond de carte
-      options: [OK, KO, Pas fait]
-    validations:
-      required: true
-  - type: dropdown
-    id: test-recherche
-    attributes:
-      label: On recherche une adresse
-      options: [OK, KO, Pas fait]
-    validations:
-      required: true
-  - type: dropdown
-    id: test-signalement
-    attributes:
-      label: On prépare un signalement
-      options: [OK, KO, Pas fait]
-    validations:
-      required: true
-  - type: dropdown
-    id: test-hors-ligne
-    attributes:
-      label: L'appli reste utilisable sans réseau
-      options: [OK, KO, Pas fait]
-    validations:
-      required: true
-  - type: dropdown
-    id: verdict
-    attributes:
-      label: Résultat de la recette
-      options:
-        - Acceptée
-        - Acceptée avec réserves
-        - Refusée
-    validations:
-      required: true
-  - type: textarea
-    id: notes
-    attributes:
-      label: Ce qui a posé problème
-      description: Quelques phrases suffisent. Pour un KO, le détail ira dans un ticket Anomalie.
-    validations:
-      required: false
+---
+name: recette terrain
+about: compte-rendu d'une sortie de test (téléphone, batterie, profil, tests)
+title: 'Recette — '
+labels: recette
+assignees: ''
+
+---
+
+<!--
+Une recette = une sortie. Remplacez les pointillés, cochez une seule case par test.
+Les consignes entre commentaires disparaissent à la publication.
+Si un test est KO, ouvrez ensuite un ticket Anomalie pour le décrire.
+-->
+
+## La sortie
+
+- **Date** :
+- **Lieu** :
+- **Durée** :
+- **Profil** : <!-- Randonneur, Professionnel, Grand public, ou Autre -->
+- **Affichage des repères** : <!-- Grand public, Expert, ou Je ne sais pas -->
+
+## Le téléphone
+
+<!--
+Modèle : marque et nom, par exemple Samsung Galaxy A54.
+Version du téléphone : Réglages, À propos (Android 14, iOS 18…).
+Version de l'application : menu de l'appli, À propos.
+-->
+
+- **Modèle** :
+- **Version du téléphone** :
+- **Version de l'application** :
+
+## La batterie
+
+<!--
+Pourcentages affichés par le téléphone, au départ puis à l'arrivée.
+-->
+
+- **Au départ (%)** :
+- **À l'arrivée (%)** :
+- **Écran resté allumé** : <!-- Oui, Non, ou Je ne sais pas -->
+- **GPS activé** : <!-- Oui ou Non -->
+
+## Tests
+
+<!--
+Cochez une seule case par ligne : OK, KO ou Pas fait.
+-->
+
+### La carte s'ouvre et des repères s'affichent
+
+- [ ] OK
+- [ ] KO
+- [ ] Pas fait
+
+### Le GPS recentre la carte
+
+- [ ] OK
+- [ ] KO
+- [ ] Pas fait
+
+### La fiche d'un repère s'ouvre
+
+- [ ] OK
+- [ ] KO
+- [ ] Pas fait
+
+### On change le fond de carte
+
+- [ ] OK
+- [ ] KO
+- [ ] Pas fait
+
+### On recherche une adresse
+
+- [ ] OK
+- [ ] KO
+- [ ] Pas fait
+
+### On prépare un signalement
+
+- [ ] OK
+- [ ] KO
+- [ ] Pas fait
+
+### L'appli reste utilisable sans réseau
+
+- [ ] OK
+- [ ] KO
+- [ ] Pas fait
+
+## Résultat
+
+<!-- Cochez une seule case. -->
+
+- [ ] Acceptée
+- [ ] Acceptée avec réserves
+- [ ] Refusée
+
+## Ce qui a posé problème
+
+<!--
+Quelques phrases suffisent. Pour un KO, le détail ira dans un ticket Anomalie.
+-->
+- [ ] ...
