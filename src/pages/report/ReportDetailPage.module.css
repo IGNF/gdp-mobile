@@ -4,7 +4,9 @@
   /* Hauteur fixe (pas `min-height`) : sans elle, la page grandit avec son contenu au lieu
      que `.main` défile seul, et la barre d'onglets suit le dernier élément au lieu de
      rester fixée en bas (cf. `.mapPage` dans MapPage.module.css, même principe). */
-  height: 100dvh;
+  /* `- safe-top` : #root a déjà `padding-top: var(--safe-top)` (global.css) ; sans ça la page
+     dépasse l'écran de cette hauteur et la barre d'onglets perd son écart `--safe-bottom`. */
+  height: calc(100dvh - var(--safe-top));
   background: var(--color-bg-subtle);
 }
 
@@ -214,6 +216,24 @@
   gap: 0.625rem;
   padding: 0.75rem 1rem 0;
   background: var(--color-bg-subtle);
+}
+
+/* flex: 0 0 auto : .button (Button.module.css) impose flex: 1 0 0, qui écrase la hauteur
+   dans un conteneur en colonne. Mêmes dimensions que les boutons du pied de fiche point. */
+.footer .footerButton {
+  flex: 0 0 auto;
+  height: 2.75rem;
+  font-size: var(--font-size-base);
+}
+
+.footerButtonIcon {
+  width: 1.5rem;
+  height: 1.5rem;
+  flex-shrink: 0;
+}
+
+.footerButtonIcon path {
+  fill: currentColor;
 }
 
 .submitError {

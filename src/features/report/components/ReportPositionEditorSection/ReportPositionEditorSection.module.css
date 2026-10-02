@@ -74,3 +74,15 @@
   gap: 0.75rem;
   padding-top: 0.25rem;
 }
+
+/* Même hauteur / police que Suivant et Retour (défauts de .button), largeur du texte, centré.
+   flex: 0 0 auto : le `flex: 1 0 0` de .button écrase la hauteur dans ce conteneur en colonne.
+   Sélecteur composé pour primer sur .button (Button.module.css) quel que soit l'ordre d'import. */
+.positionMapWrap .confirmButton {
+  flex: 0 0 auto;
+  align-self: center;
+  width: auto;
+  height: 2.75rem;
+  margin: 0;
+  font-size: var(--font-size-base);
+}
