@@ -35,6 +35,7 @@ import { useMapClickSelectionMarker } from '@/features/map/hooks/useMapClickSele
 import { usePersistedMapLayers } from '@/features/map/hooks/usePersistedMapLayers';
 import { useReportMapLayers } from '@/features/map/hooks/useReportMapLayers';
 import { useUserLocationMarker } from '@/features/map/hooks/useUserLocationMarker';
+import { trackGeolocationMode } from '@/infra/analytics/matomo';
 import { Gdp_Geolocation } from '@/platform/device/geolocation';
 import { Loading } from '@/shared/ui/Loading';
 import {
@@ -302,12 +303,15 @@ export function MapPage() {
       // Clic 1 : centrer et activer le suivi (sans recentrage automatique)
       void centerOnUserLocation();
       setUserFollowingMode('following');
+      trackGeolocationMode('following');
     } else if (userFollowingMode === 'following') {
       // Clic 2 : activer le verrouillage (recentrage périodique automatique)
       setUserFollowingMode('locked');
+      trackGeolocationMode('locked');
     } else {
       // Clic 3 : désactiver
       setUserFollowingMode('none');
+      trackGeolocationMode('none');
     }
   };
 

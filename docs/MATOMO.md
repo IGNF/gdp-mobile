@@ -105,6 +105,20 @@ Helpers : `trackGeodesyFiltersApplied`, `trackGeodesyFiltersResetDraft` ; résum
 
 Dans Matomo : **Comportement → Événements**, catégorie `Filtre géodésie`.
 
+## Géolocalisation (FAB carte)
+
+Le bouton géolocalisation sur `/map` enchaîne trois modes au clic : **Suivi position** → **Suivi verrouillé** (recentrage) → **Désactivé**. Un événement est envoyé **à chaque clic** sur le FAB (`handleGeolocationButtonClick`), pas quand le suivi s’arrête via déplacement carte, recherche, etc.
+
+| Catégorie | Action | Nom |
+|---|---|---|
+| `Géolocalisation` | `Mode` | `Suivi position` |
+| `Géolocalisation` | `Mode` | `Suivi verrouillé` |
+| `Géolocalisation` | `Mode` | `Désactivé` |
+
+Helper : `trackGeolocationMode` dans `src/infra/analytics/matomo.ts`.
+
+Dans Matomo : **Comportement → Événements**, catégorie `Géolocalisation`.
+
 ## Dimension personnalisée (plateforme)
 
 Avant chaque page vue, la dimension **1** reçoit la plateforme Capacitor : `web`, `android` ou `ios`.
@@ -120,6 +134,7 @@ import {
   trackEvent,
   trackLayerReload,
   trackGeodesyFiltersApplied,
+  trackGeolocationMode,
   trackLayerVisibilityChange,
   trackMiniMapBasemapChange,
   trackOverlayOpen,
@@ -130,7 +145,7 @@ trackOverlayOpen('Menu', 'Paramètres');
 trackLayerVisibilityChange('Géodésie', true);
 ```
 
-Signatures : `trackEvent`, `trackOverlayOpen`, `trackLayerVisibilityChange`, `trackLayerReload`, `trackMiniMapBasemapChange`, `trackGeodesyFiltersApplied`, `trackGeodesyFiltersResetDraft`.
+Signatures : `trackEvent`, `trackOverlayOpen`, `trackLayerVisibilityChange`, `trackLayerReload`, `trackMiniMapBasemapChange`, `trackGeodesyFiltersApplied`, `trackGeodesyFiltersResetDraft`, `trackGeolocationMode`.
 
 Ne pas y mettre de données personnelles (e-mail, identifiant de signalement, coordonnées).
 

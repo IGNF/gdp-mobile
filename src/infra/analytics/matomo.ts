@@ -108,3 +108,16 @@ export function trackGeodesyFiltersApplied(summary: string, activeCount: number)
 export function trackGeodesyFiltersResetDraft(): void {
   trackEvent('Filtre géodésie', 'Réinitialiser', 'Brouillon');
 }
+
+export type GeolocationTrackingMode = 'none' | 'following' | 'locked';
+
+const GEOLOCATION_MODE_LABELS: Record<GeolocationTrackingMode, string> = {
+  none: 'Désactivé',
+  following: 'Suivi position',
+  locked: 'Suivi verrouillé',
+};
+
+/** Clic FAB géolocalisation (cycle none → following → locked → none). */
+export function trackGeolocationMode(mode: GeolocationTrackingMode): void {
+  trackEvent('Géolocalisation', 'Mode', GEOLOCATION_MODE_LABELS[mode]);
+}
