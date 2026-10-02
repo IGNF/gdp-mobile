@@ -147,11 +147,21 @@
 .compassFab {
   right: 1.2rem;
   bottom: calc(var(--map-tabbar-height) + 0.8rem + var(--map-fab-size) + 0.5rem);
+  /* Le disque blanc fait partie du SVG : le fond du bouton le prolonge jusqu'au bord. */
+  background-color: var(--color-white);
+  transition: opacity 0.2s ease-out, visibility 0.2s ease-out;
+}
+
+/* Carte orientée au Nord : boussole masquée (fondu), réaffichée dès que l'utilisateur tourne la carte. */
+.compassFabHidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
 }
 
 .compassIcon {
-  width: 1.5rem;
-  height: 1.5rem;
+  width: 100%;
+  height: 100%;
   transition: transform 0.1s ease-out;
 }
 

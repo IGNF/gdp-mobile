@@ -61,7 +61,7 @@ import {
 } from '@/infra/map/openlayers/geoportailLayers';
 
 import IconGeolocation from '@/shared/assets/icons/icon-geolocation.svg?react';
-import IconCompass from '@/shared/assets/icons/icon-compass-needle.svg?react';
+import IconCompass from '@/shared/assets/icons/boussole.svg?react';
 import IconFilter from '@/shared/assets/icons/icon-filter.svg?react';
 import IconBurger from '@/shared/assets/icons/icon-burger.svg?react';
 import IconLayers from '@/shared/assets/icons/icon-layers.svg?react';
@@ -111,6 +111,15 @@ function isOpenReportPointState(value: unknown): value is OpenReportPointState {
   return typeof point.longitude === 'number' && typeof point.latitude === 'number';
 }
 
+const ROTATION_NORTH_EPSILON_RAD = 1e-3;
+
+/** Vrai si la rotation (radians, éventuellement multiple de 2π) s'écarte du Nord. */
+function isRotationOffNorth(rotation: number): boolean {
+  const TWO_PI = 2 * Math.PI;
+  const normalized = ((rotation % TWO_PI) + TWO_PI) % TWO_PI;
+  return Math.min(normalized, TWO_PI - normalized) > ROTATION_NORTH_EPSILON_RAD;
+}
+
 export function MapPage() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -133,6 +142,8 @@ export function MapPage() {
     rotation,
     resetRotation,
   } = useMap();
+  // Boussole affichée uniquement quand la carte n'est plus orientée au Nord.
+  const isMapRotated = isRotationOffNorth(rotation);
   const [activeBasemap, setActiveBasemap] = useState<string>(GEOPORTAIL_LAYERS.PLAN_IGN);
   const [geoservicesVisible, setGeoservicesVisible] = useState(true);
   const [isLayersPanelOpen, setIsLayersPanelOpen] = useState(false);
@@ -602,14 +613,16 @@ export function MapPage() {
 
           <button
             type="button"
-            className={styles.mapFab + ' ' + styles.compassFab}
+            className={`${styles.mapFab} ${styles.compassFab} ${isMapRotated ? '' : styles.compassFabHidden}`}
             aria-label="Réorienter la carte vers le Nord"
+            aria-hidden={!isMapRotated}
+            tabIndex={isMapRotated ? undefined : -1}
             disabled={!isMapReady}
             onClick={() => resetRotation()}
           >
             <IconCompass
               className={styles.compassIcon}
-              style={{ transform: `rotate(${(-rotation * 180) / Math.PI}deg)` }}
+              style={{ transform: `rotate(${rotation}rad)` }}
               aria-hidden
             />
           </button>
