@@ -33,3 +33,15 @@ export interface LocalReportDraft {
   /** Identifiant EspaceCo après envoi réussi. */
   serverId?: number;
 }
+
+/**
+ * Brouillon déjà parvenu à EspaceCo. Un envoi complet supprime le brouillon ; il ne reste
+ * que si les photos n'ont pas pu être jointes (ou s'il date d'avant cette règle).
+ */
+export function isLocalReportDraftSent(draft: LocalReportDraft): boolean {
+  return draft.status === 'sent' || draft.serverId !== undefined;
+}
+
+export function getLocalReportDraftEffectiveStatus(draft: LocalReportDraft): LocalReportDraftStatus {
+  return isLocalReportDraftSent(draft) ? 'sent' : 'not_sent';
+}
