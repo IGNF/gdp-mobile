@@ -97,14 +97,18 @@ export function ReportDetailPage() {
       },
     );
 
+    // Envoi complet : le signalement vit désormais côté EspaceCo, le brouillon disparaît.
+    if (result && !lastError) {
+      await deleteLocalReportDraft(draft.id);
+      navigate(`/reports/history/${result.serverId}`, { replace: true, state: { from: 'reports' } });
+      return;
+    }
+
+    // Signalement créé mais photos non jointes : on garde le brouillon (et ses photos).
     if (result) {
       const updated = { ...draft, serverId: result.serverId };
       await saveLocalReportDraft(updated);
       setDraft(updated);
-    }
-
-    if (result && !lastError) {
-      return;
     }
 
     setSubmitError(lastError ?? 'Impossible d’envoyer le signalement pour le moment.');

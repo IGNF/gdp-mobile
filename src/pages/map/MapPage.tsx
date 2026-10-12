@@ -26,7 +26,7 @@ import { countActiveMapGeodesyFilters } from '@/features/map/components/MapGeode
 import type { MapLayerGroupId } from '@/features/map/types/mapLayerGroups';
 import type { GeodesyPointReportMapContext } from '@/domain/report/geodesyPointMapContext';
 import type { GroupReport } from '@/domain/report/groupReportModels';
-import type { LocalReportDraft } from '@/domain/report/localReportDraft';
+import { isLocalReportDraftSent, type LocalReportDraft } from '@/domain/report/localReportDraft';
 import { useLocalReportDrafts } from '@/features/report/hooks/useLocalReportDrafts';
 import { useMap } from '@/features/map/hooks/useMap';
 import { useMapGeodesyClick } from '@/features/map/hooks/useMapGeodesyClick';
@@ -249,7 +249,7 @@ export function MapPage() {
 
   const { drafts: localReportDrafts, refetch: refetchLocalReportDrafts } = useLocalReportDrafts();
   const notSentLocalReportDrafts = useMemo(
-    () => localReportDrafts.filter((draft) => draft.status === 'not_sent'),
+    () => localReportDrafts.filter((draft) => !isLocalReportDraftSent(draft)),
     [localReportDrafts],
   );
 
