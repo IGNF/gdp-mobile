@@ -1,7 +1,7 @@
 | Name                           | License type | Link                                                                               | Installed version | Author                                         |
 | :----------------------------- | :----------- | :--------------------------------------------------------------------------------- | :---------------- | :--------------------------------------------- |
-| @capacitor/app                 | MIT          | https://github.com/ionic-team/capacitor-plugins.git                                | 8.1.1             | Ionic <hi@ionicframework.com>                  |
-| @capacitor/browser             | MIT          | https://github.com/ionic-team/capacitor-plugins.git                                | 8.0.4             | Ionic <hi@ionicframework.com>                  |
+| @capacitor/app                 | MIT          | https://github.com/ionic-team/capacitor-plugins.git                                | 8.1.2             | Ionic <hi@ionicframework.com>                  |
+| @capacitor/browser             | MIT          | https://github.com/ionic-team/capacitor-plugins.git                                | 8.0.5             | Ionic <hi@ionicframework.com>                  |
 | @capacitor/core                | MIT          | https://github.com/ionic-team/capacitor.git                                        | 8.5.2             | Ionic Team <hi@ionic.io> (https://ionic.io)    |
 | @capacitor/device              | MIT          | https://github.com/ionic-team/capacitor-plugins.git                                | 8.0.3             | Ionic <hi@ionicframework.com>                  |
 | @capacitor/filesystem          | MIT          | https://github.com/ionic-team/capacitor-filesystem.git                             | 8.1.3             | Outsystems                                     |
