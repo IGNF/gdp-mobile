@@ -97,6 +97,7 @@ function resolveLayerSheetMatomoLabel(layerId: string): string | null {
 
 function trackLayerSheetVisibility(layerId: string, visible: boolean): void {
   const label = resolveLayerSheetMatomoLabel(layerId);
+  console.log('label', label);
   if (label) {
     trackLayerVisibilityChange(label, visible);
   }

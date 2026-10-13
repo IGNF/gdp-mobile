@@ -1,4 +1,9 @@
-import type { GdpRgp2DispoState } from '@ign/gdp-tools';
+import {
+  GDP_RGP2_AVAILABILITY_COLORS,
+  GDP_RGP2_AVAILABILITY_LABELS,
+  type GdpRgp2AvailabilityLevel,
+  type GdpRgp2DispoState,
+} from '@ign/gdp-tools';
 
 import type { NearestRgpStation } from '@/features/map/hooks/useNearestRgpStations';
 import { Loading } from '@/shared/ui/Loading';
@@ -22,7 +27,21 @@ export interface RgpStationsListProps {
   onSelectStation: (longitude: number, latitude: number) => void;
 }
 
-function RgpDispoIndicators({ states }: { states: readonly GdpRgp2DispoState[] }) {
+function RgpDispoIndicators({
+  level,
+  states,
+}: {
+  level: GdpRgp2AvailabilityLevel;
+  states: readonly GdpRgp2DispoState[];
+}) {
+  if (level === 'down') {
+    return (
+      <div className={styles.dispoGroup} aria-hidden>
+        <span className={styles.dispoDown}>En panne</span>
+      </div>
+    );
+  }
+
   const indicators = states.length > 0 ? states : (['unavailable'] as const);
 
   return (
@@ -91,9 +110,17 @@ export function RgpStationsList({
               className={joinCSSClassNames(layout.card, styles.item)}
               onClick={() => onSelectStation(station.longitude, station.latitude)}
             >
-              <RgpDispoIndicators states={station.dispoStates} />
+              <RgpDispoIndicators level={station.availabilityLevel} states={station.dispoStates} />
               <span className={styles.itemText}>
-                <span className={styles.name}>{station.name}</span>
+                <span className={styles.nameRow}>
+                  <span
+                    className={styles.statusDot}
+                    style={{ background: GDP_RGP2_AVAILABILITY_COLORS[station.availabilityLevel] }}
+                    role="img"
+                    aria-label={GDP_RGP2_AVAILABILITY_LABELS[station.availabilityLevel]}
+                  />
+                  <span className={styles.name}>{station.name}</span>
+                </span>
                 {station.commune ? <span className={styles.commune}>{station.commune}</span> : null}
               </span>
               <span className={styles.distance}>{formatDistanceKm(station.distanceKm)}</span>

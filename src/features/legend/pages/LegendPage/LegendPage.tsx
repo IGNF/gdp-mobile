@@ -1,9 +1,16 @@
 import type { ReactNode } from 'react';
-import { GEODESY_GDP_PICTO_URLS } from '@ign/gdp-tools';
+import {
+  GDP_RGP2_AVAILABILITY_COLORS,
+  GDP_RGP2_AVAILABILITY_LABELS,
+  GEODESY_GDP_PICTO_URLS,
+  type GdpRgp2AvailabilityLevel,
+} from '@ign/gdp-tools';
 
 import { MapOverlaySheet } from '@/features/map/components/MapOverlaySheet';
 
 import styles from './LegendPage.module.css';
+
+const RGP_AVAILABILITY_LEVELS: readonly GdpRgp2AvailabilityLevel[] = ['full', 'partial', 'none', 'down'];
 
 export interface LegendPageProps {
   isOpen: boolean;
@@ -98,12 +105,10 @@ export function LegendPage({ isOpen, onClose, maxExpandedHeight }: LegendPagePro
 
         <LegendSection
           title="Réseau GNSS permanent"
-          rows={[
-            { label: 'Station opérationnelle', swatch: <LegendDot color="#26a581" /> },
-            { label: 'Station opérationnelle, données en attente', swatch: <LegendDot color="#f18345" /> },
-            { label: 'Données manquantes', swatch: <LegendDot color="#e86f4a" /> },
-            { label: 'Station en panne', swatch: <LegendDot color="#6c6661" /> },
-          ]}
+          rows={RGP_AVAILABILITY_LEVELS.map((level) => ({
+            label: GDP_RGP2_AVAILABILITY_LABELS[level],
+            swatch: <LegendDot color={GDP_RGP2_AVAILABILITY_COLORS[level]} />,
+          }))}
         />
 
         <LegendSection
