@@ -18,7 +18,7 @@ flowchart TB
 
 | Élément | Rôle |
 |---------|------|
-| `MapBottomSheet` | Bottom sheet carte : recherche/RGP (mode navigation) ou fiche repère (mode point) |
+| `MapBottomSheet` | Bottom sheet carte de la fiche repère (la recherche et les stations RGP sont des routes : `pages/search/`) |
 | `MapPointSheet` | Shell fixe : en-tête + corps (si snap ≥ 1) + pied de page |
 | `MapPointGeodesyFicheBody` | Contenu géodésie (snap 1 → 3) |
 | `MapPointNivellementFicheBody` | Contenu nivellement (snap 1 → 3) |
@@ -31,7 +31,7 @@ flowchart TB
 1. L'utilisateur clique un repère sur la carte.
 2. `useMapGeodesyClick` construit un `MapGeodesyClickAction` via `buildGeodesyPointDisplay` (`gdp-tools`).
 3. `MapPage` passe `mapClick.pendingAction` à `MapBottomSheet` en `selectedPoint`.
-4. Le bottom sheet bascule en **mode point** : snaps dédiés, tabbar masquée, recherche RGP désactivée.
+4. Le bottom sheet bascule en **mode point** : snaps dédiés, tabbar masquée (donc pas d'accès à la recherche).
 
 ## Snaps (4 niveaux)
 
@@ -136,7 +136,7 @@ Quand une fiche repère est ouverte (`selectedPoint !== null`) :
 |--------------|--------|
 | Tabbar | Masquée (`onTabbarVisibleChange(false)`) |
 | Boutons carte (GPS, légende, couches…) | Restent en bas de l'écran (`--map-fab-sheet-offset: 0`), **sous** la fiche (`z-index` sheet > overlays) ; entièrement masqués par la fiche au snap plein écran (3) |
-| Mode navigation | `--map-fab-sheet-offset` = hauteur du sheet recherche/RGP |
+| Hors fiche | Sheet replié (hauteur 0) ; `--map-sheet-height` et `--map-fab-sheet-offset` à 0 |
 
 Variables CSS sur `.mapPage` :
 

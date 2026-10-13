@@ -127,6 +127,7 @@ Notes :
 | `/welcome` | Onboarding |
 | `/login`, `/auth/callback` | SSO |
 | `/map` | Carte — fiche point au clic ([détail](./FICHE_POINT.md)) ; wizard de signalement en overlay |
+| `/map/search`, `/map/search/rgp` | Recherche d’adresse et stations RGP (`pages/search/`) — routes enfants de `/map`, affichées par-dessus la carte qui reste montée (`<Outlet>` + `useMapOutletContext`) |
 | `/reports` | Mes signalements (brouillons locaux + envoyés si connecté) |
 | `/reports/:id` | Détail d’un brouillon / signalement |
 | `/reports/history`, `/reports/history/:id` | Historique communauté |

@@ -11,6 +11,9 @@ import { PageHeader } from '@/shared/ui/PageHeader';
 import IconAngleRight from '@/shared/assets/icons/icon-angle-right.svg?react';
 import IconCalendar from '@/shared/assets/icons/icon-calendar.svg?react';
 
+import { joinCSSClassNames } from '@/shared/utils/join';
+import layout from '@/shared/styles/tabPage.module.css';
+
 import styles from './MyReportsPage.module.css';
 
 /** Les signalements `gdp-tools` (nouvelle app) sont listés sur la page « Signalements ». */
@@ -21,7 +24,7 @@ export function ReportHistoryPage() {
   const { reports, isLoading, isLoadingMore, error, hasMore, loadMore } = useUserReportHistory(LEGACY_REPORT_THEMES);
 
   return (
-    <div className={styles.page}>
+    <div className={layout.page}>
       <PageHeader
         title="Anciens signalements"
         showBackButton
@@ -29,16 +32,16 @@ export function ReportHistoryPage() {
         onBack={() => navigate('/reports')}
       />
 
-      <main className={styles.main}>
+      <main className={layout.main}>
         {isLoading ? (
-          <p className={styles.empty}>Chargement…</p>
+          <p className={layout.empty}>Chargement…</p>
         ) : error ? (
-          <p className={styles.empty}>{error.message}</p>
+          <p className={layout.empty}>{error.message}</p>
         ) : reports.length === 0 ? (
-          <p className={styles.empty}>Aucun ancien signalement trouvé pour ce compte.</p>
+          <p className={layout.empty}>Aucun ancien signalement trouvé pour ce compte.</p>
         ) : (
           <>
-            <ul className={styles.reportList}>
+            <ul className={layout.cardList}>
               {reports.map((report) => {
                 const statusColors = getStatusColors(report.status);
 
@@ -46,7 +49,7 @@ export function ReportHistoryPage() {
                   <li key={report.id}>
                     <button
                       type="button"
-                      className={styles.reportCard}
+                      className={joinCSSClassNames(layout.card, styles.reportCard)}
                       onClick={() => navigate(`/reports/history/${report.id}`)}
                     >
                       <div className={styles.reportCardHeader}>
@@ -65,7 +68,7 @@ export function ReportHistoryPage() {
                           {formatRelativeDayLabel(report.createdAt)}
                         </span>
                       </div>
-                      <IconAngleRight className={styles.reportChevron} aria-hidden />
+                      <IconAngleRight className={layout.cardChevron} aria-hidden />
                     </button>
                   </li>
                 );
@@ -81,7 +84,7 @@ export function ReportHistoryPage() {
         )}
       </main>
 
-      <div className={styles.tabbarBand}>
+      <div className={layout.tabbarBand}>
         <BottomTabbar activeTab="signalements" />
       </div>
     </div>

@@ -33,11 +33,11 @@ export function AboutPage({ isOpen, onClose }: AboutPageProps) {
 
         <section className={styles.section}>
             <div className={styles.sectionTitle}>Notre mission</div>
-            <div className={styles.sectionContent}>
+            <div>
             Cette application permet de <b>consulter</b> la cartographie IGN, les repères géodésiques
             et de <b>signaler</b> leur état sur le terrain.
           </div>
-          <div className={styles.sectionContent}>
+          <div>
             Éditée par l’
             <ExternalLink href="https://www.ign.fr/">Institut national de l’information géographique et forestière</ExternalLink>
           </div>
