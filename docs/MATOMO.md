@@ -84,7 +84,7 @@ Les changements de couches ne passent pas par React Router : événements Matomo
 | Action | Nom (exemples) | Déclencheur |
 |---|---|---|
 | `Activer` / `Masquer` | Mes signalements, Géodésie, Réseau GNSS permanent, Plan IGN, … | Panneau **Couches** sur `/map` (`MapLayersPanelFlow`) |
-| `Recharger` | Réseau GNSS permanent | Bouton recharger RGP (après succès) |
+| `Recharger` | Réseau GNSS permanent | Bouton recharger de la liste des stations RGP, panneau recherche (`useNearestRgpStations`, après succès) |
 | `Changer fond` | `Plan IGN (mini-carte)`, … | Sélecteur de fond sur la mini-carte (`ReportPositionMap`) |
 | `Activer` / `Masquer` | `Géodésie (mini-carte)` | Case à cocher Géodésie sur la mini-carte |
 
@@ -121,11 +121,16 @@ Helper : `trackGeolocationMode` dans `src/infra/analytics/matomo.ts`.
 
 Dans Matomo : **Comportement → Événements**, catégorie `Géolocalisation`.
 
-## Dimension personnalisée (plateforme)
+## Dimensions personnalisées
 
-Avant chaque page vue, la dimension **1** reçoit la plateforme Capacitor : `web`, `android` ou `ios`.
+| Index | Nom | Portée | Valeur | Envoi |
+|---|---|---|---|---|
+| **1** | Version app | visite | version de `gdp-mobile/package.json` (ex. `4.0.16`, via `__APP_VERSION__`) | une fois dans `initMatomo()`, reprise par toutes les requêtes suivantes |
+| **2** | Plateforme | action | `web`, `android` ou `ios` (`Capacitor.getPlatform()`) | avant chaque page vue |
 
-Cette dimension doit être créée dans l’administration Matomo du site concerné (index **1**, portée « action ») pour apparaître dans les rapports.
+Ces dimensions doivent être créées dans l’administration Matomo du site concerné, avec les mêmes index, pour apparaître dans les rapports. Si Matomo attribue un autre identifiant à la création, aligner `src/infra/analytics/matomo.ts`.
+
+La version permet surtout de suivre l’adoption des APK et de relier une variation de stats à une release. Penser à incrémenter `version` dans `gdp-mobile/package.json` à chaque livraison (sinon la valeur par défaut `4.0.0` de `vite.config.ts` est envoyée si le champ est absent).
 
 ## Événements métier (optionnel)
 
@@ -162,6 +167,6 @@ En dev local, les visites remontent sur le site configuré (par défaut le site 
 
 ## Web et APK
 
-Le même code s’exécute dans le navigateur et dans la WebView Capacitor (`fr.ign.canex`). La dimension plateforme permet de les distinguer dans Matomo.
+Le même code s’exécute dans le navigateur et dans la WebView Capacitor (`fr.ign.canex`). La dimension plateforme permet de les distinguer dans Matomo, la dimension version de comparer les versions d’APK installées.
 
 Pour tester l’APK avec le serveur Vite : `npm run dev` + `adb reverse tcp:5173 tcp:5173`, puis ouvrir `http://localhost:5173` sur le téléphone.

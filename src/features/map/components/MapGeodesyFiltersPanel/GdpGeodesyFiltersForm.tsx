@@ -5,6 +5,7 @@ import {
   type GeodesyWfsAttributeFilterValues,
 } from '@ign/gdp-tools';
 
+import { MapSheetSection } from '@/features/map/components/MapSheetSection';
 import {
   GDP_GEODESY_MIN_DETERMINATION_YEAR,
   GDP_GEODESY_MIN_VIS_YEAR,
@@ -14,7 +15,7 @@ import { YearWheelPicker } from '@/shared/ui/YearWheelPicker';
 import { clampNumber } from '@/shared/utils/number';
 import IconClose from '@/shared/assets/icons/icon-close.svg?react';
 
-import styles from './MapGeodesyFiltersPanel.module.css';
+import styles from './GdpGeodesyFiltersForm.module.css';
 
 function updateValue(
   values: GeodesyWfsAttributeFilterValues,
@@ -370,41 +371,37 @@ export function GdpGeodesyFiltersForm({ filters, values, onChange }: GdpGeodesyF
   return (
     <div className={styles.form}>
       {networkFilter?.type === 'multiChoice' ? (
-        <section className={styles.section}>
-          <h3 className={styles.sectionTitle}>{networkFilter.title}</h3>
+        <MapSheetSection title={networkFilter.title}>
           <MultiChoiceRow
             definition={networkFilter}
             value={values[networkFilter.id]}
             onChange={(next) => setFilterValue(networkFilter.id, next)}
           />
-        </section>
+        </MapSheetSection>
       ) : null}
 
       {proprioFilter?.type === 'choice' ? (
-        <section className={styles.section}>
-          <h3 className={styles.sectionTitle}>{proprioFilter.title}</h3>
+        <MapSheetSection title={proprioFilter.title}>
           <ChoiceRow
             definition={proprioFilter}
             value={values[proprioFilter.id]}
             onChange={(next) => setFilterValue(proprioFilter.id, next)}
           />
-        </section>
+        </MapSheetSection>
       ) : null}
 
       {photoFilter?.type === 'boolean' ? (
-        <section className={styles.section}>
-          <h3 className={styles.sectionTitle}>{photoFilter.title}</h3>
+        <MapSheetSection title={photoFilter.title}>
           <BooleanRow
             definition={photoFilter}
             value={values[photoFilter.id]}
             onChange={(next) => setFilterValue(photoFilter.id, next)}
           />
-        </section>
+        </MapSheetSection>
       ) : null}
 
       {hasVisitDates ? (
-        <section className={styles.section}>
-          <h3 className={styles.sectionTitle}>Vu en place</h3>
+        <MapSheetSection title="Vu en place">
           <YearRangeRow
             title="Vu en place"
             minYearBound={GDP_GEODESY_MIN_VIS_YEAR}
@@ -413,12 +410,11 @@ export function GdpGeodesyFiltersForm({ filters, values, onChange }: GdpGeodesyF
             toId="VIS_DATE_TO"
             onChange={onChange}
           />
-        </section>
+        </MapSheetSection>
       ) : null}
 
       {hasObservationDates ? (
-        <section className={styles.section}>
-          <h3 className={styles.sectionTitle}>Année de détermination</h3>
+        <MapSheetSection title="Année de détermination">
           <YearRangeRow
             title="Année de détermination"
             minYearBound={GDP_GEODESY_MIN_DETERMINATION_YEAR}
@@ -427,7 +423,7 @@ export function GdpGeodesyFiltersForm({ filters, values, onChange }: GdpGeodesyF
             toId="OBS_DATE_TO"
             onChange={onChange}
           />
-        </section>
+        </MapSheetSection>
       ) : null}
     </div>
   );

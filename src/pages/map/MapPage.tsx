@@ -17,14 +17,14 @@ import { useAuth } from '@/features/auth/hooks/useAuth';
 import { CommunityPage } from '@/features/community/pages/CommunityPage';
 import { HelpPage } from '@/features/help/pages/HelpPage';
 import { SettingsPage } from '@/features/settings/pages/SettingsPage';
-import { LegendPage } from '@/features/legend/pages/LegendPage';
 import { MapBottomSheet } from '@/features/map/components/MapBottomSheet';
 import { GeodesyPointReportWizard } from '@/features/map/components/GeodesyPointReportWizard';
 import { MapLayersPanelFlow } from '@/features/map/components/MapLayersPanelFlow';
+import { MapLegendPanel } from '@/features/map/components/MapLegendPanel';
 import { GdpNewsBanners } from '@/features/news/components/GdpNewsBanners/GdpNewsBanners';
 import { useGdpNews } from '@/features/news/hooks/useGdpNews';
 import { countActiveMapGeodesyFilters } from '@/features/map/components/MapGeodesyFiltersPanel';
-import type { MapLayerGroupId } from '@/features/map/types/mapLayerGroups';
+import type { MapPanelId } from '@/features/map/types/mapPanels';
 import type { GeodesyPointReportMapContext } from '@/domain/report/geodesyPointMapContext';
 import type { GroupReport } from '@/domain/report/groupReportModels';
 import { isLocalReportDraftSent, type LocalReportDraft } from '@/domain/report/localReportDraft';
@@ -151,14 +151,13 @@ export function MapPage() {
   const isMapRotated = isRotationOffNorth(rotation);
   const [activeBasemap, setActiveBasemap] = useState<string>(GEOPORTAIL_LAYERS.PLAN_IGN);
   const [geoservicesVisible, setGeoservicesVisible] = useState(true);
-  const [isLayersPanelOpen, setIsLayersPanelOpen] = useState(false);
-  const [layersPanelFocus, setLayersPanelFocus] = useState<MapLayerGroupId | null>(null);
+  const [activeMapPanel, setActiveMapPanel] = useState<MapPanelId | null>(null);
+  const isLegendOpen = activeMapPanel === 'legend';
+  const layersFlowView = activeMapPanel === 'layers' || activeMapPanel === 'filters' ? activeMapPanel : null;
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isLegendOpen, setIsLegendOpen] = useState(false);
   const legendFabRef = useRef<HTMLButtonElement>(null);
   const [legendMaxSheetHeight, setLegendMaxSheetHeight] = useState<number | undefined>(undefined);
   const [isTabbarHiddenByPoint, setIsTabbarHiddenByPoint] = useState(false);
-  const [isTabbarHiddenByFilters, setIsTabbarHiddenByFilters] = useState(false);
   const [reportWizardContext, setReportWizardContext] = useState<GeodesyPointReportMapContext | null>(
     null,
   );
@@ -176,7 +175,7 @@ export function MapPage() {
   }, [isTabbarVisible]);
   const [activeOverlay, setActiveOverlay] = useState<LeftMenuOverlayRoute | null>(null);
 
-  useMapPageMatomoTracking({ activeOverlay, isLegendOpen, isLayersPanelOpen });
+  useMapPageMatomoTracking({ activeOverlay, isLegendOpen, isLayersPanelOpen: layersFlowView !== null });
 
   const [geodesyMode, setGeodesyMode] = useState<GdpGeodesyMode>(GDP_GEODESY_DEFAULT_MODE);
   const [wfsClusterPreferences, setWfsClusterPreferences] = useState<GdpWfsClusterPreferences>(
@@ -284,9 +283,7 @@ export function MapPage() {
     }
 
     const handleMapClick = () => {
-      setIsLayersPanelOpen(false);
-      setLayersPanelFocus(null);
-      setIsLegendOpen(false);
+      setActiveMapPanel(null);
     };
 
     map.on('singleclick', handleMapClick);
@@ -389,47 +386,15 @@ export function MapPage() {
 
   const handleOpenMenu = useCallback(() => {
     mapClick.closeActionSheet();
-    setIsLayersPanelOpen(false);
-    setLayersPanelFocus(null);
-    setIsLegendOpen(false);
+    setActiveMapPanel(null);
     setActiveOverlay(null);
     setIsMenuOpen(true);
   }, [mapClick]);
 
-  const handleOpenLayers = () => {
+  // Un FAB ouvre son panneau (en remplaçant celui affiché) ou le referme s'il est déjà ouvert.
+  const handleToggleMapPanel = (panel: MapPanelId) => {
     mapClick.closeActionSheet();
-    setIsLegendOpen(false);
-
-    // Filtres ouverts via le même flow : basculer vers la liste des couches
-    // au lieu de fermer le panneau (isLayersPanelOpen est déjà true).
-    if (isLayersPanelOpen && layersPanelFocus === 'geodesy-filters') {
-      setLayersPanelFocus(null);
-      return;
-    }
-
-    setLayersPanelFocus(null);
-    setIsLayersPanelOpen((current) => !current);
-  };
-
-  const handleOpenFilters = () => {
-    mapClick.closeActionSheet();
-    setIsLegendOpen(false);
-    setLayersPanelFocus('geodesy-filters');
-    setIsLayersPanelOpen(true);
-  };
-
-  const handleOpenLegend = () => {
-    mapClick.closeActionSheet();
-
-    // Depuis filtres/couches : fermer le flow et ouvrir la légende (pas un toggle).
-    if (isLayersPanelOpen) {
-      setIsLayersPanelOpen(false);
-      setLayersPanelFocus(null);
-      setIsLegendOpen(true);
-      return;
-    }
-
-    setIsLegendOpen((current) => !current);
+    setActiveMapPanel((current) => (current === panel ? null : panel));
   };
 
   // Plafonne la fiche légende dépliée pour ne pas couvrir le bouton qui l'ouvre.
@@ -450,9 +415,8 @@ export function MapPage() {
     return () => window.removeEventListener('resize', updateLegendMaxSheetHeight);
   }, [isLegendOpen]);
 
-  const handleCloseLayersPanel = () => {
-    setIsLayersPanelOpen(false);
-    setLayersPanelFocus(null);
+  const handleCloseMapPanel = () => {
+    setActiveMapPanel(null);
   };
 
   const handleMenuNavigate = (route: string) => {
@@ -542,20 +506,20 @@ export function MapPage() {
             {showExpertFiltersButton ? (
               <button
                 type="button"
-                className={`${styles.mapFab} ${isTabbarHiddenByFilters || hasActiveFilters ? styles.mapFabActive : ''}`}
+                className={`${styles.mapFab} ${activeMapPanel === 'filters' || hasActiveFilters ? styles.mapFabActive : ''}`}
                 aria-label="Filtres d'affichage des points"
                 disabled={!isMapReady}
-                onClick={handleOpenFilters}
+                onClick={() => handleToggleMapPanel('filters')}
               >
                 <IconFilter className={styles.mapFabIcon} aria-hidden />
               </button>
             ) : null}
             <button
               type="button"
-              className={`${styles.mapFab} ${isLayersPanelOpen && !isTabbarHiddenByFilters ? styles.mapFabActive : ''}`}
+              className={`${styles.mapFab} ${activeMapPanel === 'layers' ? styles.mapFabActive : ''}`}
               aria-label="Couches"
               disabled={!isMapReady}
-              onClick={handleOpenLayers}
+              onClick={() => handleToggleMapPanel('layers')}
             >
               <IconLayers className={styles.mapFabIcon} aria-hidden />
             </button>
@@ -564,7 +528,7 @@ export function MapPage() {
               type="button"
               className={`${styles.mapFab} ${isLegendOpen ? styles.mapFabActive : ''}`}
               aria-label="Légende"
-              onClick={handleOpenLegend}
+              onClick={() => handleToggleMapPanel('legend')}
             >
               <IconLegend className={styles.mapFabIcon} aria-hidden />
             </button>
@@ -645,20 +609,15 @@ export function MapPage() {
           {isTabbarVisible && !isSearchRoute ? (
             <BottomTabbar
               activeTab="carte"
-              onTabClick={() => {
-                setIsLayersPanelOpen(false);
-                setIsLegendOpen(false);
-              }}
+              onTabClick={handleCloseMapPanel}
             />
           ) : null}
         </div>
       </div>
 
       <MapLayersPanelFlow
-        isOpen={isLayersPanelOpen}
-        onClose={handleCloseLayersPanel}
-        focusGroupId={layersPanelFocus}
-        map={map}
+        view={layersFlowView}
+        onClose={handleCloseMapPanel}
         activeBasemap={activeBasemap}
         onActiveBasemapChange={setActiveBasemap}
         geoservicesVisible={geoservicesVisible}
@@ -680,7 +639,6 @@ export function MapPage() {
         reportMapLayers={reportMapLayers}
         onReportMapLayersChange={setReportMapLayers}
         isAuthenticated={isAuthenticated}
-        onFiltersPanelOpenChange={setIsTabbarHiddenByFilters}
       />
 
       <GeodesyPointReportWizard
@@ -689,9 +647,9 @@ export function MapPage() {
         onClose={() => setReportWizardContext(null)}
       />
 
-      <LegendPage
+      <MapLegendPanel
         isOpen={isLegendOpen}
-        onClose={() => setIsLegendOpen(false)}
+        onClose={handleCloseMapPanel}
         maxExpandedHeight={legendMaxSheetHeight}
       />
 

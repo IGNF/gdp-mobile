@@ -52,6 +52,7 @@ export function initMatomo(): void {
 
   paq.push(['setTrackerUrl', trackerUrl]);
   paq.push(['setSiteId', config.matomo.siteId]);
+  paq.push(['setCustomDimension', 1, __APP_VERSION__]);
   paq.push(['enableLinkTracking']);
 
   const script = document.createElement('script');
@@ -70,7 +71,7 @@ export function trackPageView(pathname: string): void {
   const paq = getPaq();
   const title = resolvePageTitle(pathname);
 
-  paq.push(['setCustomDimension', 1, Capacitor.getPlatform()]);
+  paq.push(['setCustomDimension', 2, Capacitor.getPlatform()]);
   paq.push(['setCustomUrl', window.location.href]);
   paq.push(['setDocumentTitle', title]);
   paq.push(['trackPageView']);

@@ -1,0 +1,17 @@
+.section {
+  padding-bottom: var(--spacing-md);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.section:last-child {
+  border-bottom: none;
+}
+
+.title {
+  margin: var(--spacing-md) 0;
+  color: var( --figma-gray-8);
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  line-height: normal;
+}
