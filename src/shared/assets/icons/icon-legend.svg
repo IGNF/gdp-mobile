@@ -1,16 +1,1 @@
-<svg id="icon-legend" xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30">
-  <rect id="Rectangle_123" data-name="Rectangle 123" width="30" height="30" fill="none"/>
-  <g id="Légende" transform="translate(6.25 3.752)">
-    <path id="Soustraction_11" data-name="Soustraction 11" d="M16.5,22.5H1a1,1,0,0,1-1-1V1A1,1,0,0,1,1,0H16.5a1,1,0,0,1,1,1V21.5A1,1,0,0,1,16.5,22.5ZM2,2V20.5H15.5V2Z" fill="#091625"/>
-    <g id="Groupe_32" data-name="Groupe 32" transform="translate(4.625 4.624)">
-      <rect id="Rectangle_126" data-name="Rectangle 126" width="5.25" height="2" rx="1" transform="translate(2.999)" fill="#091625"/>
-      <rect id="Rectangle_160" data-name="Rectangle 160" width="2" height="2" rx="0.5" fill="#091625"/>
-      <rect id="Rectangle_161" data-name="Rectangle 161" width="2" height="2" rx="0.5" transform="translate(0 3.75)" fill="#091625"/>
-      <rect id="Rectangle_162" data-name="Rectangle 162" width="2" height="2" rx="0.5" transform="translate(0 7.5)" fill="#091625"/>
-      <rect id="Rectangle_163" data-name="Rectangle 163" width="2" height="2" rx="0.5" transform="translate(0 11.25)" fill="#091625"/>
-      <rect id="Rectangle_127" data-name="Rectangle 127" width="5.251" height="2" rx="1" transform="translate(2.998 3.75)" fill="#091625"/>
-      <rect id="Rectangle_128" data-name="Rectangle 128" width="5.251" height="2" rx="1" transform="translate(2.998 7.5)" fill="#091625"/>
-      <rect id="Rectangle_129" data-name="Rectangle 129" width="5.251" height="2" rx="1" transform="translate(2.998 11.25)" fill="#091625"/>
-    </g>
-  </g>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M13 4H21V6H13V4ZM13 11H21V13H13V11ZM13 18H21V20H13V18ZM6.5 19C5.39543 19 4.5 18.1046 4.5 17C4.5 15.8954 5.39543 15 6.5 15C7.60457 15 8.5 15.8954 8.5 17C8.5 18.1046 7.60457 19 6.5 19ZM6.5 21C8.70914 21 10.5 19.2091 10.5 17C10.5 14.7909 8.70914 13 6.5 13C4.29086 13 2.5 14.7909 2.5 17C2.5 19.2091 4.29086 21 6.5 21ZM5 6V9H8V6H5ZM3 4H10V11H3V4Z"></path></svg>
