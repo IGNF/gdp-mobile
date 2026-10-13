@@ -16,7 +16,7 @@ const PAGE_TITLES: Record<string, string> = {
   '/auth/callback': 'Connexion',
   '/map': 'Carte',
   '/map/search': 'Recherche',
-  '/map/search/rgp': 'Stations RGP',
+  '/map/search/rgp': 'Recherche Stations RGP',
   '/reports': 'Mes signalements',
   '/reports/history': 'Anciens signalements',
 };
@@ -114,9 +114,9 @@ export function trackGeodesyFiltersResetDraft(): void {
 export type GeolocationTrackingMode = 'none' | 'following' | 'locked';
 
 const GEOLOCATION_MODE_LABELS: Record<GeolocationTrackingMode, string> = {
-  none: 'Désactivé',
-  following: 'Suivi position',
-  locked: 'Suivi verrouillé',
+  none: 'Suivi position désactivé',
+  following: 'Suivi position activé',
+  locked: 'Suivi position verrouillé',
 };
 
 /** Clic FAB géolocalisation (cycle none → following → locked → none). */
