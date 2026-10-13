@@ -1,15 +1,13 @@
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect } from 'react';
 
 import type Map from 'ol/Map';
-import Overlay from 'ol/Overlay';
+import type { Coordinate } from 'ol/coordinate';
 import SearchGeoportail from 'ol-ext/control/SearchGeoportail';
 import type { Options as SearchGeoportailOptions } from 'ol-ext/control/SearchGeoportail';
 import type { SearchEvent } from 'ol-ext/control/Search';
 import 'ol-ext/control/Search.css';
-import '@/features/search/styles/searchMarker.css';
 
 import {
-  DEFAULT_MAP_SEARCH_ZOOM,
   GEOPORTAIL_API_KEY,
   SEARCH_ADDRESS_MAX_HISTORY,
 } from '@/shared/constants/map';
@@ -23,8 +21,8 @@ interface UseSearchGeoportailOptions {
   addressContainer: HTMLElement | null;
   isOpen: boolean;
   placeholder?: string;
-  onFocus?: () => void;
-  onSelect?: () => void;
+  /** Coordonnée du résultat choisi, en projection carte. */
+  onSelect?: (coordinate: Coordinate) => void;
 }
 
 export interface UseSearchGeoportailReturn {
@@ -44,49 +42,8 @@ export function useSearchGeoportail({
   addressContainer,
   isOpen,
   placeholder = 'Rechercher une adresse',
-  onFocus,
   onSelect,
 }: UseSearchGeoportailOptions): UseSearchGeoportailReturn {
-  const overlayRef = useRef<Overlay | null>(null);
-
-  const clearMarker = useCallback(() => {
-    if (overlayRef.current && map) {
-      map.removeOverlay(overlayRef.current);
-      overlayRef.current.getElement()?.remove();
-      overlayRef.current = null;
-    }
-  }, [map]);
-
-  const showMarkerAtCoordinate = useCallback(
-    (coordinate: number[]) => {
-      if (!map) {
-        return;
-      }
-
-      clearMarker();
-
-      const markerEl = document.createElement('div');
-      markerEl.className = 'search-marker-pulse';
-
-      const overlay = new Overlay({
-        element: markerEl,
-        position: coordinate,
-        positioning: 'center-center',
-        stopEvent: false,
-      });
-
-      overlayRef.current = overlay;
-      map.addOverlay(overlay);
-
-      map.getView().animate({
-        center: coordinate,
-        zoom: Math.max(map.getView().getZoom() ?? DEFAULT_MAP_SEARCH_ZOOM, DEFAULT_MAP_SEARCH_ZOOM),
-        duration: 500,
-      });
-    },
-    [clearMarker, map],
-  );
-
   useEffect(() => {
     if (!map || !isOpen || !addressContainer) {
       return;
@@ -130,19 +87,11 @@ export function useSearchGeoportail({
       window.setTimeout(hideAutocomplete, 200);
     };
 
-    const handleFocus = () => {
-      onFocus?.();
-    };
-
     container.addEventListener('mousedown', keepFocusForSuggestionPick);
     container.addEventListener('pointerdown', keepFocusForSuggestionPick);
     input?.addEventListener('blur', handleBlur);
-    input?.addEventListener('focus', handleFocus);
 
     addressSearch.on('select', (event: SearchEvent) => {
-      if (event.coordinate) {
-        showMarkerAtCoordinate(event.coordinate);
-      }
       if (input) {
         const label =
           typeof event.search === 'object' &&
@@ -155,37 +104,30 @@ export function useSearchGeoportail({
       }
       hideAutocomplete();
       input?.blur();
-      onSelect?.();
+      if (event.coordinate) {
+        onSelect?.(event.coordinate);
+      }
     });
 
     return () => {
       container.removeEventListener('mousedown', keepFocusForSuggestionPick);
       container.removeEventListener('pointerdown', keepFocusForSuggestionPick);
       input?.removeEventListener('blur', handleBlur);
-      input?.removeEventListener('focus', handleFocus);
       addressSearch.setMap(null as unknown as Map);
-      clearMarker();
     };
-  }, [addressContainer, clearMarker, isOpen, map, onFocus, onSelect, placeholder, showMarkerAtCoordinate]);
+  }, [addressContainer, isOpen, map, onSelect, placeholder]);
 
   const selectHistoryEntry = useCallback(
     (entry: AddressSearchHistoryEntry) => {
-      if (!map) {
-        return;
-      }
-
-      const coordinate = fromLonLat([entry.longitude, entry.latitude]);
-      showMarkerAtCoordinate(coordinate);
-
       const input = addressContainer?.querySelector<HTMLInputElement>('input.search');
       if (input) {
         input.value = entry.subtitle ? `${entry.title}, ${entry.subtitle}` : entry.title;
         input.blur();
       }
 
-      onSelect?.();
+      onSelect?.(fromLonLat([entry.longitude, entry.latitude]));
     },
-    [addressContainer, map, onSelect, showMarkerAtCoordinate],
+    [addressContainer, onSelect],
   );
 
   return { selectHistoryEntry };

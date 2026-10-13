@@ -7,10 +7,12 @@ import IconClose from '@/shared/assets/icons/icon-close.svg?react';
 import IconReset from '@/shared/assets/icons/icon-reset.svg?react';
 import { formatDateTime } from '@/shared/utils/date';
 import { formatDistanceKm } from '@/shared/utils/geo';
+import { joinCSSClassNames } from '@/shared/utils/join';
+import layout from '@/shared/styles/tabPage.module.css';
 
-import styles from './MapBottomSheet.module.css';
+import styles from './RgpStationsList.module.css';
 
-export interface BrowseRgpStationsListProps {
+export interface RgpStationsListProps {
   stations: readonly NearestRgpStation[];
   isLoading: boolean;
   isReloading: boolean;
@@ -24,16 +26,16 @@ function RgpDispoIndicators({ states }: { states: readonly GdpRgp2DispoState[] }
   const indicators = states.length > 0 ? states : (['unavailable'] as const);
 
   return (
-    <div className={styles.rgpDispoGroup} aria-hidden>
+    <div className={styles.dispoGroup} aria-hidden>
       {indicators.map((state, index) => (
         <span
           key={`${state}-${index}`}
-          className={state === 'available' ? styles.rgpDispoOk : styles.rgpDispoBad}
+          className={state === 'available' ? styles.dispoOk : styles.dispoBad}
         >
           {state === 'available' ? (
-            <IconCheck className={styles.rgpDispoGlyph} />
+            <IconCheck className={styles.dispoGlyph} />
           ) : (
-            <IconClose className={styles.rgpDispoGlyph} />
+            <IconClose className={styles.dispoGlyph} />
           )}
         </span>
       ))}
@@ -41,7 +43,7 @@ function RgpDispoIndicators({ states }: { states: readonly GdpRgp2DispoState[] }
   );
 }
 
-export function BrowseRgpStationsList({
+export function RgpStationsList({
   stations,
   isLoading,
   isReloading,
@@ -49,52 +51,52 @@ export function BrowseRgpStationsList({
   error,
   onRefresh,
   onSelectStation,
-}: BrowseRgpStationsListProps) {
+}: RgpStationsListProps) {
   return (
-    <div className={styles.browseRgpPanel}>
-      <div className={styles.rgpUpdateRow}>
-        <p className={styles.rgpUpdateText}>
+    <div className={styles.panel}>
+      <div className={styles.updateRow}>
+        <p className={styles.updateText}>
           {lastLoadedAt
             ? `Dernière MAJ : ${formatDateTime(lastLoadedAt)}`
             : 'Données non chargées'}
         </p>
         <button
           type="button"
-          className={styles.rgpRefreshButton}
+          className={styles.refreshButton}
           onClick={onRefresh}
           disabled={isReloading}
         >
-          <IconReset className={styles.rgpRefreshIcon} aria-hidden />
+          <IconReset className={styles.refreshIcon} aria-hidden />
           {isReloading ? 'Actualisation…' : 'Actualiser'}
         </button>
       </div>
 
       {isLoading ? (
-        <div className={styles.rgpLoading}>
+        <div className={styles.loading}>
           <Loading size="small" label="Chargement des stations…" />
         </div>
       ) : null}
 
-      {error ? <p className={styles.rgpError}>{error}</p> : null}
+      {error ? <p className={styles.error}>{error}</p> : null}
 
       {!isLoading && !error && stations.length === 0 ? (
-        <p className={styles.rgpEmpty}>Aucune station RGP à proximité.</p>
+        <p className={layout.empty}>Aucune station RGP à proximité.</p>
       ) : null}
 
-      <ul className={styles.rgpList}>
+      <ul className={layout.cardList}>
         {stations.map((station) => (
           <li key={station.id}>
             <button
               type="button"
-              className={styles.rgpItem}
+              className={joinCSSClassNames(layout.card, styles.item)}
               onClick={() => onSelectStation(station.longitude, station.latitude)}
             >
               <RgpDispoIndicators states={station.dispoStates} />
-              <span className={styles.rgpItemText}>
-                <span className={styles.rgpName}>{station.name}</span>
-                {station.commune ? <span className={styles.rgpCommune}>{station.commune}</span> : null}
+              <span className={styles.itemText}>
+                <span className={styles.name}>{station.name}</span>
+                {station.commune ? <span className={styles.commune}>{station.commune}</span> : null}
               </span>
-              <span className={styles.rgpDistance}>{formatDistanceKm(station.distanceKm)}</span>
+              <span className={styles.distance}>{formatDistanceKm(station.distanceKm)}</span>
             </button>
           </li>
         ))}

@@ -10,6 +10,8 @@ import { MyReportsPage } from '@/pages/report/MyReportsPage';
 import { ReportDetailPage } from '@/pages/report/ReportDetailPage';
 import { ReportHistoryPage } from '@/pages/report/ReportHistoryPage';
 import { ReportHistoryDetailPage } from '@/pages/report/ReportHistoryDetailPage';
+import { RgpStationsPage } from '@/pages/search/RgpStationsPage';
+import { SearchPage } from '@/pages/search/SearchPage';
 
 function routerBasename(): string | undefined {
   const base = import.meta.env.BASE_URL;
@@ -43,6 +45,16 @@ export const router = createBrowserRouter(
         {
           path: '/map',
           element: <MapPage />,
+          children: [
+            {
+              path: 'search',
+              element: <SearchPage />,
+            },
+            {
+              path: 'search/rgp',
+              element: <RgpStationsPage />,
+            },
+          ],
         },
         {
           path: '/reports',

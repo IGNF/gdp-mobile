@@ -30,7 +30,7 @@ export function parseReportPointGeometry(geometry?: string): ReportPointCoordina
       dataProjection: 'EPSG:4326',
       featureProjection: 'EPSG:3857',
     });
-    const geom = feature.getGeometry();
+    const geom = feature?.getGeometry();
     if (!(geom instanceof Point)) {
       return null;
     }

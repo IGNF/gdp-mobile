@@ -6,7 +6,9 @@ import {
 } from '@/features/search/utils/addressSearchHistory';
 
 export function useAddressSearchHistory(isActive: boolean) {
-  const [entries, setEntries] = useState<AddressSearchHistoryEntry[]>([]);
+  const [entries, setEntries] = useState<AddressSearchHistoryEntry[]>(() =>
+    isActive ? readAddressSearchHistory() : [],
+  );
 
   const refresh = useCallback(() => {
     setEntries(readAddressSearchHistory());

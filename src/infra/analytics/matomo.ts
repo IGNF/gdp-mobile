@@ -15,6 +15,8 @@ const PAGE_TITLES: Record<string, string> = {
   '/login': 'Connexion',
   '/auth/callback': 'Connexion',
   '/map': 'Carte',
+  '/map/search': 'Recherche',
+  '/map/search/rgp': 'Stations RGP',
   '/reports': 'Mes signalements',
   '/reports/history': 'Anciens signalements',
 };

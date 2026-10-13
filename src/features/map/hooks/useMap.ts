@@ -533,6 +533,10 @@ export function useMap(options: UseMapOptions = {}): UseMapReturn {
     }
 
     const viewport = olMap.getViewport();
+    if (!viewport) {
+      return;
+    }
+
     const pointerDragListener = olMap.on('pointerdrag', onUserViewportChange);
     viewport.addEventListener('wheel', onUserViewportChange, { passive: true });
     viewport.addEventListener('touchmove', onUserViewportChange, { passive: true });

@@ -53,6 +53,8 @@ Au premier affichage, le script `matomo.js` est injecté dynamiquement. À chaqu
 | `/welcome` | Accueil |
 | `/login`, `/auth/callback` | Connexion |
 | `/map` | Carte |
+| `/map/search` | Recherche |
+| `/map/search/rgp` | Stations RGP |
 | `/reports` | Mes signalements |
 | `/reports/history` | Anciens signalements |
 | `/reports/history/:id` | Détail ancien signalement |

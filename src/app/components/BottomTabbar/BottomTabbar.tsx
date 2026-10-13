@@ -7,28 +7,22 @@ export type AppTabId = 'carte' | 'signalements' | 'recherche';
 
 export interface BottomTabbarProps {
   activeTab: AppTabId;
-  onCloseSearch?: () => void;
   /** Appelé à chaque clic d’onglet (ex. fermer le sélecteur de couches). */
   onTabClick?: (tab: AppTabId) => void;
 }
 
-export function BottomTabbar({ activeTab, onCloseSearch, onTabClick }: BottomTabbarProps) {
+export function BottomTabbar({ activeTab, onTabClick }: BottomTabbarProps) {
   const navigate = useNavigate();
 
   const handleTabClick = (tab: AppTabId) => {
     onTabClick?.(tab);
-
-    if (tab === 'carte' && activeTab === 'recherche') {
-      onCloseSearch?.();
-      return;
-    }
 
     if (tab === activeTab) {
       return;
     }
 
     if (tab === 'recherche') {
-      navigate('/map', { state: { openSearch: true } });
+      navigate('/map/search');
     } else if (tab === 'signalements') {
       navigate('/reports');
     } else {

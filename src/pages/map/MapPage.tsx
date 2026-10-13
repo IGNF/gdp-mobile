@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { Outlet, useLocation, useMatch, useNavigate } from 'react-router-dom';
 import {
   isGeodesyLayerReportingEnabled,
   isGeodesyPointReportAllowed,
 } from '@ign/gdp-tools';
 import { useGeodesyOnMap, useGeodesyWfsLoading } from '@ign/gdp-tools/react';
+import type { Coordinate } from 'ol/coordinate';
 import { fromLonLat } from 'ol/proj';
 
 import { BottomTabbar } from '@/app/components/BottomTabbar';
@@ -35,6 +36,7 @@ import { useMapClickSelectionMarker } from '@/features/map/hooks/useMapClickSele
 import { usePersistedMapLayers } from '@/features/map/hooks/usePersistedMapLayers';
 import { useReportMapLayers } from '@/features/map/hooks/useReportMapLayers';
 import { useUserLocationMarker } from '@/features/map/hooks/useUserLocationMarker';
+import { useSearchResultMarker } from '@/features/search/hooks/useSearchResultMarker';
 import { trackGeolocationMode } from '@/infra/analytics/matomo';
 import { Gdp_Geolocation } from '@/platform/device/geolocation';
 import { Loading } from '@/shared/ui/Loading';
@@ -68,6 +70,7 @@ import IconBurger from '@/shared/assets/icons/icon-burger.svg?react';
 import IconLayers from '@/shared/assets/icons/icon-layers.svg?react';
 import IconLegend from '@/shared/assets/icons/icon-legend.svg?react';
 
+import type { MapOutletContext } from './mapOutletContext';
 import styles from './MapPage.module.css';
 
 interface MapFocusReportState {
@@ -124,6 +127,7 @@ function isRotationOffNorth(rotation: number): boolean {
 export function MapPage() {
   const navigate = useNavigate();
   const location = useLocation();
+  const isSearchRoute = useMatch({ path: '/map/search', end: false }) !== null;
   const { user, isAuthenticated, logout } = useAuth();
   const {
     items: newsItems,
@@ -157,9 +161,6 @@ export function MapPage() {
   const [fabSheetOffset, setFabSheetOffset] = useState(0);
   const [isTabbarHiddenByPoint, setIsTabbarHiddenByPoint] = useState(false);
   const [isTabbarHiddenByFilters, setIsTabbarHiddenByFilters] = useState(false);
-  const [forceExpandSearch, setForceExpandSearch] = useState(false);
-  const [forceCloseSearch, setForceCloseSearch] = useState(false);
-  const [isSearchPanelOpen, setIsSearchPanelOpen] = useState(false);
   const [reportWizardContext, setReportWizardContext] = useState<GeodesyPointReportMapContext | null>(
     null,
   );
@@ -355,28 +356,6 @@ export function MapPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [focusOnCoordinate, isMapReady, location.state, mapClick.openPointAtCoordinate, navigate]);
 
-  // Un seul traitement par signal `openSearch` (comparaison de référence sur `location.state`) :
-  // les resets d'état passent pendant le rendu, `navigate` (effet de bord réel) reste dans
-  // l'effet. État (pas ref) pour mémoriser le signal déjà traité : les refs ne se
-  // lisent/modifient pas pendant le rendu.
-  const [handledOpenSearchState, setHandledOpenSearchState] = useState<unknown>(undefined);
-  if (location.state?.openSearch && handledOpenSearchState !== location.state) {
-    setHandledOpenSearchState(location.state);
-    setIsLayersPanelOpen(false);
-    setIsLegendOpen(false);
-    setForceExpandSearch(true);
-  }
-
-  useEffect(() => {
-    if (!location.state?.openSearch) {
-      return;
-    }
-
-    navigate('/map', { replace: true, state: null });
-    const timer = setTimeout(() => setForceExpandSearch(false), 100);
-    return () => clearTimeout(timer);
-  }, [location.state, navigate]);
-
   useEffect(() => {
     if (!map) {
       return;
@@ -409,20 +388,14 @@ export function MapPage() {
         ? 'auth'
         : null;
 
-  const closeBrowsePanels = useCallback(() => {
-    setForceCloseSearch(true);
-    window.setTimeout(() => setForceCloseSearch(false), 100);
-  }, []);
-
   const handleOpenMenu = useCallback(() => {
     mapClick.closeActionSheet();
     setIsLayersPanelOpen(false);
     setLayersPanelFocus(null);
     setIsLegendOpen(false);
     setActiveOverlay(null);
-    closeBrowsePanels();
     setIsMenuOpen(true);
-  }, [closeBrowsePanels, mapClick]);
+  }, [mapClick]);
 
   const handleOpenLayers = () => {
     mapClick.closeActionSheet();
@@ -437,9 +410,6 @@ export function MapPage() {
 
     setLayersPanelFocus(null);
     setIsLayersPanelOpen((current) => !current);
-    if (!isLayersPanelOpen) {
-      closeBrowsePanels();
-    }
   };
 
   const handleOpenFilters = () => {
@@ -447,12 +417,10 @@ export function MapPage() {
     setIsLegendOpen(false);
     setLayersPanelFocus('geodesy-filters');
     setIsLayersPanelOpen(true);
-    closeBrowsePanels();
   };
 
   const handleOpenLegend = () => {
     mapClick.closeActionSheet();
-    closeBrowsePanels();
 
     // Depuis filtres/couches : fermer le flow et ouvrir la légende (pas un toggle).
     if (isLayersPanelOpen) {
@@ -497,16 +465,35 @@ export function MapPage() {
     navigate(route);
   };
 
-  const handleFocusCoordinate = useCallback(
-    (longitude: number, latitude: number) => {
-      void focusOnCoordinate(longitude, latitude);
+  const { showSearchResult } = useSearchResultMarker(map);
+
+  const handleSelectSearchResult = useCallback(
+    (coordinate: Coordinate) => {
+      // Sinon le suivi GPS recentrerait aussitôt la carte sur l'utilisateur.
+      setUserFollowingMode('none');
+      showSearchResult(coordinate);
+      navigate('/map');
     },
-    [focusOnCoordinate],
+    [navigate, setUserFollowingMode, showSearchResult],
   );
 
-  const handleDisableUserFollowing = useCallback(() => {
-    setUserFollowingMode('none');
-  }, [setUserFollowingMode]);
+  const handleSelectRgpStation = useCallback(
+    (longitude: number, latitude: number) => {
+      void focusOnCoordinate(longitude, latitude);
+      navigate('/map');
+    },
+    [focusOnCoordinate, navigate],
+  );
+
+  const mapOutletContext = useMemo<MapOutletContext>(
+    () => ({
+      map,
+      isMapReady,
+      onSelectSearchResult: handleSelectSearchResult,
+      onSelectRgpStation: handleSelectRgpStation,
+    }),
+    [handleSelectRgpStation, handleSelectSearchResult, isMapReady, map],
+  );
 
   const handleReportPoint = useCallback(() => {
     if (!canReportPoint || !pendingAction) {
@@ -516,11 +503,6 @@ export function MapPage() {
     setReportWizardContext({ source: 'map', reportContext: pendingAction.reportContext });
     mapClick.closeActionSheet();
   }, [canReportPoint, mapClick, pendingAction]);
-
-  const handleCloseSearch = useCallback(() => {
-    setForceCloseSearch(true);
-    setTimeout(() => setForceCloseSearch(false), 100);
-  }, []);
 
   const hasActiveFilters =
     geodesyMode === 'expert' &&
@@ -659,41 +641,26 @@ export function MapPage() {
           </button>
         </div>
 
-        <div
-          className={`${styles.mapChrome} ${isSearchPanelOpen ? styles.mapChromeSearchOpen : ''}`}
-        >
+        <div className={styles.mapChrome}>
           <MapBottomSheet
-            map={map}
-            isMapReady={isMapReady}
             selectedPoint={pendingAction}
             canReportPoint={canReportPoint}
             userFollowingMode={userFollowingMode}
             reportDisabledReason={reportDisabledReason}
             onClosePoint={mapClick.closeActionSheet}
             onReportPoint={handleReportPoint}
-            onFocusCoordinate={handleFocusCoordinate}
-            onDisableUserFollowing={handleDisableUserFollowing}
             onSheetHeightChange={setSheetHeight}
             onFabSheetOffsetChange={setFabSheetOffset}
             onTabbarVisibleChange={(visible) => setIsTabbarHiddenByPoint(!visible)}
-            hideBrowseSheet={isTabbarHiddenByFilters}
-            collapseBrowseSearch={isLayersPanelOpen || isTabbarHiddenByFilters}
-            forceExpandSearch={forceExpandSearch}
-            forceCloseSearch={forceCloseSearch}
-            onSearchPanelStateChange={setIsSearchPanelOpen}
           />
 
-          {isTabbarVisible ? (
+          {/* Sur `/map/search`, l'écran de recherche affiche sa propre barre d'onglets. */}
+          {isTabbarVisible && !isSearchRoute ? (
             <BottomTabbar
-              activeTab={isSearchPanelOpen ? 'recherche' : 'carte'}
-              onCloseSearch={handleCloseSearch}
-              onTabClick={(tab) => {
+              activeTab="carte"
+              onTabClick={() => {
                 setIsLayersPanelOpen(false);
                 setIsLegendOpen(false);
-                if (tab === 'recherche') {
-                  setForceExpandSearch(true);
-                  window.setTimeout(() => setForceExpandSearch(false), 100);
-                }
               }}
             />
           ) : null}
@@ -765,6 +732,8 @@ export function MapPage() {
         isNewsLoading={isNewsLoading}
       />
       <AboutPage isOpen={activeOverlay === '/about'} onClose={() => setActiveOverlay(null)} />
+
+      <Outlet context={mapOutletContext} />
     </div>
   );
 }
