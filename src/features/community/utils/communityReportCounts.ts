@@ -11,6 +11,10 @@ export interface FetchCommunityReportCountOptions {
   /** Thèmes à inclure dans le filtre `attributes` (obligatoire côté API GDP). */
   themes: readonly string[];
   status?: string;
+  /** `AAAA-MM-JJ` : signalements créés à partir de cette date (`opening_date`). */
+  openedSince?: string;
+  /** `AAAA-MM-JJ` : signalements clôturés à partir de cette date (`closing_date`). */
+  closedSince?: string;
 }
 
 async function readPaginatedTotal(response: ApiResponse): Promise<number> {
@@ -37,6 +41,8 @@ function buildReportCountQueryParams(options: FetchCommunityReportCountOptions):
     sort: 'id:DESC',
     attributes: serializeGdpReportThemeFilters(themes),
     ...(options.status ? { status: options.status } : {}),
+    ...(options.openedSince ? { opening_date: options.openedSince } : {}),
+    ...(options.closedSince ? { closing_date: options.closedSince } : {}),
   };
 }
 

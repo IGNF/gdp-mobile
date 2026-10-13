@@ -3,16 +3,17 @@
 ## Couches `src/`
 
 ```
-app/ → features/ → infra/ → platform/ → domain/
-         ↓
-      shared/ + styles/
+pages/ + features/ → app/ → infra/ + platform/ → domain/
+
+shared/ + styles/ : utilisables depuis toutes les couches
 ```
 
 | Couche | Rôle |
 |--------|------|
 | `domain/` | Modèles purs, sans React ni réseau (imports de **types** `@ign/gdp-tools` acceptés) |
-| `infra/` | Auth, API collaboratif, OpenLayers, stockage |
+| `infra/` | Auth, API collaboratif, OpenLayers, stockage local, persistance du viewport, cache, analytics Matomo, actualités, thèmes communauté |
 | `platform/` | Wrappers `@ign/mobile-device` / Capacitor |
+| `app/` | `App.tsx`, router, providers, `BottomTabbar`, `LeftMenu` |
 | `features/` | Hooks et composants métier |
 | `pages/` | Écrans routés (fine couche) |
 | `shared/` | UI, config, constantes, utils |
@@ -126,13 +127,32 @@ Notes :
 | `/` | Redirect → `/welcome` (premier lancement), sinon `/login` ou `/map` selon `VITE_AUTH_REQUIRED` |
 | `/welcome` | Onboarding |
 | `/login`, `/auth/callback` | SSO |
-| `/map` | Carte — fiche point au clic ([détail](./FICHE_POINT.md)) ; wizard de signalement en overlay |
+| `/map` | Carte — fiche point au clic ([détail](./FICHE_POINT.md)) ; panneaux couches / filtres / légende ([détail](#panneaux-carte)) ; wizard de signalement en overlay |
 | `/map/search`, `/map/search/rgp` | Recherche d’adresse et stations RGP (`pages/search/`) — routes enfants de `/map`, affichées par-dessus la carte qui reste montée (`<Outlet>` + `useMapOutletContext`) |
 | `/reports` | Mes signalements (brouillons locaux + envoyés si connecté) |
 | `/reports/:id` | Détail d’un brouillon / signalement |
 | `/reports/history`, `/reports/history/:id` | Historique communauté |
 
-Compte, paramètres, aide, à propos, favoris et communauté sont des **overlays** (`SlideUpPage`) ouverts depuis le menu latéral, pas des routes du router.
+Compte, paramètres, communauté, aide, à propos et déconnexion sont des **overlays** (`SlideUpPage`) ouverts depuis le menu latéral, pas des routes du router (liste : `app/components/LeftMenu/leftMenuRoutes.ts`).
+
+## Panneaux carte
+
+Les boutons flottants **Couches**, **Filtres** (mode expert) et **Légende** de `/map` ouvrent un seul panneau à la fois : état `activeMapPanel` (type `MapPanelId`) dans `pages/map/MapPage.tsx`. Un clic sur le bouton du panneau ouvert le referme ; un clic sur la carte ou la tabbar ferme le panneau.
+
+| Panneau | Composant (`features/map/components/`) |
+|---------|----------------------------------------|
+| Couches | `MapLayersPanel` — vignettes groupées « Données » / « Fonds de carte » |
+| Filtres | `MapGeodesyFiltersPanel` + `GdpGeodesyFiltersForm` — brouillon appliqué au clic **Appliquer** |
+| Légende | `MapLegendPanel` — pictos géodésie, disponibilité RGP, signalements |
+
+Couches et filtres sont orchestrés par `MapLayersPanelFlow` (prop `view` : `'layers'` / `'filters'` / `null`), qui fait le lien avec la visibilité des couches et les filtres WFS de `@ign/gdp-tools`.
+
+Charte commune :
+
+- `MapOverlaySheet` : panneau en portail au-dessus de la carte — titre aligné à gauche (+ pastille optionnelle), `size="large"` (plafond `min(92vh, 43.5rem)`), poignée `draggable`, `footer` optionnel.
+- `MapSheetSection` : section titrée, séparée de la suivante par un trait. À réutiliser pour tout nouveau panneau.
+
+La recharge des données RGP se fait depuis la liste des stations (`/map/search/rgp`, hook `useNearestRgpStations`), pas depuis le panneau Couches.
 
 ## Documentation métier carte
 

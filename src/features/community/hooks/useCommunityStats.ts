@@ -13,10 +13,11 @@ import {
 import { getCollabApiCached } from '@/infra/api/collabApiCache';
 import { COLLAB_API_CACHE_KEYS, GDP_COMMUNITY_THEME_CACHE_TTL_MS } from '@/infra/api/collabApiKeys';
 import { collabApiClient, ensureCollabApiSession } from '@/infra/api';
-
-export const COMMUNITY_THEME_FILTER_ALL = '__all__';
+import { formatIsoDateDaysAgo } from '@/shared/utils/date';
 
 const DEFAULT_COMMUNITY_TITLE = 'Géodésie';
+
+export const COMMUNITY_RECENT_PERIOD_DAYS = 30;
 
 const TRACKED_STATUSES: ReportStatus[] = [
   ReportStatus.Submit,
@@ -39,17 +40,20 @@ export interface CommunityStatsSnapshot {
   communityName: string;
   /** Présentation communauté (HTML IGN), réservée aux utilisateurs connectés. */
   communityDescriptionHtml: string;
-  themeOptions: string[];
   reportsTotal: number;
   /** Renseigné seulement si connecté (sinon `null`). */
   membersCount: number | null;
   statusCounts: CommunityStatusCount[];
+  /** Sur les `COMMUNITY_RECENT_PERIOD_DAYS` derniers jours. */
+  recent: {
+    opened: number;
+    closed: number;
+  };
 }
 
 interface UseCommunityStatsOptions {
   enabled: boolean;
   isAuthenticated: boolean;
-  themeFilter: string;
 }
 
 interface UseCommunityStatsResult {
@@ -76,20 +80,6 @@ function readCommunityText(data: unknown): { name: string; descriptionHtml: stri
   return { name, descriptionHtml };
 }
 
-function buildThemeOptions(): string[] {
-  return [...getGdpCommunityReportThemes()].sort((a, b) => a.localeCompare(b, 'fr'));
-}
-
-function resolveThemesForFilter(themeFilter: string): readonly string[] {
-  const gdpThemes = getGdpCommunityReportThemes();
-
-  if (themeFilter === COMMUNITY_THEME_FILTER_ALL) {
-    return gdpThemes;
-  }
-
-  return gdpThemes.includes(themeFilter) ? [themeFilter] : gdpThemes;
-}
-
 async function loadAuthenticatedCommunityProfile(): Promise<{
   name: string;
   descriptionHtml: string;
@@ -111,7 +101,6 @@ async function loadAuthenticatedCommunityProfile(): Promise<{
 export function useCommunityStats({
   enabled,
   isAuthenticated,
-  themeFilter,
 }: UseCommunityStatsOptions): UseCommunityStatsResult {
   const [stats, setStats] = useState<CommunityStatsSnapshot | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -134,8 +123,8 @@ export function useCommunityStats({
       setError(null);
 
       try {
-        const themes = resolveThemesForFilter(themeFilter);
-        const themeOptions = buildThemeOptions();
+        const themes = getGdpCommunityReportThemes();
+        const recentSince = formatIsoDateDaysAgo(COMMUNITY_RECENT_PERIOD_DAYS);
 
         const authenticatedExtrasPromise = isAuthenticated
           ? Promise.all([
@@ -144,15 +133,18 @@ export function useCommunityStats({
             ])
           : Promise.resolve([{ name: '', descriptionHtml: '' }, null] as const);
 
-        const [authenticatedExtras, reportsTotal, statusTotals] = await Promise.all([
-          authenticatedExtrasPromise,
-          fetchCommunityReportCount({ themes }),
-          Promise.all(
-            TRACKED_STATUSES.map((status) =>
-              fetchCommunityReportCountSafe({ themes, status }),
+        const [authenticatedExtras, reportsTotal, statusTotals, recentOpened, recentClosed] =
+          await Promise.all([
+            authenticatedExtrasPromise,
+            fetchCommunityReportCount({ themes }),
+            Promise.all(
+              TRACKED_STATUSES.map((status) =>
+                fetchCommunityReportCountSafe({ themes, status }),
+              ),
             ),
-          ),
-        ]);
+            fetchCommunityReportCountSafe({ themes, openedSince: recentSince }),
+            fetchCommunityReportCountSafe({ themes, closedSince: recentSince }),
+          ]);
 
         const [profile, membersCount] = authenticatedExtras;
 
@@ -168,10 +160,10 @@ export function useCommunityStats({
           setStats({
             communityName,
             communityDescriptionHtml: isAuthenticated ? profile.descriptionHtml : '',
-            themeOptions,
             reportsTotal,
             membersCount: isAuthenticated ? membersCount : null,
             statusCounts,
+            recent: { opened: recentOpened, closed: recentClosed },
           });
         }
       } catch (loadError) {
@@ -194,7 +186,7 @@ export function useCommunityStats({
     return () => {
       cancelled = true;
     };
-  }, [enabled, isAuthenticated, themeFilter, reloadToken]);
+  }, [enabled, isAuthenticated, reloadToken]);
 
   return { stats, isLoading, error, reload };
 }

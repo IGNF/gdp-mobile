@@ -22,8 +22,8 @@ import {
   buildGeodesyReportSubmissionComment,
   extractGeodesyReportThemeFromConfigs,
 } from '@/features/report/utils/geodesyReportTheme';
+import { loadGdpCommunityThemeConfigs } from '@/features/report/utils/loadGdpCommunityThemeConfigs';
 import { collabApiClient, ensureCollabApiSession } from '@/infra/api';
-import { fetchGdpCommunityThemeConfigs } from '@/infra/community/gdpCommunityThemes';
 import {
   getReportSubmissionDeviceInfo,
 } from '@/platform/device/reportDeviceMetadata';
@@ -105,7 +105,7 @@ export function useSubmitGeodesyPointReport() {
           return null;
         }
 
-        const themeConfigs = await fetchGdpCommunityThemeConfigs({ forceRefresh: true });
+        const themeConfigs = await loadGdpCommunityThemeConfigs({ forceRefresh: true });
         const theme = extractGeodesyReportThemeFromConfigs(themeConfigs);
         const themeName = GDP_REPORT_SUBMISSION_THEME;
         const deviceInfo = await getReportSubmissionDeviceInfo();
