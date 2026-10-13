@@ -6,6 +6,8 @@ import {
   loadGeodesyAnnexFeatures,
   parseGdpRgp2DispoStates,
   reloadGeodesyAnnexLayerOnMap,
+  resolveGdpRgp2AvailabilityLevel,
+  type GdpRgp2AvailabilityLevel,
   type GdpRgp2DispoState,
 } from '@ign/gdp-tools';
 import type Map from 'ol/Map';
@@ -27,6 +29,7 @@ export interface NearestRgpStation {
   latitude: number;
   distanceKm: number;
   isAvailable: boolean;
+  availabilityLevel: GdpRgp2AvailabilityLevel;
   dispoStates: readonly GdpRgp2DispoState[];
 }
 
@@ -99,6 +102,7 @@ export function useNearestRgpStations({
             latitude: stationLat,
             distanceKm: distanceKm({ longitude, latitude }, { longitude: stationLon, latitude: stationLat }),
             isAvailable: isGdpRgp2StationAvailable(dispo),
+            availabilityLevel: resolveGdpRgp2AvailabilityLevel(dispo),
             dispoStates: parseGdpRgp2DispoStates(dispo),
           } satisfies NearestRgpStation;
         })

@@ -104,6 +104,18 @@
   background: var(--color-danger);
 }
 
+.dispoDown {
+  grid-column: 1 / -1;
+  padding: var(--spacing-4xs) 0;
+  border-radius: 999px;
+  background: var(--color-bg-subtle);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-2xs);
+  font-weight: 600;
+  text-align: center;
+  white-space: nowrap;
+}
+
 .dispoGlyph {
   width: 0.625rem;
   height: 0.625rem;
@@ -119,6 +131,20 @@
   gap: var(--spacing-4xs);
   min-width: 0;
   flex: 1;
+}
+
+.nameRow {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2xs);
+  min-width: 0;
+}
+
+.statusDot {
+  width: 0.625rem;
+  height: 0.625rem;
+  border-radius: var(--radius-circle);
+  flex-shrink: 0;
 }
 
 .name {
