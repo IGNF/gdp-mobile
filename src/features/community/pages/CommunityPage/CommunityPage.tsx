@@ -1,9 +1,8 @@
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import {
-  COMMUNITY_THEME_FILTER_ALL,
+  COMMUNITY_RECENT_PERIOD_DAYS,
   useCommunityStats,
 } from '@/features/community/hooks/useCommunityStats';
 import { Button } from '@/shared/ui/Button';
@@ -25,12 +24,10 @@ export interface CommunityPageProps {
 export function CommunityPage({ isOpen, onClose }: CommunityPageProps) {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
-  const [themeFilter, setThemeFilter] = useState(COMMUNITY_THEME_FILTER_ALL);
 
   const { stats, isLoading, error, reload } = useCommunityStats({
     enabled: isOpen,
     isAuthenticated,
-    themeFilter,
   });
 
   const headerSubtitle = stats?.communityName || 'Géodésie';
@@ -73,26 +70,6 @@ export function CommunityPage({ isOpen, onClose }: CommunityPageProps) {
             dangerouslySetInnerHTML={{ __html: stats.communityDescriptionHtml }}
           />
         ) : null}
-
-        <section className={styles.section} aria-labelledby="community-theme-filter">
-          <label className={styles.filterLabel} htmlFor="community-theme-filter">
-            Thème des signalements
-          </label>
-          <select
-            id="community-theme-filter"
-            className={styles.themeSelect}
-            value={themeFilter}
-            onChange={(event) => setThemeFilter(event.target.value)}
-            disabled={isLoading && !stats}
-          >
-            <option value={COMMUNITY_THEME_FILTER_ALL}>Tous les thèmes</option>
-            {(stats?.themeOptions ?? []).map((theme) => (
-              <option key={theme} value={theme}>
-                {theme}
-              </option>
-            ))}
-          </select>
-        </section>
 
         {error ? (
           <section className={styles.section}>
@@ -139,12 +116,32 @@ export function CommunityPage({ isOpen, onClose }: CommunityPageProps) {
               ) : null}
             </section>
 
+            <section className={styles.section} aria-labelledby="community-recent-title">
+              <h2 id="community-recent-title" className={styles.sectionTitle}>
+                {COMMUNITY_RECENT_PERIOD_DAYS} derniers jours
+              </h2>
+              <div className={styles.kpiGrid}>
+                <div className={styles.kpiCard}>
+                  <span className={styles.kpiValue}>
+                    {isLoading ? '—' : stats.recent.opened}
+                  </span>
+                  <span className={styles.kpiLabel}>Nouveaux</span>
+                </div>
+                <div className={styles.kpiCard}>
+                  <span className={styles.kpiValue}>
+                    {isLoading ? '—' : stats.recent.closed}
+                  </span>
+                  <span className={styles.kpiLabel}>Traités</span>
+                </div>
+              </div>
+            </section>
+
             <section className={styles.section} aria-labelledby="community-status-title">
               <h2 id="community-status-title" className={styles.sectionTitle}>
                 Par statut
               </h2>
               {stats.statusCounts.length === 0 && !isLoading ? (
-                <p className="body">Aucun signalement pour ce filtre.</p>
+                <p className="body">Aucun signalement.</p>
               ) : (
                 <ul className={styles.statusList}>
                   {stats.statusCounts.map(({ status, count }) => (
