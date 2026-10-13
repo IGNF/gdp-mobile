@@ -59,6 +59,9 @@
   --safe-left: var(--safe-area-inset-left, env(safe-area-inset-left, 0px));
   --safe-right: var(--safe-area-inset-right, env(safe-area-inset-right, 0px));
 
+  /* Espace réservé à la barre d'onglets (BottomTabbar) en bas de la carte. */
+  --tabbar-height: calc(6.5rem + var(--safe-bottom));
+
   /* ── Figma : vert (palette complète 10 nuances) ── */
   --figma-green-1: #e9f6f2;   /* Fond très clair */
   --figma-green-2: #def2ec;   /* Fond clair */
@@ -129,6 +132,7 @@
   /* Alias legacy — lu entre autres par getColorCode('primary') pour le marqueur de
      ReportPositionMap ; sans lui la mini-carte de position ne s'initialise jamais. */
   --color-primary: var(--color-action-primary);
+  --color-primary-rgb: var(--color-action-primary-rgb);
 
   --color-bg-primary: var(--figma-green-4);
   --color-bg-primary-hover: var(--figma-green-5);
@@ -278,9 +282,10 @@
   /* ═════════════════════════════════════════════════════════════════════════ */
   /* SHADOWS                                                                    */
   /* ═════════════════════════════════════════════════════════════════════════ */
-  --shadow-sm: 0 1px 3px rgba(9, 22, 37, 0.12);
-  --shadow-md: 0 2px 8px rgba(9, 22, 37, 0.16);
-  --shadow-lg: 0 4px 12px rgba(9, 22, 37, 0.16);
+  --color-shadow-rgb: 9, 22, 37;
+  --shadow-sm: 0 1px 3px rgba(var(--color-shadow-rgb), 0.12);
+  --shadow-md: 0 2px 8px rgba(var(--color-shadow-rgb), 0.16);
+  --shadow-lg: 0 4px 12px rgba(var(--color-shadow-rgb), 0.16);
   --shadow-focus: 0 0 0 2px var(--color-primary), 0 2px 10px rgba(var(--color-primary-rgb), 0.18);
 }
 

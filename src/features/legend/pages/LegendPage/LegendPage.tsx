@@ -77,7 +77,7 @@ export function LegendPage({ isOpen, onClose, maxExpandedHeight }: LegendPagePro
     >
       <main className={styles.content}>
         <LegendSection
-          title="Repère de nivellement (RN)"
+          title="Repère de nivellement"
           rows={[
             { label: 'Repère IGN exploitable', swatch: <LegendPicto pictoCode="PT_RN_GOOD" /> },
             { label: 'Repère IGN d’un triplet', swatch: <LegendPicto pictoCode="PT_RN_TRIPLET_GOOD" /> },
@@ -87,12 +87,12 @@ export function LegendPage({ isOpen, onClose, maxExpandedHeight }: LegendPagePro
         />
 
         <LegendSection
-          title="Site géodésique"
+          title="Point géodésique"
           rows={[
-            { label: 'Site de base', swatch: <LegendPicto pictoCode="PT_RBF_GOOD" /> },
-            { label: 'Site de détail', swatch: <LegendPicto pictoCode="PT_RDF_GOOD" /> },
-            { label: 'Site partenaire', swatch: <LegendPicto pictoCode="PT_RDF_CANEX_GOOD" /> },
-            { label: 'Site en mauvais état', swatch: <LegendPicto pictoCode="PT_RBF_BAD" /> },
+            { label: 'Point de base', swatch: <LegendPicto pictoCode="PT_RBF_GOOD" /> },
+            { label: 'Point de détail', swatch: <LegendPicto pictoCode="PT_RDF_GOOD" /> },
+            { label: 'Point partenaire', swatch: <LegendPicto pictoCode="PT_RDF_CANEX_GOOD" /> },
+            { label: 'Point en mauvais état', swatch: <LegendPicto pictoCode="PT_RBF_BAD" /> },
           ]}
         />
 

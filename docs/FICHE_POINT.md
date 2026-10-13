@@ -135,14 +135,12 @@ Quand une fiche repère est ouverte (`selectedPoint !== null`) :
 | Comportement | Détail |
 |--------------|--------|
 | Tabbar | Masquée (`onTabbarVisibleChange(false)`) |
-| Boutons carte (GPS, légende, couches…) | Restent en bas de l'écran (`--map-fab-sheet-offset: 0`), **sous** la fiche (`z-index` sheet > overlays) ; entièrement masqués par la fiche au snap plein écran (3) |
-| Hors fiche | Sheet replié (hauteur 0) ; `--map-sheet-height` et `--map-fab-sheet-offset` à 0 |
+| Boutons carte (GPS, légende, couches…) | Restent en bas de l'écran, **sous** la fiche (`z-index` sheet > overlays) ; entièrement masqués par la fiche au snap plein écran (3) |
+| Hors fiche | Sheet replié (hauteur 0) |
 
-Variables CSS sur `.mapPage` :
+Variable CSS posée sur la racine (`document.documentElement`) par `MapPage`, lue aussi par les panneaux en portail (`MapOverlaySheet`) :
 
-- `--map-sheet-height` — hauteur rapportée par le bottom sheet
-- `--map-fab-sheet-offset` — offset des FAB / échelle OL (0 en mode fiche)
-- `--map-tabbar-height` — `5.5rem` ou `0` si tabbar masquée
+- `--map-tabbar-height` — `var(--tabbar-height)` (global.css) ou `0px` si tabbar masquée ; les FAB GPS / boussole et l'échelle OL se placent au-dessus (`--map-fab-bottom` dans MapPage.module.css)
 
 ## Données et utilitaires
 

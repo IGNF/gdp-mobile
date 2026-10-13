@@ -157,8 +157,6 @@ export function MapPage() {
   const [isLegendOpen, setIsLegendOpen] = useState(false);
   const legendFabRef = useRef<HTMLButtonElement>(null);
   const [legendMaxSheetHeight, setLegendMaxSheetHeight] = useState<number | undefined>(undefined);
-  const [sheetHeight, setSheetHeight] = useState(0);
-  const [fabSheetOffset, setFabSheetOffset] = useState(0);
   const [isTabbarHiddenByPoint, setIsTabbarHiddenByPoint] = useState(false);
   const [isTabbarHiddenByFilters, setIsTabbarHiddenByFilters] = useState(false);
   const [reportWizardContext, setReportWizardContext] = useState<GeodesyPointReportMapContext | null>(
@@ -167,8 +165,9 @@ export function MapPage() {
   // La tabbar reste visible avec le panneau filtres (comme couches / légende).
   const isTabbarVisible = !isTabbarHiddenByPoint && reportWizardContext === null;
 
+  // Sur la racine (pas sur `.mapPage`) : les panneaux rendus en portail dans `body` la lisent aussi.
   useEffect(() => {
-    const tabbarHeight = isTabbarVisible ? 'calc(6.5rem + var(--safe-bottom))' : '0px';
+    const tabbarHeight = isTabbarVisible ? 'var(--tabbar-height)' : '0px';
     document.documentElement.style.setProperty('--map-tabbar-height', tabbarHeight);
 
     return () => {
@@ -514,16 +513,7 @@ export function MapPage() {
   const showExpertFiltersButton = geodesyMode === 'expert';
 
   return (
-    <div
-      className={styles.mapPage}
-      style={{
-        ['--map-sheet-height' as string]: `${sheetHeight}px`,
-        ['--map-fab-sheet-offset' as string]: `${fabSheetOffset}px`,
-        ['--map-tabbar-height' as string]: isTabbarVisible
-          ? 'calc(6.5rem + var(--safe-bottom))'
-          : '0px',
-      }}
-    >
+    <div className={styles.mapPage}>
       <LeftMenu
         isOpen={isMenuOpen}
         onClose={() => setIsMenuOpen(false)}
@@ -541,8 +531,7 @@ export function MapPage() {
 
           <button
             type="button"
-            className={styles.mapFab}
-            style={{ top: 'max(2.5rem, var(--safe-top))', left: '1rem' }}
+            className={`${styles.mapFab} ${styles.menuFab}`}
             onClick={handleOpenMenu}
             aria-label="Menu"
           >
@@ -589,7 +578,7 @@ export function MapPage() {
 
           {isMapReady && GDP_GEODESY_SHOW_WFS_LOADING_INDICATOR && geodesyWfsLoading.isLoading && (
             <div className={styles.wfsLoadingBadge} aria-live="polite">
-              <Loading size="small" />
+              <Loading size="small" className={styles.wfsLoadingSpinner} />
               <span>
                 Chargement des points…{' '}
                 {(geodesyWfsLoading.elapsedMs / 1000).toFixed(1).replace('.', ',')} s
@@ -649,8 +638,6 @@ export function MapPage() {
             reportDisabledReason={reportDisabledReason}
             onClosePoint={mapClick.closeActionSheet}
             onReportPoint={handleReportPoint}
-            onSheetHeightChange={setSheetHeight}
-            onFabSheetOffsetChange={setFabSheetOffset}
             onTabbarVisibleChange={(visible) => setIsTabbarHiddenByPoint(!visible)}
           />
 

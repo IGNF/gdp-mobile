@@ -32,9 +32,6 @@ export interface MapBottomSheetProps {
   reportDisabledReason?: 'auth' | 'canevas' | null;
   onClosePoint: () => void;
   onReportPoint: () => void;
-  onSheetHeightChange?: (height: number) => void;
-  /** Offset carte pour GPS / échelle — suit la hauteur de la sheet. */
-  onFabSheetOffsetChange?: (offset: number) => void;
   onTabbarVisibleChange?: (visible: boolean) => void;
 }
 
@@ -45,8 +42,6 @@ export function MapBottomSheet({
   reportDisabledReason = null,
   onClosePoint,
   onReportPoint,
-  onSheetHeightChange,
-  onFabSheetOffsetChange,
   onTabbarVisibleChange,
 }: MapBottomSheetProps) {
   const isPointMode = selectedPoint !== null;
@@ -97,12 +92,6 @@ export function MapBottomSheet({
     };
   }, [isPointMode, onTabbarVisibleChange]);
 
-  useEffect(() => {
-    const height = isPointMode ? currentHeight : 0;
-    onSheetHeightChange?.(height);
-    onFabSheetOffsetChange?.(height);
-  }, [currentHeight, isPointMode, onFabSheetOffsetChange, onSheetHeightChange]);
-
   const referencePosition = useUserLocation({ enabled: userFollowingMode !== 'none' });
 
   const handleNavigateToPoint = () => {
@@ -129,11 +118,7 @@ export function MapBottomSheet({
       ]
         .filter(Boolean)
         .join(' ')}
-      style={
-        isPointMode
-          ? { height: `${currentHeight}px`, ['--map-sheet-height' as string]: `${currentHeight}px` }
-          : { height: 0, ['--map-sheet-height' as string]: '0px' }
-      }
+      style={{ height: isPointMode ? `${currentHeight}px` : 0 }}
       aria-label="Fiche repère"
       aria-hidden={!isPointMode}
     >
