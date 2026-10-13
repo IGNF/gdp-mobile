@@ -76,7 +76,19 @@ Le `.htaccess` copié dans `dist/` ne gère que le fallback SPA ; le proxy OAuth
 Un numéro semver dans `package.json`, recopié dans Android / iOS. Pas de suffixe. Le `versionCode` Android vaut `major × 10000 + minor × 100 + patch` (`4.0.1` → `40001`). L’écran **À propos** affiche cette version.
 
 Semver = semantic versioning : un numéro en trois parties, majeur.mineur.patch.
+Depuis la branche en cours, faire les tests de compilation, de linting
 
+```bash
+npm update
+npm run deps:prod
+npm run lint
+npm run lint:css-modules
+npm run knip
+npm run build
+git status
+# puis, si besoin :
+git add .; git commit -m "prepa version"; git push
+```
 Depuis `main` :
 
 ```bash
