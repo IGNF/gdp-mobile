@@ -1,0 +1,1 @@
+export { MapLegendPanel } from './MapLegendPanel';

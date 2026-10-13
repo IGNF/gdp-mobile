@@ -1,0 +1,138 @@
+.form {
+  display: flex;
+  flex-direction: column;
+}
+
+.segmentRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-xs);
+}
+
+.segment {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xs);
+  width: auto;
+  height: 2.75rem;
+  padding: 0.53125rem var(--spacing-md) 0.59375rem;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-bg-page);
+  color: var(--color-text);
+  text-align: center;
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  line-height: normal;
+}
+
+.segment[data-active='true'] {
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border-active);
+  background: var(--color-bg-primary-subtle);
+}
+
+.segment[data-active='true']::before {
+  content: '';
+  flex-shrink: 0;
+  width: 0.375rem;
+  height: 0.375rem;
+  border-radius: var(--radius-circle);
+  background: var(--color-border-active);
+}
+
+.dateRangeRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-sm);
+}
+
+.dateField {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2xs);
+  min-width: 0;
+}
+
+.dateFieldLabel {
+  color: var(--color-text);
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-normal);
+  line-height: normal;
+}
+
+.dateInputWrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2xs);
+  min-height: 1.75rem;
+  padding: var(--spacing-2xs) var(--spacing-xs) var(--spacing-2xs) var(--spacing-sm);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-surface);
+}
+
+.datePickerTrigger {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: var(--spacing-xs);
+  min-width: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  font: inherit;
+  text-align: left;
+  color: inherit;
+  cursor: pointer;
+}
+
+.datePickerTrigger:focus-visible {
+  outline: 2px solid var(--color-border-primary);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+.datePlaceholder {
+  font-size: var(--font-size-base);
+  color: var(--color-text-secondary);
+}
+
+.dateDisplayValue {
+  font-size: var(--font-size-base);
+  color: var(--color-text);
+}
+
+.dateClearButton {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-circle);
+  background: transparent;
+  cursor: pointer;
+}
+
+.dateClearButton:focus-visible {
+  outline: 2px solid var(--color-border-primary);
+  outline-offset: 1px;
+}
+
+.dateClearIcon {
+  width: 0.875rem;
+  height: 0.875rem;
+}
+
+.dateClearIcon path {
+  fill: var(--color-text-secondary);
+}

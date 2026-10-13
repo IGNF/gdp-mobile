@@ -1,36 +1,19 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import type Map from 'ol/Map';
+import { useMemo } from 'react';
 import type {
   GeodesyCatalog,
   GeodesyLayerId,
   GeodesyLayerVisibility,
   GeodesyWfsAttributeFilterValues,
 } from '@ign/gdp-tools';
-import {
-  GEODESY_ANNEX_LAYERS,
-  getGeodesyAnnexFeaturesLastLoadedAt,
-  loadGeodesyAnnexFeatures,
-  reloadGeodesyAnnexLayerOnMap,
-} from '@ign/gdp-tools';
-
-export interface GeodesyUiLayerItem {
-  id: GeodesyLayerId;
-  title: string;
-  shortLabel?: string;
-}
 
 import { MapGeodesyFiltersPanel } from '@/features/map/components/MapGeodesyFiltersPanel';
-import { MapLayerInfoPanel } from '@/features/map/components/MapLayerInfoPanel';
 import { MapLayersPanel } from '@/features/map/components/MapLayersPanel';
-import type { MapLayerGroupId } from '@/features/map/types/mapLayerGroups';
 import type { MapLayerSheetItem } from '@/features/map/types/mapLayerSheet';
+import type { MapPanelId } from '@/features/map/types/mapPanels';
 import { GEOPORTAIL_LAYERS } from '@/shared/constants/map';
 import type { GdpGeodesyMode } from '@/shared/constants/geodesy';
 import type { ReportMapLayerVisibility } from '@/shared/constants/reportMapLayers';
-import { trackLayerReload, trackLayerVisibilityChange } from '@/infra/analytics/matomo';
-import { Alert } from '@/shared/ui/Alert';
-import { formatDateTime } from '@/shared/utils/date';
-import legendSignalement from '@/shared/assets/legends/legend-signalement.png';
+import { trackLayerVisibilityChange } from '@/infra/analytics/matomo';
 import thumnailSignalement from '@/shared/assets/thumbnails/thumbnail-signalement.jpg';
 
 import thumbnailPlanIgn from '@/shared/assets/thumbnails/thumbnail-plan.jpg';
@@ -39,44 +22,17 @@ import thumbnailScan25 from '@/shared/assets/thumbnails/thumbnail-scan-25.jpg';
 import thumbnailGeodesie from '@/shared/assets/thumbnails/thumbnail-geodesie.jpg';
 import thumbnailRGP from '@/shared/assets/thumbnails/thumbnail-rgp.jpg';
 
-const RGP_ANNEX_LAYER = GEODESY_ANNEX_LAYERS.find((layer) => layer.id === 'GDP_RGP2');
-
-function formatRgpLastLoadedSubtitle(loadedAt: Date | null): string | undefined {
-  if (!loadedAt) {
-    return undefined;
-  }
-
-  return `MAJ : ${formatDateTime(loadedAt)}`;
+export interface GeodesyUiLayerItem {
+  id: GeodesyLayerId;
+  title: string;
+  shortLabel?: string;
 }
 
 const BASEMAP_SHEET_LAYERS = [
-  {
-    id: GEOPORTAIL_LAYERS.PLAN_IGN,
-    title: 'Plan IGN',
-    legend: '',
-    thumbnail: thumbnailPlanIgn,
-    detailDescription:
-      'Cartographie multi-échelles sur le territoire national, issue des bases de données vecteur de l’IGN, mis à jour régulièrement et réalisée selon un processus entièrement automatisé.',
-  },
-  {
-    id: GEOPORTAIL_LAYERS.ORTHOPHOTOS,
-    title: 'Photographies aériennes',
-    legend: '',
-    thumbnail: thumbnailOrtho,
-    detailDescription:
-      'Orthophotographies aériennes IGN : imagerie haute résolution pour visualiser le terrain et les constructions.',
-  },
-  {
-    id: GEOPORTAIL_LAYERS.MAPS_SCAN25TOUR,
-    title: 'Carte TOPO 25',
-    legend: '',
-    thumbnail: thumbnailScan25,
-    detailDescription:
-      "La carte topographique représente avec précision le relief, symbolisé par des courbes de niveaux, ainsi que les détails du terrain : routes, sentiers, constructions, bois, arbre isolé, rivière, source...<br>En France, la carte topographique de base est réalisée par l'IGN. Le SCAN 25 Touristique comprend les pictogrammes du thème tourisme de la carte de base."
-  },
+  { id: GEOPORTAIL_LAYERS.PLAN_IGN, title: 'Plan IGN', thumbnail: thumbnailPlanIgn },
+  { id: GEOPORTAIL_LAYERS.ORTHOPHOTOS, title: 'Photographies aériennes', thumbnail: thumbnailOrtho },
+  { id: GEOPORTAIL_LAYERS.MAPS_SCAN25TOUR, title: 'Carte TOPO 25', thumbnail: thumbnailScan25 },
 ] as const;
-
-const RGP_LAYER_MATOMO_LABEL = 'Réseau GNSS permanent';
 
 function resolveLayerSheetMatomoLabel(layerId: string): string | null {
   switch (layerId) {
@@ -85,7 +41,7 @@ function resolveLayerSheetMatomoLabel(layerId: string): string | null {
     case 'geodesy-wfs':
       return 'Géodésie';
     case 'geodesy-annex-rgp':
-      return RGP_LAYER_MATOMO_LABEL;
+      return 'Réseau GNSS permanent';
     default:
       if (layerId.startsWith('basemap:')) {
         const basemapId = layerId.slice('basemap:'.length);
@@ -97,17 +53,15 @@ function resolveLayerSheetMatomoLabel(layerId: string): string | null {
 
 function trackLayerSheetVisibility(layerId: string, visible: boolean): void {
   const label = resolveLayerSheetMatomoLabel(layerId);
-  console.log('label', label);
   if (label) {
     trackLayerVisibilityChange(label, visible);
   }
 }
 
 export interface MapLayersPanelFlowProps {
-  isOpen: boolean;
+  /** Vue affichée : liste des couches, filtres, ou `null` (flow fermé). */
+  view: Extract<MapPanelId, 'layers' | 'filters'> | null;
   onClose: () => void;
-  focusGroupId?: MapLayerGroupId | null;
-  map: Map | null;
   activeBasemap: string;
   onActiveBasemapChange: (layerName: string) => void;
   geoservicesVisible: boolean;
@@ -125,7 +79,6 @@ export interface MapLayersPanelFlowProps {
   reportMapLayers: ReportMapLayerVisibility;
   onReportMapLayersChange: (layers: ReportMapLayerVisibility) => void;
   isAuthenticated: boolean;
-  onFiltersPanelOpenChange?: (isOpen: boolean) => void;
 }
 
 function isWfsLayerId(catalog: GeodesyCatalog, layerId: GeodesyLayerId): boolean {
@@ -137,10 +90,8 @@ function isAnnexLayerId(catalog: GeodesyCatalog, layerId: GeodesyLayerId): boole
 }
 
 export function MapLayersPanelFlow({
-  isOpen,
+  view,
   onClose,
-  focusGroupId = null,
-  map,
   activeBasemap,
   onActiveBasemapChange,
   geoservicesVisible,
@@ -157,80 +108,8 @@ export function MapLayersPanelFlow({
   reportMapLayers,
   onReportMapLayersChange,
   isAuthenticated,
-  onFiltersPanelOpenChange,
 }: MapLayersPanelFlowProps) {
-  const [activeInfoLayerId, setActiveInfoLayerId] = useState<string | null>(null);
-  const [showFilters, setShowFilters] = useState(false);
-  const [isRgpReloadConfirmOpen, setIsRgpReloadConfirmOpen] = useState(false);
-  const [isRgpReloading, setIsRgpReloading] = useState(false);
-  const [rgpLastLoadedAt, setRgpLastLoadedAt] = useState<Date | null>(null);
   const reportsLayerVisible = isAuthenticated && reportMapLayers.myReports;
-
-  useEffect(() => {
-    const isFiltersPanelOpen = isOpen && showFilters;
-    onFiltersPanelOpenChange?.(isFiltersPanelOpen);
-    return () => {
-      onFiltersPanelOpenChange?.(false);
-    };
-  }, [isOpen, onFiltersPanelOpenChange, showFilters]);
-
-  const refreshRgpLastLoadedAt = useCallback(() => {
-    if (!RGP_ANNEX_LAYER) {
-      setRgpLastLoadedAt(null);
-      return;
-    }
-
-    setRgpLastLoadedAt(getGeodesyAnnexFeaturesLastLoadedAt({
-      definition: RGP_ANNEX_LAYER,
-      catalog: geodesyCatalog,
-    }));
-  }, [geodesyCatalog]);
-
-  // Date du dernier chargement RGP en cache : lecture pure (aucune mutation), sûre pendant
-  // le rendu. Rafraîchie à chaque ouverture, avant de lancer le rechargement (effet ci-dessous,
-  // qui reste un effet : appel réseau réel).
-  const [wasOpenForRgp, setWasOpenForRgp] = useState(isOpen);
-  if (isOpen !== wasOpenForRgp) {
-    setWasOpenForRgp(isOpen);
-    if (isOpen && RGP_ANNEX_LAYER) {
-      setRgpLastLoadedAt(
-        getGeodesyAnnexFeaturesLastLoadedAt({ definition: RGP_ANNEX_LAYER, catalog: geodesyCatalog }),
-      );
-    }
-  }
-
-  useEffect(() => {
-    if (!isOpen || !RGP_ANNEX_LAYER) {
-      return;
-    }
-
-    void loadGeodesyAnnexFeatures({ definition: RGP_ANNEX_LAYER, catalog: geodesyCatalog })
-      .then(() => {
-        refreshRgpLastLoadedAt();
-      })
-      .catch(() => {
-        // La date reste inchangée en cas d'échec.
-      });
-  }, [geodesyCatalog, isOpen, refreshRgpLastLoadedAt]);
-
-  // Bascule liste/filtres/infos selon `isOpen` et `focusGroupId`, pendant le rendu (dérivé de
-  // props, pas de resynchronisation externe) : ne rejoue qu'à un vrai changement de l'un des deux.
-  const [prevFocusState, setPrevFocusState] = useState({ isOpen, focusGroupId });
-  if (prevFocusState.isOpen !== isOpen || prevFocusState.focusGroupId !== focusGroupId) {
-    setPrevFocusState({ isOpen, focusGroupId });
-
-    if (!isOpen) {
-      setActiveInfoLayerId(null);
-      setShowFilters(false);
-      setIsRgpReloadConfirmOpen(false);
-    } else if (focusGroupId === 'geodesy-filters') {
-      setShowFilters(true);
-      setActiveInfoLayerId(null);
-    } else {
-      // Retour liste couches (ex. clic FAB couches depuis les filtres).
-      setShowFilters(false);
-    }
-  }
 
   const wfsLayerIds = useMemo(
     () => geodesyUiLayers.filter((layer) => isWfsLayerId(geodesyCatalog, layer.id)).map((layer) => layer.id),
@@ -245,99 +124,59 @@ export function MapLayersPanelFlow({
   const isWfsVisible = wfsLayerIds.some((layerId) => geodesyVisibility[layerId]);
   const isAnnexVisible = annexLayerIds.some((layerId) => geodesyVisibility[layerId]);
 
-  const rgpLastLoadedSubtitle = formatRgpLastLoadedSubtitle(rgpLastLoadedAt);
-
   const sheetItems = useMemo<readonly MapLayerSheetItem[]>(() => {
     const basemapItems = BASEMAP_SHEET_LAYERS.map(
       (layer) =>
         ({
           id: `basemap:${layer.id}`,
+          group: 'basemap',
           title: layer.title,
           visible: geoservicesVisible && activeBasemap === layer.id,
           opacity: geoservicesVisible && activeBasemap === layer.id ? 100 : 0,
-          showInfo: true,
           showOpacity: false,
-          detailTitle: layer.title,
-          detailDescription: layer.detailDescription,
-          thumbnail: layer.thumbnail ?? undefined,
-          legend: layer.legend ?? undefined,
+          thumbnail: layer.thumbnail,
         }) satisfies MapLayerSheetItem,
     );
 
     return [
       {
         id: 'reports',
+        group: 'data',
         title: 'Mes signalements',
         visible: reportsLayerVisible,
         opacity: reportsLayerVisible ? 100 : 0,
         toggleDisabled: !isAuthenticated,
-        showInfo: true,
         showOpacity: false,
-        subtitle: isAuthenticated ? undefined : 'Connexion requise',
-        detailTitle: 'Mes signalements',
         thumbnail: thumnailSignalement,
-        legend: legendSignalement,
-        detailDescription: isAuthenticated
-          ? 'Affiche vos signalements repère géodésique sur la carte, dans la zone visible.'
-          : 'Connectez-vous pour afficher vos signalements sur la carte.',
       },
       {
         id: 'geodesy-wfs',
+        group: 'data',
         title: 'Géodésie',
         visible: isWfsVisible,
         opacity: isWfsVisible ? 100 : 0,
-        showInfo: true,
         showOpacity: false,
-        detailTitle: 'Géodésie',
         thumbnail: thumbnailGeodesie,
-        legend: '',
-        detailDescription:
-          'Repères géodésiques issus des flux WFS IGN : réseaux de repères, données associées et symboles métier.',
       },
       ...(annexLayerIds.length > 0
         ? [
             {
               id: 'geodesy-annex-rgp',
+              group: 'data',
               title: 'Réseau GNSS permanent',
               visible: isAnnexVisible,
               opacity: isAnnexVisible ? 100 : 0,
-              showInfo: true,
-              showRefresh: true,
               showOpacity: false,
-              subtitle: rgpLastLoadedSubtitle,
-              detailTitle: 'Réseau GNSS permanent',
               thumbnail: thumbnailRGP,
-              legend: '',
-              detailDescription:
-                'Stations du Réseau Géodésique Permanent (RGP) : disponibilité et localisation des stations GNSS permanentes.',
             } satisfies MapLayerSheetItem,
           ]
         : []),
       ...basemapItems,
     ];
-  }, [activeBasemap, annexLayerIds.length, geoservicesVisible, isAnnexVisible, isAuthenticated, isWfsVisible, reportsLayerVisible, rgpLastLoadedSubtitle]);
-
-  const activeInfoItem = sheetItems.find((item) => item.id === activeInfoLayerId) ?? null;
+  }, [activeBasemap, annexLayerIds.length, geoservicesVisible, isAnnexVisible, isAuthenticated, isWfsVisible, reportsLayerVisible]);
 
   const expertFilters = geodesyCatalog.wfsAttributeFilters;
   const showExpertFilters = geodesyMode === 'expert' && expertFilters.length > 0;
-
-  const handleClosePanel = () => {
-    setActiveInfoLayerId(null);
-    setShowFilters(false);
-    setIsRgpReloadConfirmOpen(false);
-    onClose();
-  };
-
-  const handleCloseInfo = () => {
-    setActiveInfoLayerId(null);
-  };
-
-  const handleCloseFilters = () => {
-    setShowFilters(false);
-    setActiveInfoLayerId(null);
-    onClose();
-  };
 
   const setWfsVisibility = (visible: boolean) => {
     const nextVisibility = { ...geodesyVisibility };
@@ -419,90 +258,24 @@ export function MapLayersPanelFlow({
     }
   };
 
-  const handleRefresh = (layerId: string) => {
-    if (layerId === 'geodesy-annex-rgp') {
-      setIsRgpReloadConfirmOpen(true);
-    }
-  };
-
-  const handleConfirmRgpReload = async () => {
-    if (!map) {
-      return;
-    }
-
-    setIsRgpReloading(true);
-    try {
-      await reloadGeodesyAnnexLayerOnMap(map, 'GDP_RGP2');
-      refreshRgpLastLoadedAt();
-      trackLayerReload(RGP_LAYER_MATOMO_LABEL);
-      setIsRgpReloadConfirmOpen(false);
-    } catch (error) {
-      console.error('[gdp-mobile] RGP reload failed:', error);
-    } finally {
-      setIsRgpReloading(false);
-    }
-  };
-
-  const isLayersListOpen = isOpen && !showFilters && activeInfoLayerId === null;
-
   return (
     <>
       <MapLayersPanel
-        isOpen={isLayersListOpen}
-        onClose={handleClosePanel}
+        isOpen={view === 'layers'}
+        onClose={onClose}
         items={sheetItems}
         onOpacityChange={handleOpacityChange}
-        onInfo={setActiveInfoLayerId}
-        onRefresh={handleRefresh}
-      />
-      <MapLayerInfoPanel
-        isOpen={isOpen && activeInfoItem !== null}
-        title={activeInfoItem?.detailTitle ?? activeInfoItem?.title ?? ''}
-        thumbnail={activeInfoItem?.thumbnail}
-        legend={activeInfoItem?.legend}
-        description={
-          activeInfoItem?.id === 'geodesy-annex-rgp' && rgpLastLoadedSubtitle
-            ? `${activeInfoItem.detailDescription ?? ''}\n\n${rgpLastLoadedSubtitle}`
-            : (activeInfoItem?.detailDescription ?? '')
-        }
-        onClose={handleClosePanel}
-        onBack={handleCloseInfo}
       />
       {showExpertFilters ? (
         <MapGeodesyFiltersPanel
-          isOpen={isOpen && showFilters}
-          onClose={handleCloseFilters}
+          isOpen={view === 'filters'}
+          onClose={onClose}
           filters={expertFilters}
           values={geodesyWfsAttributeFilterValues}
           onChange={onGeodesyWfsAttributeFilterValuesChange}
           onClear={onClearGeodesyWfsAttributeFilterValues}
         />
       ) : null}
-      <Alert
-        isOpen={isRgpReloadConfirmOpen}
-        onClose={() => {
-          if (!isRgpReloading) {
-            setIsRgpReloadConfirmOpen(false);
-          }
-        }}
-        title="Recharger les données"
-        subtitle="Les données vont être mises à jour. Souhaitez-vous poursuivre ?"
-        buttons={[
-          {
-            label: 'Annuler',
-            variant: 'outline',
-            disabled: isRgpReloading,
-            onClick: () => setIsRgpReloadConfirmOpen(false),
-          },
-          {
-            label: 'Recharger',
-            loading: isRgpReloading,
-            onClick: () => {
-              void handleConfirmRgpReload();
-            },
-          },
-        ]}
-      />
     </>
   );
 }

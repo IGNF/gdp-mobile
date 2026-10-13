@@ -73,9 +73,8 @@ export function MapGeodesyFiltersPanel({
       isOpen={isOpen}
       onClose={onClose}
       title="Filtres"
-      titleAlign="left"
       titleBadge={activeCount > 0 ? activeCount : undefined}
-      sheetClassName={styles.sheetLarge}
+      size="large"
       ariaLabel="Filtres des points"
       draggable
       footer={

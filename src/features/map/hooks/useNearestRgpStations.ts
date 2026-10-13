@@ -15,6 +15,7 @@ import Point from 'ol/geom/Point';
 import { toLonLat } from 'ol/proj';
 import { useCallback, useEffect, useState } from 'react';
 
+import { trackLayerReload } from '@/infra/analytics/matomo';
 import { distanceKm } from '@/shared/utils/geo';
 
 const RGP_LAYER = GEODESY_ANNEX_LAYERS.find((layer) => layer.id === 'GDP_RGP2');
@@ -145,6 +146,7 @@ export function useNearestRgpStations({
       }
 
       await refresh({ silent: true });
+      trackLayerReload('Réseau GNSS permanent');
     } catch {
       setError('Impossible de mettre à jour les stations RGP.');
     } finally {
