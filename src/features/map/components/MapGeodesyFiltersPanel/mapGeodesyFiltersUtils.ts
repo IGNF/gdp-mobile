@@ -6,6 +6,8 @@ import {
   type GeodesyWfsAttributeFilterValues,
 } from '@ign/gdp-tools';
 
+import type { GeodesyFilterCriterion } from '@/infra/analytics/matomo';
+
 function isActiveDateFilterValue(value: boolean | string | null | undefined): boolean {
   return typeof value === 'string' && value.trim() !== '';
 }
@@ -37,8 +39,6 @@ export function createDefaultMapGeodesyFilterValues(
   return createDefaultGeodesyWfsAttributeFilterValues(filters);
 }
 
-const MATOMO_SUMMARY_MAX_LENGTH = 150;
-
 const DATE_RANGE_MATOMO_SECTIONS: ReadonlyArray<{
   fromId: string;
   toId: string;
@@ -48,8 +48,8 @@ const DATE_RANGE_MATOMO_SECTIONS: ReadonlyArray<{
   { fromId: 'OBS_DATE_FROM', toId: 'OBS_DATE_TO', title: 'Année de détermination' },
 ];
 
-function appendDateRangeSummary(
-  parts: string[],
+function appendDateRangeCriterion(
+  criteria: GeodesyFilterCriterion[],
   values: GeodesyWfsAttributeFilterValues,
   fromId: string,
   toId: string,
@@ -64,15 +64,15 @@ function appendDateRangeSummary(
     return;
   }
 
-  parts.push(`${title}: ${fromYear || '…'}–${toYear || '…'}`);
+  criteria.push({ title, value: `${fromYear || '…'}–${toYear || '…'}` });
 }
 
-/** Résumé lisible pour Matomo (sans identifiants de points). */
-export function buildGeodesyFiltersMatomoSummary(
+/** Critères actifs lisibles pour Matomo (sans identifiants de points), une entrée par valeur. */
+export function listGeodesyFiltersMatomoCriteria(
   filters: readonly GeodesyWfsAttributeFilterDefinition[],
   values: GeodesyWfsAttributeFilterValues,
-): string {
-  const parts: string[] = [];
+): GeodesyFilterCriterion[] {
+  const criteria: GeodesyFilterCriterion[] = [];
 
   for (const filter of filters) {
     if (filter.type === 'date') {
@@ -91,12 +91,10 @@ export function buildGeodesyFiltersMatomoSummary(
         continue;
       }
 
-      const labels = filter.options
-        .filter((option) => selected.has(option.value))
-        .map((option) => option.label);
-
-      if (labels.length > 0) {
-        parts.push(`${filter.title}: ${labels.join(', ')}`);
+      for (const option of filter.options) {
+        if (selected.has(option.value)) {
+          criteria.push({ title: filter.title, value: option.label });
+        }
       }
       continue;
     }
@@ -107,25 +105,21 @@ export function buildGeodesyFiltersMatomoSummary(
 
     if (filter.type === 'choice') {
       const option = filter.options.find((entry) => entry.value === value);
-      parts.push(`${filter.title}: ${option?.label ?? String(value)}`);
+      criteria.push({ title: filter.title, value: option?.label ?? String(value) });
       continue;
     }
 
     if (filter.type === 'boolean') {
-      parts.push(`${filter.title}: ${value ? filter.trueLabel : filter.falseLabel}`);
+      criteria.push({
+        title: filter.title,
+        value: (value ? filter.trueLabel : filter.falseLabel) ?? (value ? 'Oui' : 'Non'),
+      });
     }
   }
 
   for (const section of DATE_RANGE_MATOMO_SECTIONS) {
-    appendDateRangeSummary(parts, values, section.fromId, section.toId, section.title);
+    appendDateRangeCriterion(criteria, values, section.fromId, section.toId, section.title);
   }
 
-  if (parts.length === 0) {
-    return 'Par défaut';
-  }
-
-  const summary = parts.join(' · ');
-  return summary.length > MATOMO_SUMMARY_MAX_LENGTH
-    ? `${summary.slice(0, MATOMO_SUMMARY_MAX_LENGTH - 1)}…`
-    : summary;
+  return criteria;
 }

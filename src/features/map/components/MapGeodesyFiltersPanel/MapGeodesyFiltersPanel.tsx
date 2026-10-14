@@ -15,9 +15,9 @@ import {
 
 import { GdpGeodesyFiltersForm } from './GdpGeodesyFiltersForm';
 import {
-  buildGeodesyFiltersMatomoSummary,
   countActiveMapGeodesyFilters,
   createDefaultMapGeodesyFilterValues,
+  listGeodesyFiltersMatomoCriteria,
 } from './mapGeodesyFiltersUtils';
 
 import styles from './MapGeodesyFiltersPanel.module.css';
@@ -63,7 +63,7 @@ export function MapGeodesyFiltersPanel({
 
   const handleApply = () => {
     const activeCount = countActiveMapGeodesyFilters(filters, draftValues);
-    trackGeodesyFiltersApplied(buildGeodesyFiltersMatomoSummary(filters, draftValues), activeCount);
+    trackGeodesyFiltersApplied(listGeodesyFiltersMatomoCriteria(filters, draftValues), activeCount);
     onChange(draftValues);
     onClose();
   };

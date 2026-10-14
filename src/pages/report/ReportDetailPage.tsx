@@ -91,6 +91,7 @@ export function ReportDetailPage() {
       photos,
       formThemeAttributes,
       {
+        tracking: { source: 'Brouillon', isConform: draft.isConform },
         onError: (error) => {
           lastError = error.message;
         },

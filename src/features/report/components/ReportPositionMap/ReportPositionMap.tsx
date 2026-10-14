@@ -307,7 +307,7 @@ export function ReportPositionMap({
   });
   const isGeodesyVisible = geodesy.visibility[GEODESY_TOGGLE_LAYER_ID] ?? false;
   const handleToggleGeodesy = () => {
-    trackLayerVisibilityChange('Géodésie (mini-carte)', !isGeodesyVisible);
+    trackLayerVisibilityChange('Mini-carte', 'Géodésie', !isGeodesyVisible);
     geodesy.toggleLayer(GEODESY_TOGGLE_LAYER_ID);
   };
 

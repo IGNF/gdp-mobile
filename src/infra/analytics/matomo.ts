@@ -77,7 +77,7 @@ export function trackPageView(pathname: string): void {
   paq.push(['trackPageView']);
 }
 
-export function trackEvent(category: string, action: string, name?: string, value?: number): void {
+function trackEvent(category: string, action: string, name?: string, value?: number): void {
   if (!config.matomo.enabled) {
     return;
   }
@@ -88,28 +88,72 @@ export function trackEvent(category: string, action: string, name?: string, valu
   paq.push(['trackEvent', category, action, name, value]);
 }
 
-export function trackOverlayOpen(scope: 'Menu' | 'Carte', name: string): void {
-  trackEvent(scope, 'Ouverture', name);
+/**
+ * Nom d'événement au format « Contexte – Détail ». Le rapport « Noms d'événement » de Matomo
+ * n'affiche ni la catégorie ni l'action : le nom doit se comprendre seul.
+ */
+function eventName(...parts: string[]): string {
+  return parts.join(' – ');
 }
 
-export function trackLayerVisibilityChange(layerLabel: string, visible: boolean): void {
-  trackEvent('Couche', visible ? 'Activer' : 'Masquer', layerLabel);
+export function trackOverlayOpen(scope: 'Menu' | 'Carte', name: string): void {
+  trackEvent(scope, 'Ouverture', eventName(scope, name));
+}
+
+export function trackLogout(): void {
+  trackEvent('Auth', 'Déconnexion', eventName('Menu', 'Déconnexion'));
+}
+
+/** Panneau Couches de `/map` ou mini-carte du signalement. */
+export type LayerTrackingOrigin = 'Couches' | 'Mini-carte';
+
+export function trackLayerVisibilityChange(
+  origin: LayerTrackingOrigin,
+  layerLabel: string,
+  visible: boolean,
+): void {
+  trackEvent('Couche', visible ? 'Activer' : 'Masquer', eventName(origin, layerLabel));
 }
 
 export function trackLayerReload(layerLabel: string): void {
-  trackEvent('Couche', 'Recharger', layerLabel);
+  trackEvent('Couche', 'Recharger', eventName('Stations RGP', layerLabel));
 }
 
 export function trackMiniMapBasemapChange(basemapLabel: string): void {
-  trackEvent('Couche', 'Changer fond', `${basemapLabel} (mini-carte)`);
+  trackEvent('Couche', 'Changer fond', eventName('Mini-carte', basemapLabel));
 }
 
-export function trackGeodesyFiltersApplied(summary: string, activeCount: number): void {
-  trackEvent('Filtre géodésie', 'Appliquer', summary, activeCount);
+/** Une valeur retenue pour un filtre (un choix multiple produit un critère par valeur cochée). */
+export interface GeodesyFilterCriterion {
+  title: string;
+  value: string;
+}
+
+function formatActiveFiltersCount(activeCount: number): string {
+  if (activeCount === 0) {
+    return 'par défaut';
+  }
+  return activeCount === 1 ? '1 actif' : `${activeCount} actifs`;
+}
+
+/** Un événement de synthèse, puis un événement par critère pour agréger chaque valeur séparément. */
+export function trackGeodesyFiltersApplied(
+  criteria: readonly GeodesyFilterCriterion[],
+  activeCount: number,
+): void {
+  trackEvent(
+    'Filtre géodésie',
+    'Appliquer',
+    eventName('Filtres', formatActiveFiltersCount(activeCount)),
+    activeCount,
+  );
+  for (const criterion of criteria) {
+    trackEvent('Filtre géodésie', 'Critère', eventName('Filtre', `${criterion.title} : ${criterion.value}`));
+  }
 }
 
 export function trackGeodesyFiltersResetDraft(): void {
-  trackEvent('Filtre géodésie', 'Réinitialiser', 'Brouillon');
+  trackEvent('Filtre géodésie', 'Réinitialiser', eventName('Filtres', 'réinitialisés'));
 }
 
 export type GeolocationTrackingMode = 'none' | 'following' | 'locked';
@@ -123,4 +167,65 @@ const GEOLOCATION_MODE_LABELS: Record<GeolocationTrackingMode, string> = {
 /** Clic FAB géolocalisation (cycle none → following → locked → none). */
 export function trackGeolocationMode(mode: GeolocationTrackingMode): void {
   trackEvent('Géolocalisation', 'Mode', GEOLOCATION_MODE_LABELS[mode]);
+}
+
+/** Point d'entrée de l'envoi : wizard sur la carte ou brouillon dans « Mes signalements ». */
+export type ReportSubmissionSource = 'Carte' | 'Brouillon';
+
+export type ReportSubmissionFailure = 'authRequired' | 'reportCreationFailed';
+
+const REPORT_SUBMISSION_FAILURE_LABELS: Record<ReportSubmissionFailure, string> = {
+  authRequired: 'Connexion requise',
+  reportCreationFailed: 'Création impossible',
+};
+
+function formatConformity(isConform: boolean): string {
+  return isConform ? 'Conforme' : 'Non conforme';
+}
+
+export function trackReportDraftSaved(isConform: boolean, photoCount: number): void {
+  trackEvent(
+    'Signalement',
+    'Brouillon enregistré',
+    eventName('Signalement', formatConformity(isConform)),
+    photoCount,
+  );
+}
+
+export function trackReportSubmitted(
+  source: ReportSubmissionSource,
+  isConform: boolean,
+  photoCount: number,
+): void {
+  trackEvent(
+    'Signalement',
+    'Envoi réussi',
+    eventName('Signalement', source, formatConformity(isConform)),
+    photoCount,
+  );
+}
+
+/** Signalement créé côté serveur, mais photos non jointes. */
+export function trackReportSubmittedWithoutPhotos(
+  source: ReportSubmissionSource,
+  isConform: boolean,
+  photoCount: number,
+): void {
+  trackEvent(
+    'Signalement',
+    'Envoi partiel',
+    eventName('Signalement', source, formatConformity(isConform)),
+    photoCount,
+  );
+}
+
+export function trackReportSubmitFailed(
+  source: ReportSubmissionSource,
+  failure: ReportSubmissionFailure,
+): void {
+  trackEvent(
+    'Signalement',
+    'Envoi échoué',
+    eventName('Signalement', source, REPORT_SUBMISSION_FAILURE_LABELS[failure]),
+  );
 }
