@@ -13,7 +13,7 @@ flowchart TB
   shell --> footer["MapPointSheetFooter"]
   body --> geod["MapPointGeodesyFicheBody"]
   body --> niv["MapPointNivellementFicheBody"]
-  click --> gdp["@ign/gdp-tools<br/>buildGeodesyPointDisplay"]
+  click --> gdp["&#64;ign/gdp-tools<br/>buildGeodesyPointDisplay"]
 ```
 
 | Élément | Rôle |
