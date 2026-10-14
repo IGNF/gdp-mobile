@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 
 import type { LeftMenuOverlayRoute } from '@/app/components/LeftMenu';
-import { trackEvent, trackOverlayOpen } from '@/infra/analytics/matomo';
+import { trackLogout, trackOverlayOpen } from '@/infra/analytics/matomo';
 
 const MENU_OVERLAY_LABELS: Record<Exclude<LeftMenuOverlayRoute, '/logout'>, string> = {
   '/my-account': 'Mon compte',
@@ -28,7 +28,7 @@ export function useMapPageMatomoTracking({
     }
 
     if (activeOverlay === '/logout') {
-      trackEvent('Auth', 'Déconnexion');
+      trackLogout();
       return;
     }
 

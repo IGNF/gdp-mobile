@@ -54,7 +54,7 @@ function resolveLayerSheetMatomoLabel(layerId: string): string | null {
 function trackLayerSheetVisibility(layerId: string, visible: boolean): void {
   const label = resolveLayerSheetMatomoLabel(layerId);
   if (label) {
-    trackLayerVisibilityChange(label, visible);
+    trackLayerVisibilityChange('Couches', label, visible);
   }
 }
 
