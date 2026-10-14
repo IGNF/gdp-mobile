@@ -35,7 +35,7 @@ L’identifiant serveur est un **entier** EspaceCo (`id`). L’auteur n’est pa
 |-----------|--------|
 | Session | OAuth 2 + PKCE, header `Authorization: Bearer <access_token>` |
 | Droit | utilisateur membre de la communauté 96 |
-| Origine | clic sur un **repère existant** (WFS / GetFeatureInfo) |
+| Origine | clic sur un **point existant** (WFS / GetFeatureInfo) |
 | Interdit | domaines WFS `rsge` et `nive` (canevas) — pas de signalement |
 | Position déplaçable | uniquement nivellement `nivf` / `nivo` |
 
