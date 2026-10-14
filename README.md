@@ -10,10 +10,10 @@ En cas de blocage : [Dépannage](./docs/DEPANNAGE.md).
 
 Prérequis : Node.js ≥ 22, accès SSH GitHub IGNF (`gdp-tools`, `mobile-core`, `mobile-device`, `collaboratif-client-api`).
 
-Depuis `gdp-mobile/` (dépôt GitHub) ou la racine du monorepo local `geodesie-de-poche/` :
+Depuis `gdp-mobile/` (dépôt GitHub) :
 
 ```bash
-cp .env.dist .env   # puis renseigner les variables (gdp-mobile/.env en monorepo)
+cp .env.dist .env   # puis renseigner les variables (gdp-mobile/.env)
 npm install
 ```
 
@@ -25,7 +25,7 @@ npm install
 npm run dev
 ```
 
-Ouvre l’app sur [http://localhost:5173](http://localhost:5173). En monorepo local : `gdp-tools` en watch met à jour `dist/` ; sinon Vite utilise le `dist` installé dans `node_modules`.
+Ouvre l’app sur [http://localhost:5173](http://localhost:5173).
 
 ## Déploiement en qualif
 
@@ -152,7 +152,6 @@ Inspecter la WebView (bundle `dist`, pas Vite) : `chrome://inspect/#devices` →
 | `npm run lint:css-modules` | Contrôle des CSS modules |
 | `npm run knip` | Fichiers, dépendances et exports inutilisés |
 
-Depuis la racine du monorepo, les mêmes noms marchent pour `dev`, `build`, `build:qualif`, `setup-android`, `generate-apk`, `run-apk`, `bump:version` et `knip` (`npm run knip -w gdp-mobile`).
 
 ## Documentation
 
