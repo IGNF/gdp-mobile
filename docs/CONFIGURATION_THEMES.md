@@ -52,29 +52,6 @@ VITE_GDP_REPORT_DISPLAY_THEMES="gdp-tools,mobile-geodesy,legacy-theme"
 VITE_GDP_REPORT_SUBMISSION_THEME="gdp-tools"
 ```
 
-### Cas 3 : Thèmes par type de repère
-
-```bash
-# Afficher tous les types
-VITE_GDP_REPORT_DISPLAY_THEMES="theme-planimetre,theme-altimetre,theme-gravimetre"
-
-# Créer par défaut sur planimétrique
-VITE_GDP_REPORT_SUBMISSION_THEME="theme-planimetre"
-```
-
-## Migration depuis l'ancienne configuration
-
-**Avant :**
-```bash
-VITE_GDP_REPORT_THEME="gdp-tools"
-```
-
-**Après :**
-```bash
-VITE_GDP_REPORT_DISPLAY_THEMES="gdp-tool,Géodésies"
-VITE_GDP_REPORT_SUBMISSION_THEME="gdp-tools"
-```
-
 ## Notes techniques
 
 - Les thèmes doivent exister dans la communauté configurée (ID communauté dans `VITE_GDP_REPORT_COMMUNITY_ID`)
