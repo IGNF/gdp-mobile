@@ -6,14 +6,14 @@ Documentation de la fiche affichée au clic sur un repère géodésique ou de ni
 
 ```mermaid
 flowchart TB
-  click["Clic repère<br/>useMapGeodesyClick"] --> sheet["MapBottomSheet<br/>mode point"]
+  mapClick["Clic repère<br/>useMapGeodesyClick"] --> sheet["MapBottomSheet<br/>mode point"]
   sheet --> shell["MapPointSheet<br/>shell commun"]
   shell --> header["MapPointSheetHeader"]
   shell --> body["Corps selon variante"]
   shell --> footer["MapPointSheetFooter"]
   body --> geod["MapPointGeodesyFicheBody"]
   body --> niv["MapPointNivellementFicheBody"]
-  click --> gdp["&#64;ign/gdp-tools<br/>buildGeodesyPointDisplay"]
+  mapClick --> gdp["@ign/gdp-tools<br/>buildGeodesyPointDisplay"]
 ```
 
 | Élément | Rôle |
