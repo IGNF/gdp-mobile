@@ -1,5 +1,5 @@
 import { ReportStatus } from '@ign/mobile-core';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import {
   fetchCommunityMembersCount,
@@ -183,7 +183,7 @@ export function useCommunityStats({
     setError(null);
   }
 
-  const reload = useCallback(() => {
+  const reload = () => {
     if (isReloading || isLoading) {
       return;
     }
@@ -208,7 +208,7 @@ export function useCommunityStats({
       .finally(() => {
         setIsReloading(false);
       });
-  }, [cacheKey, isAuthenticated, isLoading, isReloading]);
+  };
 
   useEffect(() => {
     if (!enabled || peekCollabApiCache<CachedCommunityStats>(cacheKey)) {
