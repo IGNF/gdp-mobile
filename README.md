@@ -76,29 +76,33 @@ Le `.htaccess` copié dans `dist/` ne gère que le fallback SPA ; le proxy OAuth
 Un numéro semver dans `package.json`, recopié dans Android / iOS. Pas de suffixe. Le `versionCode` Android vaut `major × 10000 + minor × 100 + patch` (`4.0.1` → `40001`). L’écran **À propos** affiche cette version.
 
 Semver = semantic versioning : un numéro en trois parties, majeur.mineur.patch.
+
 Depuis la branche en cours, faire les tests de compilation, de linting
 
 ```bash
 npm update
-npm run deps:prod
 npm run lint
 npm run lint:css-modules
 npm run knip
 npm run build
+npm run deps:prod
 git status
 # puis, si besoin :
 git add .; git commit -m "prepa prod-dependencies.md"; git push
 ```
+
+Merger la branche sur github, puis :
+
 Depuis `main` :
 
 ```bash
 git checkout main
 git pull
-npm run bump:version -- 4.0.1
-git push && git push origin v4.0.1
+npm run bump:version -- 4.0.X
+git push && git push origin v4.0.X
 ```
 
-Commit `4.0.1` + tag `v4.0.1`. Le push du tag déclenche la CI store.
+Commit `4.0.X` + tag `v4.0.X`. Le push du tag déclenche la CI store.
 
 ## Test sur mobile avec Chrome
 
