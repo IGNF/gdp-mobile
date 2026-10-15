@@ -54,6 +54,16 @@ export async function getCollabApiCached<T>(
   return request;
 }
 
+/** Lecture synchrone d’une entrée encore valide, sans lancer de requête. */
+export function peekCollabApiCache<T>(cacheKey: string, ttlMs?: number): T | undefined {
+  const cached = memoryCache.get(cacheKey) as CollabApiCacheEntry<T> | undefined;
+  if (!cached || !isCacheEntryFresh(cached, ttlMs)) {
+    return undefined;
+  }
+
+  return cached.value;
+}
+
 export function clearCollabApiCache(): void {
   memoryCache.clear();
   inflightRequests.clear();

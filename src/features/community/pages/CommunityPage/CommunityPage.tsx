@@ -7,10 +7,12 @@ import {
 } from '@/features/community/hooks/useCommunityStats';
 import { Button } from '@/shared/ui/Button';
 import { TrackedExternalLink } from '@/infra/analytics/TrackedExternalLink';
+import IconReset from '@/shared/assets/icons/icon-reset.svg?react';
 import { Loading } from '@/shared/ui/Loading';
 import { PageHeader } from '@/shared/ui/PageHeader';
 import { SlideUpPage } from '@/shared/ui/SlideUpPage';
 import { EXTERNAL_LINKS } from '@/shared/constants/externalLinks';
+import { formatDateTime } from '@/shared/utils/date';
 import { getStatusLabel } from '@/shared/utils/reportStatus';
 
 import screen from '@/shared/styles/screen.module.css';
@@ -25,7 +27,7 @@ export function CommunityPage({ isOpen, onClose }: CommunityPageProps) {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
 
-  const { stats, isLoading, error, reload } = useCommunityStats({
+  const { stats, isLoading, isReloading, lastLoadedAt, error, reload } = useCommunityStats({
     enabled: isOpen,
     isAuthenticated,
   });
@@ -71,6 +73,21 @@ export function CommunityPage({ isOpen, onClose }: CommunityPageProps) {
           />
         ) : null}
 
+        <div className={styles.updateRow}>
+          <p className={styles.updateText}>
+            {lastLoadedAt ? `Dernière MAJ : ${formatDateTime(lastLoadedAt)}` : 'Données non chargées'}
+          </p>
+          <button
+            type="button"
+            className={styles.refreshButton}
+            onClick={reload}
+            disabled={isLoading || isReloading}
+          >
+            <IconReset className={styles.refreshIcon} aria-hidden />
+            {isReloading ? 'Actualisation…' : 'Actualiser'}
+          </button>
+        </div>
+
         {error ? (
           <section className={styles.section}>
             <p className={`body ${styles.errorText}`}>{error.message}</p>
@@ -92,19 +109,17 @@ export function CommunityPage({ isOpen, onClose }: CommunityPageProps) {
               </h2>
               <div className={styles.kpiGrid}>
                 <div className={styles.kpiCard}>
-                  <span className={styles.kpiValue}>
-                    {isLoading ? '—' : stats.reportsTotal}
-                  </span>
+                  <span className={styles.kpiValue}>{stats.reportsTotal}</span>
                   <span className={styles.kpiLabel}>Signalements</span>
                 </div>
                 <div className={styles.kpiCard}>
                   <span className={styles.kpiValue}>
-                    {isLoading || !isAuthenticated ? '—' : stats.membersCount ?? '—'}
+                    {!isAuthenticated ? '—' : stats.membersCount ?? '—'}
                   </span>
                   <span className={styles.kpiLabel}>Membres</span>
                 </div>
               </div>
-              {!isAuthenticated && !isLoading ? (
+              {!isAuthenticated ? (
                 <p className={`body ${styles.hint}`}>
                   Connectez-vous pour afficher le nombre de membres.
                 </p>
@@ -122,15 +137,11 @@ export function CommunityPage({ isOpen, onClose }: CommunityPageProps) {
               </h2>
               <div className={styles.kpiGrid}>
                 <div className={styles.kpiCard}>
-                  <span className={styles.kpiValue}>
-                    {isLoading ? '—' : stats.recent.opened}
-                  </span>
+                  <span className={styles.kpiValue}>{stats.recent.opened}</span>
                   <span className={styles.kpiLabel}>Nouveaux</span>
                 </div>
                 <div className={styles.kpiCard}>
-                  <span className={styles.kpiValue}>
-                    {isLoading ? '—' : stats.recent.closed}
-                  </span>
+                  <span className={styles.kpiValue}>{stats.recent.closed}</span>
                   <span className={styles.kpiLabel}>Traités</span>
                 </div>
               </div>
@@ -140,16 +151,14 @@ export function CommunityPage({ isOpen, onClose }: CommunityPageProps) {
               <h2 id="community-status-title" className={styles.sectionTitle}>
                 Par statut
               </h2>
-              {stats.statusCounts.length === 0 && !isLoading ? (
+              {stats.statusCounts.length === 0 ? (
                 <p className="body">Aucun signalement.</p>
               ) : (
                 <ul className={styles.statusList}>
                   {stats.statusCounts.map(({ status, count }) => (
                     <li key={status} className={styles.statusRow}>
                       <span className={styles.statusLabel}>{getStatusLabel(status)}</span>
-                      <span className={styles.statusCount}>
-                        {isLoading ? '—' : count}
-                      </span>
+                      <span className={styles.statusCount}>{count}</span>
                     </li>
                   ))}
                 </ul>

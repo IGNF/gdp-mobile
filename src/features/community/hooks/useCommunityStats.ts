@@ -1,5 +1,5 @@
 import { ReportStatus } from '@ign/mobile-core';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import {
   fetchCommunityMembersCount,
@@ -10,7 +10,7 @@ import {
   GDP_REPORT_COMMUNITY_ID,
   getGdpCommunityReportThemes,
 } from '@/features/report/constants/reportApi';
-import { getCollabApiCached } from '@/infra/api/collabApiCache';
+import { getCollabApiCached, peekCollabApiCache } from '@/infra/api/collabApiCache';
 import { COLLAB_API_CACHE_KEYS, GDP_COMMUNITY_THEME_CACHE_TTL_MS } from '@/infra/api/collabApiKeys';
 import { collabApiClient, ensureCollabApiSession } from '@/infra/api';
 import { formatIsoDateDaysAgo } from '@/shared/utils/date';
@@ -56,9 +56,17 @@ interface UseCommunityStatsOptions {
   isAuthenticated: boolean;
 }
 
+interface CachedCommunityStats {
+  stats: CommunityStatsSnapshot;
+  fetchedAt: number;
+}
+
 interface UseCommunityStatsResult {
   stats: CommunityStatsSnapshot | null;
   isLoading: boolean;
+  isReloading: boolean;
+  /** Date de la récupération mise en cache, `null` tant qu’aucun chargement n’a abouti. */
+  lastLoadedAt: Date | null;
   error: Error | null;
   reload: () => void;
 }
@@ -98,21 +106,112 @@ async function loadAuthenticatedCommunityProfile(): Promise<{
   return readCommunityText(response.data);
 }
 
+function communityStatsCacheKey(isAuthenticated: boolean): string {
+  return COLLAB_API_CACHE_KEYS.communityStats(
+    GDP_REPORT_COMMUNITY_ID,
+    isAuthenticated ? 'auth' : 'public',
+  );
+}
+
+function readCachedCommunityStats(isAuthenticated: boolean): CachedCommunityStats | undefined {
+  return peekCollabApiCache<CachedCommunityStats>(communityStatsCacheKey(isAuthenticated));
+}
+
+async function fetchCommunityStatsSnapshot(
+  isAuthenticated: boolean,
+): Promise<CachedCommunityStats> {
+  const themes = getGdpCommunityReportThemes();
+  const recentSince = formatIsoDateDaysAgo(COMMUNITY_RECENT_PERIOD_DAYS);
+
+  const authenticatedExtrasPromise = isAuthenticated
+    ? Promise.all([loadAuthenticatedCommunityProfile(), fetchCommunityMembersCount()])
+    : Promise.resolve([{ name: '', descriptionHtml: '' }, null] as const);
+
+  const [authenticatedExtras, reportsTotal, statusTotals, recentOpened, recentClosed] =
+    await Promise.all([
+      authenticatedExtrasPromise,
+      fetchCommunityReportCount({ themes }),
+      Promise.all(
+        TRACKED_STATUSES.map((status) => fetchCommunityReportCountSafe({ themes, status })),
+      ),
+      fetchCommunityReportCountSafe({ themes, openedSince: recentSince }),
+      fetchCommunityReportCountSafe({ themes, closedSince: recentSince }),
+    ]);
+
+  const [profile, membersCount] = authenticatedExtras;
+
+  const statusCounts: CommunityStatusCount[] = TRACKED_STATUSES.map((status, index) => ({
+    status,
+    count: statusTotals[index] ?? 0,
+  })).filter((entry) => entry.count > 0);
+
+  const communityName = isAuthenticated && profile.name ? profile.name : DEFAULT_COMMUNITY_TITLE;
+
+  return {
+    fetchedAt: Date.now(),
+    stats: {
+      communityName,
+      communityDescriptionHtml: isAuthenticated ? profile.descriptionHtml : '',
+      reportsTotal,
+      membersCount: isAuthenticated ? membersCount : null,
+      statusCounts,
+      recent: { opened: recentOpened, closed: recentClosed },
+    },
+  };
+}
+
 export function useCommunityStats({
   enabled,
   isAuthenticated,
 }: UseCommunityStatsOptions): UseCommunityStatsResult {
-  const [stats, setStats] = useState<CommunityStatsSnapshot | null>(null);
+  const cacheKey = communityStatsCacheKey(isAuthenticated);
+  const initialCache = readCachedCommunityStats(isAuthenticated);
+  const [stats, setStats] = useState<CommunityStatsSnapshot | null>(initialCache?.stats ?? null);
+  const [lastLoadedAt, setLastLoadedAt] = useState<Date | null>(
+    initialCache ? new Date(initialCache.fetchedAt) : null,
+  );
   const [isLoading, setIsLoading] = useState(false);
+  const [isReloading, setIsReloading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
-  const [reloadToken, setReloadToken] = useState(0);
+  const [appliedCacheKey, setAppliedCacheKey] = useState(cacheKey);
 
-  const reload = useCallback(() => {
-    setReloadToken((value) => value + 1);
-  }, []);
+  if (appliedCacheKey !== cacheKey) {
+    const cached = peekCollabApiCache<CachedCommunityStats>(cacheKey);
+    setAppliedCacheKey(cacheKey);
+    setStats(cached?.stats ?? null);
+    setLastLoadedAt(cached ? new Date(cached.fetchedAt) : null);
+    setError(null);
+  }
+
+  const reload = () => {
+    if (isReloading || isLoading) {
+      return;
+    }
+
+    setIsReloading(true);
+    setError(null);
+
+    void getCollabApiCached(cacheKey, () => fetchCommunityStatsSnapshot(isAuthenticated), {
+      forceRefresh: true,
+    })
+      .then((payload) => {
+        setStats(payload.stats);
+        setLastLoadedAt(new Date(payload.fetchedAt));
+      })
+      .catch((loadError: unknown) => {
+        setError(
+          loadError instanceof Error
+            ? loadError
+            : new Error('Impossible de charger les statistiques de la communauté'),
+        );
+      })
+      .finally(() => {
+        setIsReloading(false);
+      });
+  };
 
   useEffect(() => {
-    if (!enabled) {
+    if (!enabled || peekCollabApiCache<CachedCommunityStats>(cacheKey)) {
       return;
     }
 
@@ -123,48 +222,13 @@ export function useCommunityStats({
       setError(null);
 
       try {
-        const themes = getGdpCommunityReportThemes();
-        const recentSince = formatIsoDateDaysAgo(COMMUNITY_RECENT_PERIOD_DAYS);
-
-        const authenticatedExtrasPromise = isAuthenticated
-          ? Promise.all([
-              loadAuthenticatedCommunityProfile(),
-              fetchCommunityMembersCount(),
-            ])
-          : Promise.resolve([{ name: '', descriptionHtml: '' }, null] as const);
-
-        const [authenticatedExtras, reportsTotal, statusTotals, recentOpened, recentClosed] =
-          await Promise.all([
-            authenticatedExtrasPromise,
-            fetchCommunityReportCount({ themes }),
-            Promise.all(
-              TRACKED_STATUSES.map((status) =>
-                fetchCommunityReportCountSafe({ themes, status }),
-              ),
-            ),
-            fetchCommunityReportCountSafe({ themes, openedSince: recentSince }),
-            fetchCommunityReportCountSafe({ themes, closedSince: recentSince }),
-          ]);
-
-        const [profile, membersCount] = authenticatedExtras;
-
-        const statusCounts: CommunityStatusCount[] = TRACKED_STATUSES.map((status, index) => ({
-          status,
-          count: statusTotals[index] ?? 0,
-        })).filter((entry) => entry.count > 0);
-
-        const communityName =
-          isAuthenticated && profile.name ? profile.name : DEFAULT_COMMUNITY_TITLE;
+        const payload = await getCollabApiCached(cacheKey, () =>
+          fetchCommunityStatsSnapshot(isAuthenticated),
+        );
 
         if (!cancelled) {
-          setStats({
-            communityName,
-            communityDescriptionHtml: isAuthenticated ? profile.descriptionHtml : '',
-            reportsTotal,
-            membersCount: isAuthenticated ? membersCount : null,
-            statusCounts,
-            recent: { opened: recentOpened, closed: recentClosed },
-          });
+          setStats(payload.stats);
+          setLastLoadedAt(new Date(payload.fetchedAt));
         }
       } catch (loadError) {
         if (!cancelled) {
@@ -186,7 +250,7 @@ export function useCommunityStats({
     return () => {
       cancelled = true;
     };
-  }, [enabled, isAuthenticated, reloadToken]);
+  }, [cacheKey, enabled, isAuthenticated]);
 
-  return { stats, isLoading, error, reload };
+  return { stats, isLoading, isReloading, lastLoadedAt, error, reload };
 }

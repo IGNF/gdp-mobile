@@ -1,6 +1,8 @@
 export const COLLAB_API_CACHE_KEYS = {
   currentUser: 'collab:user:me',
   community: (communityId: number) => `collab:community:${communityId}`,
+  communityStats: (communityId: number, audience: 'auth' | 'public') =>
+    `collab:community:${communityId}:stats:${audience}`,
   communityMember: (communityId: number, memberId: number) =>
     `collab:community:${communityId}:member:${memberId}`,
 } as const;
