@@ -80,11 +80,11 @@ Depuis la branche en cours, faire les tests de compilation, de linting
 
 ```bash
 npm update
-npm run deps:prod
 npm run lint
 npm run lint:css-modules
 npm run knip
 npm run build
+npm run deps:prod
 git status
 # puis, si besoin :
 git add .; git commit -m "prepa prod-dependencies.md"; git push
@@ -94,11 +94,11 @@ Depuis `main` :
 ```bash
 git checkout main
 git pull
-npm run bump:version -- 4.0.1
-git push && git push origin v4.0.1
+npm run bump:version -- 4.0.X
+git push && git push origin v4.0.X
 ```
 
-Commit `4.0.1` + tag `v4.0.1`. Le push du tag déclenche la CI store.
+Commit `4.0.X` + tag `v4.0.X`. Le push du tag déclenche la CI store.
 
 ## Test sur mobile avec Chrome
 
