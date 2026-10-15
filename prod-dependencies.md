@@ -4,7 +4,7 @@
 | @capacitor/browser             | MIT          | https://github.com/ionic-team/capacitor-plugins.git                                | 8.0.5             | Ionic <hi@ionicframework.com>                  |
 | @capacitor/core                | MIT          | https://github.com/ionic-team/capacitor.git                                        | 8.5.3             | Ionic Team <hi@ionic.io> (https://ionic.io)    |
 | @capacitor/device              | MIT          | https://github.com/ionic-team/capacitor-plugins.git                                | 8.0.3             | Ionic <hi@ionicframework.com>                  |
-| @capacitor/filesystem          | MIT          | https://github.com/ionic-team/capacitor-filesystem.git                             | 8.1.4             | Outsystems                                     |
+| @capacitor/filesystem          | MIT          | https://github.com/ionic-team/capacitor-filesystem.git                             | 8.1.5             | Outsystems                                     |
 | @capacitor/geolocation         | MIT          | https://github.com/ionic-team/capacitor-geolocation.git                            | 8.2.3             | Outsystems                                     |
 | @capacitor/preferences         | MIT          | https://github.com/ionic-team/capacitor-plugins.git                                | 8.0.1             | Ionic <hi@ionicframework.com>                  |
 | @fontsource-variable/open-sans | OFL-1.1      | https://github.com/fontsource/font-files.git                                       | 5.3.0             | Google Inc.                                    |
@@ -16,8 +16,8 @@
 | ol                             | BSD-2-Clause | https://github.com/openlayers/openlayers.git                                       | 10.11.0           |                                                |
 | ol-ext                         | BSD-3-Clause | https://github.com/Viglino/ol-ext.git                                              | 4.0.38            | Jean-Marc Viglino (https://github.com/Viglino) |
 | proj4                          | MIT          | https://github.com/proj4js/proj4js.git                                             | 2.22.0            |                                                |
-| react                          | MIT          | https://github.com/react/react.git                                                 | 19.3.0            |                                                |
-| react-dom                      | MIT          | https://github.com/react/react.git                                                 | 19.3.0            |                                                |
+| react                          | MIT          | https://github.com/react/react.git                                                 | 19.3.1            |                                                |
+| react-dom                      | MIT          | https://github.com/react/react.git                                                 | 19.3.1            |                                                |
 | react-icons                    | MIT          | https://github.com/react-icons/react-icons.git                                     | 5.7.0             | Goran Gajic                                    |
 | react-router-dom               | MIT          | https://github.com/remix-run/react-router.git                                      | 7.18.4            | Remix Software <hello@remix.run>               |
 | vite-plugin-svgr               | MIT          | https://github.com/pd4d10/vite-plugin-svgr.git                                     | 5.2.0             | Rongjian Zhang                                 |

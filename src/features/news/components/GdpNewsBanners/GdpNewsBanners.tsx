@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
 
 import { Alert } from '@/shared/ui/Alert';
-import { ExternalLink } from '@/shared/ui/ExternalLink';
+import { TrackedExternalLink } from '@/infra/analytics/TrackedExternalLink';
 import type { GdpNewsItem } from '@/domain/news/models';
 import { NEWS_SEVERITY_VISUALS } from '@/features/news/utils/newsSeverityVisuals';
 
@@ -49,7 +49,14 @@ export function GdpNewsBanners({ items, onDismiss }: GdpNewsBannersProps) {
       iconColor={visual.color}
       buttons={[{ label: 'J’ai compris', onClick: handleClose }]}
     >
-      {current.cta ? <ExternalLink href={current.cta.url}>{current.cta.label}</ExternalLink> : null}
+      {current.cta ? (
+        <TrackedExternalLink
+          href={current.cta.url}
+          tracking={{ context: 'Bandeau actualités', label: current.title }}
+        >
+          {current.cta.label}
+        </TrackedExternalLink>
+      ) : null}
     </Alert>
   );
 }

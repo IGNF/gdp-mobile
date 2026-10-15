@@ -3,7 +3,7 @@ import { useState } from 'react';
 import type { AppUser } from '@/domain/user/models';
 import { config } from '@/shared/config/env';
 import { EXTERNAL_LINKS } from '@/shared/constants/externalLinks';
-import { ExternalLink } from '@/shared/ui/ExternalLink';
+import { TrackedExternalLink } from '@/infra/analytics/TrackedExternalLink';
 
 import IconAngleRight from '@/shared/assets/icons/icon-angle-right.svg?react';
 import IconSettings from '@/shared/assets/icons/icon-settings.svg?react';
@@ -277,14 +277,15 @@ export function LeftMenu({
             return (
               <div key={group.id} className={styles.menuGroup}>
                 {href ? (
-                  <ExternalLink
+                  <TrackedExternalLink
                     href={href}
                     className={styles.groupHeader}
                     showIcon={false}
                     onClick={onClose}
+                    tracking={{ context: 'Menu', label: group.title }}
                   >
                     {content}
-                  </ExternalLink>
+                  </TrackedExternalLink>
                 ) : route ? (
                   <button
                     type="button"

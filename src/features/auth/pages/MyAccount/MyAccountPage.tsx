@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { useUserStats } from '@/features/auth/hooks/useUserStats';
 import { Button } from '@/shared/ui/Button';
-import { ExternalLink } from '@/shared/ui/ExternalLink';
+import { TrackedExternalLink } from '@/infra/analytics/TrackedExternalLink';
 import { PageHeader } from '@/shared/ui/PageHeader';
 import { SlideUpPage } from '@/shared/ui/SlideUpPage';
 import { config } from '@/shared/config/env';
@@ -64,14 +64,15 @@ export function MyAccountPage({ isOpen, onClose }: MyAccountPageProps) {
                     <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" fill="currentColor"/>
                   </svg>
                 </div>
-                <ExternalLink
+                <TrackedExternalLink
                   href={ssoAccountUrl}
                   className={styles.cameraButton}
                   showIcon={false}
                   aria-label="Modifier la photo"
+                  tracking={{ context: 'Mon compte', label: 'Modifier la photo' }}
                 >
                   <IconCamera className={styles.photoIcon} aria-hidden />
-                </ExternalLink>
+                </TrackedExternalLink>
               </div>
               <h2 className={styles.profileName}>{displayName}</h2>
             </div>
@@ -115,9 +116,12 @@ export function MyAccountPage({ isOpen, onClose }: MyAccountPageProps) {
 
             {/* Note en bas */}
             <p className={styles.footerNote}>Pour modifier votre profil, rendez-vous sur{' '}
-              <ExternalLink href={EXTERNAL_LINKS.ESPACE_COLLABORATIF}>
+              <TrackedExternalLink
+                href={EXTERNAL_LINKS.ESPACE_COLLABORATIF}
+                tracking={{ context: 'Mon compte', label: 'Espace collaboratif' }}
+              >
                 l'espace collaboratif
-              </ExternalLink>
+              </TrackedExternalLink>
               .
             </p>
           </>

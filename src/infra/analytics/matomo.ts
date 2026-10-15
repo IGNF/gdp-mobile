@@ -53,7 +53,6 @@ export function initMatomo(): void {
   paq.push(['setTrackerUrl', trackerUrl]);
   paq.push(['setSiteId', config.matomo.siteId]);
   paq.push(['setCustomDimension', 1, __APP_VERSION__]);
-  paq.push(['enableLinkTracking']);
 
   const script = document.createElement('script');
   script.async = true;
@@ -102,6 +101,22 @@ export function trackOverlayOpen(scope: 'Menu' | 'Carte', name: string): void {
 
 export function trackLogout(): void {
   trackEvent('Auth', 'Déconnexion', eventName('Menu', 'Déconnexion'));
+}
+
+/**
+ * Liens sortants suivis explicitement : `enableLinkTracking` ne voit ni les liens rendus après
+ * son appel (SPA) ni les ouvertures via `Browser.open`.
+ */
+export function trackOutlinkOpen(context: string, label: string): void {
+  trackEvent('Lien sortant', 'Ouverture', eventName(context, label));
+}
+
+export function trackNavigateToPoint(navigationAppLabel: string): void {
+  trackEvent('Lien sortant', "S'y rendre", eventName('Fiche point', navigationAppLabel));
+}
+
+export function trackPointPdfOpen(): void {
+  trackEvent('Lien sortant', 'Fiche PDF', eventName('Fiche point', 'PDF'));
 }
 
 /** Panneau Couches de `/map` ou mini-carte du signalement. */

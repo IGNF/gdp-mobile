@@ -87,7 +87,7 @@ npm run knip
 npm run build
 git status
 # puis, si besoin :
-git add .; git commit -m "prepa version"; git push
+git add .; git commit -m "prepa prod-dependencies.md"; git push
 ```
 Depuis `main` :
 
