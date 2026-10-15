@@ -3,12 +3,16 @@ import { useState } from 'react';
 import { AppLogo } from '@/shared/ui/AppLogo';
 import { PageHeader } from '@/shared/ui/PageHeader';
 import { SlideUpPage } from '@/shared/ui/SlideUpPage';
-import { ExternalLink } from '@/shared/ui/ExternalLink';
+import { TrackedExternalLink } from '@/infra/analytics/TrackedExternalLink';
 import { EXTERNAL_LINKS } from '@/shared/constants/externalLinks';
 import IconClose from '@/shared/assets/icons/icon-close.svg?react';
 
 import screen from '@/shared/styles/screen.module.css';
 import styles from './AboutPage.module.css';
+
+function aboutTracking(label: string) {
+  return { context: 'À propos', label };
+}
 
 export interface AboutPageProps {
   isOpen: boolean;
@@ -39,18 +43,41 @@ export function AboutPage({ isOpen, onClose }: AboutPageProps) {
           </div>
           <div>
             Éditée par l’
-            <ExternalLink href="https://www.ign.fr/">Institut national de l’information géographique et forestière</ExternalLink>
+            <TrackedExternalLink href="https://www.ign.fr/" tracking={aboutTracking('Site IGN')}>
+              Institut national de l’information géographique et forestière
+            </TrackedExternalLink>
           </div>
         </section>
 
         <section className={styles.section}>
           <div className={styles.sectionTitle}>Liens utiles</div>
-          <ExternalLink href={EXTERNAL_LINKS.AIDE_GUIDE_UTILISATEUR}>Aide / guide utilisateur</ExternalLink>
-          <ExternalLink href={EXTERNAL_LINKS.FAQ_FORUM}>FAQ / Forum</ExternalLink>
-          <ExternalLink href={EXTERNAL_LINKS.DONNEES_PERSONNELLES}>Données à caractère personnel</ExternalLink>
-          <ExternalLink href={EXTERNAL_LINKS.ACCESSIBILITE}>Accessibilité</ExternalLink>
-          <ExternalLink href={EXTERNAL_LINKS.CODE_SOURCE}>Code source de l'application</ExternalLink>
-          <ExternalLink href={EXTERNAL_LINKS.LICENCES_OPENSOURCE}>Licences OpenSource</ExternalLink>
+          <TrackedExternalLink
+            href={EXTERNAL_LINKS.AIDE_GUIDE_UTILISATEUR}
+            tracking={aboutTracking('Aide / guide utilisateur')}
+          >
+            Aide / guide utilisateur
+          </TrackedExternalLink>
+          <TrackedExternalLink href={EXTERNAL_LINKS.FAQ_FORUM} tracking={aboutTracking('FAQ / Forum')}>
+            FAQ / Forum
+          </TrackedExternalLink>
+          <TrackedExternalLink
+            href={EXTERNAL_LINKS.DONNEES_PERSONNELLES}
+            tracking={aboutTracking('Données personnelles')}
+          >
+            Données à caractère personnel
+          </TrackedExternalLink>
+          <TrackedExternalLink href={EXTERNAL_LINKS.ACCESSIBILITE} tracking={aboutTracking('Accessibilité')}>
+            Accessibilité
+          </TrackedExternalLink>
+          <TrackedExternalLink href={EXTERNAL_LINKS.CODE_SOURCE} tracking={aboutTracking('Code source')}>
+            Code source de l'application
+          </TrackedExternalLink>
+          <TrackedExternalLink
+            href={EXTERNAL_LINKS.LICENCES_OPENSOURCE}
+            tracking={aboutTracking('Licences open source')}
+          >
+            Licences OpenSource
+          </TrackedExternalLink>
         </section>
 
 
@@ -95,9 +122,12 @@ export function AboutPage({ isOpen, onClose }: AboutPageProps) {
                   L’accès et l’utilisation de ces données est gratuit et illimité pour tous les usages privés
                   comme professionnels, sous réserve du respect des droits de propriété intellectuelle et des
                   conditions de licence, notamment les licences IGN accessibles ici :{' '}
-                  <ExternalLink href="https://geoservices.ign.fr/cgu-licences">
+                  <TrackedExternalLink
+                    href="https://geoservices.ign.fr/cgu-licences"
+                    tracking={aboutTracking('Licences Géoservices')}
+                  >
                     Conditions de licences | Géoservices (ign.fr)
-                  </ExternalLink>
+                  </TrackedExternalLink>
                 </p>
                 <p>
                   Les données accessibles depuis l’application sont publiées à titre d’information, à
@@ -121,12 +151,18 @@ export function AboutPage({ isOpen, onClose }: AboutPageProps) {
                 <p>
                   L’application vous permet de signaler le statut de repères géodésiques sur le terrain. 
                   Ces signalements sont stockés localement sur votre téléphone portable ou tablette et accessibles depuis le menu « Enregistrés » et envoyés sur le serveur de l’IGN.
-                  Ils sont également accessibles depuis l’<ExternalLink href={EXTERNAL_LINKS.ESPACE_COLLABORATIF}>Espace collaboratif IGN</ExternalLink>.
+                  Ils sont également accessibles depuis l’<TrackedExternalLink
+                    href={EXTERNAL_LINKS.ESPACE_COLLABORATIF}
+                    tracking={aboutTracking('Espace collaboratif')}
+                  >Espace collaboratif IGN</TrackedExternalLink>.
                 </p>
                 <p>
-                  <ExternalLink href={EXTERNAL_LINKS.ESPACE_COLLABORATIF}>
+                  <TrackedExternalLink
+                    href={EXTERNAL_LINKS.ESPACE_COLLABORATIF}
+                    tracking={aboutTracking('Espace collaboratif')}
+                  >
                     l’Espace collaboratif IGN
-                  </ExternalLink>
+                  </TrackedExternalLink>
                 </p>
               </div>
             ) : null}

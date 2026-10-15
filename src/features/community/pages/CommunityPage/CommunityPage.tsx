@@ -6,7 +6,7 @@ import {
   useCommunityStats,
 } from '@/features/community/hooks/useCommunityStats';
 import { Button } from '@/shared/ui/Button';
-import { ExternalLink } from '@/shared/ui/ExternalLink';
+import { TrackedExternalLink } from '@/infra/analytics/TrackedExternalLink';
 import { Loading } from '@/shared/ui/Loading';
 import { PageHeader } from '@/shared/ui/PageHeader';
 import { SlideUpPage } from '@/shared/ui/SlideUpPage';
@@ -160,9 +160,12 @@ export function CommunityPage({ isOpen, onClose }: CommunityPageProps) {
 
         <p className={`body ${styles.footerNote}`}>
           Détails et gestion sur{' '}
-          <ExternalLink href={EXTERNAL_LINKS.ESPACE_COLLABORATIF}>
+          <TrackedExternalLink
+            href={EXTERNAL_LINKS.ESPACE_COLLABORATIF}
+            tracking={{ context: 'Communauté', label: 'Espace collaboratif' }}
+          >
             l&apos;Espace collaboratif IGN
-          </ExternalLink>
+          </TrackedExternalLink>
           .
         </p>
       </main>

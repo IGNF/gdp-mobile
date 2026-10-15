@@ -1,5 +1,5 @@
 import type { GdpNewsItem, GdpNewsSeverity } from '@/domain/news/models';
-import { ExternalLink } from '@/shared/ui/ExternalLink';
+import { TrackedExternalLink } from '@/infra/analytics/TrackedExternalLink';
 import { Loading } from '@/shared/ui/Loading';
 
 import styles from './NewsTimeline.module.css';
@@ -56,9 +56,13 @@ export function NewsTimeline({ items, isLoading = false }: NewsTimelineProps) {
               <p className={styles.title}>{item.title}</p>
               <p className={styles.text}>{item.body}</p>
               {item.cta ? (
-                <ExternalLink href={item.cta.url} className={styles.cta}>
+                <TrackedExternalLink
+                  href={item.cta.url}
+                  className={styles.cta}
+                  tracking={{ context: 'Actualités', label: item.title }}
+                >
                   {item.cta.label}
-                </ExternalLink>
+                </TrackedExternalLink>
               ) : null}
             </div>
           </li>

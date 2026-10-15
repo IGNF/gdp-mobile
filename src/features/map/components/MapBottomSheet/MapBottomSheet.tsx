@@ -7,7 +7,11 @@ import {
 } from '@/features/map/hooks/usePointFicheSheetDrag';
 import { useUserLocation } from '@/features/map/hooks/useUserLocation';
 import type { UserFollowingMode } from '@/features/map/hooks/useMap';
-import { openExternalNavigation } from '@/shared/utils/externalNavigation';
+import { trackNavigateToPoint } from '@/infra/analytics/matomo';
+import {
+  getExternalNavigationAppLabel,
+  openExternalNavigation,
+} from '@/shared/utils/externalNavigation';
 
 import sheetChrome from '@/features/map/styles/mapSheet.module.css';
 
@@ -99,6 +103,7 @@ export function MapBottomSheet({
       return;
     }
 
+    trackNavigateToPoint(getExternalNavigationAppLabel());
     void openExternalNavigation({
       longitude: selectedPoint.point.longitude,
       latitude: selectedPoint.point.latitude,

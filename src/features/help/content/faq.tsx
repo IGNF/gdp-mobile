@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 
+import { TrackedExternalLink } from '@/infra/analytics/TrackedExternalLink';
 import { EXTERNAL_LINKS } from '@/shared/constants/externalLinks';
-import { ExternalLink } from '@/shared/ui/ExternalLink';
 
 export interface FaqItem {
   question: string;
@@ -30,7 +30,12 @@ export const FAQ_ITEMS: readonly FaqItem[] = [
       <>
         Ouvrez le menu latéral, section « Mon compte », puis « Se connecter ». Vous pouvez aussi créer un
         compte sur{' '}
-        <ExternalLink href={EXTERNAL_LINKS.ESPACE_COLLABORATIF}>l’Espace collaboratif IGN</ExternalLink>.
+        <TrackedExternalLink
+          href={EXTERNAL_LINKS.ESPACE_COLLABORATIF}
+          tracking={{ context: 'Aide', label: 'Espace collaboratif' }}
+        >
+          l’Espace collaboratif IGN
+        </TrackedExternalLink>.
       </>
     ),
   },
