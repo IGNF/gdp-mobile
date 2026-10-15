@@ -54,6 +54,11 @@ export async function getCollabApiCached<T>(
   return request;
 }
 
+/** Écrit une entrée déjà connue (ex. relue depuis le stockage persistant). */
+export function setCollabApiCache<T>(cacheKey: string, value: T): void {
+  memoryCache.set(cacheKey, { value, cachedAt: Date.now() });
+}
+
 /** Lecture synchrone d’une entrée encore valide, sans lancer de requête. */
 export function peekCollabApiCache<T>(cacheKey: string, ttlMs?: number): T | undefined {
   const cached = memoryCache.get(cacheKey) as CollabApiCacheEntry<T> | undefined;

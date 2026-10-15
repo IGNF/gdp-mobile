@@ -16,6 +16,7 @@ import {
   generateCodeVerifier,
 } from '@/infra/auth/oauthPkce';
 import { getUser as getStoredUser } from '@/infra/storage/UserStorage';
+import { clearPersistedCommunityStats } from '@/infra/storage/communityStatsStore';
 import { config } from '@/shared/config/env';
 import { storageKey } from '@/shared/constants/storage';
 import { getRedirectUri } from '@/shared/utils/auth';
@@ -633,6 +634,7 @@ export async function logout(): Promise<LogoutResult> {
   await clearStoredAuthState();
   clearCollabApiClientAuth();
   clearCollabApiCache();
+  await clearPersistedCommunityStats();
   lastOAuthCallback = null;
   inflightOAuthCallback = null;
 

@@ -10,9 +10,14 @@ import {
   GDP_REPORT_COMMUNITY_ID,
   getGdpCommunityReportThemes,
 } from '@/features/report/constants/reportApi';
-import { getCollabApiCached, peekCollabApiCache } from '@/infra/api/collabApiCache';
+import { getCollabApiCached, peekCollabApiCache, setCollabApiCache } from '@/infra/api/collabApiCache';
 import { COLLAB_API_CACHE_KEYS, GDP_COMMUNITY_THEME_CACHE_TTL_MS } from '@/infra/api/collabApiKeys';
 import { collabApiClient, ensureCollabApiSession } from '@/infra/api';
+import {
+  readPersistedCommunityStats,
+  writePersistedCommunityStats,
+  type CommunityStatsAudience,
+} from '@/infra/storage/communityStatsStore';
 import { formatIsoDateDaysAgo } from '@/shared/utils/date';
 
 const DEFAULT_COMMUNITY_TITLE = 'Géodésie';
@@ -106,15 +111,27 @@ async function loadAuthenticatedCommunityProfile(): Promise<{
   return readCommunityText(response.data);
 }
 
+function communityStatsAudience(isAuthenticated: boolean): CommunityStatsAudience {
+  return isAuthenticated ? 'auth' : 'public';
+}
+
 function communityStatsCacheKey(isAuthenticated: boolean): string {
   return COLLAB_API_CACHE_KEYS.communityStats(
     GDP_REPORT_COMMUNITY_ID,
-    isAuthenticated ? 'auth' : 'public',
+    communityStatsAudience(isAuthenticated),
   );
 }
 
 function readCachedCommunityStats(isAuthenticated: boolean): CachedCommunityStats | undefined {
   return peekCollabApiCache<CachedCommunityStats>(communityStatsCacheKey(isAuthenticated));
+}
+
+async function rememberCommunityStats(
+  isAuthenticated: boolean,
+  payload: CachedCommunityStats,
+): Promise<void> {
+  setCollabApiCache(communityStatsCacheKey(isAuthenticated), payload);
+  await writePersistedCommunityStats(communityStatsAudience(isAuthenticated), payload);
 }
 
 async function fetchCommunityStatsSnapshot(
@@ -194,7 +211,8 @@ export function useCommunityStats({
     void getCollabApiCached(cacheKey, () => fetchCommunityStatsSnapshot(isAuthenticated), {
       forceRefresh: true,
     })
-      .then((payload) => {
+      .then(async (payload) => {
+        await rememberCommunityStats(isAuthenticated, payload);
         setStats(payload.stats);
         setLastLoadedAt(new Date(payload.fetchedAt));
       })
@@ -218,6 +236,21 @@ export function useCommunityStats({
     let cancelled = false;
 
     const load = async () => {
+      const persisted = await readPersistedCommunityStats<CommunityStatsSnapshot>(
+        communityStatsAudience(isAuthenticated),
+      );
+
+      if (cancelled) {
+        return;
+      }
+
+      if (persisted) {
+        setCollabApiCache(cacheKey, persisted);
+        setStats(persisted.stats);
+        setLastLoadedAt(new Date(persisted.fetchedAt));
+        return;
+      }
+
       setIsLoading(true);
       setError(null);
 
@@ -225,6 +258,7 @@ export function useCommunityStats({
         const payload = await getCollabApiCached(cacheKey, () =>
           fetchCommunityStatsSnapshot(isAuthenticated),
         );
+        await rememberCommunityStats(isAuthenticated, payload);
 
         if (!cancelled) {
           setStats(payload.stats);
