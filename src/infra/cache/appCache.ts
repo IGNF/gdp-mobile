@@ -1,6 +1,7 @@
 import { clearAllGeodesyCaches, getGeodesyCacheStats } from '@ign/gdp-tools';
 
 import { clearCollabApiCache, getCollabApiCacheStats } from '@/infra/api/collabApiCache';
+import { clearPersistedCommunityStats, getPersistedCommunityStatsSizeBytes } from '@/infra/storage/communityStatsStore';
 
 export interface AppCacheStats {
   apiCacheEntryCount: number;
@@ -16,14 +17,16 @@ export function getClearableCacheSizeBytes(stats: AppCacheStats): number {
 }
 
 export async function loadAppCacheStats(): Promise<AppCacheStats> {
-  const [apiCache, geodesyCache] = await Promise.all([
+  const [apiCache, geodesyCache, persistedCommunityStatsBytes] = await Promise.all([
     Promise.resolve(getCollabApiCacheStats()),
     Promise.resolve(getGeodesyCacheStats()),
+    getPersistedCommunityStatsSizeBytes(),
   ]);
 
   return {
-    apiCacheEntryCount: apiCache.entryCount,
-    apiCacheSizeBytes: apiCache.sizeBytes,
+    apiCacheEntryCount:
+      apiCache.entryCount + (persistedCommunityStatsBytes > 0 ? 1 : 0),
+    apiCacheSizeBytes: apiCache.sizeBytes + persistedCommunityStatsBytes,
     geodesyFeatureInfoEntryCount: geodesyCache.featureInfoEntryCount,
     geodesyFeatureInfoSizeBytes: geodesyCache.featureInfoSizeBytes,
     geodesyImageEntryCount: geodesyCache.imageEntryCount,
@@ -31,7 +34,8 @@ export async function loadAppCacheStats(): Promise<AppCacheStats> {
   };
 }
 
-export function clearAppCaches(): void {
+export async function clearAppCaches(): Promise<void> {
   clearCollabApiCache();
   clearAllGeodesyCaches();
+  await clearPersistedCommunityStats();
 }

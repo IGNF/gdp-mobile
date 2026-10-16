@@ -1,0 +1,187 @@
+/* Mise en page, champ et cartes : `@/shared/styles/tabPage.module.css`. Ici, uniquement
+   l'habillage du contrôle ol-ext (SearchGeoportail) et la carte « Stations RGP ». */
+
+/* À combiner avec `.searchWrap` : au-dessus du contenu, pour que les suggestions le recouvrent. */
+.searchField {
+  position: relative;
+  z-index: 1;
+}
+
+/* Historique ol-ext affiché sous le champ : on masque la liste de la page qu'il recouvre. */
+.searchField:focus-within:has(:global(.ol-search ul.autocomplete.history:not(:empty))) ~ .content {
+  visibility: hidden;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Input créé par ol-ext dans `.searchContainer` : reprend le rendu de `.searchInput`. */
+.searchContainer {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+}
+
+.searchContainer :global(.ol-search) {
+  position: static;
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  padding: 0;
+  max-width: 100%;
+}
+
+.searchContainer :global(.ol-search > button:first-child),
+.searchContainer :global(.ol-search button.ol-revers) {
+  display: none;
+}
+
+.searchContainer :global(.ol-search input.search) {
+  width: 100%;
+  height: 1.25rem;
+  margin: 0;
+  padding: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  box-sizing: border-box;
+  font: inherit;
+  font-size: 0.9375rem;
+  line-height: 1.25rem;
+  color: var(--color-text);
+}
+
+.searchContainer :global(.ol-search input.search::placeholder) {
+  color: var(--color-text-secondary);
+}
+
+/* Suggestions : pleine largeur du champ (icône comprise), masquées tant que le champ n'a pas le focus. */
+.searchContainer :global(.ol-search ul.autocomplete) {
+  display: none;
+  position: absolute;
+  left: calc(-1 * (1.125rem + 1rem));
+  right: -0.5rem;
+  top: calc(100% + 0.25rem);
+  bottom: auto;
+  max-height: min(40vh, 16rem);
+  overflow-y: auto;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-radius: 5px;
+  box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.2);
+  z-index: 20;
+  background: var(--color-bg-surface);
+}
+
+.searchField:focus-within .searchContainer :global(.ol-search ul.autocomplete:not(:empty)) {
+  display: block !important;
+}
+
+.searchContainer :global(.ol-search ul:empty) {
+  display: none !important;
+}
+
+.searchContainer :global(.ol-search ul li) {
+  padding: var(--spacing-sm) var(--spacing-s);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-tight);
+  color: var(--color-text);
+  cursor: pointer;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: unset;
+  word-break: break-word;
+}
+
+.searchContainer :global(.ol-search ul li.copy) {
+  display: none !important;
+}
+
+.searchContainer :global(.ol-search ul li.select),
+.searchContainer :global(.ol-search ul li:hover) {
+  background-color: var(--color-bg-primary-subtle);
+  color: var(--color-text);
+}
+
+.searchContainer :global(.ol-search ul.autocomplete.history) {
+  padding: var(--spacing-2xs) 0 var(--spacing-3xs);
+}
+
+.searchContainer :global(.ol-search ul.autocomplete.history)::before {
+  content: 'Recherches récentes';
+  display: block;
+  padding: var(--spacing-xs) var(--spacing-s) var(--spacing-2xs);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-secondary);
+}
+
+.searchContainer :global(.ol-search ul.autocomplete.history li) {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-sm);
+  border-bottom: 1px solid var(--color-bg-hover);
+  font-weight: var(--font-weight-medium);
+}
+
+.searchContainer :global(.ol-search ul.autocomplete.history li::before) {
+  content: '';
+  flex-shrink: 0;
+  width: var(--icon-wrap-xs);
+  height: var(--icon-wrap-xs);
+  border-radius: var(--radius-circle);
+  background-color: var(--color-bg-active);
+  background-image: url('../../shared/assets/icons/icon-clock.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 1.125rem;
+}
+
+.searchContainer :global(.ol-search ul.autocomplete.history li:last-child) {
+  border-bottom: none;
+}
+
+/* Accès aux stations RGP — à combiner avec `.card`. */
+.navCard {
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: 1rem 2.25rem 1rem 1rem;
+  font: inherit;
+}
+
+.navCardIconWrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--icon-wrap-sm);
+  height: var(--icon-wrap-sm);
+  border-radius: var(--radius-circle);
+  background: var(--color-rgp-bg);
+  flex-shrink: 0;
+}
+
+.navCardIcon {
+  width: 1.125rem;
+  height: 1.125rem;
+}
+
+.navCardIcon path {
+  fill: var(--color-rgp);
+}
+
+.navCardLabel {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--font-family-heading);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-text-title);
+}

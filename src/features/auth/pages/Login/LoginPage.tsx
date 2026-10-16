@@ -5,7 +5,7 @@ import { useAuth } from '@/features/auth/hooks/useAuth';
 import { EXTERNAL_LINKS } from '@/shared/constants/externalLinks';
 import IconExternalLink from '@/shared/assets/icons/icon-external-link.svg?react';
 import { Button } from '@/shared/ui/Button';
-import { ExternalLink } from '@/shared/ui/ExternalLink';
+import { TrackedExternalLink } from '@/infra/analytics/TrackedExternalLink';
 import { Loading } from '@/shared/ui/Loading';
 
 import styles from './LoginPage.module.css';
@@ -82,23 +82,25 @@ export function LoginPage() {
             )}
           </Button>
 
-          <ExternalLink
+          <TrackedExternalLink
             href={EXTERNAL_LINKS.ESPACE_COLLABORATIF}
             className={styles.outlineButton}
             showIcon={false}
+            tracking={{ context: 'Connexion', label: 'Créer un compte' }}
           >
             Créer un compte
             <IconExternalLink className={styles.buttonIcon} aria-hidden />
-          </ExternalLink>
+          </TrackedExternalLink>
 
-          <ExternalLink
+          <TrackedExternalLink
             href={EXTERNAL_LINKS.GEOPF_SSO_RESET_CREDENTIALS}
             className={styles.forgotPasswordLink}
             showIcon={false}
+            tracking={{ context: 'Connexion', label: 'Mot de passe oublié' }}
           >
             Mot de passe oublié ?
             <IconExternalLink className={styles.forgotPasswordIcon} aria-hidden />
-          </ExternalLink>
+          </TrackedExternalLink>
         </form>
       </div>
     </div>

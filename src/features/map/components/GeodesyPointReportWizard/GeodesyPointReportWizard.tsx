@@ -24,7 +24,8 @@ import {
   buildGdpWizardThemeFormAttributes,
 } from '@/features/report/utils/gdpWizardThemeAttributes';
 import { buildGeodesyPointReportThemeAttributesForSubmit } from '@/features/report/utils/geodesyReportTheme';
-import { saveLocalReportDraft } from '@/infra/storage/localReportDraftsStore';
+import { trackReportDraftSaved } from '@/infra/analytics/matomo';
+import { deleteLocalReportDraft, saveLocalReportDraft } from '@/infra/storage/localReportDraftsStore';
 import { Button } from '@/shared/ui/Button';
 import IconClose from '@/shared/assets/icons/icon-close.svg?react';
 
@@ -127,6 +128,7 @@ function GeodesyPointReportWizardContent({ isOpen, context, onClose }: GeodesyPo
         themeAttributes,
       });
       await saveLocalReportDraft(draft);
+      trackReportDraftSaved(isConform === true, form.photos.length);
       setSavedDraft(draft);
       setStep(confirmationStep);
     } finally {
@@ -161,6 +163,7 @@ function GeodesyPointReportWizardContent({ isOpen, context, onClose }: GeodesyPo
       form.photos,
       wizardThemeAttributes,
       {
+        tracking: { source: 'Carte', isConform: isConform === true },
         onError: (error) => {
           lastError = error.message;
         },
@@ -168,7 +171,12 @@ function GeodesyPointReportWizardContent({ isOpen, context, onClose }: GeodesyPo
     );
 
     if (result && savedDraft) {
-      await saveLocalReportDraft({ ...savedDraft, serverId: result.serverId });
+      // Envoi complet : le brouillon disparaît ; photos non jointes : on le garde avec son `serverId`.
+      if (lastError) {
+        await saveLocalReportDraft({ ...savedDraft, serverId: result.serverId });
+      } else {
+        await deleteLocalReportDraft(savedDraft.id);
+      }
     }
 
     if (result && !lastError) {
@@ -181,6 +189,7 @@ function GeodesyPointReportWizardContent({ isOpen, context, onClose }: GeodesyPo
   }, [
     form.comment,
     form.photos,
+    isConform,
     isSubmitting,
     navigate,
     nonConformReasons,

@@ -45,7 +45,7 @@ export function ReportPositionEditorSection({ form, isOpen, onToggle }: ReportPo
             showLayerSwitcher
             showFullscreenButton
           />
-          <Button type="button" fullWidth onClick={onToggle}>
+          <Button type="button" className={styles.confirmButton} onClick={onToggle}>
             Confirmer la position
           </Button>
         </div>

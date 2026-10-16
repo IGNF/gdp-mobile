@@ -19,11 +19,13 @@ import { formatRelativeDayLabel } from '@/shared/utils/date';
 import { joinCSSClassNames } from '@/shared/utils/join';
 import { EXTERNAL_LINKS } from '@/shared/constants/externalLinks';
 import { Button } from '@/shared/ui/Button';
-import { ExternalLink } from '@/shared/ui/ExternalLink';
+import { TrackedExternalLink } from '@/infra/analytics/TrackedExternalLink';
 import { PageHeader } from '@/shared/ui/PageHeader';
 import IconAngleRight from '@/shared/assets/icons/icon-angle-right.svg?react';
 import IconLocation from '@/shared/assets/icons/icon-location.svg?react';
 import IconSearch from '@/shared/assets/icons/icon-search.svg?react';
+
+import layout from '@/shared/styles/tabPage.module.css';
 
 import styles from './MyReportsPage.module.css';
 
@@ -78,16 +80,16 @@ export function MyReportsPage() {
   const isLoading = isLoadingDrafts || (serverHistory.isLoading && items.length === 0);
 
   return (
-    <div className={styles.page}>
+    <div className={layout.page}>
       <PageHeader
         title="Mes Signalements"
-        className={styles.pageHeader}
+        className={layout.pageHeader}
         showBackButton
         showCloseButton={false}
         onBack={() => navigate('/map')}
       />
 
-      <main className={styles.main}>
+      <main className={layout.main}>
         {!isAuthenticated ? (
           <div className={styles.notConnected}>
             <p className="body">
@@ -100,11 +102,11 @@ export function MyReportsPage() {
           </div>
         ) : (
           <>
-            <div className={styles.searchWrap}>
-              <IconSearch className={styles.searchIcon} aria-hidden />
+            <div className={layout.searchWrap}>
+              <IconSearch className={layout.searchIcon} aria-hidden />
               <input
                 type="text"
-                className={styles.searchInput}
+                className={layout.searchInput}
                 placeholder="Rechercher par ID"
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
@@ -128,19 +130,18 @@ export function MyReportsPage() {
             </div>
 
             {isLoading ? (
-              <p className={styles.empty}>Chargement…</p>
+              <p className={layout.empty}>Chargement…</p>
             ) : filteredItems.length === 0 ? (
-              <p className={styles.empty}>Aucun signalement.</p>
+              <p className={layout.empty}>Aucun signalement.</p>
             ) : (
-              <ul className={styles.reportList}>
+              <ul className={layout.cardList}>
                 {filteredItems.map((item) => (
                   <li key={item.key}>
                     <button
                       type="button"
-                      className={joinCSSClassNames(styles.reportCard, styles.reportCardSpaced)}
+                      className={joinCSSClassNames(layout.card, styles.reportCard, styles.reportCardSpaced)}
                       style={{
-                        '--report-card-hover-color': item.statusColors.color,
-                        '--report-card-hover-rgb': item.accentRgb,
+                        '--card-hover-rgb': item.accentRgb,
                       } as CSSProperties}
                       onClick={() => navigate(item.detailPath, { state: { from: 'reports' } })}
                     >
@@ -183,7 +184,7 @@ export function MyReportsPage() {
                           </span>
                         </div>
                       ) : null}
-                      <IconAngleRight className={styles.reportChevron} aria-hidden />
+                      <IconAngleRight className={layout.cardChevron} aria-hidden />
                     </button>
                   </li>
                 ))}
@@ -191,7 +192,7 @@ export function MyReportsPage() {
             )}
 
             {serverHistory.error ? (
-              <p className={styles.empty}>
+              <p className={layout.empty}>
                 Signalements envoyés indisponibles pour le moment : seuls ceux de cet appareil sont affichés.
               </p>
             ) : null}
@@ -218,13 +219,20 @@ export function MyReportsPage() {
 
             <p className={styles.espaceCollaboratifNote}>
               Pour plus de détails sur vos signalements (statut, historique…), rendez-vous sur{' '}
-              <ExternalLink href={EXTERNAL_LINKS.ESPACE_COLLABORATIF_PROFILE}>l'espace collaboratif</ExternalLink>.
+              <TrackedExternalLink
+                href={EXTERNAL_LINKS.ESPACE_COLLABORATIF_PROFILE}
+                tracking={{ context: 'Mes signalements', label: 'Profil Espace collaboratif' }}
+              >
+                l'espace collaboratif
+              </TrackedExternalLink>.
             </p>
           </>
         )}
       </main>
 
-      <BottomTabbar activeTab="signalements" />
+      <div className={layout.tabbarBand}>
+        <BottomTabbar activeTab="signalements" />
+      </div>
     </div>
   );
 }

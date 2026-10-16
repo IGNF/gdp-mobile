@@ -22,8 +22,14 @@ import {
   buildGeodesyReportSubmissionComment,
   extractGeodesyReportThemeFromConfigs,
 } from '@/features/report/utils/geodesyReportTheme';
+import { loadGdpCommunityThemeConfigs } from '@/features/report/utils/loadGdpCommunityThemeConfigs';
+import {
+  trackReportSubmitFailed,
+  trackReportSubmitted,
+  trackReportSubmittedWithoutPhotos,
+  type ReportSubmissionSource,
+} from '@/infra/analytics/matomo';
 import { collabApiClient, ensureCollabApiSession } from '@/infra/api';
-import { fetchGdpCommunityThemeConfigs } from '@/infra/community/gdpCommunityThemes';
 import {
   getReportSubmissionDeviceInfo,
 } from '@/platform/device/reportDeviceMetadata';
@@ -38,6 +44,11 @@ export interface GeodesyPointReportSubmitError {
 }
 
 interface SubmitGeodesyPointReportOptions {
+  /** Statistiques Matomo uniquement. */
+  tracking: {
+    source: ReportSubmissionSource;
+    isConform: boolean;
+  };
   onError?: (error: GeodesyPointReportSubmitError) => void;
 }
 
@@ -88,8 +99,9 @@ export function useSubmitGeodesyPointReport() {
       comment: string,
       photos: ReportPhoto[],
       formThemeAttributes: Record<string, string>,
-      options: SubmitGeodesyPointReportOptions = {},
+      options: SubmitGeodesyPointReportOptions,
     ): Promise<GeodesyPointReportSubmitResult | null> => {
+      const { source, isConform } = options.tracking;
       setIsSubmitting(true);
       setError(null);
 
@@ -102,10 +114,11 @@ export function useSubmitGeodesyPointReport() {
           };
           setError(authError);
           options.onError?.(authError);
+          trackReportSubmitFailed(source, 'authRequired');
           return null;
         }
 
-        const themeConfigs = await fetchGdpCommunityThemeConfigs({ forceRefresh: true });
+        const themeConfigs = await loadGdpCommunityThemeConfigs({ forceRefresh: true });
         const theme = extractGeodesyReportThemeFromConfigs(themeConfigs);
         const themeName = GDP_REPORT_SUBMISSION_THEME;
         const deviceInfo = await getReportSubmissionDeviceInfo();
@@ -136,10 +149,12 @@ export function useSubmitGeodesyPointReport() {
             );
             setError(uploadError);
             options.onError?.(uploadError);
+            trackReportSubmittedWithoutPhotos(source, isConform, photos.length);
             return { serverId };
           }
         }
 
+        trackReportSubmitted(source, isConform, photos.length);
         return { serverId };
       } catch (submitError) {
         const failure = toSubmitError(
@@ -149,6 +164,7 @@ export function useSubmitGeodesyPointReport() {
         );
         setError(failure);
         options.onError?.(failure);
+        trackReportSubmitFailed(source, 'reportCreationFailed');
         return null;
       } finally {
         setIsSubmitting(false);

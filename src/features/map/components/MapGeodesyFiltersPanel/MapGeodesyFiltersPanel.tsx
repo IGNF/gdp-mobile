@@ -8,10 +8,16 @@ import type {
 import { MapOverlaySheet } from '@/features/map/components/MapOverlaySheet';
 import { Button } from '@/shared/ui/Button';
 
+import {
+  trackGeodesyFiltersApplied,
+  trackGeodesyFiltersResetDraft,
+} from '@/infra/analytics/matomo';
+
 import { GdpGeodesyFiltersForm } from './GdpGeodesyFiltersForm';
 import {
   countActiveMapGeodesyFilters,
   createDefaultMapGeodesyFilterValues,
+  listGeodesyFiltersMatomoCriteria,
 } from './mapGeodesyFiltersUtils';
 
 import styles from './MapGeodesyFiltersPanel.module.css';
@@ -52,9 +58,12 @@ export function MapGeodesyFiltersPanel({
 
   const handleReset = () => {
     setDraftValues(createDefaultMapGeodesyFilterValues(filters));
+    trackGeodesyFiltersResetDraft();
   };
 
   const handleApply = () => {
+    const activeCount = countActiveMapGeodesyFilters(filters, draftValues);
+    trackGeodesyFiltersApplied(listGeodesyFiltersMatomoCriteria(filters, draftValues), activeCount);
     onChange(draftValues);
     onClose();
   };
@@ -64,9 +73,8 @@ export function MapGeodesyFiltersPanel({
       isOpen={isOpen}
       onClose={onClose}
       title="Filtres"
-      titleAlign="left"
       titleBadge={activeCount > 0 ? activeCount : undefined}
-      sheetClassName={styles.sheetLarge}
+      size="large"
       ariaLabel="Filtres des points"
       draggable
       footer={

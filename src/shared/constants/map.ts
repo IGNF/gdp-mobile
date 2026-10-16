@@ -18,7 +18,6 @@ export const REPORT_POSITION_MAP_DEFAULT_ZOOM = 19;
 export const DEFAULT_MAP_CENTER_LON_LAT: [number, number] = [2.3522, 48.8566];
 export const DEFAULT_MAP_ZOOM = 11;
 export const DEFAULT_MAP_FOCUS_ZOOM = 13;
-export const DEFAULT_MAP_FOCUS_ZOOM_ON_USER_LOCATION = 16;
 export const DEFAULT_MAP_SEARCH_ZOOM = 16;
 /** Nombre de recherches d’adresse mémorisées (ol-ext + localStorage). */
 export const SEARCH_ADDRESS_MAX_HISTORY = 10;

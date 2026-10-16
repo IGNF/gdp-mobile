@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import type { MapGeodesyClickAction } from '@/features/map/hooks/useMapGeodesyClick';
-import type { useBottomSheetSnap } from '@/features/map/hooks/useBottomSheetSnap';
+import type { usePointFicheSheetDrag } from '@/features/map/hooks/usePointFicheSheetDrag';
 
 import { useTrackSheetView } from '@/features/map/hooks/useTrackSheetView';
 import { MapPointGeodesyFicheBody } from './MapPointGeodesyFicheBody';
@@ -22,7 +22,7 @@ export interface MapPointSheetProps {
   referencePosition: { longitude: number; latitude: number } | null;
   canReport: boolean;
   reportDisabledReason?: 'auth' | 'canevas' | null;
-  dragHandleProps: ReturnType<typeof useBottomSheetSnap>['dragHandleProps'];
+  dragHandleProps: ReturnType<typeof usePointFicheSheetDrag>['dragHandleProps'];
   onReport: () => void;
   onNavigate: () => void;
   /** Hauteur de fiche (px) nécessaire pour voir la photo/croquis en entier — seuil d'ouverture

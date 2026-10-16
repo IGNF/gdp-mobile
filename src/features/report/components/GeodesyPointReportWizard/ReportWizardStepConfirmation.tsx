@@ -43,7 +43,14 @@ export function ReportWizardStepConfirmation({
       {submitError ? <p className={styles.errorText}>{submitError}</p> : null}
 
       <div className={styles.actions}>
-        <Button type="button" variant="outline" fullWidth onClick={onSendLater} disabled={isSubmitting}>
+        <Button
+          type="button"
+          variant="outline"
+          fullWidth
+          className={styles.sendLater}
+          onClick={onSendLater}
+          disabled={isSubmitting}
+        >
           Envoyer plus tard
         </Button>
         <Button type="button" fullWidth onClick={onSendNow} loading={isSubmitting}>

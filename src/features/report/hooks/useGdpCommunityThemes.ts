@@ -2,7 +2,7 @@ import { useCallback, useEffect, useSyncExternalStore } from 'react';
 
 import type { CommunityThemeConfig } from '@/domain/community/models';
 import { useAuth } from '@/features/auth/hooks/useAuth';
-import { fetchGdpCommunityThemeConfigs } from '@/infra/community/gdpCommunityThemes';
+import { loadGdpCommunityThemeConfigs } from '@/features/report/utils/loadGdpCommunityThemeConfigs';
 
 interface GdpCommunityThemesState {
   themes: CommunityThemeConfig[];
@@ -44,7 +44,7 @@ async function loadThemes(forceRefresh = false): Promise<void> {
 
   loadPromise = (async () => {
     try {
-      const themes = await fetchGdpCommunityThemeConfigs({ forceRefresh });
+      const themes = await loadGdpCommunityThemeConfigs({ forceRefresh });
       state = { themes, isLoading: false, error: null };
     } catch {
       state = {

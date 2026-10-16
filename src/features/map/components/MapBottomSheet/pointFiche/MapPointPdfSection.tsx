@@ -1,3 +1,4 @@
+import { trackPointPdfOpen } from '@/infra/analytics/matomo';
 import IconDownload from '@/shared/assets/icons/icon-download.svg?react';
 import IconExternalLink from '@/shared/assets/icons/icon-external-link.svg?react';
 
@@ -18,6 +19,7 @@ export function MapPointPdfSection({ pdfUrl }: MapPointPdfSectionProps) {
       target="_blank"
       rel="noopener noreferrer"
       className={styles.pdfDownloadLink}
+      onClick={trackPointPdfOpen}
     >
       <span className={styles.pdfDownloadIconSlot}>
         <IconDownload className={styles.pdfDownloadIcon} aria-hidden />

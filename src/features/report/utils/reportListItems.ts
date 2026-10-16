@@ -6,7 +6,12 @@ import {
 } from '@ign/gdp-tools';
 
 import type { GroupReport } from '@/domain/report/groupReportModels';
-import type { LocalReportDraft, LocalReportDraftStatus } from '@/domain/report/localReportDraft';
+import {
+  getLocalReportDraftEffectiveStatus,
+  isLocalReportDraftSent,
+  type LocalReportDraft,
+  type LocalReportDraftStatus,
+} from '@/domain/report/localReportDraft';
 import {
   resolveCommuneLabel,
   resolveVoieSuivieLabel,
@@ -48,9 +53,10 @@ export function readGroupReportPointRef(report: GroupReport): GeodesyPointRef | 
 }
 
 function buildLocalDraftItem(draft: LocalReportDraft, serverReport?: GroupReport): ReportListItem {
+  const status = getLocalReportDraftEffectiveStatus(draft);
   const base: ReportListItem = {
     key: `local:${draft.id}`,
-    filterStatus: draft.status,
+    filterStatus: status,
     detailPath: `/reports/${draft.id}`,
     title: draft.title,
     titlePicto: draft.titlePicto,
@@ -59,9 +65,9 @@ function buildLocalDraftItem(draft: LocalReportDraft, serverReport?: GroupReport
     createdAt: new Date(draft.createdAt),
     commune: draft.commune,
     voieSuivie: draft.voieSuivie,
-    statusLabel: getLocalReportDraftStatusLabel(draft.status),
-    statusColors: getLocalReportDraftStatusColors(draft.status),
-    accentRgb: getLocalReportDraftStatusAccentRgb(draft.status),
+    statusLabel: getLocalReportDraftStatusLabel(status),
+    statusColors: getLocalReportDraftStatusColors(status),
+    accentRgb: getLocalReportDraftStatusAccentRgb(status),
   };
 
   // Brouillon envoyé retrouvé côté serveur : son vrai statut (soumis, validé…) prime.
@@ -103,7 +109,7 @@ function buildServerReportItem(
 
 /**
  * Fusionne brouillons locaux et signalements serveur (`serverReports`, `null` si non chargés) :
- * - brouillons « Pas envoyés » : toujours affichés (propres à l'appareil) ;
+ * - brouillons « Pas envoyés » (sans `serverId`) : toujours affichés (propres à l'appareil) ;
  * - signalements serveur : affichés, enrichis par le brouillon local de même `serverId`
  *   s'il existe, sinon par le repère relu dans le WFS (`points`) ;
  * - brouillons « Envoyés » sans correspondance : affichés uniquement si le serveur n'a pas
@@ -119,12 +125,12 @@ export function buildReportListItems(
   );
 
   const unsent = drafts
-    .filter((draft) => draft.status === 'not_sent')
+    .filter((draft) => !isLocalReportDraftSent(draft))
     .map((draft) => buildLocalDraftItem(draft));
 
   if (!serverReports) {
     const sent = drafts
-      .filter((draft) => draft.status === 'sent')
+      .filter(isLocalReportDraftSent)
       .map((draft) => buildLocalDraftItem(draft));
     return [...unsent, ...sent].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
   }

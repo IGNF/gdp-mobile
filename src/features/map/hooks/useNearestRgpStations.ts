@@ -6,6 +6,8 @@ import {
   loadGeodesyAnnexFeatures,
   parseGdpRgp2DispoStates,
   reloadGeodesyAnnexLayerOnMap,
+  resolveGdpRgp2AvailabilityLevel,
+  type GdpRgp2AvailabilityLevel,
   type GdpRgp2DispoState,
 } from '@ign/gdp-tools';
 import type Map from 'ol/Map';
@@ -13,6 +15,7 @@ import Point from 'ol/geom/Point';
 import { toLonLat } from 'ol/proj';
 import { useCallback, useEffect, useState } from 'react';
 
+import { trackLayerReload } from '@/infra/analytics/matomo';
 import { distanceKm } from '@/shared/utils/geo';
 
 const RGP_LAYER = GEODESY_ANNEX_LAYERS.find((layer) => layer.id === 'GDP_RGP2');
@@ -27,6 +30,7 @@ export interface NearestRgpStation {
   latitude: number;
   distanceKm: number;
   isAvailable: boolean;
+  availabilityLevel: GdpRgp2AvailabilityLevel;
   dispoStates: readonly GdpRgp2DispoState[];
 }
 
@@ -99,6 +103,7 @@ export function useNearestRgpStations({
             latitude: stationLat,
             distanceKm: distanceKm({ longitude, latitude }, { longitude: stationLon, latitude: stationLat }),
             isAvailable: isGdpRgp2StationAvailable(dispo),
+            availabilityLevel: resolveGdpRgp2AvailabilityLevel(dispo),
             dispoStates: parseGdpRgp2DispoStates(dispo),
           } satisfies NearestRgpStation;
         })
@@ -141,6 +146,7 @@ export function useNearestRgpStations({
       }
 
       await refresh({ silent: true });
+      trackLayerReload('Réseau GNSS permanent');
     } catch {
       setError('Impossible de mettre à jour les stations RGP.');
     } finally {

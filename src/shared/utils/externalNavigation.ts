@@ -7,6 +7,15 @@ export interface ExternalNavigationDestination {
   label?: string;
 }
 
+function usesAppleMaps(): boolean {
+  return Capacitor.getPlatform() === 'ios';
+}
+
+/** Nom de l'app de navigation ouverte par `openExternalNavigation` sur la plateforme courante. */
+export function getExternalNavigationAppLabel(): string {
+  return usesAppleMaps() ? 'Plans' : 'Google Maps';
+}
+
 /**
  * Ouvre l'app de navigation du système (Plans sur iOS, Google Maps sur Android/web)
  * avec l'itinéraire vers `destination`. Aucune origine n'est fournie : l'app de
@@ -15,10 +24,9 @@ export interface ExternalNavigationDestination {
  * son point de départ.
  */
 export function openExternalNavigation({ longitude, latitude, label }: ExternalNavigationDestination) {
-  const url =
-    Capacitor.getPlatform() === 'ios'
-      ? buildAppleMapsUrl(longitude, latitude, label)
-      : buildGoogleMapsUrl(longitude, latitude);
+  const url = usesAppleMaps()
+    ? buildAppleMapsUrl(longitude, latitude, label)
+    : buildGoogleMapsUrl(longitude, latitude);
 
   return Browser.open({ url });
 }

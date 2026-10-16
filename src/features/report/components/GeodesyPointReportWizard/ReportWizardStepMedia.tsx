@@ -1,4 +1,5 @@
 import { useState, type ChangeEvent } from 'react';
+import { Capacitor } from '@capacitor/core';
 import { RiImageLine } from 'react-icons/ri';
 
 import { ReportPositionEditorSection } from '@/features/report/components/ReportPositionEditorSection';
@@ -14,6 +15,9 @@ const PHOTO_INSTRUCTIONS = [
   'Cadrez le point dans son environnement',
   'Assurez une bonne luminosité',
 ];
+
+/** Sur le web, `capture` n'ouvre pas l'appareil photo (desktop) : seule la galerie est proposée. */
+const CAN_TAKE_PHOTO = Capacitor.isNativePlatform();
 
 export interface ReportWizardStepMediaProps {
   form: UseGeodesyPointReportFormReturn;
@@ -58,19 +62,21 @@ export function ReportWizardStepMedia({ form }: ReportWizardStepMediaProps) {
         </div>
       ) : (
         <div className={styles.photoSourceRow}>
-          <label className={styles.photoSourceButton}>
-            <input
-              type="file"
-              accept="image/*"
-              capture="environment"
-              className={styles.photoInput}
-              onChange={handlePhotoChange}
-            />
-            <span className={styles.photoIconWrap}>
-              <IconCamera className={styles.photoIcon} aria-hidden />
-            </span>
-            <span className={styles.photoLabel}>Prendre une photo</span>
-          </label>
+          {CAN_TAKE_PHOTO ? (
+            <label className={styles.photoSourceButton}>
+              <input
+                type="file"
+                accept="image/*"
+                capture="environment"
+                className={styles.photoInput}
+                onChange={handlePhotoChange}
+              />
+              <span className={styles.photoIconWrap}>
+                <IconCamera className={styles.photoIcon} aria-hidden />
+              </span>
+              <span className={styles.photoLabel}>Prendre une photo</span>
+            </label>
+          ) : null}
           <label className={styles.photoSourceButton}>
             <input
               type="file"

@@ -27,9 +27,5 @@ export function getDisplayedFieldIds(variant: PointFicheVariant, snapIndex: numb
     );
   }
 
-  if (snapIndex >= 3) {
-    groups.push(['full']);
-  }
-
   return mergeDisplayedFieldIds(...groups);
 }

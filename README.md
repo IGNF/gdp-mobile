@@ -10,10 +10,10 @@ En cas de blocage : [Dépannage](./docs/DEPANNAGE.md).
 
 Prérequis : Node.js ≥ 22, accès SSH GitHub IGNF (`gdp-tools`, `mobile-core`, `mobile-device`, `collaboratif-client-api`).
 
-Depuis `gdp-mobile/` (dépôt GitHub) ou la racine du monorepo local `geodesie-de-poche/` :
+Depuis `gdp-mobile/` (dépôt GitHub) :
 
 ```bash
-cp .env.dist .env   # puis renseigner les variables (gdp-mobile/.env en monorepo)
+cp .env.dist .env   # puis renseigner les variables (gdp-mobile/.env)
 npm install
 ```
 
@@ -25,7 +25,7 @@ npm install
 npm run dev
 ```
 
-Ouvre l’app sur [http://localhost:5173](http://localhost:5173). En monorepo local : `gdp-tools` en watch met à jour `dist/` ; sinon Vite utilise le `dist` installé dans `node_modules`.
+Ouvre l’app sur [http://localhost:5173](http://localhost:5173).
 
 ## Déploiement en qualif
 
@@ -77,16 +77,32 @@ Un numéro semver dans `package.json`, recopié dans Android / iOS. Pas de suffi
 
 Semver = semantic versioning : un numéro en trois parties, majeur.mineur.patch.
 
+Depuis la branche en cours, faire les tests de compilation, de linting
+
+```bash
+npm update
+npm run lint
+npm run lint:css-modules
+npm run knip
+npm run build
+npm run deps:prod
+git status
+# puis, si besoin :
+git add .; git commit -m "prepa prod-dependencies.md"; git push
+```
+
+Merger la branche sur github, puis :
+
 Depuis `main` :
 
 ```bash
 git checkout main
 git pull
-npm run bump:version -- 4.0.1
-git push && git push origin v4.0.1
+npm run bump:version -- 4.0.X
+git push && git push origin v4.0.X
 ```
 
-Commit `4.0.1` + tag `v4.0.1`. Le push du tag déclenche la CI store.
+Commit `4.0.X` + tag `v4.0.X`. Le push du tag déclenche la CI store.
 
 ## Test sur mobile avec Chrome
 
@@ -140,7 +156,6 @@ Inspecter la WebView (bundle `dist`, pas Vite) : `chrome://inspect/#devices` →
 | `npm run lint:css-modules` | Contrôle des CSS modules |
 | `npm run knip` | Fichiers, dépendances et exports inutilisés |
 
-Depuis la racine du monorepo, les mêmes noms marchent pour `dev`, `build`, `build:qualif`, `setup-android`, `generate-apk`, `run-apk`, `bump:version` et `knip` (`npm run knip -w gdp-mobile`).
 
 ## Documentation
 

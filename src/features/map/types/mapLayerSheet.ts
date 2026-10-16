@@ -1,15 +1,12 @@
+export type MapLayerSheetGroup = 'data' | 'basemap';
+
 export interface MapLayerSheetItem {
   id: string;
+  group: MapLayerSheetGroup;
   title: string;
   thumbnail?: string;
-  legend?: string;
   visible: boolean;
   opacity: number;
-  showInfo?: boolean;
-  showRefresh?: boolean;
   showOpacity?: boolean;
   toggleDisabled?: boolean;
-  subtitle?: string;
-  detailTitle?: string;
-  detailDescription?: string;
 }

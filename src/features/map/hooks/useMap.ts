@@ -24,7 +24,6 @@ import {
 import {
   DEFAULT_MAP_CENTER_LON_LAT,
   DEFAULT_MAP_FOCUS_ZOOM,
-  DEFAULT_MAP_FOCUS_ZOOM_ON_USER_LOCATION,
   DEFAULT_MAP_SHOW_SCALELINE,
   GEOLOCATION_LOCK_RECENTER_ANIMATION_DURATION_MS,
   GEOLOCATION_LOCK_RECENTER_INTERVAL_MS,
@@ -135,7 +134,7 @@ export function useMap(options: UseMapOptions = {}): UseMapReturn {
     async (
       targetMap: Map,
       centerLonLat: [number, number],
-      zoom: number = DEFAULT_MAP_FOCUS_ZOOM,
+      zoom?: number,
       duration: number = 500,
     ) => {
       await new Promise<void>((resolve) => {
@@ -143,7 +142,7 @@ export function useMap(options: UseMapOptions = {}): UseMapReturn {
         targetMap.getView().animate(
           {
             center: fromLonLat(centerLonLat),
-            zoom,
+            ...(zoom !== undefined ? { zoom } : {}),
             duration,
           },
           () => {
@@ -207,33 +206,25 @@ export function useMap(options: UseMapOptions = {}): UseMapReturn {
   const animateToPosition = useCallback(
     async (targetMap: Map, position: Position, animationDuration: number) => {
       const { longitude, latitude } = position.coords;
-      await animateTo(
-        targetMap,
-        [longitude, latitude],
-        DEFAULT_MAP_FOCUS_ZOOM_ON_USER_LOCATION,
-        animationDuration,
-      );
+      await animateTo(targetMap, [longitude, latitude], undefined, animationDuration);
     },
     [animateTo],
   );
 
   const centerViewOnPosition = useCallback(
-    (targetMap: Map, position: Position, shouldResetZoom = false) => {
+    (targetMap: Map, position: Position) => {
       const { longitude, latitude } = position.coords;
       const view = targetMap.getView();
 
       runProgrammaticViewportChange(() => {
         view.setCenter(fromLonLat([longitude, latitude]));
-        if (shouldResetZoom) {
-          view.setZoom(DEFAULT_MAP_FOCUS_ZOOM_ON_USER_LOCATION);
-        }
       });
     },
     [runProgrammaticViewportChange],
   );
 
   const animateViewToPosition = useCallback(
-    (targetMap: Map, position: Position, shouldResetZoom = false) => {
+    (targetMap: Map, position: Position) => {
       const { longitude, latitude } = position.coords;
       const view = targetMap.getView();
 
@@ -241,7 +232,6 @@ export function useMap(options: UseMapOptions = {}): UseMapReturn {
       view.animate(
         {
           center: fromLonLat([longitude, latitude]),
-          ...(shouldResetZoom ? { zoom: DEFAULT_MAP_FOCUS_ZOOM_ON_USER_LOCATION } : {}),
           duration: GEOLOCATION_LOCK_RECENTER_ANIMATION_DURATION_MS,
         },
         () => {
@@ -315,12 +305,12 @@ export function useMap(options: UseMapOptions = {}): UseMapReturn {
     const viewportStatus = getPositionViewportStatus(currentMap, position);
     if (viewportStatus === 'outside') {
       hasManualViewportOverrideRef.current = false;
-      animateViewToPosition(currentMap, position, true);
+      animateViewToPosition(currentMap, position);
       return;
     }
 
     if (viewportStatus === 'border') {
-      animateViewToPosition(currentMap, position, false);
+      animateViewToPosition(currentMap, position);
     }
   }, [animateViewToPosition, getLatestPosition, getPositionViewportStatus]);
 
@@ -439,7 +429,7 @@ export function useMap(options: UseMapOptions = {}): UseMapReturn {
           return;
         }
 
-        centerViewOnPosition(currentMap, position, !hasManualViewportOverrideRef.current);
+        centerViewOnPosition(currentMap, position);
       };
 
       watchId = await Gdp_Geolocation.watchUsersLocation(onPositionUpdate, {
@@ -533,6 +523,10 @@ export function useMap(options: UseMapOptions = {}): UseMapReturn {
     }
 
     const viewport = olMap.getViewport();
+    if (!viewport) {
+      return;
+    }
+
     const pointerDragListener = olMap.on('pointerdrag', onUserViewportChange);
     viewport.addEventListener('wheel', onUserViewportChange, { passive: true });
     viewport.addEventListener('touchmove', onUserViewportChange, { passive: true });

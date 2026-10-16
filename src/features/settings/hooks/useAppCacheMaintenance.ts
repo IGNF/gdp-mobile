@@ -25,7 +25,7 @@ export function useAppCacheMaintenance() {
     setIsClearing(true);
 
     try {
-      clearAppCaches();
+      await clearAppCaches();
       setStats(await loadAppCacheStats());
     } finally {
       setIsClearing(false);

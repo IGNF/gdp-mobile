@@ -1,27 +1,7 @@
-.sheet {
-  /* Plafond CSS généreux — la vraie limite (bouton légende) vient de maxExpandedHeightPx. */
-  max-height: min(92vh, 43.5rem);
-}
-
-.content {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-lg);
-  padding-top: var(--spacing-2xs);
-  padding-bottom: var(--spacing-md);
-}
-
-.section {
+.rows {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-sm);
-}
-
-.sectionTitle {
-  margin: 0;
-  color: var(--color-primary);
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-bold);
 }
 
 .row {
@@ -48,7 +28,7 @@
 .dot {
   width: 0.875rem;
   height: 0.875rem;
-  border-radius: 50%;
+  border-radius: var(--radius-circle);
 }
 
 .pictoImage {

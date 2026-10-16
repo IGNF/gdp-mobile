@@ -1,75 +1,5 @@
-.page {
-  display: flex;
-  flex-direction: column;
-  /* Hauteur fixe (pas `min-height`) : sans elle, la page grandit avec son contenu au lieu
-     que `.main` défile seul, et la barre d'onglets suit le dernier élément au lieu de
-     rester fixée en bas (cf. `.mapPage` dans MapPage.module.css, même principe). */
-  height: 100dvh;
-  background: var(--color-bg-page);
-}
-
-/* `.page` en préfixe : doit l'emporter sur le fond par défaut de PageHeader. */
-.page .pageHeader {
-  background-color: var(--color-bg-page-header);
-}
-
-.main {
-  flex: 1;
-  overflow: auto;
-  padding: 1rem 1rem calc(1rem + var(--safe-bottom));
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.searchWrap {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  /* Maquette : 344px = pleine largeur de l'écran de référence, hors marges. */
-  width: 100%;
-  height: 3.0625rem; /* 49px */
-  padding: 0 0.5rem;
-  box-sizing: border-box;
-  border-radius: 5px;
-  background: var(--color-bg-surface);
-  box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.2);
-}
-
-/* Le champ n'a plus de contour propre : le focus s'affiche sur le conteneur. */
-.searchWrap:focus-within {
-  outline: 2px solid var(--color-primary);
-  outline-offset: 1px;
-}
-
-.searchIcon {
-  flex-shrink: 0;
-  width: 1.125rem;
-  height: 1.125rem;
-  color: var(--color-text-secondary);
-  pointer-events: none;
-}
-
-.searchIcon path {
-  fill: currentColor;
-}
-
-.searchInput {
-  flex: 1;
-  min-width: 0;
-  height: 100%;
-  padding: 0;
-  border: none;
-  outline: none;
-  background: transparent;
-  font: inherit;
-  font-size: 0.9375rem;
-  color: var(--color-text);
-}
-
-.searchInput::placeholder {
-  color: var(--color-text-secondary);
-}
+/* Mise en page (page, en-tête, liste, barre d'onglets, champ de recherche, carte) :
+   `@/shared/styles/tabPage.module.css`. Ici, uniquement ce qui est propre aux signalements. */
 
 .filterRow {
   display: flex;
@@ -101,13 +31,6 @@
   color: var(--color-bg-surface);
 }
 
-.empty {
-  padding: 2rem 0;
-  text-align: center;
-  font-size: 0.875rem;
-  color: var(--color-text-secondary);
-}
-
 .actionButton {
   display: flex;
   height: 2.75rem;
@@ -135,39 +58,16 @@
   text-align: center;
 }
 
-.reportList {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.875rem;
-}
-
+/* À combiner avec `.card` (tabPage.module.css). */
 .reportCard {
-  position: relative;
-  display: flex;
   flex-direction: column;
   gap: 0.25rem;
-  width: 100%;
   padding: 1rem 2.25rem 1rem 1rem;
-  border: none;
-  border-radius: 1rem;
-  background: var(--color-bg-surface);
-  box-shadow: 0 1px 10px rgba(0, 0, 0, 0.05);
-  text-align: left;
-  cursor: pointer;
-  transition: box-shadow 0.15s ease;
 }
 
 /* Liste « Signalements » : lignes (titre, position modifiée, adresse) un peu plus aérées. */
 .reportCardSpaced {
   gap: 0.5rem;
-}
-
-.reportCard:hover,
-.reportCard:focus-visible {
-  box-shadow: 0 2px 10px rgba(var(--report-card-hover-rgb, var(--color-primary-rgb)), 0.18);
 }
 
 .reportCardHeader {
@@ -183,6 +83,19 @@
   font-weight: 700;
   line-height: 1rem;
   color: var(--color-text-title);
+  /* Le CSS de GeodesyPointTitle (@ign/gdp-tools) n'est pas exporté par le paquet : on
+     reproduit ici l'espacement picto / texte. */
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.reportId img {
+  flex: none;
+  width: 1.5rem;
+  height: 1.5rem;
+  object-fit: contain;
 }
 
 .reportTitleGroup {
@@ -276,20 +189,6 @@
 }
 
 .reportMetaIcon path {
-  fill: currentColor;
-}
-
-.reportChevron {
-  position: absolute;
-  top: 50%;
-  right: 0.875rem;
-  transform: translateY(-50%);
-  width: 1rem;
-  height: 1rem;
-  color: var(--color-text-secondary);
-}
-
-.reportChevron path {
   fill: currentColor;
 }
 

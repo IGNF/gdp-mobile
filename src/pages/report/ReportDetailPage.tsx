@@ -91,20 +91,25 @@ export function ReportDetailPage() {
       photos,
       formThemeAttributes,
       {
+        tracking: { source: 'Brouillon', isConform: draft.isConform },
         onError: (error) => {
           lastError = error.message;
         },
       },
     );
 
+    // Envoi complet : le signalement vit désormais côté EspaceCo, le brouillon disparaît.
+    if (result && !lastError) {
+      await deleteLocalReportDraft(draft.id);
+      navigate(`/reports/history/${result.serverId}`, { replace: true, state: { from: 'reports' } });
+      return;
+    }
+
+    // Signalement créé mais photos non jointes : on garde le brouillon (et ses photos).
     if (result) {
       const updated = { ...draft, serverId: result.serverId };
       await saveLocalReportDraft(updated);
       setDraft(updated);
-    }
-
-    if (result && !lastError) {
-      return;
     }
 
     setSubmitError(lastError ?? 'Impossible d’envoyer le signalement pour le moment.');
@@ -166,23 +171,25 @@ export function ReportDetailPage() {
             variant="outline"
             color="danger"
             fullWidth
+            className={styles.footerButton}
             onClick={() => {
               void handleDelete();
             }}
           >
-            <IconDelete className={styles.actionIcon} aria-hidden />
+            <IconDelete className={styles.footerButtonIcon} aria-hidden />
             Supprimer
           </Button>
           <Button
             type="button"
             fullWidth
+            className={styles.footerButton}
             loading={isSubmitting}
             disabled={Boolean(draft.serverId)}
             onClick={() => {
               void handleSend();
             }}
           >
-            <IconSend className={styles.actionIcon} aria-hidden />
+            <IconSend className={styles.footerButtonIcon} aria-hidden />
             {draft.serverId ? 'Envoyé' : 'Envoyer'}
           </Button>
         </div>

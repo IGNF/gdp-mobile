@@ -1,0 +1,84 @@
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.title {
+  margin: 0;
+  padding: 0 0.25rem;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-secondary);
+}
+
+/* Liste groupée dans une seule carte — à combiner avec `.cardSurface` (tabPage.module.css). */
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.list > li + li {
+  border-top: 1px solid var(--color-bg-hover);
+}
+
+.item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-sm);
+  width: 100%;
+  padding: 0.875rem 1rem;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+}
+
+.item:hover,
+.item:focus-visible {
+  background: var(--color-bg-primary-subtle);
+}
+
+.iconWrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--icon-wrap-xs);
+  height: var(--icon-wrap-xs);
+  border-radius: var(--radius-circle);
+  background: var(--color-bg-active);
+  flex-shrink: 0;
+}
+
+.icon {
+  width: 1rem;
+  height: 1rem;
+}
+
+.icon path {
+  fill: var(--color-border-strong);
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4xs);
+  min-width: 0;
+  flex: 1;
+}
+
+.itemTitle {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text);
+}
+
+.itemSubtitle {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+}

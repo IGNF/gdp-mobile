@@ -6,75 +6,102 @@ Documentation de la fiche affichée au clic sur un repère géodésique ou de ni
 
 ```mermaid
 flowchart TB
-  click["Clic repère<br/>useMapGeodesyClick"] --> sheet["MapBottomSheet<br/>mode point"]
+  mapClick["Clic repère<br/>useMapGeodesyClick"] --> sheet["MapBottomSheet<br/>mode point"]
+  sheet --> drag["usePointFicheSheetDrag<br/>hauteur et glissé"]
   sheet --> shell["MapPointSheet<br/>shell commun"]
   shell --> header["MapPointSheetHeader"]
   shell --> body["Corps selon variante"]
   shell --> footer["MapPointSheetFooter"]
   body --> geod["MapPointGeodesyFicheBody"]
   body --> niv["MapPointNivellementFicheBody"]
-  click --> gdp["@ign/gdp-tools<br/>buildGeodesyPointDisplay"]
+  mapClick --> gdp["@ign/gdp-tools/react<br/>useGeodesyMapClick"]
 ```
 
 | Élément | Rôle |
 |---------|------|
-| `MapBottomSheet` | Bottom sheet carte : recherche/RGP (mode navigation) ou fiche repère (mode point) |
-| `MapPointSheet` | Shell fixe : en-tête + corps (si snap ≥ 1) + pied de page |
-| `MapPointGeodesyFicheBody` | Contenu géodésie (snap 1 → 3) |
-| `MapPointNivellementFicheBody` | Contenu nivellement (snap 1 → 3) |
+| `MapBottomSheet` | Bottom sheet carte de la fiche repère (la recherche et les stations RGP sont des routes : `pages/search/`) |
+| `usePointFicheSheetDrag` | Hauteur de la fiche : glissé libre, seuil d'ouverture, plein écran, fermeture |
+| `MapPointSheet` | Shell fixe : poignée + en-tête (zone de glissé) + corps scrollable + pied de page |
+| `MapPointGeodesyFicheBody` | Contenu géodésie (niveaux 1 et 2) |
+| `MapPointNivellementFicheBody` | Contenu nivellement (niveaux 1 et 2) |
 | `@ign/gdp-tools` | Données repère : titre, attributs, photos, contexte signalement |
 
-**Chemin des sources :** `src/features/map/components/MapBottomSheet/pointFiche/`
+**Chemin des sources :** `src/features/map/components/MapBottomSheet/pointFiche/` (hook de glissé : `src/features/map/hooks/usePointFicheSheetDrag.ts`)
 
 ## Ouverture d'une fiche
 
 1. L'utilisateur clique un repère sur la carte.
-2. `useMapGeodesyClick` construit un `MapGeodesyClickAction` via `buildGeodesyPointDisplay` (`gdp-tools`).
+2. `useMapGeodesyClick` s'appuie sur `useGeodesyMapClick` (`gdp-tools/react`), qui construit l'affichage du point (`buildGeodesyPointDisplay`) et le contexte de signalement ; le hook expose un `MapGeodesyClickAction` (`pendingAction`).
 3. `MapPage` passe `mapClick.pendingAction` à `MapBottomSheet` en `selectedPoint`.
-4. Le bottom sheet bascule en **mode point** : snaps dédiés, tabbar masquée, recherche RGP désactivée.
+4. Le bottom sheet bascule en **mode point** : fiche ouverte à sa hauteur minimale, tabbar masquée (donc pas d'accès à la recherche).
 
-## Snaps (4 niveaux)
+Comportements complémentaires :
 
-Gérés par `useBottomSheetSnap` dans `MapBottomSheet`. Hauteurs recalculées au resize fenêtre.
+- **Clic-bascule** : recliquer sur le repère déjà ouvert referme la fiche.
+- **Autre repère** : cliquer un autre repère pendant qu'une fiche est ouverte conserve la hauteur courante.
+- **Ouverture programmatique** : `openPointAtCoordinate(coordinate)` ouvre la fiche sans clic réel (ex. depuis un signalement).
 
-| Snap | Index | Hauteur | Contenu visible |
-|------|-------|---------|-----------------|
-| Mini | 0 | auto (~220 px) | Poignée + en-tête + pied de page (pas de corps) |
-| Medium 1 | 1 | ~48 % viewport (plafonné) | Corps snap 1 : carrousel, identité, description… |
-| Medium 2 | 2 | ~68 % viewport (plafonné) | + coordonnées / remarques / partenaire (placeholders partiels) |
-| Full (plein écran) | 3 | 100 % viewport (hors safe-area haut) | + vue complète (placeholder) |
+## Hauteur et glissé (`usePointFicheSheetDrag`)
 
-- **Snap 0** : hauteur automatique (`sheetAuto`), pas de scroll corps.
-- **Snaps 1–2** ("consultation rapide") : carte flottante à coins arrondis par-dessus la carte, plafonnée pour ne jamais recouvrir la pile de FAB (filtre/couches/légende).
-- **Snap 3** ("consultation complète") : la fiche passe en **plein écran** — coins carrés, pas d'ombre, plus de marge basse, recouvre entièrement la carte et ses FAB (classe `sheetFullscreen`). Le contenu affiché ne change pas (toujours celui du corps `snapIndex >= 2`), seul le conteneur devient plein écran.
-- Agrandissement/réduction : tirer la **poignée** grise en haut du sheet.
+La fiche n'a pas de snaps fixes : sa hauteur suit le doigt, puis se cale au relâché selon les seuils ci-dessous (fractions de la hauteur du viewport). Géométrie calculée par `getPointFicheSheetGeometry`, recalculée au resize fenêtre.
 
-```ts
-// MapBottomSheet.tsx — hauteurs mode point
-[220, min(48% vh, quickViewMax), min(68% vh, quickViewMax), 100% vh - safeAreaTop]
-```
+| Seuil | Valeur | Rôle |
+|-------|--------|------|
+| Hauteur minimale | max(20 % vh, en-tête + pied de page mesurés) | Hauteur à l'ouverture ; boutons jamais rognés (`--safe-bottom` inclus) |
+| Seuil d'ouverture | Hauteur mesurée pour voir la photo / le croquis en entier (repli : 40 % vh) | Bascule du contenu au niveau 2 |
+| Zone tampon | seuil − 5 % vh → seuil + 10 % vh | Un relâché dans cette zone se cale exactement au seuil |
+| Plein écran | 100 % vh − max(12 px, safe-area haut) | Au-delà de seuil + 10 % vh, la fiche s'ouvre en grand |
+
+- **Sous la zone tampon** : la fiche reste où elle est relâchée (jamais sous la hauteur minimale).
+- **Depuis le plein écran** : un relâché au-dessus de 75 % vh revient en plein écran (hystérésis, évite une fermeture accidentelle).
+- **Double tap sur la poignée** : ouverture directe en plein écran.
+- **Fermeture** : tirer plus de 64 px sous la hauteur minimale ferme la fiche.
+- **Zone de glissé** : poignée + en-tête (`dragZone`). Le corps scrolle normalement.
+
+Le seuil d'ouverture et la hauteur minimale sont mesurés dans le DOM par `MapPointSheet` (`useMeasuredHeight` sur la zone de glissé, le bloc photo et le pied de page) et remontés via `onOpenThresholdChange` / `onFloorHeightChange`.
+
+### Niveaux de contenu
+
+`MapBottomSheet` passe au corps un niveau (prop `snapIndex`) calculé sur la hauteur de repos (jamais pendant un glissé actif, pour ne pas interrompre le geste) :
+
+| Niveau | Condition | Contenu |
+|--------|-----------|---------|
+| 1 | Hauteur < seuil d'ouverture | Carrousel, identité, description, détails (rognés par la hauteur à l'ouverture) |
+| 2 | Hauteur ≥ seuil d'ouverture | + coordonnées, remarques, partenaire |
+
+- **Plein écran** (classe `sheetFullscreen`) : même contenu que le niveau 2 ; la fiche perd ses marges latérales et recouvre la carte et ses FAB.
+- **Suivi** : `useTrackSheetView` enregistre la consultation du repère au passage au niveau 2.
 
 ## Shell commun (`MapPointSheet`)
 
 ### En-tête (`MapPointSheetHeader`)
 
-Toujours visible (tous snaps) :
+Toujours visible :
 
-- Titre + picto (`GeodesyPointTitle` de `gdp-tools`)
-- Badge état (vert si « BON ETAT »)
-- Méta : année de visite, distance au centre de la carte
-- Bouton fermer ; favori (placeholder, désactivé)
+- Titre + picto (`GeodesyPointTitle` de `gdp-tools`) et bouton **copier** le numéro du point (coche de confirmation 1,5 s)
+- Badge état (`formatEtatLabel`, vert si « BON ETAT »)
+- Méta : année de visite, distance à la position de l'utilisateur (uniquement si le suivi GPS est actif)
+- Favori : désactivé pour cette version (code commenté)
 
 ### Pied de page (`MapPointSheetFooter`)
 
 Toujours visible :
 
-- **S'y rendre** — recentre la carte sur le repère
-- **Signaler** — navigation vers le formulaire de signalement (si couche autorisée)
+- **S'y rendre** — ouvre la navigation externe vers le repère (`openExternalNavigation`)
+- **Signaler** — ouvre le wizard de signalement en overlay sur la carte (`GeodesyPointReportWizard`)
+
+Si le signalement est indisponible (`reportDisabledReason`), le bouton est désactivé et une icône d'aide ouvre une bulle d'explication :
+
+| Raison | Message |
+|--------|---------|
+| `auth` | Connexion requise, avec lien « Se connecter » vers `/login` |
+| `canevas` | Signalement non disponible pour les points de canevas |
+
+Si la couche n'autorise pas le signalement, le bouton est désactivé sans bulle.
 
 ### Corps
 
-Affiché uniquement si `snapIndex >= 1`. Variante résolue par `resolvePointFicheVariant`.
+Toujours monté, dans une zone scrollable. Variante résolue par `resolvePointFicheVariant`.
 
 ## Variantes géodésie / nivellement
 
@@ -87,43 +114,54 @@ Affiché uniquement si `snapIndex >= 1`. Variante résolue par `resolvePointFich
 | `layerId === 'RN'` ou `'DOMAIN_NIVELLEMENT'` | nivellement |
 | Défaut | géodésie |
 
-### Contenu par snap (état actuel)
+### Contenu par niveau
 
-**Géodésie — snap 1** : carrousel photo/croquis, n° point, ID croquis, exploitabilité GPS, description (type), détails (département, n° Insee, commune, type du site, localisation).
+**Géodésie — niveau 1** :
 
-**Géodésie — snap 2** : coordonnées, commune, dernière MAJ, lien PDF, remarques, partenaire (placeholder).
+- Carrousel photo / croquis + date d'observation en légende
+- **Point géodésique** : numéro du point, ID croquis
+- **Description** : badge exploitabilité GPS (`expl_gps` / `expl_gpscode`, voir `gpsExploitabilityBadge.ts`), localisation, type
+- **Détails** : département (`entite_no` ou déduit du n° Insee), n° Insee, commune, type du site, localisation
 
-**Géodésie — snap 3** : vue complète (placeholder).
+**Géodésie — niveau 2** : coordonnées, remarques, partenaire.
 
-**Nivellement — snap 1** : carrousel, système d'altitude, altitude, complément, type.
+**Nivellement — niveau 1** :
 
-**Nivellement — snap 2** : remarques, partenaire (placeholder).
+- Carrousel + date d'observation en légende
+- **Repère de nivellement** : système d'altitude, altitude (libellé issu de `cp1_altitude_type`), complément, type
+- **Détails** : voie suivie, distance au repère voisin, côté, support, localisation, partie support, repèrements
 
-**Nivellement — snap 3** : vue complète (placeholder).
+**Nivellement — niveau 2** : coordonnées, partenaire, puis remarques.
 
-Les maquettes Figma de référence sont à la racine du monorepo : `figma/fiche_geod_medium.png`, `figma/fiche_niv_medium.png`.
+**Commun aux deux variantes** :
+
+- **Coordonnées** (`PointCoordinatesSection`, données `pointFicheCoordinates.ts`) : onglets **Géographique** (champs `cg1_*`) et **Projection** (champs `cp1_*`) ; onglet désactivé s'il est vide.
+- **Partenaire** (`PartenaireSection`) : nom (`proprio`) et logo chargé via `usePartnerLogo(proprio_id)`.
+- **Fiche PDF** (`MapPointPdfSection`) : lien « Télécharger la fiche PDF » (`url_pdf`), affiché à tous les niveaux en bas du corps.
 
 ## Carrousel photos / croquis
 
 `PointImageCarousel` + `PointImageLightbox`.
 
-- **Source unique** : `action.point.photos` (`collectGeodesyPointPhotos` dans `gdp-tools`), dédoublonnage par URL.
+- **Source unique** : `action.point.photos` (`collectGeodesyPointPhotos` dans `gdp-tools`), dédoublonnage par URL (`buildPointCarouselItems`).
 - **Navigation** : balayage horizontal (`scroll-snap`), indicateurs points.
-- **Plein écran** : bouton en haut à droite de chaque image → lightbox portail (`z-index: 200`), navigation clavier (‹ ›, Échap).
+- **Sans image** : message « Aucune photo ou croquis disponible. »
+- **Plein écran** : bouton en haut à droite de chaque image → lightbox portail (`z-index: 200`), navigation ‹ › et clavier (flèches, Échap).
+- **Zoom** (`useLightboxImageZoom`) : pincement et double tap (jusqu'à ×4), déplacement de l'image zoomée ; la navigation entre images est désactivée tant que l'image est zoomée.
 
-Les onglets de contenu (coords, etc.) se changent par **clic**, pas par swipe. Seules les images utilisent le swipe horizontal.
+Les onglets de contenu (coordonnées) se changent par **clic**, pas par swipe. Seules les images utilisent le swipe horizontal.
 
 ## Mode debug — champs non affichés
 
-Section `UnmappedFieldsDebug` en bas du corps (snap ≥ 1).
+Section `UnmappedFieldsDebug` en bas du corps, repliée par défaut (chevron pour la déplier).
 
 Objectif : lister les propriétés WFS / attributs pas encore mappés dans la fiche, pour ne rien oublier lors de l'implémentation Figma.
 
 | Fichier | Rôle |
 |---------|------|
 | `collectAllPointFields` | Agrège propriétés scalaires + attributs + commentaire |
-| `displayedFieldKeys.ts` | Clés considérées comme « affichées » par zone (header, snap 1, snap 2…) |
-| `getDisplayedFieldIds` | Union des clés selon variante + `snapIndex` |
+| `displayedFieldKeys.ts` | Clés considérées comme « affichées » par zone (en-tête, niveau 1, niveau 2) |
+| `getDisplayedFieldIds` | Union des clés selon variante + niveau |
 | `filterUnmappedPointFields` | Différence = liste debug |
 
 **Pour marquer un champ comme couvert** : ajouter sa clé dans `displayedFieldKeys.ts` (et l'afficher dans le corps correspondant).
@@ -135,14 +173,12 @@ Quand une fiche repère est ouverte (`selectedPoint !== null`) :
 | Comportement | Détail |
 |--------------|--------|
 | Tabbar | Masquée (`onTabbarVisibleChange(false)`) |
-| Boutons carte (GPS, légende, couches…) | Restent en bas de l'écran (`--map-fab-sheet-offset: 0`), **sous** la fiche (`z-index` sheet > overlays) ; entièrement masqués par la fiche au snap plein écran (3) |
-| Mode navigation | `--map-fab-sheet-offset` = hauteur du sheet recherche/RGP |
+| Boutons carte (GPS, légende, couches…) | Restent en bas de l'écran, **sous** la fiche (`z-index` sheet > overlays) ; entièrement masqués par la fiche en plein écran |
+| Hors fiche | Sheet replié (hauteur 0), resté monté pour animer l'ouverture |
 
-Variables CSS sur `.mapPage` :
+Variable CSS posée sur la racine (`document.documentElement`) par `MapPage`, lue aussi par les panneaux en portail (`MapOverlaySheet`) :
 
-- `--map-sheet-height` — hauteur rapportée par le bottom sheet
-- `--map-fab-sheet-offset` — offset des FAB / échelle OL (0 en mode fiche)
-- `--map-tabbar-height` — `5.5rem` ou `0` si tabbar masquée
+- `--map-tabbar-height` — `var(--tabbar-height)` (global.css) ou `0px` si tabbar masquée ; les FAB GPS / boussole et l'échelle OL se placent au-dessus (`--map-fab-bottom` dans MapPage.module.css)
 
 ## Données et utilitaires
 
@@ -151,30 +187,42 @@ Variables CSS sur `.mapPage` :
 | `readProperty(action, key)` | Lit une propriété WFS (casse `key` / `KEY`) |
 | `findEtatLabel` / `findVisitYear` | Champs en-tête depuis propriétés ou attributs |
 | `buildPointCarouselItems` | Liste images pour le carrousel |
-| `pointFicheUtils.ts` | Helpers partagés entre les deux corps |
+| `buildPointCoordinatesView` | Champs des onglets coordonnées (`pointFicheCoordinates.ts`) |
+| `resolveGpsExploitabilityVariant` | Variante visuelle du badge GPS |
+| `pointFicheUtils.ts` | Helpers partagés entre les deux corps (formatage, libellés) |
 
 Type principal : `MapGeodesyClickAction` (`useMapGeodesyClick`) — contient `point` (affichage) et `reportContext` (signalement).
 
 ## Extension — checklist
 
 1. **Nouveau champ affiché** : lire via `readProperty` ou `action.point.attributes`, l'ajouter au JSX du corps, puis sa clé dans `displayedFieldKeys.ts`.
-2. **Nouvelle section snap** : condition `snapIndex >= N` dans le corps concerné, clés associées dans `getDisplayedFieldIds`.
+2. **Nouvelle section** : condition `snapIndex >= 1` (niveau 1) ou `snapIndex >= 2` (niveau 2) dans le corps concerné, clés associées dans `getDisplayedFieldIds`.
 3. **Nouvelle variante** : étendre `PointFicheVariant`, `resolvePointFicheVariant`, créer un `MapPoint…FicheBody`.
-4. **Figma** : comparer avec les PNG `figma/fiche_*` ; placeholders « à remplir » signalent le travail restant.
+4. **Section influant sur le seuil d'ouverture** : seul le bloc carrousel est mesuré (`onPhotoBlockHeightChange`) ; ne pas y inclure de contenu secondaire.
 
 ## Fichiers principaux
 
 ```
-MapBottomSheet/
-├── MapBottomSheet.tsx          # Orchestration sheet + snaps
+features/map/hooks/
+└── usePointFicheSheetDrag.ts      # Géométrie + glissé de la fiche
+
+features/map/components/MapBottomSheet/
+├── MapBottomSheet.tsx             # Orchestration sheet + niveau de contenu
 └── pointFiche/
-    ├── MapPointSheet.tsx       # Shell
+    ├── MapPointSheet.tsx          # Shell + mesures DOM
     ├── MapPointSheetHeader.tsx
     ├── MapPointSheetFooter.tsx
     ├── MapPointGeodesyFicheBody.tsx
     ├── MapPointNivellementFicheBody.tsx
+    ├── PointCoordinatesSection.tsx
+    ├── pointFicheCoordinates.ts
+    ├── PartenaireSection.tsx
+    ├── MapPointPdfSection.tsx
     ├── PointImageCarousel.tsx
     ├── PointImageLightbox.tsx
+    ├── useLightboxImageZoom.ts
+    ├── useMeasuredHeight.ts
+    ├── gpsExploitabilityBadge.ts
     ├── UnmappedFieldsDebug.tsx
     ├── resolvePointFicheVariant.ts
     ├── displayedFieldKeys.ts
