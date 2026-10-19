@@ -1,15 +1,15 @@
 .tabbar {
 	display: flex;
 	align-items: center;
-	justify-content: space-around;
+	justify-content: center;
 	gap: var(--spacing-md);
 	flex-shrink: 0;
-	width: 19.0625rem;
-	background-color: var(--color-bg-subtle);
+	width: 19.0625rem; /* 305px */
+	background: rgba(255, 255, 255, 0.90);
 	margin: 0 auto calc(var(--spacing-xl) + var(--safe-bottom));
-	border-radius: var(--radius-pill);
+	border-radius: 100px;
 	box-shadow: 0 0 40px 2px rgba(0, 0, 0, 0.20);
-	height: 4.5rem;
+	height: 4.5rem; /* 72px */
 }
 
 .tab {

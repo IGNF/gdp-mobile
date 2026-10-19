@@ -4,20 +4,16 @@ import type { MapGeodesyClickAction } from '@/features/map/hooks/useMapGeodesyCl
 
 import {
   buildPointCarouselItems,
-  collectAllPointFields,
-  filterUnmappedPointFields,
   formatObsDateCaption,
   formatSentenceCase,
   readProperty,
   resolveVoieSuivieLabel,
   stripAltitudeSystemLabel,
 } from './pointFicheUtils';
-import { getDisplayedFieldIds } from './getDisplayedFieldIds';
 import { MapPointPdfSection } from './MapPointPdfSection';
 import { PointCoordinatesSection } from './PointCoordinatesSection';
 import { PointImageCarousel } from './PointImageCarousel';
 import { PartenaireSection } from './PartenaireSection';
-import { UnmappedFieldsDebug } from './UnmappedFieldsDebug';
 import { useMeasuredHeight } from './useMeasuredHeight';
 
 import styles from './MapPointSheet.module.css';
@@ -61,10 +57,6 @@ export function MapPointNivellementFicheBody({
   useEffect(() => {
     onPhotoBlockHeightChange?.(photoBlockHeight);
   }, [photoBlockHeight, onPhotoBlockHeightChange]);
-  const unmappedFields = useMemo(() => {
-    const displayedIds = getDisplayedFieldIds('nivellement', snapIndex);
-    return filterUnmappedPointFields(collectAllPointFields(action), displayedIds);
-  }, [action, snapIndex]);
 
  // console.log('action', action);  
   const altitudeSystemRaw =
@@ -125,33 +117,16 @@ export function MapPointNivellementFicheBody({
               <FieldCard label="Type" value={repereType} wide />
             </div>
           </section>
-
-          {hasDetails ? (
-            <section>
-              <h3 className={styles.sectionTitle}>Détails</h3>
-              <div className={styles.fieldGrid}>
-                <FieldCard label="Voie suivie" value={voieSuivieValue} wide />
-                <FieldCard label="Distance" value={distance} wide />
-                <FieldCard label="Côté" value={cote} />
-                <FieldCard label="Support" value={support} />
-                <FieldCard label="Localisation" value={localisation} wide />
-                <FieldCard label="Partie support" value={supportPart} wide />
-                <FieldCard label="Repèrements" value={reperements} wide />
-              </div>
-            </section>
-          ) : null}
         </>
       ) : null}
 
       {snapIndex >= 2 ? (
         <>
-          <PointCoordinatesSection action={action} />
-
-          {/* Partenaire avant remarques */}
           {partenaire ? (
             <PartenaireSection name={partenaire} partnerId={partenaireId} />
           ) : null}
 
+          <PointCoordinatesSection action={action} />
 
           {remark ? (
             <section>
@@ -162,9 +137,24 @@ export function MapPointNivellementFicheBody({
         </>
       ) : null}
 
+      {/* Détails en dernier (après partenaire, coordonnées, remarques) ; visibles dès le niveau 1. */}
+      {snapIndex >= 1 && hasDetails ? (
+        <section>
+          <h3 className={styles.sectionTitle}>Détails</h3>
+          <div className={styles.fieldGrid}>
+            <FieldCard label="Voie suivie" value={voieSuivieValue} wide />
+            <FieldCard label="Distance" value={distance} wide />
+            <FieldCard label="Côté" value={cote} />
+            <FieldCard label="Support" value={support} />
+            <FieldCard label="Localisation" value={localisation} wide />
+            <FieldCard label="Partie support" value={supportPart} wide />
+            <FieldCard label="Repèrements" value={reperements} wide />
+          </div>
+        </section>
+      ) : null}
+
       <MapPointPdfSection pdfUrl={pdfUrl} />
 
-      <UnmappedFieldsDebug fields={unmappedFields} />
     </>
   );
 }

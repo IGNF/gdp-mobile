@@ -25,13 +25,20 @@
   box-sizing: border-box;
 }
 
-/* Bande opaque pleine largeur, du bas de l'écran jusqu'au-dessus de la barre d'onglets.
-   La liste défile au-dessus et n'est jamais à moitié cachée par la barre. */
+/* Barre d'onglets posée par-dessus le bas de la liste : les cellules défilent jusqu'en bas
+   de l'écran et passent derrière la barre. Seule la barre capte les clics, pas la zone autour. */
 .tabbarBand {
-  flex-shrink: 0;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
   display: flex;
-  padding-top: 0.75rem;
-  background: var(--color-bg-page);
+  pointer-events: none;
+}
+
+.tabbarBand > * {
+  pointer-events: auto;
 }
 
 /* `.page` en préfixe : doit l'emporter sur le fond par défaut de PageHeader. */
@@ -40,19 +47,15 @@
 }
 
 .main {
-  /* Hauteur du fondu en bas de la liste, au-dessus de la bande de la barre d'onglets. */
-  --list-fade-height: 1.5rem;
-
   flex: 1;
   overflow: auto;
-  /* Marge basse = hauteur du fondu : en fin de défilement, le dernier élément est net. */
-  padding: 1rem 1rem var(--list-fade-height);
+  /* Marge basse = encombrement de la barre d'onglets (hauteur + marge basse, cf.
+     BottomTabbar.module.css) + 1rem : en fin de défilement, le dernier élément reste visible
+     au-dessus de la barre. */
+  padding: 1rem 1rem calc(4.5rem + var(--spacing-xl) + var(--safe-bottom) + 1rem);
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  /* Les cellules s'estompent en approchant de la bande au lieu d'y être coupées net. */
-  -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - var(--list-fade-height)), transparent);
-  mask-image: linear-gradient(to bottom, #000 calc(100% - var(--list-fade-height)), transparent);
 }
 
 /* `.main` défile : ses enfants gardent leur taille au lieu d'être écrasés quand la liste

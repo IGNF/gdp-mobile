@@ -1,12 +1,15 @@
-import { useEffect, useState } from 'react';
+import { geodesyPointRefKey } from '@ign/gdp-tools';
+import { useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
-import { BottomTabbar } from '@/app/components/BottomTabbar';
 import type { GroupReport } from '@/domain/report/groupReportModels';
 import {
   mapApiReportToGroupReport,
   type ApiGroupReportResponse,
 } from '@/domain/report/groupReportMappers';
+import { useReportGeodesyPoints } from '@/features/report/hooks/useReportGeodesyPoints';
+import { readPointFicheReturn } from '@/features/report/utils/pointFicheReturn';
+import { readGroupReportPointRef } from '@/features/report/utils/reportListItems';
 import { collabApiClient, ensureCollabApiSession } from '@/infra/api';
 import { PageHeader } from '@/shared/ui/PageHeader';
 
@@ -64,6 +67,12 @@ export function ReportHistoryDetailPage() {
     };
   }, [hasValidId, reportId]);
 
+  // Repère relu dans le WFS : l'Espace collaboratif ne stocke pas son picto.
+  const pointRef = useMemo(() => (report ? readGroupReportPointRef(report) : null), [report]);
+  const pointRefs = useMemo(() => (pointRef ? [pointRef] : []), [pointRef]);
+  const points = useReportGeodesyPoints(pointRefs);
+  const point = pointRef ? points.get(geodesyPointRefKey(pointRef)) : undefined;
+
   const handleViewOnMap = () => {
     if (!report || report.longitude === null || report.latitude === null) {
       return;
@@ -80,6 +89,12 @@ export function ReportHistoryDetailPage() {
   };
 
   const handleBack = () => {
+    const pointFiche = readPointFicheReturn(location.state);
+    if (pointFiche) {
+      navigate('/map', { state: { openReportPoint: pointFiche } });
+      return;
+    }
+
     if (cameFromMap && report && report.longitude !== null && report.latitude !== null) {
       navigate('/map', {
         state: { focusReport: { longitude: report.longitude, latitude: report.latitude } },
@@ -94,6 +109,7 @@ export function ReportHistoryDetailPage() {
     <div className={styles.page}>
       <PageHeader
         title="Détail du signalement"
+        className={styles.pageHeader}
         showBackButton
         showCloseButton={false}
         onBack={handleBack}
@@ -106,13 +122,11 @@ export function ReportHistoryDetailPage() {
           <p className={styles.empty}>Ce signalement est introuvable.</p>
         ) : (
           <ReportDetailContent
-            report={buildReportDetailViewFromGroupReport(report)}
+            report={buildReportDetailViewFromGroupReport(report, point)}
             onViewOnMap={handleViewOnMap}
           />
         )}
       </main>
-
-      <BottomTabbar activeTab="signalements" />
     </div>
   );
 }

@@ -1,47 +1,48 @@
+import { buildGeodesyPointTitleDisplay, type GeodesyPointTitlePicto } from '@ign/gdp-tools';
+
 import type { GroupReport } from '@/domain/report/groupReportModels';
 import type { LocalReportDraft } from '@/domain/report/localReportDraft';
-import {
-  NON_CONFORM_REASON_LABELS,
-  type NonConformReason,
-} from '@/features/report/components/GeodesyPointReportWizard';
-import {
-  GDP_REPORT_CONFORM_ETAT,
-  resolveNonConformReasonFromGdpEtat,
-} from '@/features/report/utils/gdpWizardThemeAttributes';
+import { GDP_REPORT_CONFORM_ETAT } from '@/features/report/utils/gdpWizardThemeAttributes';
 import {
   getLocalReportDraftStatusColors,
   getLocalReportDraftStatusLabel,
 } from '@/features/report/utils/localReportDraftStatus';
+import {
+  resolveCommuneLabel,
+  resolveVoieSuivieLabel,
+} from '@/features/map/components/MapBottomSheet/pointFiche/pointFicheUtils';
+import { GDP_GEODESY_POINT_DISPLAY_OPTIONS } from '@/features/map/utils/geodesyReportContext';
 import { getStatusColors, getStatusLabel } from '@/shared/utils/reportStatus';
 
 /** Données affichées par la fiche détail, quelle que soit la source (brouillon local ou serveur). */
 export interface ReportDetailView {
-  idLabel: string;
+  /** Id EspaceCo du signalement (nom du repère tant qu'il n'est pas envoyé), avec le picto du repère. */
+  title: string;
+  titlePicto?: GeodesyPointTitlePicto;
   statusLabel: string;
   statusColors: { color: string; background: string };
   photoUrl?: string;
   isConform: boolean;
-  /** « Conforme » ou motifs de non-conformité. */
-  etatDetail: string;
   positionModified: boolean;
+  createdAt: Date;
+  /** Adresse du repère : voie suivie, à défaut sa commune. */
+  address?: string;
   longitude: number | null;
   latitude: number | null;
   comment: string;
 }
 
-function formatNonConformReasons(reasons: readonly string[]): string {
-  return reasons.map((reason) => NON_CONFORM_REASON_LABELS[reason as NonConformReason]).join(', ') || '—';
-}
-
 export function buildReportDetailViewFromDraft(draft: LocalReportDraft): ReportDetailView {
   return {
-    idLabel: `ID_${draft.geodesyId ?? draft.title}`,
+    title: draft.serverId !== undefined ? `ID : #${draft.serverId}` : draft.title,
+    titlePicto: draft.titlePicto,
     statusLabel: getLocalReportDraftStatusLabel(draft.status),
     statusColors: getLocalReportDraftStatusColors(draft.status),
     photoUrl: draft.photos[0]?.dataUrl,
     isConform: draft.isConform,
-    etatDetail: draft.isConform ? 'Conforme' : formatNonConformReasons(draft.nonConformReasons ?? []),
     positionModified: draft.positionModified,
+    createdAt: new Date(draft.createdAt),
+    address: draft.voieSuivie || draft.commune,
     longitude: draft.longitude,
     latitude: draft.latitude,
     comment: draft.comment,
@@ -50,23 +51,33 @@ export function buildReportDetailViewFromDraft(draft: LocalReportDraft): ReportD
 
 /**
  * Signalement serveur : thème `gdp-tools` (`id`, `etat`, `move`) ou ancien thème `Géodésie`
- * (`Etat du point`, sans identifiant de repère ni indicateur de déplacement).
+ * (`Etat du point`, sans identifiant de repère ni indicateur de déplacement). `point` : repère
+ * relu dans le WFS (picto, voie suivie), absent tant qu'il n'est pas chargé ou si la requête échoue.
  */
-export function buildReportDetailViewFromGroupReport(report: GroupReport): ReportDetailView {
+export function buildReportDetailViewFromGroupReport(
+  report: GroupReport,
+  point?: Record<string, unknown>,
+): ReportDetailView {
   const attributes = report.themeAttributes;
-  const pointId = attributes.id?.trim();
   const etat = (attributes.etat ?? attributes['Etat du point'])?.trim();
   const isConform = etat?.toUpperCase() === GDP_REPORT_CONFORM_ETAT;
-  const reason = resolveNonConformReasonFromGdpEtat(etat);
+  const titleDisplay = point
+    ? buildGeodesyPointTitleDisplay(point, { ...GDP_GEODESY_POINT_DISPLAY_OPTIONS, layerId: 'DATA_GEOD' })
+    : null;
 
   return {
-    idLabel: pointId ? `ID_${pointId}` : `Signalement #${report.id}`,
+    title: `ID : #${report.id}`,
+    titlePicto: titleDisplay?.titlePicto,
     statusLabel: getStatusLabel(report.status),
     statusColors: getStatusColors(report.status),
     photoUrl: report.photoUrls[0],
     isConform,
-    etatDetail: isConform ? 'Conforme' : reason ? formatNonConformReasons([reason]) : etat || '—',
     positionModified: attributes.move?.trim().toLowerCase() === 'true',
+    createdAt: report.createdAt,
+    address:
+      (point && (resolveVoieSuivieLabel(point) || resolveCommuneLabel(point))) ||
+      report.communeTitle ||
+      undefined,
     longitude: report.longitude,
     latitude: report.latitude,
     comment: report.comment,

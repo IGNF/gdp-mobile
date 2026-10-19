@@ -5,7 +5,8 @@
 | @capacitor/core                | MIT          | https://github.com/ionic-team/capacitor.git                                        | 8.5.3             | Ionic Team <hi@ionic.io> (https://ionic.io)    |
 | @capacitor/device              | MIT          | https://github.com/ionic-team/capacitor-plugins.git                                | 8.0.3             | Ionic <hi@ionicframework.com>                  |
 | @capacitor/filesystem          | MIT          | https://github.com/ionic-team/capacitor-filesystem.git                             | 8.1.5             | Outsystems                                     |
-| @capacitor/geolocation         | MIT          | https://github.com/ionic-team/capacitor-geolocation.git                            | 8.2.3             | Outsystems                                     |
+| @capacitor/geolocation         | MIT          | https://github.com/ionic-team/capacitor-geolocation.git                            | 8.2.4             | Outsystems                                     |
+| @capacitor/ios                 | MIT          | https://github.com/ionic-team/capacitor.git                                        | 8.5.3             | Ionic Team <hi@ionic.io> (https://ionic.io)    |
 | @capacitor/preferences         | MIT          | https://github.com/ionic-team/capacitor-plugins.git                                | 8.0.1             | Ionic <hi@ionicframework.com>                  |
 | @fontsource-variable/open-sans | OFL-1.1      | https://github.com/fontsource/font-files.git                                       | 5.3.0             | Google Inc.                                    |
 | @fontsource/fira-sans          | OFL-1.1      | https://github.com/fontsource/font-files.git                                       | 5.3.0             | Google Inc.                                    |

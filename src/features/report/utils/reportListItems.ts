@@ -33,6 +33,8 @@ export interface ReportListItem {
   detailPath: string;
   title: string;
   titlePicto?: GeodesyPointTitlePicto;
+  /** Identifiant EspaceCo, une fois le signalement envoyé. */
+  serverId?: number;
   /** Texte recherché par « Rechercher par ID ». */
   searchLabel: string;
   /** L'utilisateur a déplacé le repère (signalement non conforme, « mal positionné »). */
@@ -60,6 +62,7 @@ function buildLocalDraftItem(draft: LocalReportDraft, serverReport?: GroupReport
     detailPath: `/reports/${draft.id}`,
     title: draft.title,
     titlePicto: draft.titlePicto,
+    serverId: serverReport?.id ?? draft.serverId,
     searchLabel: `ID_${draft.geodesyId ?? draft.title}`,
     positionModified: draft.positionModified,
     createdAt: new Date(draft.createdAt),
@@ -95,6 +98,7 @@ function buildServerReportItem(
     detailPath: `/reports/history/${report.id}`,
     title: titleDisplay?.title ?? (pointRef ? `Repère ${pointRef.id}` : `Signalement #${report.id}`),
     titlePicto: titleDisplay?.titlePicto,
+    serverId: report.id,
     searchLabel: `ID_${pointRef?.id ?? report.id} ${titleDisplay?.title ?? ''}`,
     // Attribut `move` du thème `gdp-tools` (cf. `buildGdpWizardThemeFormAttributes`).
     positionModified: report.themeAttributes.move?.trim().toLowerCase() === 'true',

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { GeodesyPointTitle } from '@ign/gdp-tools/react';
 
 import type { MapGeodesyClickAction } from '@/features/map/hooks/useMapGeodesyClick';
-import { formatDistanceFromMapCenter, distanceKm } from '@/shared/utils/geo';
+import { distanceKm, formatDistanceFromReference } from '@/shared/utils/geo';
 import { joinCSSClassNames } from '@/shared/utils/join';
 import IconCheck from '@/shared/assets/icons/icon-check.svg?react';
 import IconCopy from '@/shared/assets/icons/icon-copy.svg?react';
@@ -15,9 +15,16 @@ import styles from './MapPointSheet.module.css';
 
 const COPY_FEEDBACK_DURATION_MS = 1500;
 
+/** Point de départ de la distance affichée : l'utilisateur (GPS actif) ou le centre de la carte. */
+export interface DistanceReference {
+  longitude: number;
+  latitude: number;
+  kind: 'user' | 'mapCenter';
+}
+
 export interface MapPointSheetHeaderProps {
   action: MapGeodesyClickAction;
-  referencePosition: { longitude: number; latitude: number } | null;
+  referencePosition: DistanceReference | null;
 }
 
 export function MapPointSheetHeader({ action, referencePosition }: MapPointSheetHeaderProps) {
@@ -38,11 +45,12 @@ export function MapPointSheetHeader({ action, referencePosition }: MapPointSheet
   const visitYear = findVisitYear(action);
 
   const distanceLabel = referencePosition
-    ? formatDistanceFromMapCenter(
+    ? formatDistanceFromReference(
         distanceKm(referencePosition, {
           longitude: point.longitude,
           latitude: point.latitude,
         }),
+        referencePosition.kind,
       )
     : null;
 

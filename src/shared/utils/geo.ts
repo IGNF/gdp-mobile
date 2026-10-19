@@ -27,11 +27,11 @@ export function formatDistanceKm(distanceKmValue: number): string {
   return `${distanceKmValue.toFixed(1).replace('.', ',')} km`;
 }
 
-/** Libellé de distance par rapport au centre de la carte. */
-export function formatDistanceFromMapCenter(distanceKmValue: number): string {
-  if (distanceKmValue < 1) {
-    return `à ${Math.round(distanceKmValue * 1000)} m de vous`;
-  }
-
-  return `à ${distanceKmValue.toFixed(1).replace('.', ',')} km de vous`;
+/** Libellé de distance au point : depuis l'utilisateur (GPS actif) ou depuis le centre de la carte. */
+export function formatDistanceFromReference(
+  distanceKmValue: number,
+  reference: 'user' | 'mapCenter',
+): string {
+  const from = reference === 'user' ? 'de vous' : 'du centre de la carte';
+  return `À ${formatDistanceKm(distanceKmValue)} ${from}`;
 }
