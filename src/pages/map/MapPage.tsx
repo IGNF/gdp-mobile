@@ -596,6 +596,7 @@ export function MapPage() {
 
         <div className={styles.mapChrome}>
           <MapBottomSheet
+            map={map}
             selectedPoint={pendingAction}
             canReportPoint={canReportPoint}
             userFollowingMode={userFollowingMode}

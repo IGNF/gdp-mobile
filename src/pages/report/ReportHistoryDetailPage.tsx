@@ -8,6 +8,7 @@ import {
   type ApiGroupReportResponse,
 } from '@/domain/report/groupReportMappers';
 import { useReportGeodesyPoints } from '@/features/report/hooks/useReportGeodesyPoints';
+import { readPointFicheReturn } from '@/features/report/utils/pointFicheReturn';
 import { readGroupReportPointRef } from '@/features/report/utils/reportListItems';
 import { collabApiClient, ensureCollabApiSession } from '@/infra/api';
 import { PageHeader } from '@/shared/ui/PageHeader';
@@ -88,6 +89,12 @@ export function ReportHistoryDetailPage() {
   };
 
   const handleBack = () => {
+    const pointFiche = readPointFicheReturn(location.state);
+    if (pointFiche) {
+      navigate('/map', { state: { openReportPoint: pointFiche } });
+      return;
+    }
+
     if (cameFromMap && report && report.longitude !== null && report.latitude !== null) {
       navigate('/map', {
         state: { focusReport: { longitude: report.longitude, latitude: report.latitude } },

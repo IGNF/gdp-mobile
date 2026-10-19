@@ -7,6 +7,7 @@ import { useSubmitGeodesyPointReport } from '@/features/report/hooks/useSubmitGe
 import {
   buildGdpWizardThemeFormAttributes,
 } from '@/features/report/utils/gdpWizardThemeAttributes';
+import { readPointFicheReturn } from '@/features/report/utils/pointFicheReturn';
 import {
   buildGeodesyPointReportContextFromDraft,
   buildReportPhotosFromDraft,
@@ -138,6 +139,12 @@ export function ReportDetailPage() {
   };
 
   const handleBack = () => {
+    const pointFiche = readPointFicheReturn(location.state);
+    if (pointFiche) {
+      navigate('/map', { state: { openReportPoint: pointFiche } });
+      return;
+    }
+
     if (cameFromMap && draft) {
       navigate('/map', {
         state: { focusReport: { longitude: draft.longitude, latitude: draft.latitude } },

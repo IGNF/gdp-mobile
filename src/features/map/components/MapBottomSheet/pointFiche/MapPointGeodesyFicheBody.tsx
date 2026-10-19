@@ -4,19 +4,15 @@ import type { MapGeodesyClickAction } from '@/features/map/hooks/useMapGeodesyCl
 
 import {
   buildPointCarouselItems,
-  collectAllPointFields,
-  filterUnmappedPointFields,
   formatObsDateCaption,
   normalizeLabel,
   readProperty,
 } from './pointFicheUtils';
-import { getDisplayedFieldIds } from './getDisplayedFieldIds';
 import { resolveGpsExploitabilityVariant } from './gpsExploitabilityBadge';
 import { MapPointPdfSection } from './MapPointPdfSection';
 import { PartenaireSection } from './PartenaireSection';
 import { PointCoordinatesSection } from './PointCoordinatesSection';
 import { PointImageCarousel } from './PointImageCarousel';
-import { UnmappedFieldsDebug } from './UnmappedFieldsDebug';
 import { useMeasuredHeight } from './useMeasuredHeight';
 import IconAlertCircle from '@/shared/assets/icons/icon-alert-circle.svg?react';
 
@@ -70,10 +66,6 @@ export function MapPointGeodesyFicheBody({
   useEffect(() => {
     onPhotoBlockHeightChange?.(photoBlockHeight);
   }, [photoBlockHeight, onPhotoBlockHeightChange]);
-  const unmappedFields = useMemo(() => {
-    const displayedIds = getDisplayedFieldIds('geodesy', snapIndex);
-    return filterUnmappedPointFields(collectAllPointFields(action), displayedIds);
-  }, [action, snapIndex]);
 
   const pointNumber = [readProperty(action, 'nom'), readProperty(action, 'no')].filter(Boolean).join(' — ');
   const sketchId = readProperty(action, 'id') ?? action.reportContext.geodesyId ?? null;
@@ -136,24 +128,15 @@ export function MapPointGeodesyFicheBody({
               </div>
             </section>
           ) : null}
-
-          {hasGeodesyDetails ? (
-            <section>
-              <h3 className={styles.sectionTitle}>Détails</h3>
-              <div className={styles.fieldGrid}>
-                <FieldCard label="Département" value={departement} />
-                <FieldCard label="Numéro Insee" value={insee} />
-                <FieldCard label="Commune" value={commune} />
-                <FieldCard label="Type du site" value={siteType} />
-                <FieldCard label="Localisation" value={localisation} wide />
-              </div>
-            </section>
-          ) : null}
         </>
       ) : null}
 
       {snapIndex >= 2 ? (
         <>
+          {partenaire ? (
+            <PartenaireSection name={partenaire} partnerId={partenaireId} />
+          ) : null}
+
           <PointCoordinatesSection action={action} />
 
           {remark ? (
@@ -162,16 +145,25 @@ export function MapPointGeodesyFicheBody({
               <p className={styles.remarkBlock}>{remark}</p>
             </section>
           ) : null}
-
-          {partenaire ? (
-            <PartenaireSection name={partenaire} partnerId={partenaireId} />
-          ) : null}
         </>
+      ) : null}
+
+      {/* Détails en dernier (après partenaire, coordonnées, remarques) ; visibles dès le niveau 1. */}
+      {snapIndex >= 1 && hasGeodesyDetails ? (
+        <section>
+          <h3 className={styles.sectionTitle}>Détails</h3>
+          <div className={styles.fieldGrid}>
+            <FieldCard label="Département" value={departement} />
+            <FieldCard label="Numéro Insee" value={insee} />
+            <FieldCard label="Commune" value={commune} />
+            <FieldCard label="Type du site" value={siteType} />
+            <FieldCard label="Localisation" value={localisation} wide />
+          </div>
+        </section>
       ) : null}
 
       <MapPointPdfSection pdfUrl={pdfUrl} />
 
-      <UnmappedFieldsDebug fields={unmappedFields} />
     </>
   );
 }

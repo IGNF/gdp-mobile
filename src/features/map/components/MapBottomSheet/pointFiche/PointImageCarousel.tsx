@@ -1,6 +1,6 @@
 import { useCallback, useRef, useState } from 'react';
 
-import IconFullscreen from '@/shared/assets/icons/icon-fullscreen.svg?react';
+import IconFullscreen from '@/shared/assets/icons/full-screen.svg?react';
 
 import type { PointCarouselItem } from './pointFicheUtils';
 import { PointImageLightbox } from './PointImageLightbox';

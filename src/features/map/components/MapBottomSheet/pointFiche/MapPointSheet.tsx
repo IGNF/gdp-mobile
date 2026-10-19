@@ -6,7 +6,8 @@ import { useTrackSheetView } from '@/features/map/hooks/useTrackSheetView';
 import { MapPointGeodesyFicheBody } from './MapPointGeodesyFicheBody';
 import { MapPointNivellementFicheBody } from './MapPointNivellementFicheBody';
 import { MapPointSheetFooter } from './MapPointSheetFooter';
-import { MapPointSheetHeader } from './MapPointSheetHeader';
+import { MapPointSheetHeader, type DistanceReference } from './MapPointSheetHeader';
+import { PointUserReportsSection } from './PointUserReportsSection';
 import { resolvePointFicheVariant } from './resolvePointFicheVariant';
 import { useMeasuredHeight } from './useMeasuredHeight';
 
@@ -19,7 +20,7 @@ const BODY_TOP_PADDING_PX = 12;
 export interface MapPointSheetProps {
   action: MapGeodesyClickAction;
   snapIndex: number;
-  referencePosition: { longitude: number; latitude: number } | null;
+  referencePosition: DistanceReference | null;
   canReport: boolean;
   reportDisabledReason?: 'auth' | 'canevas' | null;
   dragHandleProps: ReturnType<typeof usePointFicheSheetDrag>['dragHandleProps'];
@@ -131,6 +132,9 @@ export function MapPointSheet({
             onPhotoBlockHeightChange={setPhotoBlockHeight}
           />
         )}
+
+        {/* Tout en bas, avec les sections de la fiche agrandie. */}
+        {snapIndex >= 2 ? <PointUserReportsSection action={action} /> : null}
       </div>
 
       {footer}

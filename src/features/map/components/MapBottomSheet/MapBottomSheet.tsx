@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
+import type Map from 'ol/Map';
 
 import type { MapGeodesyClickAction } from '@/features/map/hooks/useMapGeodesyClick';
 import {
   getPointFicheSheetGeometry,
   usePointFicheSheetDrag,
 } from '@/features/map/hooks/usePointFicheSheetDrag';
+import { useMapCenter } from '@/features/map/hooks/useMapCenter';
 import { useUserLocation } from '@/features/map/hooks/useUserLocation';
 import type { UserFollowingMode } from '@/features/map/hooks/useMap';
 import { trackNavigateToPoint } from '@/infra/analytics/matomo';
@@ -30,6 +32,7 @@ function getSafeAreaTopPx(): number {
 }
 
 export interface MapBottomSheetProps {
+  map: Map | null;
   selectedPoint: MapGeodesyClickAction | null;
   canReportPoint: boolean;
   userFollowingMode: UserFollowingMode;
@@ -40,6 +43,7 @@ export interface MapBottomSheetProps {
 }
 
 export function MapBottomSheet({
+  map,
   selectedPoint,
   canReportPoint,
   userFollowingMode,
@@ -96,7 +100,15 @@ export function MapBottomSheet({
     };
   }, [isPointMode, onTabbarVisibleChange]);
 
-  const referencePosition = useUserLocation({ enabled: userFollowingMode !== 'none' });
+  // Distance affichée sur la fiche : depuis l'utilisateur si le GPS est actif (et sa position
+  // connue), sinon depuis le centre de la carte.
+  const userLocation = useUserLocation({ enabled: userFollowingMode !== 'none' });
+  const mapCenter = useMapCenter(map, isPointMode && userLocation === null);
+  const referencePosition = userLocation
+    ? { ...userLocation, kind: 'user' as const }
+    : mapCenter
+      ? { ...mapCenter, kind: 'mapCenter' as const }
+      : null;
 
   const handleNavigateToPoint = () => {
     if (!selectedPoint) {
