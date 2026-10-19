@@ -16,7 +16,7 @@ function generateLocalReportDraftId(): string {
   return `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 }
 
-function fileToDataUrl(file: File): Promise<string> {
+export function fileToDataUrl(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => resolve(reader.result as string);
@@ -32,6 +32,7 @@ export interface BuildLocalReportDraftParams {
   comment: string;
   longitude: number;
   latitude: number;
+  originalPosition: { longitude: number; latitude: number };
   positionModified: boolean;
   photos: ReportPhoto[];
   themeAttributes?: Record<string, string>;
@@ -57,6 +58,8 @@ export async function buildLocalReportDraft(
     commune: resolveCommuneLabel(params.reportContext.properties) ?? undefined,
     longitude: params.longitude,
     latitude: params.latitude,
+    originalLongitude: params.originalPosition.longitude,
+    originalLatitude: params.originalPosition.latitude,
     positionModified: params.positionModified,
     isConform: params.isConform,
     nonConformReasons: params.nonConformReasons,

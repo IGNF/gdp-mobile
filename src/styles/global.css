@@ -170,6 +170,10 @@
   --color-navy-emphasis: var(--figma-blue-10);
   --color-bg-navy-subtle: var(--figma-blue-1);
 
+  /* ── Badge de signalement « Pas envoyé » ── */
+  --color-report-not-sent: #4D4DAA;
+  --color-bg-report-not-sent: #E3E3FD;
+
   /* ── Formulaire de signalement : état conforme / non conforme (icônes Figma) ── */
   --color-report-conform: #229574;
   --color-report-conform-rgb: 34, 149, 116;

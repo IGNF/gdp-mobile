@@ -2,12 +2,129 @@
   display: flex;
   flex-direction: column;
   /* Hauteur fixe (pas `min-height`) : sans elle, la page grandit avec son contenu au lieu
-     que `.main` défile seul, et la barre d'onglets suit le dernier élément au lieu de
-     rester fixée en bas (cf. `.mapPage` dans MapPage.module.css, même principe). */
+     que `.main` défile seul, et le pied de page suit le dernier élément au lieu de rester
+     fixé en bas (cf. `.mapPage` dans MapPage.module.css, même principe). */
   /* `- safe-top` : #root a déjà `padding-top: var(--safe-top)` (global.css) ; sans ça la page
-     dépasse l'écran de cette hauteur et la barre d'onglets perd son écart `--safe-bottom`. */
+     dépasse l'écran de cette hauteur et le pied de page perd son écart `--safe-bottom`. */
   height: calc(100dvh - var(--safe-top));
-  background: var(--color-bg-subtle);
+  background: var(--color-bg-page);
+}
+
+/* `.page` en préfixe : doit l'emporter sur les styles par défaut de PageHeader. */
+.page .pageHeader {
+  justify-content: flex-start;
+  gap: 19px;
+  box-sizing: border-box;
+  height: 103px;
+  padding: 0 1.5rem;
+  background-color: var(--color-bg-page-header);
+}
+
+.page .pageHeader > button:first-child {
+  flex-shrink: 0;
+  width: 3rem;
+  height: 3rem;
+  padding: 0.5rem;
+}
+
+.page .pageHeader > button:first-child svg {
+  width: 23px;
+  height: 23px;
+}
+
+/* Espaceur de droite à la largeur du bouton retour : le titre reste centré sur la page. */
+.page .pageHeader > div:last-child {
+  flex-shrink: 0;
+  width: 3rem;
+}
+
+/* Crayon « Modifier » d'un champ (brouillon non envoyé). */
+.editButton {
+  display: flex;
+  flex-shrink: 0;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 7.333px;
+  border: none;
+  border-radius: 100px;
+  background: var(--color-bg-surface);
+  color: var(--figma-green-7);
+  cursor: pointer;
+}
+
+.editIcon {
+  width: 100%;
+  height: 100%;
+}
+
+.editIcon path {
+  fill: currentColor;
+}
+
+/* Coin supérieur droit d'un encart. */
+.editButtonCorner {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+}
+
+/* Au-dessus d'une photo ou d'une carte. */
+.editButtonOverlay {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  z-index: 1;
+}
+
+/* Carte : en bas à gauche (plein écran en haut à droite, « Voir sur la carte » en bas à droite). */
+.editButtonMap {
+  top: auto;
+  right: auto;
+  bottom: 0.5rem;
+  left: 0.5rem;
+}
+
+.photoInput {
+  display: none;
+}
+
+.editActions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.editError {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--color-danger-emphasis);
+}
+
+.mapEditor {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.commentInput {
+  width: 100%;
+  min-height: 4.5rem;
+  padding: 0.75rem 0.875rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.75rem;
+  background: var(--color-bg-surface);
+  font: inherit;
+  font-size: 0.875rem;
+  color: var(--color-text);
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+.commentInput:focus {
+  border-color: var(--color-text-primary);
+  outline: none;
 }
 
 .main {
@@ -30,21 +147,45 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  align-self: stretch;
   gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-radius: var(--spacing-sm);
+  background: var(--color-bg-surface);
 }
 
 .reportId {
-  font-size: 0.9375rem;
+  font-family: var(--font-family-heading);
+  font-size: 1rem;
   font-weight: 700;
+  line-height: normal;
   color: var(--color-text);
+  /* Le CSS de GeodesyPointTitle (@ign/gdp-tools) n'est pas exporté par le paquet : on
+     reproduit ici l'espacement picto / texte (cf. MyReportsPage.module.css). */
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.reportId img {
+  flex: none;
+  width: 1.5rem;
+  height: 1.5rem;
+  object-fit: cover;
 }
 
 .statusBadge {
   flex-shrink: 0;
-  padding: 0.25rem 0.625rem;
+  padding: 7px 0.5rem;
   border-radius: 999px;
+  font-family: var(--font-family-base);
   font-size: 0.75rem;
   font-weight: 600;
+  line-height: 1rem;
+  /* `text-box` (ex-`leading-trim` / `text-edge` de Figma) : rogne l'interligne au-dessus des
+     capitales et sous la ligne de base. Ignoré par les navigateurs qui ne le gèrent pas. */
+  text-box: trim-both cap alphabetic;
   white-space: nowrap;
 }
 
@@ -88,28 +229,59 @@
 
 
 .grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Ligne du haut : « État signalé » et « Date » côte à côte. */
+.gridRow {
+  display: flex;
+  flex-wrap: wrap;
   gap: 0.75rem;
 }
 
 .card {
+  position: relative;
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
-  padding: 0.875rem 1rem;
-  border: 1px solid var(--color-border);
-  border-radius: 0.75rem;
-  background: var(--color-fiche-surface);
+  gap: 0.75rem;
+  box-sizing: border-box;
+  /* 12px en vertical : titre + 12px + valeur tiennent dans les 75px de l'encart Position. */
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  background: var(--color-bg-surface);
+}
+
+.cardTop {
+  flex: 1 0 0;
+  min-width: 0;
+  height: 82px;
+}
+
+/* Place pour le crayon du coin supérieur droit. */
+.cardWithEditButton {
+  padding-right: 3.5rem;
+}
+
+/* Encart en cours de modification : pleine largeur, hauteur libre. */
+.cardEditing {
+  flex: 1 0 100%;
+  gap: 1rem;
+}
+
+.cardBottom {
+  align-self: stretch;
+  height: 75px;
 }
 
 .cardLabel {
   margin: 0;
-  font-size: 0.6875rem;
+  font-family: var(--font-family-base);
+  font-size: 0.8125rem;
   font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--color-text-secondary);
+  line-height: normal;
+  color: #626262;
 }
 
 .cardValue {
@@ -117,9 +289,11 @@
   display: flex;
   align-items: center;
   gap: 0.375rem;
+  font-family: var(--font-family-base);
   font-size: 0.9375rem;
-  font-weight: 700;
-  color: var(--color-text);
+  font-weight: 400;
+  line-height: normal;
+  color: #091625;
 }
 
 .cardValueIcon {
@@ -146,67 +320,64 @@
   fill: currentColor;
 }
 
-.cardDetail {
-  margin: 0;
-  font-size: 0.8125rem;
-  color: var(--color-text-secondary);
-}
-
 .mapPreview {
+  position: relative;
   border-radius: 0.75rem;
   overflow: hidden;
 }
 
 .commentCard {
+  position: relative;
   display: flex;
   flex-direction: column;
-  gap: 0.625rem;
+  gap: 5px;
+  box-sizing: border-box;
   padding: 0.875rem 1rem;
-  border: 1px solid var(--color-border);
-  border-radius: 0.75rem;
-  background: var(--color-fiche-surface);
+  border-radius: 10px;
+  background: var(--color-bg-surface);
 }
 
-.commentHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
+/* Modification : un peu d'air entre libellé, zone de texte et boutons. */
+.commentCard .commentInput,
+.commentCard .editActions {
+  margin-top: 0.5rem;
 }
 
-.commentTitle {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.6875rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--color-text-secondary);
-}
-
-.commentIcon {
-  width: 1rem;
-  height: 1rem;
-  flex-shrink: 0;
-}
-
-.commentIcon path {
-  fill: var(--color-text-primary);
+/* 16px avec la carte au-dessus (`gap` de `.main` : 20px). */
+.mapPreview + .commentCard {
+  margin-top: -0.25rem;
 }
 
 .commentBody {
   margin: 0;
-  font-size: 0.875rem;
-  line-height: 1.45;
-  color: var(--color-text);
+  font-family: var(--font-family-base);
+  font-size: 0.9375rem;
+  font-weight: 400;
+  line-height: normal;
+  color: #091625;
+  white-space: pre-line;
 }
 
+/* « Voir sur la carte », en bas à droite de la carte. */
 .viewOnMap {
-  /* Le bouton partagé a `flex: 1 0 0` : sans ce reset, il grandit pour occuper tout
-     l'espace restant de `.main` (colonne flex) au lieu de garder sa taille naturelle. */
-  flex: 0 0 auto;
-  align-self: stretch;
+  position: absolute;
+  right: 0.5rem;
+  bottom: 0.5rem;
+  z-index: 1;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 100px;
+  background: rgba(38, 165, 129, 0.85);
+  box-shadow: 0 6px 16px -4px rgba(0, 0, 0, 0.15);
+  font-family: var(--font-family-base);
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-white);
+  cursor: pointer;
 }
 
 .footer {
@@ -214,16 +385,44 @@
   display: flex;
   flex-direction: column;
   gap: 0.625rem;
-  padding: 0.75rem 1rem 0;
-  background: var(--color-bg-subtle);
+  /* Plus de barre d'onglets dessous : même marge basse qu'elle (BottomTabbar.module.css). */
+  padding: 0.75rem 1rem calc(var(--spacing-xl) + var(--safe-bottom));
+  background: var(--color-bg-page);
 }
 
-/* flex: 0 0 auto : .button (Button.module.css) impose flex: 1 0 0, qui écrase la hauteur
-   dans un conteneur en colonne. Mêmes dimensions que les boutons du pied de fiche point. */
+/* Supprimer / Envoyer : deux colonnes égales, même mise en page que le pied de la fiche
+   point (« S'y rendre » / « Signaler », MapPointSheet.module.css). */
+.footerRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+/* `.footer` en préfixe : doit l'emporter sur .button (Button.module.css, `flex: 1 0 0`). */
 .footer .footerButton {
-  flex: 0 0 auto;
+  display: flex;
+  width: 100%;
+  box-sizing: border-box;
   height: 2.75rem;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  border-radius: 100px;
   font-size: var(--font-size-base);
+}
+
+/* Couleurs via les variables de Button : survol et focus suivent la même teinte. */
+.footer .footerDeleteButton {
+  --btn-color: #B90500;
+  --btn-shade: #B90500;
+  --btn-light: rgba(185, 5, 0, 0.1);
+  --btn-rgb: 185, 5, 0;
+  padding: 8px 10px;
+}
+
+.footer .footerSendButton {
+  --btn-color: var(--figma-green-4);
+  padding: 0 20px 0 10px;
 }
 
 .footerButtonIcon {

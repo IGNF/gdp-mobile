@@ -70,6 +70,21 @@ export function buildGdpWizardThemeFormAttributes(params: {
   return attributes;
 }
 
+/** Inverse de `buildGdpWizardComment` : commentaire saisi, sans les motifs ajoutés à la fin. */
+export function extractGdpWizardUserComment(
+  comment: string,
+  nonConformReasons: readonly NonConformReason[],
+): string {
+  const extraBlock = COMMENT_ONLY_REASONS.filter((reason) => nonConformReasons.includes(reason))
+    .map((reason) => NON_CONFORM_REASON_LABELS[reason])
+    .join('\n');
+  if (!extraBlock || !comment.endsWith(extraBlock)) {
+    return comment;
+  }
+
+  return comment.slice(0, -extraBlock.length).trim();
+}
+
 /** Ajoute au commentaire les motifs wizard qui ne sont pas le champ `etat`. */
 export function buildGdpWizardComment(
   userComment: string,

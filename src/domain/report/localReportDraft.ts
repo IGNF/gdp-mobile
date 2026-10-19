@@ -19,6 +19,9 @@ export interface LocalReportDraft {
   commune?: string;
   longitude: number;
   latitude: number;
+  /** Position d'origine du repère (avant déplacement), pour modifier le brouillon. */
+  originalLongitude?: number;
+  originalLatitude?: number;
   positionModified: boolean;
   isConform: boolean;
   nonConformReasons: string[];

@@ -6,7 +6,7 @@ const STATUS_LABELS: Record<LocalReportDraftStatus, string> = {
 };
 
 const STATUS_COLORS: Record<LocalReportDraftStatus, { color: string; background: string }> = {
-  not_sent: { color: 'var(--color-navy)', background: 'var(--color-bg-navy-subtle)' },
+  not_sent: { color: 'var(--color-report-not-sent)', background: 'var(--color-bg-report-not-sent)' },
   sent: { color: 'var(--color-primary)', background: 'var(--color-bg-primary-subtle)' },
 };
 

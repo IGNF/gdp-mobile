@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
-import { BottomTabbar } from '@/app/components/BottomTabbar';
-import type { LocalReportDraft } from '@/domain/report/localReportDraft';
+import { isLocalReportDraftSent, type LocalReportDraft } from '@/domain/report/localReportDraft';
 import type { NonConformReason } from '@/features/report/components/GeodesyPointReportWizard';
 import { useSubmitGeodesyPointReport } from '@/features/report/hooks/useSubmitGeodesyPointReport';
 import {
@@ -18,9 +17,10 @@ import {
   saveLocalReportDraft,
 } from '@/infra/storage/localReportDraftsStore';
 import { Button } from '@/shared/ui/Button';
+import { joinCSSClassNames } from '@/shared/utils/join';
 import { PageHeader } from '@/shared/ui/PageHeader';
 import IconDelete from '@/shared/assets/icons/icon-delete.svg?react';
-import IconSend from '@/shared/assets/icons/icon-send.svg?react';
+import IconSend from '@/shared/assets/icons/send.svg?react';
 
 import { ReportDetailContent } from './ReportDetailContent';
 import { buildReportDetailViewFromDraft } from './reportDetailView';
@@ -34,6 +34,13 @@ export function ReportDetailPage() {
   const [draft, setDraft] = useState<LocalReportDraft | null | undefined>(undefined);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const { submitGeodesyPointReport, isSubmitting } = useSubmitGeodesyPointReport();
+  const canEdit = draft ? !isLocalReportDraftSent(draft) : false;
+
+  // Modification d'un champ depuis la fiche : le brouillon est réenregistré tel quel.
+  const handleDraftChange = async (updated: LocalReportDraft) => {
+    await saveLocalReportDraft(updated);
+    setDraft(updated);
+  };
 
   // Identifiant absent : introuvable, pendant le rendu plutôt que dans l'effet ci-dessous
   // (qui n'a alors plus qu'à charger le brouillon, une vraie resynchronisation avec le
@@ -145,6 +152,7 @@ export function ReportDetailPage() {
     <div className={styles.page}>
       <PageHeader
         title="Détail du signalement"
+        className={styles.pageHeader}
         showBackButton
         showCloseButton={false}
         onBack={handleBack}
@@ -159,6 +167,8 @@ export function ReportDetailPage() {
           <ReportDetailContent
             report={buildReportDetailViewFromDraft(draft)}
             onViewOnMap={handleViewOnMap}
+            editableDraft={canEdit ? draft : undefined}
+            onDraftChange={handleDraftChange}
           />
         )}
       </main>
@@ -166,36 +176,34 @@ export function ReportDetailPage() {
       {draft ? (
         <div className={styles.footer}>
           {submitError ? <p className={styles.submitError}>{submitError}</p> : null}
-          <Button
-            type="button"
-            variant="outline"
-            color="danger"
-            fullWidth
-            className={styles.footerButton}
-            onClick={() => {
-              void handleDelete();
-            }}
-          >
-            <IconDelete className={styles.footerButtonIcon} aria-hidden />
-            Supprimer
-          </Button>
-          <Button
-            type="button"
-            fullWidth
-            className={styles.footerButton}
-            loading={isSubmitting}
-            disabled={Boolean(draft.serverId)}
-            onClick={() => {
-              void handleSend();
-            }}
-          >
-            <IconSend className={styles.footerButtonIcon} aria-hidden />
-            {draft.serverId ? 'Envoyé' : 'Envoyer'}
-          </Button>
+          <div className={styles.footerRow}>
+            <Button
+              type="button"
+              variant="outline"
+              color="danger"
+              className={joinCSSClassNames(styles.footerButton, styles.footerDeleteButton)}
+              onClick={() => {
+                void handleDelete();
+              }}
+            >
+              <IconDelete className={styles.footerButtonIcon} aria-hidden />
+              Supprimer
+            </Button>
+            <Button
+              type="button"
+              className={joinCSSClassNames(styles.footerButton, styles.footerSendButton)}
+              loading={isSubmitting}
+              disabled={Boolean(draft.serverId)}
+              onClick={() => {
+                void handleSend();
+              }}
+            >
+              <IconSend className={styles.footerButtonIcon} aria-hidden />
+              {draft.serverId ? 'Envoyé' : 'Envoyer'}
+            </Button>
+          </div>
         </div>
       ) : null}
-
-      <BottomTabbar activeTab="signalements" />
     </div>
   );
 }

@@ -9,7 +9,7 @@ const TIME_FORMATTER = new Intl.DateTimeFormat('fr-FR', {
   minute: '2-digit',
 });
 
-function formatDate(date: Date): string {
+export function formatDate(date: Date): string {
   return DATE_FORMATTER.format(date);
 }
 
