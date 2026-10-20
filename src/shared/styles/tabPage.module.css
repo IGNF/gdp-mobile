@@ -118,7 +118,12 @@
 }
 
 .searchInput::placeholder {
-  color: var(--color-text-secondary);
+  font-family: var(--font-family-base);
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.5rem;
+  font-feature-settings: 'liga' off, 'clig' off;
+  color: #788089;
 }
 
 /* Liste verticale de `.card`. */

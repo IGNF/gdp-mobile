@@ -65,9 +65,11 @@
   padding: 1rem 2.25rem 1rem 1rem;
 }
 
-/* Liste « Signalements » : lignes (titre, position modifiée, adresse) un peu plus aérées. */
+/* Liste « Signalements » : 10px entre les lignes (titre, position modifiée, adresse). Le
+   chevron est dans la dernière ligne (pas en absolu) : pas de marge droite réservée. */
 .reportCardSpaced {
-  gap: 0.5rem;
+  gap: 10px;
+  padding-right: 1rem;
 }
 
 .reportCardHeader {
@@ -93,8 +95,9 @@
 
 .reportId img {
   flex: none;
-  width: 1.5rem;
-  height: 1.5rem;
+  /* Hauteur du nom du point (`line-height: 1rem`). */
+  width: 1rem;
+  height: 1rem;
   object-fit: contain;
 }
 
@@ -126,7 +129,6 @@
 
 .reportReason {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
   gap: 0.375rem;
   margin: 0;
@@ -158,14 +160,8 @@
   color: var(--color-text-secondary);
 }
 
-.reportLocationText {
-  display: flex;
-  align-items: baseline;
-  gap: 0.3125rem;
-  min-width: 0;
-}
-
-.reportVoieText {
+/* Texte d'une ligne de carte : toute la largeur restante, sur une ligne, « … » s'il déborde. */
+.reportRowText {
   flex: 1 1 auto;
   min-width: 0;
   overflow: hidden;
@@ -173,13 +169,26 @@
   white-space: nowrap;
 }
 
-.reportLocationSeparator {
+/* Chevron « ouvrir », au bout de la dernière ligne : 15px avant lui (`gap` des lignes : 5px). */
+.reportChevron {
   flex-shrink: 0;
+  width: 1rem;
+  height: 1rem;
+  margin-left: calc(15px - 0.3125rem);
+  color: var(--color-text-secondary);
 }
 
-.reportCommuneText {
-  flex-shrink: 0;
-  white-space: nowrap;
+.reportChevron path {
+  fill: currentColor;
+}
+
+/* Lignes titre et motif : écarts différents de la ligne adresse, 15px conservés. */
+.reportCardHeader .reportChevron {
+  margin-left: calc(15px - 0.5rem);
+}
+
+.reportReason .reportChevron {
+  margin-left: calc(15px - 0.375rem);
 }
 
 .reportMetaIcon {
