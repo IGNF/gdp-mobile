@@ -1,4 +1,5 @@
-name: iOS deploy
+name: iOS Deploy
+
 permissions:
   contents: read
 
@@ -10,107 +11,149 @@ on:
 
 jobs:
   deploy:
-    runs-on: macos-26
+    name: Build and Deploy iOS App
+    runs-on: macos-15
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v7
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Known hosts (GitHub)
+        run: ssh-keyscan github.com >> ~/.ssh/known_hosts
 
       - name: Make envfile
         run: |
-          echo "GPF_key=${{ secrets.GPF_key }}" > .env
-          echo "signalement_url=${{ secrets.SIGNALEMENT_URL }}" >> .env
-          echo "osm_bearer_token=${{ secrets.OSM_BEARER_TOKEN }}" >> .env
+          set -euo pipefail
+          touch .env
+          [ -n "${{ secrets.VITE_SECRET }}" ] && echo "VITE_SECRET=${{ secrets.VITE_SECRET }}" >> .env || true
+          [ -n "${{ secrets.VITE_BASE_API_URL }}" ] && echo "VITE_BASE_API_URL=${{ secrets.VITE_BASE_API_URL }}" >> .env || true
+          [ -n "${{ secrets.VITE_OAUTH_CLIENT_ID }}" ] && echo "VITE_OAUTH_CLIENT_ID=${{ secrets.VITE_OAUTH_CLIENT_ID }}" >> .env || true
+          [ -n "${{ secrets.VITE_OAUTH_BASE_URL }}" ] && echo "VITE_OAUTH_BASE_URL=${{ secrets.VITE_OAUTH_BASE_URL }}" >> .env || true
+          [ -n "${{ secrets.VITE_OAUTH_IOS_REDIRECT_URI }}" ] && echo "VITE_OAUTH_IOS_REDIRECT_URI=${{ secrets.VITE_OAUTH_IOS_REDIRECT_URI }}" >> .env || true
+          [ -n "${{ secrets.VITE_GEOPORTAIL_SCAN_API_KEY }}" ] && echo "VITE_GEOPORTAIL_SCAN_API_KEY=${{ secrets.VITE_GEOPORTAIL_SCAN_API_KEY }}" >> .env || true
+          [ -n "${{ secrets.VITE_GDP_REPORT_COMMUNITY_ID }}" ] && echo "VITE_GDP_REPORT_COMMUNITY_ID=${{ secrets.VITE_GDP_REPORT_COMMUNITY_ID }}" >> .env || true
+          [ -n "${{ secrets.VITE_GDP_REPORT_DISPLAY_THEMES }}" ] && echo "VITE_GDP_REPORT_DISPLAY_THEMES=${{ secrets.VITE_GDP_REPORT_DISPLAY_THEMES }}" >> .env || true
+          [ -n "${{ secrets.VITE_GDP_REPORT_SUBMISSION_THEME }}" ] && echo "VITE_GDP_REPORT_SUBMISSION_THEME=${{ secrets.VITE_GDP_REPORT_SUBMISSION_THEME }}" >> .env || true
+          [ -n "${{ secrets.VITE_GDP_NEWS_URL }}" ] && echo "VITE_GDP_NEWS_URL=${{ secrets.VITE_GDP_NEWS_URL }}" >> .env || true
+          [ -n "${{ secrets.VITE_MATOMO_URL }}" ] && echo "VITE_MATOMO_URL=${{ secrets.VITE_MATOMO_URL }}" >> .env || true
+          [ -n "${{ secrets.VITE_MATOMO_SITE_ID }}" ] && echo "VITE_MATOMO_SITE_ID=${{ secrets.VITE_MATOMO_SITE_ID }}" >> .env || true
+          [ -n "${{ secrets.VITE_AUTH_REQUIRED }}" ] && echo "VITE_AUTH_REQUIRED=${{ secrets.VITE_AUTH_REQUIRED }}" >> .env || true
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v7
-        with:
-          node-version: 24
-
-      - name: Install app dependencies
+      - name: Install dependencies
         run: npm install
 
-      - name: Build
-        run: npm run build
+      - name: Build web bundle
+        run: npm run build:mobile
 
-      - name: Sync
-        run: npx cap sync
-      ## Use this if build mobileprovision too big in base64 for GH secrets
-      - name: Decrypt build mobileprovision
-        run: ios/decrypt_provision.sh
-        env:
-          BUILD_PROVISION_PASSPHRASE: ${{ secrets.BUILD_PROVISION_PASSPHRASE }}
+      - name: Capacitor sync (iOS)
+        run: npx cap sync ios
 
-      - name: Install the Apple certificate and provisioning profile
+      - name: Install Apple distribution cert and App Store profile
         env:
-          BUILD_CERTIFICATE_BASE64: ${{ secrets.BUILD_CERTIFICATE_BASE64 }}
           DISTRIBUTION_CERTIFICATE_P12: ${{ secrets.DISTRIBUTION_CERTIFICATE_P12 }}
-          P12_PASSWORD: ${{ secrets.P12_PASSWORD }}
           P12_PASSWORD_DISTR: ${{ secrets.P12_PASSWORD_DISTR }}
           DEPLOY_PROVISION_PROFILE_BASE64: ${{ secrets.DEPLOY_PROVISION_PROFILE_BASE64 }}
-          ## Comment this if build mobileprovision too big in base64 for GH secrets
-          # BUILD_PROVISION_PROFILE_BASE64: ${{ secrets.BUILD_PROVISION_PROFILE_BASE64 }}
           KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
         run: |
-          # create variables
-          CERTIFICATE_PATH=$RUNNER_TEMP/build_certificate.p12
-          CERTIFICATE_DISTR_PATH=$RUNNER_TEMP/distribution_certificate.p12
-          PP_PATH=$RUNNER_TEMP/build_pp.mobileprovision
-          DPP_PATH=$RUNNER_TEMP/deploy_pp.mobileprovision
-          KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
+          set -euo pipefail
+          CERT_P12=$RUNNER_TEMP/dist.p12
+          PROFILE=$RUNNER_TEMP/appstore.mobileprovision
+          KEYCHAIN=$RUNNER_TEMP/app-signing.keychain-db
 
-          # import certificate and provisioning profile from secrets
-          echo -n "$BUILD_CERTIFICATE_BASE64" | base64 --decode -o $CERTIFICATE_PATH
-          echo -n "$DISTRIBUTION_CERTIFICATE_P12" | base64 --decode -o $CERTIFICATE_DISTR_PATH
-          echo -n "$DEPLOY_PROVISION_PROFILE_BASE64" | base64 --decode -o $DPP_PATH
-          ## Comment this if build mobileprovision too big in base64 for GH secrets
-          # echo -n "$BUILD_PROVISION_PROFILE_BASE64" | base64 --decode -o $PP_PATH
-          ## And use this instead
-          mv $HOME/secrets/build.mobileprovision $PP_PATH
+          echo -n "$DISTRIBUTION_CERTIFICATE_P12" | base64 --decode > "$CERT_P12"
+          echo -n "$DEPLOY_PROVISION_PROFILE_BASE64" | base64 --decode > "$PROFILE"
 
-          # create temporary keychain
-          security create-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
-          security set-keychain-settings -lut 21600 $KEYCHAIN_PATH
-          security unlock-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN"
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
+          security import "$CERT_P12" -P "$P12_PASSWORD_DISTR" -A -t cert -f pkcs12 -k "$KEYCHAIN"
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
+          security list-keychain -d user -s "$KEYCHAIN"
 
-          # import certificate to keychain
-          security import $CERTIFICATE_PATH -P "" -A -t cert -f pkcs12 -k $KEYCHAIN_PATH
-          security import $CERTIFICATE_DISTR_PATH -P "" -A -t cert -f pkcs12 -k $KEYCHAIN_PATH
-          security list-keychain -d user -s $KEYCHAIN_PATH
+          PROFILE_UUID=$(security cms -D -i "$PROFILE" | plutil -extract UUID raw -)
+          mkdir -p "$HOME/Library/MobileDevice/Provisioning Profiles"
+          cp "$PROFILE" "$HOME/Library/MobileDevice/Provisioning Profiles/${PROFILE_UUID}.mobileprovision"
 
-          # apply provisioning profile
-          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-          cp $PP_PATH ~/Library/MobileDevice/Provisioning\ Profiles
-          cp $DPP_PATH ~/Library/MobileDevice/Provisioning\ Profiles
-
-      - name: Build app
-        run: cd ios/App && xcodebuild -workspace "App.xcworkspace" -scheme "App" clean archive -archivePath $GITHUB_WORKSPACE/ign.xcarchive -configuration "Release Production" DEVELOPMENT_TEAM=${{ secrets.APPSTORE_TEAM_ID }} -destination generic/platform=iOS
-
-      - name: export ipa
+      - name: Build archive
         env:
-          EXPORT_PLIST: ${{ secrets.IOS_EXPORT_PRODUCTION }}
+          TEAM_ID: ${{ secrets.APPSTORE_TEAM_ID }}
         run: |
-          EXPORT_PLIST_PATH=$RUNNER_TEMP/ExportOptions.plist
-          echo $EXPORT_PLIST_PATH
-          echo -n "$EXPORT_PLIST" | base64 --decode -i - -o $EXPORT_PLIST_PATH
-          cd ios/App && xcodebuild -exportArchive -archivePath $GITHUB_WORKSPACE/ign.xcarchive -exportOptionsPlist $EXPORT_PLIST_PATH -exportPath $RUNNER_TEMP/export
+          set -euo pipefail
+          cd ios/App
+          xcodebuild \
+            -project App.xcodeproj \
+            -scheme App \
+            -configuration Release \
+            -archivePath "$GITHUB_WORKSPACE/App.xcarchive" \
+            -destination "generic/platform=iOS" \
+            DEVELOPMENT_TEAM="$TEAM_ID" \
+            CODE_SIGN_STYLE=Manual \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            PROVISIONING_PROFILE_SPECIFIER="" \
+            PROVISIONING_PROFILE="" \
+            clean archive
 
-      - name: Upload application
+      - name: Export IPA
+        env:
+          EXPORT_PLIST_B64: ${{ secrets.IOS_EXPORT_PRODUCTION }}
+        run: |
+          set -euo pipefail
+          EXPORT_PLIST=$RUNNER_TEMP/ExportOptions.plist
+          echo -n "$EXPORT_PLIST_B64" | base64 --decode > "$EXPORT_PLIST"
+          cd ios/App
+          xcodebuild -exportArchive \
+            -archivePath "$GITHUB_WORKSPACE/App.xcarchive" \
+            -exportOptionsPlist "$EXPORT_PLIST" \
+            -exportPath "$RUNNER_TEMP/export"
+
+      - name: Upload IPA artifact
         uses: actions/upload-artifact@v4
         with:
-          name: app
-          path: ${{ runner.temp }}/export/App.ipa
+          name: ios-ipa
+          path: ${{ runner.temp }}/export/*.ipa
           retention-days: 3
 
-      - name: Decode auth api key file and save it
+      - name: Save App Store Connect API key
+        if: ${{ vars.IOS_DEPLOY_TO_TESTFLIGHT == 'true' }}
         env:
-          API_KEY_BASE64: ${{ secrets.APPSTORE_API_PRIVATE_KEY }}
+          API_KEY_B64: ${{ secrets.APPSTORE_API_PRIVATE_KEY }}
         run: |
+          set -euo pipefail
+          key_id="${{ secrets.APPSTORE_API_KEY_ID }}"
+          if [[ -z "$key_id" ]]; then
+            echo "APPSTORE_API_KEY_ID secret is missing" >&2
+            exit 1
+          fi
           mkdir -p ~/private_keys
-          echo -n " $API_KEY_BASE64" | base64 --decode -i - -o ~/private_keys/AuthKey_${{ secrets.APPSTORE_API_KEY_ID }}.p8
+          mkdir -p ~/.appstoreconnect/private_keys
+          echo -n "$API_KEY_B64" | base64 --decode > ~/private_keys/AuthKey_${key_id}.p8
+          cp ~/private_keys/AuthKey_${key_id}.p8 ~/.appstoreconnect/private_keys/AuthKey_${key_id}.p8
 
-      - name: "Upload file to test flight using CLI"
+      - name: Upload to TestFlight
+        if: ${{ vars.IOS_DEPLOY_TO_TESTFLIGHT == 'true' }}
+        env:
+          API_KEY_ID: ${{ secrets.APPSTORE_API_KEY_ID }}
+          API_ISSUER_ID: ${{ secrets.APPSTORE_ISSUER_ID }}
         run: |
-          echo "Starting upload"
-          cd ios/App && xcrun altool --validate-app -f $RUNNER_TEMP/export/App.ipa -t ios --apiKey ${{ secrets.APPSTORE_API_KEY_ID }} --apiIssuer ${{ secrets.APPSTORE_ISSUER_ID }}
-          xcrun altool --upload-app -f $RUNNER_TEMP/export/App.ipa -t ios --apiKey ${{ secrets.APPSTORE_API_KEY_ID }} --apiIssuer ${{ secrets.APPSTORE_ISSUER_ID }}
+          set -euo pipefail
+          IPA=$(ls "$RUNNER_TEMP"/export/*.ipa | head -n 1)
+          if [[ -z "$IPA" || ! -f "$IPA" ]]; then
+            echo "No IPA found to upload" >&2
+            exit 1
+          fi
+          xcrun altool --upload-app \
+            --type ios \
+            --file "$IPA" \
+            --apiKey "$API_KEY_ID" \
+            --apiIssuer "$API_ISSUER_ID"

@@ -23,6 +23,7 @@
     "generate-apk": "bash ./scripts/generate-apk.sh",
     "run-apk": "bash ./scripts/run-apk.sh",
     "setup-android": "bash ./scripts/setup-android.sh",
+    "setup-ios": "bash ./scripts/setup-ios.sh",
     "bump:version": "node ./scripts/bump-version.js",
     "deps:prod": "node ./scripts/write-prod-dependencies.js",
     "deps:prod:check": "node ./scripts/write-prod-dependencies.js --check"

@@ -73,7 +73,7 @@ Le `.htaccess` copié dans `dist/` ne gère que le fallback SPA ; le proxy OAuth
 
 ## Déploiement avec tag 
 !! A terme, cette commande lancera aussi le déploiement sur les stores. !!
-Un numéro semver dans `package.json`, recopié dans Android / iOS. Pas de suffixe. Le `versionCode` Android vaut `major × 10000 + minor × 100 + patch` (`4.0.1` → `40001`). L’écran **À propos** affiche cette version.
+Un numéro semver dans `package.json`, recopié dans Android / iOS. Pas de suffixe. Le `versionCode` Android et le `CURRENT_PROJECT_VERSION` iOS valent `major × 10000 + minor × 100 + patch` (`4.0.1` → `40001`). L’écran **À propos** affiche la version semver.
 
 Semver = semantic versioning : un numéro en trois parties, majeur.mineur.patch.
 
@@ -137,7 +137,19 @@ npm run generate-apk
 
 APK : `gdp-mobile/android/app/build/outputs/apk/debug/app-debug.apk`. Identifiant `fr.ign.canex` : cohabite avec l’ancienne app `fr.ign.canex`.
 
-Inspecter la WebView (bundle `dist`, pas Vite) : `chrome://inspect/#devices` → **WebView in fr.ign.canex**.
+Inspecter la WebView (bundle `dist`, pas Vite) : `chrome://inspect/#devices` → **WebView in fr.ign.canex`.
+
+## iOS (build local & CI)
+
+Première fois sur macOS (Xcode installé) :
+
+```bash
+npm run setup-ios
+```
+
+Build web + sync, puis Xcode : `open ios/App/App.xcodeproj`.
+
+**CI store** : tag `vX.Y.Z` → workflows Android et iOS. Secrets et renouvellement certificats : [docs/MAJ_IOS.md](./docs/MAJ_IOS.md). Upload TestFlight si la variable de dépôt `IOS_DEPLOY_TO_TESTFLIGHT` vaut `true`.
 
 ## Scripts (`gdp-mobile`)
 
@@ -149,6 +161,7 @@ Inspecter la WebView (bundle `dist`, pas Vite) : `chrome://inspect/#devices` →
 | `npm run build:mobile` | Alias de `build` — appelé par `generate-apk` / `run-apk` |
 | `npm run preview:qualif` | Aperçu local du build qualif |
 | `npm run setup-android` | Première config Android |
+| `npm run setup-ios` | Première config iOS (macOS) |
 | `npm run generate-apk` | Produit le fichier APK debug |
 | `npm run run-apk` | Build, installe et lance l’APK sur le téléphone USB |
 | `npm run bump:version -- 4.0.1` | Version + commit + tag `v4.0.1` |
