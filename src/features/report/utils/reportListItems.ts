@@ -23,6 +23,7 @@ import {
 } from '@/features/report/utils/localReportDraftStatus';
 import { GDP_GEODESY_POINT_DISPLAY_OPTIONS } from '@/features/map/utils/geodesyReportContext';
 import { getStatusColors, getStatusLabel } from '@/shared/utils/reportStatus';
+import { normalizeSearchText } from '@/shared/utils/text';
 
 /** Carte de la liste « Signalements » : brouillon local, signalement serveur, ou les deux fusionnés. */
 export interface ReportListItem {
@@ -35,7 +36,10 @@ export interface ReportListItem {
   titlePicto?: GeodesyPointTitlePicto;
   /** Identifiant EspaceCo, une fois le signalement envoyé. */
   serverId?: number;
-  /** Texte recherché par « Rechercher par ID ». */
+  /**
+   * Texte de la recherche (normalisé, cf. `normalizeSearchText`) : nom et identifiant du repère,
+   * id du signalement (« #1234 »), commune et voie suivie.
+   */
   searchLabel: string;
   /** L'utilisateur a déplacé le repère (signalement non conforme, « mal positionné »). */
   positionModified: boolean;
@@ -54,6 +58,10 @@ export function readGroupReportPointRef(report: GroupReport): GeodesyPointRef | 
   return id && domaine ? { id, domaine } : null;
 }
 
+function buildSearchLabel(parts: ReadonlyArray<string | number | null | undefined>): string {
+  return normalizeSearchText(parts.filter((part) => part !== null && part !== undefined && part !== '').join(' '));
+}
+
 function buildLocalDraftItem(draft: LocalReportDraft, serverReport?: GroupReport): ReportListItem {
   const status = getLocalReportDraftEffectiveStatus(draft);
   const base: ReportListItem = {
@@ -63,7 +71,13 @@ function buildLocalDraftItem(draft: LocalReportDraft, serverReport?: GroupReport
     title: draft.title,
     titlePicto: draft.titlePicto,
     serverId: serverReport?.id ?? draft.serverId,
-    searchLabel: `ID_${draft.geodesyId ?? draft.title}`,
+    searchLabel: buildSearchLabel([
+      draft.title,
+      draft.geodesyId,
+      serverReport?.id ?? draft.serverId ? `#${serverReport?.id ?? draft.serverId}` : null,
+      draft.commune,
+      draft.voieSuivie,
+    ]),
     positionModified: draft.positionModified,
     createdAt: new Date(draft.createdAt),
     commune: draft.commune,
@@ -92,19 +106,23 @@ function buildServerReportItem(
     ? buildGeodesyPointTitleDisplay(point, { ...GDP_GEODESY_POINT_DISPLAY_OPTIONS, layerId: 'DATA_GEOD' })
     : null;
 
+  const title = titleDisplay?.title ?? (pointRef ? `Repère ${pointRef.id}` : `Signalement #${report.id}`);
+  const commune = (point && resolveCommuneLabel(point)) || report.communeTitle;
+  const voieSuivie = (point && resolveVoieSuivieLabel(point)) || undefined;
+
   return {
     key: `server:${report.id}`,
     filterStatus: 'sent',
     detailPath: `/reports/history/${report.id}`,
-    title: titleDisplay?.title ?? (pointRef ? `Repère ${pointRef.id}` : `Signalement #${report.id}`),
+    title,
     titlePicto: titleDisplay?.titlePicto,
     serverId: report.id,
-    searchLabel: `ID_${pointRef?.id ?? report.id} ${titleDisplay?.title ?? ''}`,
+    searchLabel: buildSearchLabel([title, pointRef?.id, `#${report.id}`, commune, voieSuivie]),
     // Attribut `move` du thème `gdp-tools` (cf. `buildGdpWizardThemeFormAttributes`).
     positionModified: report.themeAttributes.move?.trim().toLowerCase() === 'true',
     createdAt: report.createdAt,
-    commune: (point && resolveCommuneLabel(point)) || report.communeTitle,
-    voieSuivie: (point && resolveVoieSuivieLabel(point)) || undefined,
+    commune,
+    voieSuivie,
     statusLabel: getStatusLabel(report.status),
     statusColors: getStatusColors(report.status),
     accentRgb: getLocalReportDraftStatusAccentRgb('sent'),

@@ -17,6 +17,7 @@ import {
 } from '@/features/report/utils/reportListItems';
 import { formatRelativeDayLabel } from '@/shared/utils/date';
 import { joinCSSClassNames } from '@/shared/utils/join';
+import { matchesSearchQuery } from '@/shared/utils/text';
 import { EXTERNAL_LINKS } from '@/shared/constants/externalLinks';
 import { Button } from '@/shared/ui/Button';
 import { TrackedExternalLink } from '@/infra/analytics/TrackedExternalLink';
@@ -66,14 +67,13 @@ export function MyReportsPage() {
   );
 
   const filteredItems = useMemo(() => {
-    const query = search.trim().toLowerCase();
-
     return items.filter((item) => {
       if (statusFilter !== 'all' && item.filterStatus !== statusFilter) {
         return false;
       }
 
-      return !query || item.searchLabel.toLowerCase().includes(query);
+      // Sans accents ni casse, tous les mots doivent figurer (ex. « reims gare », « #1234 »).
+      return matchesSearchQuery(item.searchLabel, search);
     });
   }, [items, search, statusFilter]);
 
@@ -107,7 +107,7 @@ export function MyReportsPage() {
               <input
                 type="text"
                 className={layout.searchInput}
-                placeholder="Rechercher par ID"
+                placeholder="Rechercher un point, une adresse..."
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
               />
