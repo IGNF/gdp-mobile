@@ -101,6 +101,7 @@ jobs:
           serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
           packageName: ${{ env.PACKAGE_NAME }}
           releaseFiles: ${{ steps.sign_aab.outputs.signedReleaseFile }}
-          track: internal
+          tracks: internal
           status: completed
           inAppUpdatePriority: 5
+          changesNotSentForReview: true
