@@ -54,8 +54,6 @@ Pour remplir les secrets GitHub, ne travaillez qu’avec **Distribution** + prof
 | Certificat **Apple Distribution** | ~1 an | `DISTRIBUTION_CERTIFICATE_P12`, `P12_PASSWORD_DISTR` | **Mac** (CSR, export `.p12`) + navigateur (portail) |
 | Profil **App Store** | Lié au certificat / capacités | `DEPLOY_PROVISION_PROFILE_BASE64` ; **`IOS_EXPORT_PRODUCTION`** si le **nom** du profil change | Navigateur + **Mac** (téléchargement `.mobileprovision`) |
 | Clé API `.p8` | Jusqu’à révocation ; perte = nouvelle clé | `APPSTORE_API_KEY_ID`, `APPSTORE_ISSUER_ID`, `APPSTORE_API_PRIVATE_KEY` | App Store Connect (navigateur) |
-| `KEYCHAIN_PASSWORD` | Aucune expiration | Valeur arbitraire, uniquement pour le runner CI | GitHub (secret) |
-
 Après renouvellement : lancer **iOS Deploy** en `workflow_dispatch` (sans tag) pour valider avant la prochaine release.
 
 ### À chaque déploiement store
@@ -186,7 +184,6 @@ Tous les `VITE_*` du workflow [android-deploy.yml](../.github/workflows/android-
 | `DISTRIBUTION_CERTIFICATE_P12` | `.p12` Distribution en base64 |
 | `P12_PASSWORD_DISTR` | Mot de passe du `.p12` (texte clair) |
 | `DEPLOY_PROVISION_PROFILE_BASE64` | `.mobileprovision` App Store en base64 |
-| `KEYCHAIN_PASSWORD` | Chaîne aléatoire (keychain éphémère du runner) |
 | `APPSTORE_TEAM_ID` | Team ID 10 caractères |
 | `IOS_EXPORT_PRODUCTION` | `ExportOptions.plist` complet en base64 |
 | `APPSTORE_API_KEY_ID` | Key ID API |
@@ -225,6 +222,7 @@ Profil **Development** + certificat **Development** sur le portail si besoin de 
 | --- | --- |
 | Échec à l’export IPA | Nom du profil dans `ExportOptions.plist` ≠ nom sur le portail |
 | `security import` en CI | Mauvais `P12_PASSWORD_DISTR` ou base64 tronqué |
+| `SecKeychainUnlock` / passphrase incorrecte | Ancien secret `KEYCHAIN_PASSWORD` : le workflow génère désormais le mot de passe du trousseau éphémère ; vérifier surtout `P12_PASSWORD_DISTR` |
 | Pas de clé à côté du certificat Distribution | `.cer` installé sans CSR du même Mac → refaire certificat + export `.p12` sur ce Mac |
 | Pas de menu Utilisateurs et accès | Mauvais site (utiliser App Store Connect) ou rôle insuffisant |
 | Upload TestFlight OK, pas d’app visible | Traitement Apple (minutes à heures) ; vérifier la fiche app et le bundle ID |
