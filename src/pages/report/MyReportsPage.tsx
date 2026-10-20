@@ -135,59 +135,60 @@ export function MyReportsPage() {
               <p className={layout.empty}>Aucun signalement.</p>
             ) : (
               <ul className={layout.cardList}>
-                {filteredItems.map((item) => (
-                  <li key={item.key}>
-                    <button
-                      type="button"
-                      className={joinCSSClassNames(layout.card, styles.reportCard, styles.reportCardSpaced)}
-                      style={{
-                        '--card-hover-rgb': item.accentRgb,
-                      } as CSSProperties}
-                      onClick={() => navigate(item.detailPath, { state: { from: 'reports' } })}
-                    >
-                      <div className={styles.reportCardHeader}>
-                        <span className={styles.reportTitleGroup}>
-                          <GeodesyPointTitle
-                            title={item.title}
-                            picto={item.titlePicto}
-                            className={styles.reportId}
-                          />
-                          <span className={styles.reportDate}>
-                            {formatRelativeDayLabel(item.createdAt)}
+                {filteredItems.map((item) => {
+                  const location = [item.commune, item.voieSuivie].filter(Boolean).join(', ');
+                  // Chevron « ouvrir » au bout de la dernière ligne de la carte.
+                  const chevron = <IconAngleRight className={styles.reportChevron} aria-hidden />;
+                  const lastRow = location ? 'location' : item.positionModified ? 'reason' : 'header';
+
+                  return (
+                    <li key={item.key}>
+                      <button
+                        type="button"
+                        className={joinCSSClassNames(layout.card, styles.reportCard, styles.reportCardSpaced)}
+                        style={{
+                          '--card-hover-rgb': item.accentRgb,
+                        } as CSSProperties}
+                        onClick={() => navigate(item.detailPath, { state: { from: 'reports' } })}
+                      >
+                        <div className={styles.reportCardHeader}>
+                          <span className={styles.reportTitleGroup}>
+                            <GeodesyPointTitle
+                              title={item.title}
+                              picto={item.titlePicto}
+                              className={styles.reportId}
+                            />
+                            <span className={styles.reportDate}>
+                              {formatRelativeDayLabel(item.createdAt)}
+                            </span>
                           </span>
-                        </span>
-                        <span
-                          className={styles.statusBadge}
-                          style={{ color: item.statusColors.color, background: item.statusColors.background }}
-                        >
-                          {item.statusLabel}
-                        </span>
-                      </div>
-                      {item.positionModified ? (
-                        <p className={styles.reportReason}>Position modifiée</p>
-                      ) : null}
-                      {item.voieSuivie || item.commune ? (
-                        <div className={styles.reportLocationRow}>
-                          <IconLocation className={styles.reportMetaIcon} aria-hidden />
-                          <span className={styles.reportLocationText}>
-                            {item.commune ? (
-                              <span className={styles.reportCommuneText}>{item.commune}</span>
-                            ) : null}
-                            {item.commune && item.voieSuivie ? (
-                              <span className={styles.reportLocationSeparator}>,</span>
-                            ) : null}
-                            {item.voieSuivie ? (
-                              <span className={styles.reportVoieText} title={item.voieSuivie}>
-                                {item.voieSuivie}
-                              </span>
-                            ) : null}
+                          <span
+                            className={styles.statusBadge}
+                            style={{ color: item.statusColors.color, background: item.statusColors.background }}
+                          >
+                            {item.statusLabel}
                           </span>
+                          {lastRow === 'header' ? chevron : null}
                         </div>
-                      ) : null}
-                      <IconAngleRight className={layout.cardChevron} aria-hidden />
-                    </button>
-                  </li>
-                ))}
+                        {item.positionModified ? (
+                          <p className={styles.reportReason}>
+                            <span className={styles.reportRowText}>Position modifiée</span>
+                            {lastRow === 'reason' ? chevron : null}
+                          </p>
+                        ) : null}
+                        {location ? (
+                          <div className={styles.reportLocationRow}>
+                            <IconLocation className={styles.reportMetaIcon} aria-hidden />
+                            <span className={styles.reportRowText} title={location}>
+                              {location}
+                            </span>
+                            {chevron}
+                          </div>
+                        ) : null}
+                      </button>
+                    </li>
+                  );
+                })}
               </ul>
             )}
 
