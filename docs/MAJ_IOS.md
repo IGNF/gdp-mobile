@@ -84,13 +84,24 @@ Aucune commande `xcodebuild` ni export `.p12` n’est requise **à chaque tag** 
 3. Double-cliquer sur le `.cer` reçu → vérifier dans **Mes certificats** : **Apple Distribution** + **clé privée** ▼.
 4. Exporter en **`.p12`** (mot de passe → futur `P12_PASSWORD_DISTR`).
 
-Encodage pour GitHub (**Mac**) :
+Encodage pour GitHub (une **seule ligne** base64, sans retours) :
+
+**macOS** (`-w` n’existe pas — `invalid argument` si vous copiez la commande Linux) :
 
 ```bash
-base64 -i gdp-distribution.p12 | pbcopy   # → DISTRIBUTION_CERTIFICATE_P12
+# Vérifier que le fichier existe et n’est pas vide
+ls -la gdp-distribution.p12
+
+# Recommandé : une seule ligne, fiable sur macOS
+openssl base64 -in gdp-distribution.p12 -A | pbcopy   # → DISTRIBUTION_CERTIFICATE_P12
+
+# Variante
+base64 < gdp-distribution.p12 | tr -d '\n' | pbcopy
 ```
 
-**Linux** :
+Si `pbcopy` reste vide : lancer sans `pbcopy` et regarder la sortie (`openssl … -A | head -c 80`). Taille attendue : plusieurs milliers de caractères (`openssl … -A | wc -c`).
+
+**Linux** (GNU base64) :
 
 ```bash
 base64 -w 0 gdp-distribution.p12
@@ -113,7 +124,7 @@ Télécharger le profil, puis :
 # Mac — nom exact du profil
 security cms -D -i MonProfil.mobileprovision 2>/dev/null | plutil -extract Name raw -
 
-base64 -i MonProfil.mobileprovision | pbcopy   # → DEPLOY_PROVISION_PROFILE_BASE64
+openssl base64 -in MonProfil.mobileprovision -A | pbcopy   # → DEPLOY_PROVISION_PROFILE_BASE64 (macOS)
 ```
 
 ### 3. Team ID (`teamID`)
@@ -133,7 +144,7 @@ Même valeur dans `ExportOptions.plist`, secret **`APPSTORE_TEAM_ID`**, et champ
 3. Encoder :
 
 ```bash
-base64 -i ios/ExportOptions.plist | pbcopy   # → IOS_EXPORT_PRODUCTION
+openssl base64 -in ios/ExportOptions.plist -A | pbcopy   # → IOS_EXPORT_PRODUCTION (macOS)
 ```
 
 Seul [`ExportOptions.plist.example`](../ios/ExportOptions.plist.example) est versionné.
@@ -217,3 +228,4 @@ Profil **Development** + certificat **Development** sur le portail si besoin de 
 | Pas de clé à côté du certificat Distribution | `.cer` installé sans CSR du même Mac → refaire certificat + export `.p12` sur ce Mac |
 | Pas de menu Utilisateurs et accès | Mauvais site (utiliser App Store Connect) ou rôle insuffisant |
 | Upload TestFlight OK, pas d’app visible | Traitement Apple (minutes à heures) ; vérifier la fiche app et le bundle ID |
+| `built with the iOS 18.x SDK` / exige **iOS 26 SDK** | Runner trop ancien : le workflow utilise `macos-26` + **Xcode 26** (`setup-xcode`) ; vérifier l’étape *Verify Xcode / iOS SDK* dans les logs |
