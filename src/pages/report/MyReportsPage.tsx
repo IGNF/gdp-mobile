@@ -1,11 +1,11 @@
 import { useMemo, useState, type CSSProperties } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GeodesyPointTitle } from '@ign/gdp-tools/react';
+import { ReportStatus } from '@ign/mobile-core';
 
 import { BottomTabbar } from '@/app/components/BottomTabbar';
 import type { GeodesyPointRef } from '@ign/gdp-tools';
 
-import type { LocalReportDraftStatus } from '@/domain/report/localReportDraft';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { GDP_REPORT_SUBMISSION_THEME } from '@/features/report/constants/reportApi';
 import { useLocalReportDrafts } from '@/features/report/hooks/useLocalReportDrafts';
@@ -14,6 +14,7 @@ import { useUserReportHistory } from '@/features/report/hooks/useUserReportHisto
 import {
   buildReportListItems,
   readGroupReportPointRef,
+  type ReportListItem,
 } from '@/features/report/utils/reportListItems';
 import { formatRelativeDayLabel } from '@/shared/utils/date';
 import { joinCSSClassNames } from '@/shared/utils/join';
@@ -29,17 +30,32 @@ import IconSearch from '@/shared/assets/icons/icon-search.svg?react';
 import layout from '@/shared/styles/tabPage.module.css';
 
 import styles from './MyReportsPage.module.css';
+import { ReportFilterRow } from './ReportFilterRow';
 
-type StatusFilter = 'all' | LocalReportDraftStatus;
 
 /** Signalements envoyés par cette version de l'app (les anciens, thème `Géodésie`, sont dans l'historique). */
 const SENT_REPORT_THEMES = [GDP_REPORT_SUBMISSION_THEME];
 
-const FILTERS: Array<{ value: StatusFilter; label: string }> = [
-  { value: 'all', label: 'Tous' },
-  { value: 'not_sent', label: 'Pas envoyés' },
-  { value: 'sent', label: 'Envoyés' },
-];
+const ACCEPTED_STATUSES: readonly string[] = [ReportStatus.Valid, ReportStatus.Valid_Already_Treated];
+const REJECTED_STATUSES: readonly string[] = [ReportStatus.Reject, ReportStatus.Reject_Irrelevant];
+
+const FILTERS = [
+  { value: 'all', label: 'Tous', matches: () => true },
+  { value: 'not_sent', label: 'Pas envoyés', matches: (item: ReportListItem) => item.filterStatus === 'not_sent' },
+  { value: 'sent', label: 'Envoyés', matches: (item: ReportListItem) => item.filterStatus === 'sent' },
+  {
+    value: 'accepted',
+    label: 'Pris en compte',
+    matches: (item: ReportListItem) => item.serverStatus !== undefined && ACCEPTED_STATUSES.includes(item.serverStatus),
+  },
+  {
+    value: 'rejected',
+    label: 'Rejetés',
+    matches: (item: ReportListItem) => item.serverStatus !== undefined && REJECTED_STATUSES.includes(item.serverStatus),
+  },
+] as const;
+
+type StatusFilter = (typeof FILTERS)[number]['value'];
 
 export function MyReportsPage() {
   const navigate = useNavigate();
@@ -67,8 +83,10 @@ export function MyReportsPage() {
   );
 
   const filteredItems = useMemo(() => {
+    const filter = FILTERS.find(({ value }) => value === statusFilter) ?? FILTERS[0];
+
     return items.filter((item) => {
-      if (statusFilter !== 'all' && item.filterStatus !== statusFilter) {
+      if (!filter.matches(item)) {
         return false;
       }
 
@@ -113,21 +131,22 @@ export function MyReportsPage() {
               />
             </div>
 
-            <div className={styles.filterRow}>
-              {FILTERS.map((filter) => (
-                <button
-                  key={filter.value}
-                  type="button"
-                  className={joinCSSClassNames(
-                    styles.filterChip,
-                    statusFilter === filter.value && styles.filterChipActive,
-                  )}
-                  onClick={() => setStatusFilter(filter.value)}
-                >
-                  {filter.label}
-                </button>
-              ))}
-            </div>
+            <ReportFilterRow>
+              {FILTERS.map((filter) => {
+                const isActive = statusFilter === filter.value;
+                return (
+                  <button
+                    key={filter.value}
+                    type="button"
+                    className={joinCSSClassNames(styles.filterChip, isActive && styles.filterChipActive)}
+                    aria-pressed={isActive}
+                    onClick={() => setStatusFilter(filter.value)}
+                  >
+                    {isActive ? `•  ${filter.label}` : filter.label}
+                  </button>
+                );
+              })}
+            </ReportFilterRow>
 
             {isLoading ? (
               <p className={layout.empty}>Chargement…</p>

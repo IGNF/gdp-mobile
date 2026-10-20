@@ -97,3 +97,7 @@ jobs:
           track: internal
           status: completed
           inAppUpdatePriority: 5
+          # Des modifications en attente dans la Play Console (fiche, contenu de l'appli…) empêchent
+          # l'envoi automatique en examen : la version est publiée dans l'édition, l'envoi en
+          # examen se fait ensuite depuis la Play Console (« Vue d'ensemble de la publication »).
+          changesNotSentForReview: true
