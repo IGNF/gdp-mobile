@@ -79,6 +79,8 @@
 	</array>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Votre position est utilisée pour afficher la carte et vous situer sur le terrain.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Votre position est utilisée pour afficher la carte et vous situer sur le terrain lorsque l’application est ouverte.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>L’appareil photo permet d’ajouter des photos à vos signalements.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
