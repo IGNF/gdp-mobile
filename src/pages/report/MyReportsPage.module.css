@@ -1,6 +1,13 @@
 /* Mise en page (page, en-tête, liste, barre d'onglets, champ de recherche, carte) :
    `@/shared/styles/tabPage.module.css`. Ici, uniquement ce qui est propre aux signalements. */
 
+/* Rangée de filtres (ReportFilterRow) : la flèche est posée par-dessus, à droite. */
+.filterBar {
+  --filter-slider-width: 1.75rem; /* 28px, largeur de slider.svg */
+  --filter-fade-width: 2.5rem;
+  position: relative;
+}
+
 .filterRow {
   display: flex;
   gap: 0.5rem;
@@ -12,8 +19,66 @@
   display: none;
 }
 
+/* Fondu sous les flèches : les filtres qui passent dessous s'estompent progressivement
+   (transparent sous la flèche, opaque après `--filter-fade-width`). Côté sans flèche : 0. */
+.filterRowFadedLeft {
+  --mask-left: var(--filter-slider-width);
+  --mask-left-fade: var(--filter-fade-width);
+}
+
+.filterRowFadedRight {
+  --mask-right: var(--filter-slider-width);
+  --mask-right-fade: var(--filter-fade-width);
+}
+
+.filterRowFadedLeft,
+.filterRowFadedRight {
+  --filter-mask: linear-gradient(
+    to right,
+    transparent var(--mask-left, 0px),
+    #000 calc(var(--mask-left, 0px) + var(--mask-left-fade, 0px)),
+    #000 calc(100% - var(--mask-right, 0px) - var(--mask-right-fade, 0px)),
+    transparent calc(100% - var(--mask-right, 0px))
+  );
+  /* Préfixe : WebView Android / Safari iOS anciens. */
+  -webkit-mask-image: var(--filter-mask);
+  mask-image: var(--filter-mask);
+}
+
+.filterSlider {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--filter-slider-width);
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.filterSliderRight {
+  right: 0;
+}
+
+/* Même flèche, retournée vers la gauche. */
+.filterSliderLeft {
+  left: 0;
+  transform: scaleX(-1);
+}
+
+.filterSliderIcon {
+  width: var(--filter-slider-width);
+  height: 2rem;
+  flex-shrink: 0;
+}
+
 .filterChip {
   flex-shrink: 0;
+  /* Garde les deux espaces après le « • » du filtre actif. */
+  white-space: pre;
   padding: 0.5rem 0.875rem;
   border: 1px solid var(--color-border);
   border-radius: 999px;
@@ -22,7 +87,6 @@
   font-weight: 600;
   color: var(--color-text-secondary);
   cursor: pointer;
-  white-space: nowrap;
 }
 
 .filterChipActive {

@@ -15,9 +15,32 @@
   justify-content: flex-start;
   gap: 19px;
   box-sizing: border-box;
-  height: 103px;
-  padding: 0 1.5rem;
+  /* Maquette : 103px ; réduit pour laisser plus de place au contenu de la fiche. 12px fixes
+     au-dessus et en dessous du bouton retour (48px) : jamais collé au haut de l'écran, la zone
+     de la barre d'état étant déjà réservée par `#root` (`padding-top: var(--safe-top)`). */
+  min-height: 72px;
+  padding: 0.75rem 1.5rem;
   background-color: var(--color-bg-page-header);
+}
+
+/* Titre sur une seule ligne ; « … » en dernier recours sur un écran très étroit. */
+.page .pageHeader > div:nth-child(2) {
+  min-width: 0;
+}
+
+.page .pageHeader h1 {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Écrans étroits (< 380px) : marges réduites pour que « Détail du signalement » tienne en entier. */
+@media (max-width: 379px) {
+  .page .pageHeader {
+    gap: 0.75rem;
+    padding-right: 1rem;
+    padding-left: 1rem;
+  }
 }
 
 .page .pageHeader > button:first-child {
@@ -79,12 +102,25 @@
   z-index: 1;
 }
 
-/* Carte : en bas à gauche (plein écran en haut à droite, « Voir sur la carte » en bas à droite). */
+/* Carte : en bas à gauche (plein écran en haut à droite, « Voir sur la carte » en bas à droite).
+   Même bouton que plein écran / couches (ReportPositionMap.module.css), crayon vert. */
 .editButtonMap {
   top: auto;
   right: auto;
   bottom: 0.5rem;
   left: 0.5rem;
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
+  border: 1px solid var(--color-bg-disabled);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
+
+.editButtonMap .editIcon {
+  width: 1.125rem;
+  height: 1.125rem;
 }
 
 .photoInput {
@@ -191,7 +227,9 @@
 
 .photoCard {
   position: relative;
-  height: 11rem;
+  /* Ne rétrécit pas quand la page déborde (`.main` en colonne flex) : 20:9 de la largeur. */
+  flex-shrink: 0;
+  aspect-ratio: 20 / 9;
   border-radius: 0.75rem;
   overflow: hidden;
   background: linear-gradient(135deg, var(--color-bg-primary) 0%, var(--color-bg-primary-hover) 100%);
@@ -264,6 +302,20 @@
   padding-right: 3.5rem;
 }
 
+/* Encart étroit (État signalé) : seule la ligne du titre laisse la place au crayon ; la valeur,
+   plus bas, passe sous sa marge transparente et garde toute la largeur. */
+.cardWithEditButtonOnLabel > .cardLabel {
+  padding-right: 2.5rem;
+}
+
+/* Valeur sur une seule ligne, « … » en dernier recours. */
+.cardValueText {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 /* Encart en cours de modification : pleine largeur, hauteur libre. */
 .cardEditing {
   flex: 1 0 100%;
@@ -296,32 +348,15 @@
   color: #091625;
 }
 
-.cardValueIcon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
 
-.cardValueIconConform {
-  color: var(--color-text-primary);
-}
 
-.cardValueIconNonConform {
-  color: var(--color-danger);
-}
 
-.cardValueIconSvg {
-  width: 0.875rem;
-  height: 0.875rem;
-}
 
-.cardValueIconSvg path {
-  fill: currentColor;
-}
 
 .mapPreview {
   position: relative;
+  /* Ne rétrécit pas quand la page déborde ; hauteur en 2:1 (`aspectRatio`, ReportDetailContent). */
+  flex-shrink: 0;
   border-radius: 0.75rem;
   overflow: hidden;
 }
@@ -356,6 +391,27 @@
   line-height: normal;
   color: #091625;
   white-space: pre-line;
+}
+
+/* Replié : deux lignes, « … » à la fin. */
+.commentBodyClamped {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+}
+
+.commentToggle {
+  align-self: flex-start;
+  padding: 0;
+  border: none;
+  background: none;
+  font-family: var(--font-family-base);
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--figma-green-4);
+  cursor: pointer;
 }
 
 /* « Voir sur la carte », en bas à droite de la carte. */

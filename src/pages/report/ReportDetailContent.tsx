@@ -1,4 +1,4 @@
-import { useState, type ChangeEvent } from 'react';
+import { useEffect, useRef, useState, type ChangeEvent } from 'react';
 import { isGeodesyPointReportPositionEditable } from '@ign/gdp-tools';
 import { GeodesyPointTitle } from '@ign/gdp-tools/react';
 import { RiMap2Line } from 'react-icons/ri';
@@ -28,12 +28,13 @@ import { Loading } from '@/shared/ui/Loading';
 import { formatDate } from '@/shared/utils/date';
 import { joinCSSClassNames } from '@/shared/utils/join';
 import IconCamera from '@/shared/assets/icons/icon-camera.svg?react';
-import IconCheck from '@/shared/assets/icons/icon-check.svg?react';
-import IconClose from '@/shared/assets/icons/icon-close.svg?react';
 import IconPencil from '@/shared/assets/icons/icon-pencil.svg?react';
 
 import styles from './ReportDetailPage.module.css';
 import type { ReportDetailView } from './reportDetailView';
+
+/** Carte de la fiche : 2:1 (la photo est en 20:9, cf. `.photoCard`). */
+const MAP_ASPECT_RATIO = '2 / 1';
 
 type EditableField = 'conformity' | 'photo' | 'position' | 'comment';
 
@@ -81,6 +82,48 @@ function EditActions({ canSave = true, isSaving, onCancel, onSave }: EditActions
         Enregistrer
       </Button>
     </div>
+  );
+}
+
+/** Commentaire limité à deux lignes, avec « Voir plus » / « Voir moins » s'il est plus long. */
+function CollapsibleComment({ text }: { text: string }) {
+  const bodyRef = useRef<HTMLParagraphElement>(null);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [isClamped, setIsClamped] = useState(false);
+
+  useEffect(() => {
+    const element = bodyRef.current;
+    if (!element || isExpanded) {
+      return;
+    }
+
+    // Texte coupé : plus haut que les deux lignes affichées (mesuré aussi au redimensionnement).
+    const measure = () => setIsClamped(element.scrollHeight > element.clientHeight + 1);
+    measure();
+    const resizeObserver = new ResizeObserver(measure);
+    resizeObserver.observe(element);
+    return () => resizeObserver.disconnect();
+  }, [isExpanded, text]);
+
+  return (
+    <>
+      <p
+        ref={bodyRef}
+        className={joinCSSClassNames(styles.commentBody, !isExpanded && styles.commentBodyClamped)}
+      >
+        {text}
+      </p>
+      {isClamped || isExpanded ? (
+        <button
+          type="button"
+          className={styles.commentToggle}
+          onClick={() => setIsExpanded((current) => !current)}
+          aria-expanded={isExpanded}
+        >
+          {isExpanded ? 'Voir moins' : 'Voir plus'}
+        </button>
+      ) : null}
+    </>
   );
 }
 
@@ -159,7 +202,10 @@ export function ReportDetailContent({
   };
 
   const originalPosition = editableDraft ? getDraftOriginalPosition(editableDraft) : null;
-  const showEditButton = (field: EditableField) => canEdit && editingField === null && (field !== 'position' || canEditPosition);
+  // Position modifiable seulement pour un signalement non conforme (repère déplaçable).
+  const canEditDraftPosition = canEditPosition && editableDraft?.isConform === false;
+  const showEditButton = (field: EditableField) =>
+    canEdit && editingField === null && (field !== 'position' || canEditDraftPosition);
 
   return (
     <>
@@ -216,24 +262,12 @@ export function ReportDetailContent({
               className={joinCSSClassNames(
                 styles.card,
                 styles.cardTop,
-                showEditButton('conformity') && styles.cardWithEditButton,
+                showEditButton('conformity') && styles.cardWithEditButtonOnLabel,
               )}
             >
               <p className={styles.cardLabel}>État signalé</p>
               <p className={styles.cardValue}>
-                <span
-                  className={joinCSSClassNames(
-                    styles.cardValueIcon,
-                    report.isConform ? styles.cardValueIconConform : styles.cardValueIconNonConform,
-                  )}
-                >
-                  {report.isConform ? (
-                    <IconCheck className={styles.cardValueIconSvg} aria-hidden />
-                  ) : (
-                    <IconClose className={styles.cardValueIconSvg} aria-hidden />
-                  )}
-                </span>
-                {report.isConform ? 'Conforme' : 'Non conforme'}
+                <span className={styles.cardValueText}>{report.isConform ? 'Conforme' : 'Non conforme'}</span>
               </p>
               {showEditButton('conformity') ? (
                 <EditButton
@@ -278,6 +312,7 @@ export function ReportDetailContent({
               }}
               showLayerSwitcher
               showFullscreenButton
+              aspectRatio={MAP_ASPECT_RATIO}
             />
           </div>
           <EditActions
@@ -295,6 +330,7 @@ export function ReportDetailContent({
             readOnly
             showLayerSwitcher
             showFullscreenButton
+            aspectRatio={MAP_ASPECT_RATIO}
           />
           {showEditButton('position') ? (
             // En bas à gauche : le coin haut droit porte le bouton plein écran, le bas droit « Voir sur la carte ».
@@ -342,9 +378,9 @@ export function ReportDetailContent({
             />
           </>
         ) : (
-          <p className={styles.commentBody}>
-            {report.comment.trim() ? report.comment : 'Aucun commentaire ajouté.'}
-          </p>
+          <CollapsibleComment
+            text={report.comment.trim() ? report.comment : 'Aucun commentaire ajouté.'}
+          />
         )}
       </div>
     </>
