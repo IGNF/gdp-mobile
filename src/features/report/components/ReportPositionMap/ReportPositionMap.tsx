@@ -81,6 +81,8 @@ export interface ReportPositionMapProps {
   initialGeodesyVisible?: boolean;
   /** Usage interne (vue plein écran) : la carte occupe toute la hauteur de son conteneur. */
   fillContainer?: boolean;
+  /** Rapport largeur / hauteur de la mini-carte (ex. `'18 / 9'`) au lieu des 220px de haut. */
+  aspectRatio?: string;
 }
 
 function createReportMarkerIconSrc(color: string): string {
@@ -120,6 +122,7 @@ export function ReportPositionMap({
   initialBasemap,
   initialGeodesyVisible = false,
   fillContainer = false,
+  aspectRatio,
 }: ReportPositionMapProps) {
   const mapElementRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<Map | null>(null);
@@ -391,6 +394,7 @@ export function ReportPositionMap({
           <div
             ref={mapElementRef}
             className={joinCSSClassNames(styles.mapTarget, fillContainer && styles.mapTargetFill)}
+            style={aspectRatio && !fillContainer ? { height: 'auto', aspectRatio } : undefined}
             aria-label="Carte de position du signalement"
           />
 

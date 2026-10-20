@@ -36,6 +36,8 @@ export interface ReportListItem {
   titlePicto?: GeodesyPointTitlePicto;
   /** Identifiant EspaceCo, une fois le signalement envoyé. */
   serverId?: number;
+  /** Statut EspaceCo (`ReportStatus`), connu une fois le signalement retrouvé côté serveur. */
+  serverStatus?: string;
   /**
    * Texte de la recherche (normalisé, cf. `normalizeSearchText`) : nom et identifiant du repère,
    * id du signalement (« #1234 »), commune et voie suivie.
@@ -91,6 +93,7 @@ function buildLocalDraftItem(draft: LocalReportDraft, serverReport?: GroupReport
   return serverReport
     ? {
         ...base,
+        serverStatus: serverReport.status,
         statusLabel: getStatusLabel(serverReport.status),
         statusColors: getStatusColors(serverReport.status),
       }
@@ -117,6 +120,7 @@ function buildServerReportItem(
     title,
     titlePicto: titleDisplay?.titlePicto,
     serverId: report.id,
+    serverStatus: report.status,
     searchLabel: buildSearchLabel([title, pointRef?.id, `#${report.id}`, commune, voieSuivie]),
     // Attribut `move` du thème `gdp-tools` (cf. `buildGdpWizardThemeFormAttributes`).
     positionModified: report.themeAttributes.move?.trim().toLowerCase() === 'true',

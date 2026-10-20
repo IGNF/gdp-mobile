@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import styles from './PageHeader.module.css';
 
-import IconArrowLeft from '@/shared/assets/icons/icon-arrow-left.svg?react';
+import IconBack from '@/shared/assets/icons/back.svg?react';
 import IconBurger from '@/shared/assets/icons/icon-burger.svg?react';
 import IconClose from '@/shared/assets/icons/icon-close.svg?react';
 import { joinCSSClassNames } from '@/shared/utils/join';
@@ -57,7 +57,7 @@ export function PageHeader({
 					onClick={handleBack}
 					aria-label="Back"
 				>
-					<IconArrowLeft className={styles.headerIcon} />
+					<IconBack className={styles.headerIcon} />
 				</button>
 			) : showMenuButton ? (
 				<button
