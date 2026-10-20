@@ -72,12 +72,13 @@ jobs:
           DISTRIBUTION_CERTIFICATE_P12: ${{ secrets.DISTRIBUTION_CERTIFICATE_P12 }}
           P12_PASSWORD_DISTR: ${{ secrets.P12_PASSWORD_DISTR }}
           DEPLOY_PROVISION_PROFILE_BASE64: ${{ secrets.DEPLOY_PROVISION_PROFILE_BASE64 }}
-          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
         run: |
           set -euo pipefail
           CERT_P12=$RUNNER_TEMP/dist.p12
           PROFILE=$RUNNER_TEMP/appstore.mobileprovision
           KEYCHAIN=$RUNNER_TEMP/app-signing.keychain-db
+          # Trousseau éphémère du runner : mot de passe généré ici (pas un secret GitHub).
+          KEYCHAIN_PASSWORD=$(openssl rand -hex 16)
 
           echo -n "$DISTRIBUTION_CERTIFICATE_P12" | base64 --decode > "$CERT_P12"
           echo -n "$DEPLOY_PROVISION_PROFILE_BASE64" | base64 --decode > "$PROFILE"
