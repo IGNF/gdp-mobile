@@ -74,10 +74,11 @@ function applyIosVersions(version) {
     throw new Error('iOS : CURRENT_PROJECT_VERSION ou MARKETING_VERSION introuvable dans project.pbxproj');
   }
 
-  txt = txt.replace(/CURRENT_PROJECT_VERSION = [^;]+;/g, `CURRENT_PROJECT_VERSION = ${version};`);
+  const buildNumber = versionToCode(version);
+  txt = txt.replace(/CURRENT_PROJECT_VERSION = [^;]+;/g, `CURRENT_PROJECT_VERSION = ${buildNumber};`);
   txt = txt.replace(/MARKETING_VERSION = [^;]+;/g, `MARKETING_VERSION = ${version};`);
   fs.writeFileSync(IOS_PBXPROJ, txt, 'utf8');
-  return version;
+  return { marketingVersion: version, buildNumber };
 }
 
 function runGit(gitRoot, args) {
@@ -119,8 +120,11 @@ try {
     console.warn('Android : projet natif absent, version non écrite dans build.gradle');
   }
 
-  if (applyIosVersions(version)) {
-    console.log(`iOS : MARKETING_VERSION=${version} CURRENT_PROJECT_VERSION=${version}`);
+  const ios = applyIosVersions(version);
+  if (ios) {
+    console.log(
+      `iOS : MARKETING_VERSION=${ios.marketingVersion} CURRENT_PROJECT_VERSION=${ios.buildNumber}`,
+    );
   }
 
   const prodDependencies = writeProdDependencies();
