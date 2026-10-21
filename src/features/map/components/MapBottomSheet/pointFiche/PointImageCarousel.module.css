@@ -1,7 +1,5 @@
 .carousel {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+  position: relative;
 }
 
 .track {
@@ -73,10 +71,19 @@
   text-align: center;
 } */
 
+/* Superposés à la photo, centrés à 4px de son bord inférieur. */
 .dots {
+  position: absolute;
+  bottom: 0.25rem;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
   justify-content: center;
   gap: 0.375rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--radius-pill);
+  background: var(--color-bg-disabled);
+  pointer-events: none;
 }
 
 .dot,
@@ -84,7 +91,8 @@
   width: 0.375rem;
   height: 0.375rem;
   border-radius: 999px;
-  background: var(--color-bg-disabled);
+  /* Plus foncé que le fond de la pastille (#EBEAE9), sinon les points inactifs s'y fondent. */
+  background: var(--figma-gray-6);
 }
 
 .dotActive {
