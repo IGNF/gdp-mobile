@@ -69,6 +69,11 @@
   cursor: pointer;
 }
 
+.legalRowLink {
+  box-sizing: border-box;
+  text-decoration: none;
+}
+
 .legalLabel {
   flex: 1;
   margin: 0;
@@ -78,13 +83,23 @@
 }
 
 .legalPlus,
-.legalClose {
+.legalClose,
+.legalExternalLink {
   display: inline-flex;
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
   width: 28px;
   height: 28px;
+}
+
+.legalExternalLinkIcon {
+  width: var(--icon-lg);
+  height: var(--icon-lg);
+}
+
+.legalExternalLinkIcon path {
+  fill: var(--color-text-gray-10);
 }
 
 .legalPlus {
