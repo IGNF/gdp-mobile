@@ -6,6 +6,7 @@ import { SlideUpPage } from '@/shared/ui/SlideUpPage';
 import { TrackedExternalLink } from '@/infra/analytics/TrackedExternalLink';
 import { EXTERNAL_LINKS } from '@/shared/constants/externalLinks';
 import IconClose from '@/shared/assets/icons/icon-close.svg?react';
+import IconExternalLink from '@/shared/assets/icons/icon-external-link.svg?react';
 
 import screen from '@/shared/styles/screen.module.css';
 import styles from './AboutPage.module.css';
@@ -38,8 +39,8 @@ export function AboutPage({ isOpen, onClose }: AboutPageProps) {
         <section className={styles.section}>
             <div className={styles.sectionTitle}>Notre mission</div>
             <div>
-            Cette application permet de <b>consulter</b> la cartographie IGN, les repères géodésiques
-            et de <b>signaler</b> leur état sur le terrain.
+            Cette application permet de consulter la cartographie IGN, les repères géodésiques
+            et de signaler leur état sur le terrain.
           </div>
           <div>
             Éditée par l’
@@ -48,39 +49,7 @@ export function AboutPage({ isOpen, onClose }: AboutPageProps) {
             </TrackedExternalLink>
           </div>
         </section>
-
-        <section className={styles.section}>
-          <div className={styles.sectionTitle}>Liens utiles</div>
-          <TrackedExternalLink
-            href={EXTERNAL_LINKS.AIDE_GUIDE_UTILISATEUR}
-            tracking={aboutTracking('Aide / guide utilisateur')}
-          >
-            Aide / guide utilisateur
-          </TrackedExternalLink>
-          <TrackedExternalLink href={EXTERNAL_LINKS.FAQ_FORUM} tracking={aboutTracking('FAQ / Forum')}>
-            FAQ / Forum
-          </TrackedExternalLink>
-          <TrackedExternalLink
-            href={EXTERNAL_LINKS.DONNEES_PERSONNELLES}
-            tracking={aboutTracking('Données personnelles')}
-          >
-            Données à caractère personnel
-          </TrackedExternalLink>
-          <TrackedExternalLink href={EXTERNAL_LINKS.ACCESSIBILITE} tracking={aboutTracking('Accessibilité')}>
-            Accessibilité
-          </TrackedExternalLink>
-          <TrackedExternalLink href={EXTERNAL_LINKS.CODE_SOURCE} tracking={aboutTracking('Code source')}>
-            Code source de l'application
-          </TrackedExternalLink>
-          <TrackedExternalLink
-            href={EXTERNAL_LINKS.LICENCES_OPENSOURCE}
-            tracking={aboutTracking('Licences open source')}
-          >
-            Licences OpenSource
-          </TrackedExternalLink>
-        </section>
-
-
+        <div className={styles.sectionTitle}>Liens utiles</div>
         <section className={styles.section}>
           <article className={styles.legal}>
             <button
@@ -167,6 +136,66 @@ export function AboutPage({ isOpen, onClose }: AboutPageProps) {
               </div>
             ) : null}
           </article>
+
+
+          <article className={styles.legal}>
+            <TrackedExternalLink
+              href={EXTERNAL_LINKS.DONNEES_PERSONNELLES}
+              tracking={aboutTracking('Données personnelles')}
+              className={`${styles.legalTrigger} ${styles.legalRowLink}`}
+              showIcon={false}
+            >
+              <span className={styles.legalLabel}>Données à caractère personnel</span>
+              <span className={styles.legalExternalLink} aria-hidden>
+                <IconExternalLink className={styles.legalExternalLinkIcon} />
+              </span>
+            </TrackedExternalLink>
+          </article>
+
+
+          <article className={styles.legal}>
+            <TrackedExternalLink
+              href={EXTERNAL_LINKS.ACCESSIBILITE}
+              tracking={aboutTracking('Accessibilité')}
+              className={`${styles.legalTrigger} ${styles.legalRowLink}`}
+              showIcon={false}
+            >
+              <span className={styles.legalLabel}>Déclaration d'accessibilité</span>
+              <span className={styles.legalExternalLink} aria-hidden>
+                <IconExternalLink className={styles.legalExternalLinkIcon} />
+              </span>
+            </TrackedExternalLink>
+          </article>
+
+
+          <article className={styles.legal}>
+            <TrackedExternalLink
+              href={EXTERNAL_LINKS.CODE_SOURCE}
+              tracking={aboutTracking('Code source')}
+              className={`${styles.legalTrigger} ${styles.legalRowLink}`}
+              showIcon={false}
+            >
+              <span className={styles.legalLabel}>Code source</span>
+              <span className={styles.legalExternalLink} aria-hidden>
+                <IconExternalLink className={styles.legalExternalLinkIcon} />
+              </span>
+            </TrackedExternalLink>
+          </article>
+
+          <article className={styles.legal}>
+            <TrackedExternalLink
+              href={EXTERNAL_LINKS.LICENCES_OPENSOURCE}
+              tracking={aboutTracking('Licences OpenSource')}
+              className={`${styles.legalTrigger} ${styles.legalRowLink}`}
+              showIcon={false}
+            >
+              <span className={styles.legalLabel}>Licences open source</span>
+              <span className={styles.legalExternalLink} aria-hidden>
+                <IconExternalLink className={styles.legalExternalLinkIcon} />
+              </span>
+            </TrackedExternalLink>
+          </article>
+
         </section>
       </main>
     </SlideUpPage>
