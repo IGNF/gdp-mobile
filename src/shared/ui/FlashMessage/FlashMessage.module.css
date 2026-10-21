@@ -28,8 +28,8 @@
 	line-height: var(--line-height-tight);
 	cursor: pointer;
 	pointer-events: auto;
-	/* Le glissement horizontal est géré en JS ; le défilement vertical reste natif. */
-	touch-action: pan-y;
+	/* Glissements horizontal et vers le haut gérés en JS. */
+	touch-action: none;
 	user-select: none;
 	opacity: 0;
 	transform: translateY(calc(-100% - var(--spacing-sm) - var(--safe-top)));
