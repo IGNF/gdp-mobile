@@ -14,6 +14,7 @@ import IconTeam from '@/shared/assets/icons/icon-team.svg?react';
 import IconDisconnect from '@/shared/assets/icons/icon-deconnect.svg?react';
 import IconSend from '@/shared/assets/icons/icon-send.svg?react';
 import IconExternalLink from '@/shared/assets/icons/icon-external-link.svg?react';
+import IconBug from '@/shared/assets/icons/bug-line.svg?react';
 
 import screen from '@/shared/styles/screen.module.css';
 
@@ -38,7 +39,8 @@ type MenuGroupId =
   | 'communaute'
   | 'aide'
   | 'aPropos'
-  | 'jeDonneMonAvis';
+  | 'jeDonneMonAvis'
+  | 'questionnaireBug';
 
 interface MenuItem {
   id: string;
@@ -110,6 +112,16 @@ const menuGroups: MenuGroup[] = [
         href: EXTERNAL_LINKS.JE_DONNE_MON_AVIS,
       },
     ],
+  },
+  {
+    id: 'questionnaireBug',
+    title: 'Signaler un bug',
+    icon: IconBug,
+    items: [
+      { id: 'questionnaireBug', 
+        label: 'Signaler un bug', 
+        href: EXTERNAL_LINKS.QUESTIONNAIRE_BUG,
+      }],
   },
 ];
 
