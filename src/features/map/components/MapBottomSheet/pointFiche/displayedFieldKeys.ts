@@ -40,6 +40,9 @@ export const GEODESY_FICHE_SNAP2_FIELD_KEYS = [
   'cp1_prec',
   'cp1_srv',
   'cp1_precv',
+  'g',
+  'gravi_abs_date',
+  'gravi_rel_date',
 ] as const;
 
 export const NIVELLEMENT_FICHE_SNAP1_FIELD_KEYS = [
@@ -89,4 +92,7 @@ export const NIVELLEMENT_FICHE_SNAP2_FIELD_KEYS = [
   'proprio',
   'proprio_logo',
   'proprio_id',
+  'g',
+  'gravi_abs_date',
+  'gravi_rel_date',
 ] as const;

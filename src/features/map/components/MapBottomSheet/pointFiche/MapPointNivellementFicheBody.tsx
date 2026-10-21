@@ -12,6 +12,7 @@ import {
 } from './pointFicheUtils';
 import { MapPointPdfSection } from './MapPointPdfSection';
 import { PointCoordinatesSection } from './PointCoordinatesSection';
+import { PointGravimetrySection } from './PointGravimetrySection';
 import { PointImageCarousel } from './PointImageCarousel';
 import { PartenaireSection } from './PartenaireSection';
 import { useMeasuredHeight } from './useMeasuredHeight';
@@ -127,6 +128,8 @@ export function MapPointNivellementFicheBody({
           ) : null}
 
           <PointCoordinatesSection action={action} />
+
+          <PointGravimetrySection action={action} />
 
           {remark ? (
             <section>

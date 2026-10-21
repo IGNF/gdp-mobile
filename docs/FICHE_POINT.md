@@ -123,7 +123,7 @@ Toujours monté, dans une zone scrollable. Variante résolue par `resolvePointFi
 - **Description** : badge exploitabilité GPS (`expl_gps` / `expl_gpscode`, voir `gpsExploitabilityBadge.ts`), localisation, type
 - **Détails** : département (`entite_no` ou déduit du n° Insee), n° Insee, commune, type du site, localisation
 
-**Géodésie — niveau 2** : coordonnées, remarques, partenaire.
+**Géodésie — niveau 2** : partenaire, coordonnées, gravimétrie, remarques.
 
 **Nivellement — niveau 1** :
 
@@ -131,11 +131,12 @@ Toujours monté, dans une zone scrollable. Variante résolue par `resolvePointFi
 - **Repère de nivellement** : système d'altitude, altitude (libellé issu de `cp1_altitude_type`), complément, type
 - **Détails** : voie suivie, distance au repère voisin, côté, support, localisation, partie support, repèrements
 
-**Nivellement — niveau 2** : coordonnées, partenaire, puis remarques.
+**Nivellement — niveau 2** : partenaire, coordonnées, gravimétrie, puis remarques.
 
 **Commun aux deux variantes** :
 
 - **Coordonnées** (`PointCoordinatesSection`, données `pointFicheCoordinates.ts`) : onglets **Géographique** (champs `cg1_*`) et **Projection** (champs `cp1_*`) ; onglet désactivé s'il est vide.
+- **Gravimétrie** (`PointGravimetrySection`) : valeur `g` en mGal et année de mesure (`gravi_abs_date`, sinon `gravi_rel_date`) ; section masquée si `g` est vide.
 - **Partenaire** (`PartenaireSection`) : nom (`proprio`) et logo chargé via `usePartnerLogo(proprio_id)`.
 - **Fiche PDF** (`MapPointPdfSection`) : lien « Télécharger la fiche PDF » (`url_pdf`), affiché à tous les niveaux en bas du corps.
 
@@ -215,6 +216,7 @@ features/map/components/MapBottomSheet/
     ├── MapPointGeodesyFicheBody.tsx
     ├── MapPointNivellementFicheBody.tsx
     ├── PointCoordinatesSection.tsx
+    ├── PointGravimetrySection.tsx
     ├── pointFicheCoordinates.ts
     ├── PartenaireSection.tsx
     ├── MapPointPdfSection.tsx
