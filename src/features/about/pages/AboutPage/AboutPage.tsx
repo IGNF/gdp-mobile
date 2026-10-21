@@ -125,14 +125,6 @@ export function AboutPage({ isOpen, onClose }: AboutPageProps) {
                     tracking={aboutTracking('Espace collaboratif')}
                   >Espace collaboratif IGN</TrackedExternalLink>.
                 </p>
-                <p>
-                  <TrackedExternalLink
-                    href={EXTERNAL_LINKS.ESPACE_COLLABORATIF}
-                    tracking={aboutTracking('Espace collaboratif')}
-                  >
-                    l’Espace collaboratif IGN
-                  </TrackedExternalLink>
-                </p>
               </div>
             ) : null}
           </article>
