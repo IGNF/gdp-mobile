@@ -48,39 +48,7 @@ export function AboutPage({ isOpen, onClose }: AboutPageProps) {
             </TrackedExternalLink>
           </div>
         </section>
-
-        <section className={styles.section}>
-          <div className={styles.sectionTitle}>Liens utiles</div>
-          <TrackedExternalLink
-            href={EXTERNAL_LINKS.AIDE_GUIDE_UTILISATEUR}
-            tracking={aboutTracking('Aide / guide utilisateur')}
-          >
-            Aide / guide utilisateur
-          </TrackedExternalLink>
-          <TrackedExternalLink href={EXTERNAL_LINKS.FAQ_FORUM} tracking={aboutTracking('FAQ / Forum')}>
-            FAQ / Forum
-          </TrackedExternalLink>
-          <TrackedExternalLink
-            href={EXTERNAL_LINKS.DONNEES_PERSONNELLES}
-            tracking={aboutTracking('Données personnelles')}
-          >
-            Données à caractère personnel
-          </TrackedExternalLink>
-          <TrackedExternalLink href={EXTERNAL_LINKS.ACCESSIBILITE} tracking={aboutTracking('Accessibilité')}>
-            Accessibilité
-          </TrackedExternalLink>
-          <TrackedExternalLink href={EXTERNAL_LINKS.CODE_SOURCE} tracking={aboutTracking('Code source')}>
-            Code source de l'application
-          </TrackedExternalLink>
-          <TrackedExternalLink
-            href={EXTERNAL_LINKS.LICENCES_OPENSOURCE}
-            tracking={aboutTracking('Licences open source')}
-          >
-            Licences OpenSource
-          </TrackedExternalLink>
-        </section>
-
-
+        <div className={styles.sectionTitle}>Liens utiles</div>
         <section className={styles.section}>
           <article className={styles.legal}>
             <button
@@ -168,6 +136,41 @@ export function AboutPage({ isOpen, onClose }: AboutPageProps) {
             ) : null}
           </article>
         </section>
+
+        <section className={styles.section}>
+         
+          <TrackedExternalLink
+            href={EXTERNAL_LINKS.AIDE_GUIDE_UTILISATEUR}
+            tracking={aboutTracking('Aide / guide utilisateur')}
+          >
+            Aide / guide utilisateur
+          </TrackedExternalLink>
+          
+          <TrackedExternalLink href={EXTERNAL_LINKS.FAQ_FORUM} tracking={aboutTracking('FAQ / Forum')}>
+            FAQ / Forum
+          </TrackedExternalLink>
+          <TrackedExternalLink
+            href={EXTERNAL_LINKS.DONNEES_PERSONNELLES}
+            tracking={aboutTracking('Données personnelles')}
+          >
+            Données à caractère personnel
+          </TrackedExternalLink>
+          <TrackedExternalLink href={EXTERNAL_LINKS.ACCESSIBILITE} tracking={aboutTracking('Accessibilité')}>
+            Accessibilité
+          </TrackedExternalLink>
+          <TrackedExternalLink href={EXTERNAL_LINKS.CODE_SOURCE} tracking={aboutTracking('Code source')}>
+            Code source de l'application
+          </TrackedExternalLink>
+          <TrackedExternalLink
+            href={EXTERNAL_LINKS.LICENCES_OPENSOURCE}
+            tracking={aboutTracking('Licences open source')}
+          >
+            Licences OpenSource
+          </TrackedExternalLink>
+        </section>
+
+
+
       </main>
     </SlideUpPage>
   );
