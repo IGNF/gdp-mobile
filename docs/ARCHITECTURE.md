@@ -156,5 +156,5 @@ La recharge des données RGP se fait depuis la liste des stations (`/map/search/
 
 ## Documentation métier carte
 
-- [Fiche point](./FICHE_POINT.md) — bottom sheet, snaps, variantes géodésie/nivellement, carrousel, mode debug champs
+- [Fiche point](./FICHE_POINT.md) — bottom sheet, snaps, variantes géodésie/nivellement, carrousel
 - [Contrat d’échange des signalements](./CONTRAT_SIGNALEMENTS.md) — payload EspaceCo (appli **4.0.1**)

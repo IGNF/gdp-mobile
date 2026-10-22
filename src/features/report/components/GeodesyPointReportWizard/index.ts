@@ -4,7 +4,6 @@ export { ReportWizardStepConformity } from './ReportWizardStepConformity';
 export type { ReportWizardStepConformityProps } from './ReportWizardStepConformity';
 export { ReportWizardStepNonConformReason } from './ReportWizardStepNonConformReason';
 export type { ReportWizardStepNonConformReasonProps } from './ReportWizardStepNonConformReason';
-export { NON_CONFORM_REASON_LABELS } from './nonConformReasons';
 export type { NonConformReason } from './nonConformReasons';
 export { ReportWizardStepMedia } from './ReportWizardStepMedia';
 export type { ReportWizardStepMediaProps } from './ReportWizardStepMedia';
