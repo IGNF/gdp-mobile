@@ -2,19 +2,6 @@ import type { GeodesyPointPhoto } from '@ign/gdp-tools';
 
 import type { MapGeodesyClickAction } from '@/features/map/hooks/useMapGeodesyClick';
 
-const SKIPPED_PROPERTY_KEYS = new Set([
-  'geometry',
-  'features',
-  'coordinate',
-  'boundedBy',
-]);
-
-export interface PointFieldEntry {
-  id: string;
-  label: string;
-  value: string;
-}
-
 export interface PointCarouselItem {
   id: string;
   label: string;
@@ -131,14 +118,6 @@ export function formatEtatLabel(etatLabel: string): string {
   });
 }
 
-function isScalarPropertyValue(value: unknown): value is string | number | boolean {
-  return (
-    typeof value === 'string' ||
-    typeof value === 'number' ||
-    typeof value === 'boolean'
-  );
-}
-
 function readPropertyValue(
   properties: Record<string, unknown>,
   key: string,
@@ -240,63 +219,4 @@ export function buildPointCarouselItems(action: MapGeodesyClickAction): PointCar
   });
 
   return items;
-}
-
-export function collectAllPointFields(action: MapGeodesyClickAction): PointFieldEntry[] {
-  const byId = new Map<string, PointFieldEntry>();
-
-  for (const [key, value] of Object.entries(action.reportContext.properties)) {
-    if (SKIPPED_PROPERTY_KEYS.has(key) || !isScalarPropertyValue(value)) {
-      continue;
-    }
-
-    const text = String(value).trim();
-    if (!text) {
-      continue;
-    }
-
-    byId.set(key.toLowerCase(), { id: key, label: key, value: text });
-  }
-
-  action.point.attributes.forEach((attribute, index) => {
-    const id = `attribute:${attribute.label}:${index}`;
-    if (!attribute.value?.trim()) {
-      return;
-    }
-
-    byId.set(id, {
-      id,
-      label: attribute.label,
-      value: attribute.value.trim(),
-    });
-  });
-
-  if (action.point.comment.trim()) {
-    byId.set('comment', {
-      id: 'comment',
-      label: 'comment',
-      value: action.point.comment.trim(),
-    });
-  }
-
-  return Array.from(byId.values()).sort((left, right) => left.label.localeCompare(right.label, 'fr'));
-}
-
-export function filterUnmappedPointFields(
-  fields: readonly PointFieldEntry[],
-  displayedIds: ReadonlySet<string>,
-): PointFieldEntry[] {
-  return fields.filter((field) => {
-    const normalizedId = field.id.toLowerCase();
-    return !displayedIds.has(field.id) && !displayedIds.has(normalizedId);
-  });
-}
-
-export function mergeDisplayedFieldIds(...groups: readonly string[][]): Set<string> {
-  const ids = new Set<string>();
-  groups.flat().forEach((id) => {
-    ids.add(id);
-    ids.add(id.toLowerCase());
-  });
-  return ids;
 }

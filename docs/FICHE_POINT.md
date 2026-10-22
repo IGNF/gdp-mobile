@@ -152,21 +152,6 @@ Toujours monté, dans une zone scrollable. Variante résolue par `resolvePointFi
 
 Les onglets de contenu (coordonnées) se changent par **clic**, pas par swipe. Seules les images utilisent le swipe horizontal.
 
-## Mode debug — champs non affichés
-
-Section `UnmappedFieldsDebug` en bas du corps, repliée par défaut (chevron pour la déplier).
-
-Objectif : lister les propriétés WFS / attributs pas encore mappés dans la fiche, pour ne rien oublier lors de l'implémentation Figma.
-
-| Fichier | Rôle |
-|---------|------|
-| `collectAllPointFields` | Agrège propriétés scalaires + attributs + commentaire |
-| `displayedFieldKeys.ts` | Clés considérées comme « affichées » par zone (en-tête, niveau 1, niveau 2) |
-| `getDisplayedFieldIds` | Union des clés selon variante + niveau |
-| `filterUnmappedPointFields` | Différence = liste debug |
-
-**Pour marquer un champ comme couvert** : ajouter sa clé dans `displayedFieldKeys.ts` (et l'afficher dans le corps correspondant).
-
 ## Interaction avec le chrome carte (`MapPage`)
 
 Quand une fiche repère est ouverte (`selectedPoint !== null`) :
@@ -196,8 +181,8 @@ Type principal : `MapGeodesyClickAction` (`useMapGeodesyClick`) — contient `po
 
 ## Extension — checklist
 
-1. **Nouveau champ affiché** : lire via `readProperty` ou `action.point.attributes`, l'ajouter au JSX du corps, puis sa clé dans `displayedFieldKeys.ts`.
-2. **Nouvelle section** : condition `snapIndex >= 1` (niveau 1) ou `snapIndex >= 2` (niveau 2) dans le corps concerné, clés associées dans `getDisplayedFieldIds`.
+1. **Nouveau champ affiché** : lire via `readProperty` ou `action.point.attributes`, puis l'ajouter au JSX du corps.
+2. **Nouvelle section** : condition `snapIndex >= 1` (niveau 1) ou `snapIndex >= 2` (niveau 2) dans le corps concerné.
 3. **Nouvelle variante** : étendre `PointFicheVariant`, `resolvePointFicheVariant`, créer un `MapPoint…FicheBody`.
 4. **Section influant sur le seuil d'ouverture** : seul le bloc carrousel est mesuré (`onPhotoBlockHeightChange`) ; ne pas y inclure de contenu secondaire.
 
@@ -225,10 +210,7 @@ features/map/components/MapBottomSheet/
     ├── useLightboxImageZoom.ts
     ├── useMeasuredHeight.ts
     ├── gpsExploitabilityBadge.ts
-    ├── UnmappedFieldsDebug.tsx
     ├── resolvePointFicheVariant.ts
-    ├── displayedFieldKeys.ts
-    ├── getDisplayedFieldIds.ts
     └── pointFicheUtils.ts
 ```
 
