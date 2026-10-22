@@ -15,6 +15,7 @@ export const EXTERNAL_LINKS = {
   ACCESSIBILITE: 'https://www.ign.fr/declaration-daccessibilite-rgaa',
   CODE_SOURCE: 'https://github.com/IGNF/gdp-mobile',
   LICENCES_OPENSOURCE: 'https://github.com/IGNF/gdp-mobile/blob/main/prod-dependencies.md',
+  QUESTIONNAIRE_BUG: 'https://tally.so/r/LD1EKO'
 } as const;
 
 

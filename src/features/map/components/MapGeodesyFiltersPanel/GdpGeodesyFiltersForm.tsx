@@ -56,9 +56,15 @@ function MultiChoiceRow({
   value: boolean | string | null | undefined;
   onChange: (value: boolean | string | null) => void;
 }) {
+  const isAllNetworks = value === null || value === undefined;
   const selected = getGeodesyWfsMultiChoiceSelectedValues(definition, value);
 
   const handleToggle = (optionValue: string) => {
+    if (isAllNetworks) {
+      onChange(optionValue);
+      return;
+    }
+
     const next = new Set(selected);
 
     if (next.has(optionValue)) {
@@ -82,16 +88,12 @@ function MultiChoiceRow({
 
   return (
     <div className={styles.segmentRow} role="group" aria-label={definition.title}>
-      <SegmentButton
-        label="Tous"
-        active={value === null || value === undefined}
-        onClick={() => onChange(null)}
-      />
+      <SegmentButton label="Tous" active={isAllNetworks} onClick={() => onChange(null)} />
       {definition.options.map((option) => (
         <SegmentButton
           key={option.value}
           label={option.label}
-          active={selected.has(option.value)}
+          active={!isAllNetworks && selected.has(option.value)}
           onClick={() => handleToggle(option.value)}
         />
       ))}

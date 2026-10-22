@@ -25,7 +25,7 @@ export function SearchPage() {
     map,
     addressContainer: searchContainer,
     isOpen: isMapReady,
-    placeholder: 'Rechercher un point, une adresse…',
+    placeholder: 'Rechercher une adresse',
     onSelect: onSelectSearchResult,
   });
 
