@@ -12,6 +12,7 @@ import { resolveGpsExploitabilityVariant } from './gpsExploitabilityBadge';
 import { MapPointPdfSection } from './MapPointPdfSection';
 import { PartenaireSection } from './PartenaireSection';
 import { PointCoordinatesSection } from './PointCoordinatesSection';
+import { PointGravimetrySection } from './PointGravimetrySection';
 import { PointImageCarousel } from './PointImageCarousel';
 import { useMeasuredHeight } from './useMeasuredHeight';
 import IconAlertCircle from '@/shared/assets/icons/icon-alert-circle.svg?react';
@@ -138,6 +139,8 @@ export function MapPointGeodesyFicheBody({
           ) : null}
 
           <PointCoordinatesSection action={action} />
+
+          <PointGravimetrySection action={action} />
 
           {remark ? (
             <section>
