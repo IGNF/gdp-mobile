@@ -136,7 +136,7 @@ Toujours monté, dans une zone scrollable. Variante résolue par `resolvePointFi
 **Commun aux deux variantes** :
 
 - **Coordonnées** (`PointCoordinatesSection`, données `pointFicheCoordinates.ts`) : onglets **Géographique** (champs `cg1_*`) et **Projection** (champs `cp1_*`) ; onglet désactivé s'il est vide.
-- **Gravimétrie** (`PointGravimetrySection`) : valeur `g` en mGal et année de mesure (`gravi_abs_date`, sinon `gravi_rel_date`) ; section masquée si `g` est vide.
+- **Gravimétrie** (`PointGravimetrySection`) : valeur `g` en mGal et année de calcul (`gravi_calcul_date`) ; section masquée si `g` est vide.
 - **Partenaire** (`PartenaireSection`) : nom (`proprio`) et logo chargé via `usePartnerLogo(proprio_id)`.
 - **Fiche PDF** (`MapPointPdfSection`) : lien « Télécharger la fiche PDF » (`url_pdf`), affiché à tous les niveaux en bas du corps.
 

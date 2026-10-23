@@ -13,29 +13,27 @@ function extractYear(date: string | null): string | null {
   return date?.match(/\d{4}/)?.[0] ?? null;
 }
 
-/** Section « Gravimétrie » : valeur de g (mGal) et année de mesure (absolue, sinon relative). */
+/** Section « Gravimétrie » : valeur de g (mGal) et année de calcul. */
 export function PointGravimetrySection({ action }: PointGravimetrySectionProps) {
   const g = readProperty(action, 'g');
   if (!g) {
     return null;
   }
 
-  const measureYear =
-    extractYear(readProperty(action, 'gravi_abs_date')) ??
-    extractYear(readProperty(action, 'gravi_rel_date'));
+  const calculYear = extractYear(readProperty(action, 'gravi_calcul_date'));
 
   return (
     <section>
       <h3 className={styles.sectionTitle}>Gravimétrie</h3>
       <div className={styles.fieldGrid}>
         <div className={styles.fieldCard}>
-          <span className={styles.fieldLabel}>g(mGal)</span>
+          <span className={styles.fieldLabel}>g (mGal)</span>
           <span className={styles.fieldValue}>{g}</span>
         </div>
-        {measureYear ? (
+        {calculYear ? (
           <div className={styles.fieldCard}>
             <span className={styles.fieldLabel}>Année</span>
-            <span className={styles.fieldValue}>{measureYear}</span>
+            <span className={styles.fieldValue}>{calculYear}</span>
           </div>
         ) : null}
       </div>
