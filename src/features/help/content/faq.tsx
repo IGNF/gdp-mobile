@@ -30,7 +30,7 @@ export const FAQ_ITEMS: readonly FaqItem[] = [
     'La connexion est nécessaire pour consulter vos signalements envoyés et pour transmettre vos contributions.',
   },
   {
-    question: 'Comment filter les données ?',
+    question: 'Comment filtrer les données ?',
     answer:
     'Depuis la carte, sélectionner la première icône en haut à droite, puis activer ou désactiver les filtres souhaités, ou saisissez les dates de "Vu en place" ou de "Détermination" des coordonnées du point',
   },
