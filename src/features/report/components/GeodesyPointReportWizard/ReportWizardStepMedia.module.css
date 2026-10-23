@@ -40,7 +40,8 @@
   padding: 1.5rem 1rem;
   border: 1px dashed var(--color-border-primary);
   border-radius: 0.75rem;
-  background: var(--color-bg-surface);
+  /* #F7F7F7, même gris que le fond de la modal : seuls les tirets verts délimitent l'encart. */
+  background: var(--color-bg-page);
   cursor: pointer;
   text-align: center;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
