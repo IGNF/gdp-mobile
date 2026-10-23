@@ -34,7 +34,7 @@ export function BottomTabbar({ activeTab, onTabClick }: BottomTabbarProps) {
     <nav className={styles.tabbar} aria-label="Navigation principale">
       <button
         type="button"
-        className={`${styles.tab} ${styles.tabMAP} ${activeTab === 'carte' ? styles.active : ''}`}
+        className={`${styles.tab} ${activeTab === 'carte' ? styles.active : ''}`}
         onClick={() => handleTabClick('carte')}
         aria-current={activeTab === 'carte' ? 'page' : undefined}
       >
@@ -53,7 +53,7 @@ export function BottomTabbar({ activeTab, onTabClick }: BottomTabbarProps) {
 
       <button
         type="button"
-        className={`${styles.tab} ${styles.tabSearch} ${activeTab === 'recherche' ? styles.active : ''}`}
+        className={`${styles.tab} ${activeTab === 'recherche' ? styles.active : ''}`}
         onClick={() => handleTabClick('recherche')}
         aria-current={activeTab === 'recherche' ? 'page' : undefined}
       >

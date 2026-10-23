@@ -4,12 +4,15 @@
 	justify-content: center;
 	gap: var(--spacing-md);
 	flex-shrink: 0;
-	width: 19.0625rem; /* 305px */
+	/* Largeur et hauteur suivent les onglets, avec 16px tout autour (72px de haut :
+	   onglet de 40px + 2 × 16px, cf. `--tabbar-height` dans global.css). */
+	width: fit-content;
+	box-sizing: border-box;
+	padding: var(--spacing-md);
 	background: rgba(255, 255, 255, 0.90);
 	margin: 0 auto calc(var(--spacing-xl) + var(--safe-bottom));
 	border-radius: 100px;
 	box-shadow: 0 0 40px 2px rgba(0, 0, 0, 0.20);
-	height: 4.5rem; /* 72px */
 }
 
 .tab {
@@ -27,19 +30,6 @@
 	gap: var(--spacing-xs);
 	fill: var(--color-text);
 }
-.tabSearch {
-	margin-right: var(--spacing-md);
-}
-
-
-.tabMAP {
-	margin-left: var(--spacing-md);
-}
-
-.tabMAP.active {
-	margin-left: unset;
-}
-
 .tab.active {
 	border-radius: var(--radius-pill);
 	background: var(--color-bg-primary-pressed);
