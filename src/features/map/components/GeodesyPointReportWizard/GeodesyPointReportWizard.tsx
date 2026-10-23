@@ -6,6 +6,10 @@ import { withGeodesyPointReportPosition } from '@ign/gdp-tools';
 import type { GeodesyPointReportMapContext } from '@/domain/report/geodesyPointMapContext';
 import type { LocalReportDraft } from '@/domain/report/localReportDraft';
 import { useBottomSheetSnap } from '@/features/map/hooks/useBottomSheetSnap';
+import {
+  resolveCommuneLabel,
+  resolveVoieSuivieLabel,
+} from '@/features/map/components/MapBottomSheet/pointFiche/pointFicheUtils';
 import { resolvePointVariantFromReportContext } from '@/features/map/components/MapBottomSheet/pointFiche/resolvePointFicheVariant';
 import {
   ReportWizardStepConformity,
@@ -326,9 +330,11 @@ function GeodesyPointReportWizardContent({ isOpen, context, onClose }: GeodesyPo
           ) : step === summaryStep ? (
             <ReportWizardStepSummary
               isConform={isConform === true}
-              nonConformReasons={nonConformReasons}
               mediaStep={mediaStep}
               form={form}
+              address={
+                resolveVoieSuivieLabel(reportContext.properties) ?? resolveCommuneLabel(reportContext.properties)
+              }
               onEditStep={(targetStep) => setStep(targetStep)}
             />
           ) : step === confirmationStep ? (

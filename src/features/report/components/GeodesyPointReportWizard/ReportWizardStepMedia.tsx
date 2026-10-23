@@ -87,7 +87,9 @@ export function ReportWizardStepMedia({ form }: ReportWizardStepMediaProps) {
             <span className={styles.photoIconWrap}>
               <RiImageLine className={styles.photoIcon} aria-hidden />
             </span>
-            <span className={styles.photoLabel}>Choisir dans la galerie</span>
+            <span className={styles.photoLabel}>
+              {CAN_TAKE_PHOTO ? 'Choisir dans la galerie' : 'Ajouter une photo'}
+            </span>
           </label>
         </div>
       )}

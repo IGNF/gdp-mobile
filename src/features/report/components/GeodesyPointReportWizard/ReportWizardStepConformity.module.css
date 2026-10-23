@@ -34,9 +34,12 @@
   flex-direction: column;
   width: 100%;
   padding: 0.875rem 1rem;
-  border: 1px solid var(--color-border);
+  /* Pas de bordure visible tant que la carte n'est pas sélectionnée ; transparente plutôt
+     qu'absente pour que la sélection ne décale pas le contenu. */
+  border: 1px solid transparent;
   border-radius: 0.75rem;
-  background: var(--color-fiche-surface);
+  /* Blanc sur le fond #F7F7F7 de la modal, comme les encarts de la fiche détail. */
+  background: var(--color-bg-surface);
   text-align: left;
   cursor: pointer;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
@@ -84,7 +87,7 @@
 }
 
 .cardLabel {
-  font-size: 1.1875rem;
+  font-size: 0.9375rem;
   font-weight: 600;
 }
 
@@ -145,7 +148,8 @@
   /* Padding vertical nul replié : sinon il reste ~1.5rem visibles (et le 1er critère dépasse). */
   padding: 0 0.875rem;
   border-radius: 0.625rem;
-  background: var(--color-bg-subtle);
+  /* Gris clair : se détache de la carte blanche qui le contient. */
+  background: var(--color-bg-page);
   min-height: 0;
   overflow: hidden;
   transition: padding 0.25s ease;

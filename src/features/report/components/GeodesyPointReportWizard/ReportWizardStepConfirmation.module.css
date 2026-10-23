@@ -8,78 +8,10 @@
   text-align: center;
 }
 
-.iconWrap {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 7rem;
-  height: 7rem;
-  margin-bottom: 0.5rem;
-}
-
-.rays {
-  position: absolute;
-  inset: 0;
-}
-
-.ray {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 0.1875rem;
-  height: 0.75rem;
-  margin-top: -3.25rem;
-  margin-left: -0.09375rem;
-  border-radius: 999px;
-  background: var(--color-bg-primary-subtle);
-  transform-origin: 50% 3.25rem;
-}
-
-.iconCircle {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 5.5rem;
-  height: 5.5rem;
-  border-radius: 50%;
-  background: var(--color-bg-primary-subtle);
-}
-
-.icon {
-  width: 2.25rem;
-  height: 2.25rem;
-  color: var(--color-text-primary);
-}
-
-.icon path {
-  fill: currentColor;
-}
-
-.iconBadge {
-  position: absolute;
-  bottom: 0.1rem;
-  right: 0.1rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 1.75rem;
-  height: 1.75rem;
-  border-radius: 50%;
-  background: var(--color-bg-primary);
-  border: 2px solid var(--color-fiche-surface);
-}
-
-.iconBadgeSvg {
-  width: 0.875rem;
-  height: 0.875rem;
-  color: var(--color-white);
-}
-
-.iconBadgeSvg path {
-  fill: currentColor;
+.illustration {
+  flex-shrink: 0;
+  width: 157px;
+  height: 163px;
 }
 
 /* Figma « Appli - H1 » : Fira Sans SemiBold 17px. */
@@ -118,7 +50,8 @@
   /* Figma : 18px entre les boutons. */
   gap: 1.125rem;
   width: 100%;
-  margin-top: 0.75rem;
+  /* 80px au-dessus des boutons : 12px de `gap` (`.step`) + 68px. */
+  margin-top: 68px;
 }
 
 /*
