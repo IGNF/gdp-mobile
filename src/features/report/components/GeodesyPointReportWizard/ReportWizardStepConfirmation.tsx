@@ -1,10 +1,7 @@
 import { Button } from '@/shared/ui/Button';
-import IconArticle from '@/shared/assets/icons/icon-article.svg?react';
-import IconCheck from '@/shared/assets/icons/icon-check.svg?react';
+import ReportDoneIllustration from '@/shared/assets/icons/report-done.svg?react';
 
 import styles from './ReportWizardStepConfirmation.module.css';
-
-const RAY_ANGLES = [0, 45, 90, 135, 180, 225, 270, 315];
 
 export interface ReportWizardStepConfirmationProps {
   onSendLater: () => void;
@@ -21,19 +18,7 @@ export function ReportWizardStepConfirmation({
 }: ReportWizardStepConfirmationProps) {
   return (
     <div className={styles.step}>
-      <div className={styles.iconWrap}>
-        <span className={styles.rays} aria-hidden>
-          {RAY_ANGLES.map((angle) => (
-            <span key={angle} className={styles.ray} style={{ transform: `rotate(${angle}deg)` }} />
-          ))}
-        </span>
-        <span className={styles.iconCircle}>
-          <IconArticle className={styles.icon} aria-hidden />
-          <span className={styles.iconBadge}>
-            <IconCheck className={styles.iconBadgeSvg} aria-hidden />
-          </span>
-        </span>
-      </div>
+      <ReportDoneIllustration className={styles.illustration} aria-hidden />
 
       <h2 className={styles.title}>Signalement enregistré !</h2>
       <p className={styles.body}>
