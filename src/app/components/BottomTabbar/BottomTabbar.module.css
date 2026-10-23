@@ -31,9 +31,15 @@
 	margin-right: var(--spacing-md);
 }
 
+
 .tabMAP {
 	margin-left: var(--spacing-md);
 }
+
+.tabMAP.active {
+	margin-left: unset;
+}
+
 .tab.active {
 	border-radius: var(--radius-pill);
 	background: var(--color-bg-primary-pressed);
