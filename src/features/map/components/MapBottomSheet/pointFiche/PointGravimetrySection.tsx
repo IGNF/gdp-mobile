@@ -27,7 +27,7 @@ export function PointGravimetrySection({ action }: PointGravimetrySectionProps) 
       <h3 className={styles.sectionTitle}>Gravimétrie</h3>
       <div className={styles.fieldGrid}>
         <div className={styles.fieldCard}>
-          <span className={styles.fieldLabel}>g(mGal)</span>
+          <span className={styles.fieldLabel}>g (mGal)</span>
           <span className={styles.fieldValue}>{g}</span>
         </div>
         {calculYear ? (
