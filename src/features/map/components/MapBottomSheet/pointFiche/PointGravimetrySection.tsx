@@ -32,7 +32,7 @@ export function PointGravimetrySection({ action }: PointGravimetrySectionProps) 
         </div>
         {calculYear ? (
           <div className={styles.fieldCard}>
-            <span className={styles.fieldLabel}>Année</span>
+            <span className={styles.fieldLabel}>Année du calcul</span>
             <span className={styles.fieldValue}>{calculYear}</span>
           </div>
         ) : null}
