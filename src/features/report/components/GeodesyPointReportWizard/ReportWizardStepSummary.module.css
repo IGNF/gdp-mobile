@@ -156,7 +156,9 @@
 .cardTop {
   flex: 1 0 0;
   min-width: 0;
-  height: 82px;
+  /* Minimum seulement : s'agrandit si le texte passe sur plusieurs lignes. Les deux encarts
+     de la ligne restent à la même hauteur (`align-items: stretch` par défaut de `.gridRow`). */
+  min-height: 82px;
 }
 
 /* Place pour le crayon du coin supérieur droit. */
@@ -178,9 +180,10 @@
   white-space: nowrap;
 }
 
+/* 75px minimum (une ligne d'adresse) ; s'agrandit si l'adresse passe sur plusieurs lignes. */
 .cardBottom {
   align-self: stretch;
-  height: 75px;
+  min-height: 75px;
 }
 
 .cardLabel {
@@ -202,6 +205,8 @@
   font-weight: 400;
   line-height: normal;
   color: #091625;
+  /* Mot très long (référence, URL) : retour à la ligne plutôt que débordement. */
+  overflow-wrap: anywhere;
 }
 
 .mapPreview {
@@ -237,4 +242,5 @@
   line-height: normal;
   color: #091625;
   white-space: pre-line;
+  overflow-wrap: anywhere;
 }

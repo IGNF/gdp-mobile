@@ -17,8 +17,7 @@
 .photoDropzone {
   display: block;
   position: relative;
-  /* Pas de bordure visible hors survol (transparente : pas de décalage). */
-  border: 1px dashed transparent;
+  border: 1px dashed var(--color-border-primary);
   border-radius: 0.75rem;
   background: var(--color-bg-surface);
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
@@ -39,8 +38,7 @@
   justify-content: center;
   gap: 0.5rem;
   padding: 1.5rem 1rem;
-  /* Pas de bordure visible hors survol (transparente : pas de décalage). */
-  border: 1px dashed transparent;
+  border: 1px dashed var(--color-border-primary);
   border-radius: 0.75rem;
   background: var(--color-bg-surface);
   cursor: pointer;
