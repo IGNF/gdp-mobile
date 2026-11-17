@@ -39,7 +39,7 @@
     "@capacitor/preferences": "^8.0.0",
     "@fontsource-variable/open-sans": "^5.3.0",
     "@fontsource/fira-sans": "^5.3.0",
-    "@ign/gdp-tools": "git+ssh://git@github.com/IGNF/gdp-tools.git#main",
+    "@ign/gdp-tools": "github:IGNF/gdp-tools#main",
     "@ign/mobile-core": "git+ssh://git@github.com/IGNF/mobile-core.git#main",
     "@ign/mobile-device": "git+ssh://git@github.com/IGNF/mobile-device.git#main",
     "collaboratif-client-api": "github:IGNF/collaboratif-client-api#2.0",
