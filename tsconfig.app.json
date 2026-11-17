@@ -14,9 +14,7 @@
     "jsx": "react-jsx",
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"],
-      "@ign/gdp-tools": ["../gdp-tools/dist/index"],
-      "@ign/gdp-tools/react": ["../gdp-tools/dist/react"]
+      "@/*": ["src/*"]
     },
     "strict": true,
     "noUnusedLocals": true,
