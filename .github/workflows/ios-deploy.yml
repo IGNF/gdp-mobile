@@ -136,7 +136,7 @@ jobs:
           retention-days: 3
 
       - name: Save App Store Connect API key
-        if: ${{ vars.IOS_DEPLOY_TO_TESTFLIGHT == 'true' }}
+        if: ${{ vars.IOS_DEPLOY_TO_TESTFLIGHT == 'true' && startsWith(github.ref, 'refs/tags/') }}
         env:
           API_KEY_B64: ${{ secrets.APPSTORE_API_PRIVATE_KEY }}
         run: |
@@ -152,7 +152,7 @@ jobs:
           cp ~/private_keys/AuthKey_${key_id}.p8 ~/.appstoreconnect/private_keys/AuthKey_${key_id}.p8
 
       - name: Upload to TestFlight
-        if: ${{ vars.IOS_DEPLOY_TO_TESTFLIGHT == 'true' }}
+        if: ${{ vars.IOS_DEPLOY_TO_TESTFLIGHT == 'true' && startsWith(github.ref, 'refs/tags/') }}
         env:
           API_KEY_ID: ${{ secrets.APPSTORE_API_KEY_ID }}
           API_ISSUER_ID: ${{ secrets.APPSTORE_ISSUER_ID }}
