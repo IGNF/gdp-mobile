@@ -1,0 +1,153 @@
+.intro {
+  margin: 0 0 1rem;
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+  line-height: 1.45;
+}
+
+.empty {
+  margin: 2rem 0;
+  text-align: center;
+  color: var(--color-text-muted);
+  font-size: 0.9375rem;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.65rem 0.75rem;
+  border-radius: 0.5rem;
+  background: var(--color-bg-subtle);
+}
+
+.rowBody {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.rowMain {
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+}
+
+.rowMain:hover {
+  color: var(--color-primary);
+}
+
+
+.subtitle {
+  display: block;
+  margin-top: 0.15rem;
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+}
+
+.badgeNoPdf {
+  display: inline-flex;
+  margin-top: 0.35rem;
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  background: rgba(var(--color-shadow-rgb), 0.08);
+  color: var(--color-text-muted);
+}
+
+.rowActions {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 0.15rem;
+}
+
+.iconActionButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+  color: var(--color-text-muted);
+  text-decoration: none;
+}
+
+.iconActionButton:hover {
+  background: rgba(var(--color-shadow-rgb), 0.08);
+  color: var(--color-primary);
+}
+
+.rowActions .iconActionButton:last-child:hover {
+  color: var(--color-danger, #c0392b);
+}
+
+.actionIcon {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.footer {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-sm);
+  padding-top: var(--spacing-md);
+  border-top: 1px solid var(--color-border);
+}
+
+.downloadError {
+  margin: 0 0 0.75rem;
+  font-size: 0.875rem;
+  color: var(--color-danger);
+  line-height: 1.4;
+}
+
+.kbd {
+  display: inline-block;
+  padding: 0.1em 0.45em;
+  border: 1px solid var(--color-border);
+  border-radius: 0.25rem;
+  background: var(--color-bg-subtle);
+  font-family: inherit;
+  font-size: 0.875em;
+  font-weight: var(--font-weight-semibold);
+  line-height: 1.3;
+  vertical-align: baseline;
+}
+
+.cartPointTitle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-family: var(--font-family-heading);
+  font-size: 0.9375rem;
+  font-weight: var(--font-weight-semibold);
+  line-height: 1.3;
+  color: var(--color-text-title);
+}
+
+.rowMain:hover .cartPointTitle {
+  color: var(--color-primary);
+}
+

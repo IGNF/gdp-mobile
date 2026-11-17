@@ -6,6 +6,8 @@ import { defineConfig, loadEnv, type ViteDevServer } from 'vite'
 import react from '@vitejs/plugin-react'
 import svgr from 'vite-plugin-svgr'
 
+import { viteGeodesyPdfProxyPlugin } from './scripts/viteGeodesyPdfProxyPlugin'
+
 const appRoot = __dirname
 const requireFromApp = createRequire(path.join(appRoot, 'package.json'))
 
@@ -56,6 +58,7 @@ const appPackage = JSON.parse(
 const appVersion = appPackage.version ?? '4.0.0'
 
 const oauthDevProxyPrefix = '/__sso'
+const geodesyPdfDevProxyPrefix = '/__gdp-pdf'
 
 function normalizeOAuthBaseUrl(url: string): string {
   return url.trim().replace(/\/+$/, '')
@@ -186,11 +189,17 @@ export default defineConfig(({ mode }) => {
 
   const basePath = env.VITE_BASE_PATH || '/'
   const oauthProxyMount = `${basePath.replace(/\/+$/, '')}${oauthDevProxyPrefix}`
+  const geodesyPdfProxyMount = `${basePath.replace(/\/+$/, '')}${geodesyPdfDevProxyPrefix}`
   const oauthProxyAgent = createOauthProxyAgent(oauthSsoTarget, env)
 
   return {
     base: basePath,
-    plugins: [react(), svgr(), stripOauthBrowserOriginPlugin(oauthProxyMount)],
+    plugins: [
+      react(),
+      svgr(),
+      stripOauthBrowserOriginPlugin(oauthProxyMount),
+      viteGeodesyPdfProxyPlugin(geodesyPdfProxyMount),
+    ],
     define: {
       'process.env.SECRET': JSON.stringify(env.VITE_SECRET || 'default-secret'),
       __APP_VERSION__: JSON.stringify(appVersion),

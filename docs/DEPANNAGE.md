@@ -20,9 +20,38 @@ Le navigateur envoie `Origin: http://sgm.ign.fr`. Si Apache le transmet, Keycloa
 
 Contrôle : le même POST **sans** `Origin` doit répondre `400` `Code not valid` (proxy OK). **Avec** `Origin`, après config correcte, on doit aussi avoir 400, plus 403.
 
-Config qui marche : `SetEnvIf` + `RequestHeader unset Origin` / `Referer` au niveau du VirtualHost (pas `unset … early` dans `<Location>`, ignoré sur Apache 2.4). Snippet : [scripts/apache-qlf-gdp-sso.conf.example](../scripts/apache-qlf-gdp-sso.conf.example). Puis `apachectl configtest` et reload.
+Config qui marche : `SetEnvIf` + `RequestHeader unset Origin` / `Referer` au niveau du VirtualHost (pas `unset … early` dans `<Location>`, ignoré sur Apache 2.4). Snippet : [scripts/apache-qlf-gdp.conf.example](../scripts/apache-qlf-gdp.conf.example). Puis `apachectl configtest` et reload.
 
 Le `.htaccess` du `dist/` ne s’applique pas au `ProxyPass`.
+
+## Qualif / prod : panier PDF — fusion échoue ou « pas un PDF »
+
+Symptômes :
+
+- **Télécharger les PDF** → « Aucune fiche PDF n’a pu être téléchargée »
+- `GET /qlf-gdp/__gdp-pdf?url=…` → **404 React Router** (« Unexpected Application Error ») = fallback SPA (`index.html`) : le proxy PDF **n’est pas actif**
+- Même URL → **404 Apache** (« The requested URL was not found on this server ») = garde-fou Directory déployé mais **réécriture/proxy PDF inactive** (souvent `<LocationMatch>` + `RewriteMap` qui ne s’appliquent pas sur Apache 2.4) ; le fichier `/var/www/…/__gdp-pdf` n’existe pas
+
+Dans tous les cas, la requête n’est **pas** proxifiée vers `data.geopf.fr` / `*.ign.fr`.
+
+Autres causes : script `RewriteMap prg:…` absent ou non exécutable (`python3` → utiliser `/usr/bin/python3` dans le script), `RewriteMap` qui renvoie `-` (URL hors liste blanche), modules `proxy` / `proxy_http` / `rewrite` désactivés.
+
+Cause générale : l’app appelle `GET /qlf-gdp/__gdp-pdf?url=…` (same-origin). En dev, Vite relaie vers les annexes Géoplateforme. En qualif, il faut **`RewriteEngine` + `RewriteRule` au niveau VirtualHost** (avant `Alias`), voir [scripts/apache-qlf-gdp.conf.example](../scripts/apache-qlf-gdp.conf.example) — pas seulement un bloc `<LocationMatch>`.
+
+Ce n’est **pas** un second `ProxyPass` fixe comme `__sso` : la cible change à chaque fiche (`paramètre url=`).
+
+Config de référence : [scripts/apache-qlf-gdp.conf.example](../scripts/apache-qlf-gdp.conf.example) (section `__gdp-pdf`) + [scripts/apache-qlf-gdp-pdf-rewrite-map.sh](../scripts/apache-qlf-gdp-pdf-rewrite-map.sh) installé sous `/etc/apache2/gdp/`, `chmod 755`. Garder `GDP_SSO` / `unset Origin` **limités à `__sso`**.
+
+Test rapide (remplacer `URL_PDF` par une vraie `url_pdf`) :
+
+```bash
+curl -sS -D- -o /dev/null \
+  'http://sgm.ign.fr/qlf-gdp/__gdp-pdf?url='$(python3 -c "import urllib.parse; print(urllib.parse.quote('URL_PDF', safe=''))")
+```
+
+Attendu : `200` et un corps PDF, pas `text/html`.
+
+**Contournement applicatif (depuis une version avec `createGeodesyPdfFetchWithProxyFallback`)** : le panier tente d’abord le téléchargement **direct** vers `*.geopf.fr` / `*.ign.fr` (CORS `*` sur les annexes Géoplateforme). **Télécharger les PDF** peut donc fonctionner en qualif **sans** proxy Apache, même si ouvrir `/__gdp-pdf?url=…` dans le navigateur affiche encore une 404 React (cette URL sert surtout au proxy ; elle n’est pas une route de l’app). Le relais Apache reste nécessaire pour les PDF sans CORS direct.
 
 ## Chrome inspect — le téléphone n’apparaît pas
 

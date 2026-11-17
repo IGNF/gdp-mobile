@@ -48,15 +48,26 @@ Aperçu local du même build : `npm run preview:qualif -w gdp-mobile` → [http:
 
 ### Apache sur le serveur de qualif
 
-Le vhost (fichier type `qlf-gdp.conf`) sert les fichiers de `/var/www/intranet/qlf-gdp` sous `http://sgm.ign.fr/qlf-gdp/` et relaie OAuth `/qlf-gdp/__sso/` vers Keycloak — **même rôle que Vite `/__sso` en local**. Le login (`/auth`) reste une redirection navigateur vers `sso.geopf.fr`. Seuls `/token` et `/revoke` passent par Apache.
+Le vhost (fichier type `qlf-gdp.conf`) sert les fichiers de `/var/www/intranet/qlf-gdp` sous `http://sgm.ign.fr/qlf-gdp/` et relaie :
+
+| Chemin | Rôle | Équivalent dev |
+|--------|------|----------------|
+| `/qlf-gdp/__sso/` | OAuth token/revoke → Keycloak | Vite `/__sso` |
+| `/qlf-gdp/__gdp-pdf` | Téléchargement PDF panier (param `url=`) | Vite `/__gdp-pdf` |
+
+Le login (`/auth`) reste une redirection navigateur vers `sso.geopf.fr`. Seuls `/token` et `/revoke` passent par le proxy SSO.
 
 Il faut retirer `Origin` et `Referer` avant d’appeler Keycloak (sinon `403 Invalid origin`). Sur Apache 2.4, le faire avec `SetEnvIf` + `RequestHeader unset` au niveau du VirtualHost, **pas** `unset … early` dans un `<Location>`.
 
-Référence à coller / comparer : [scripts/apache-qlf-gdp-sso.conf.example](./scripts/apache-qlf-gdp-sso.conf.example). Après modification : `sudo apachectl configtest && sudo systemctl reload apache2`.
+Référence VirtualHost (SPA + `__sso` + `__gdp-pdf`) : [scripts/apache-qlf-gdp.conf.example](./scripts/apache-qlf-gdp.conf.example) et script PDF [scripts/apache-qlf-gdp-pdf-rewrite-map.sh](./scripts/apache-qlf-gdp-pdf-rewrite-map.sh) → `/etc/apache2/gdp/`.
+
+Après modification : `sudo apachectl configtest && sudo systemctl reload apache2`.
 
 Keycloak (client PKCE) : Valid Redirect URI `http://sgm.ign.fr/qlf-gdp/auth/callback`. Le `ProxyPass` ne remplace pas cette URI.
 
-Le `.htaccess` copié dans `dist/` ne gère que le fallback SPA ; le proxy OAuth n’existe qu’en VirtualHost.
+Le `.htaccess` copié dans `dist/` ne gère que le fallback SPA ; les proxies `__sso` et `__gdp-pdf` n’existent qu’en VirtualHost.
+
+Sans relais `__gdp-pdf` en qualif, le bouton **Télécharger les PDF** du panier web échoue (CORS / HTML SPA). Voir [docs/DEPANNAGE.md](./docs/DEPANNAGE.md).
 
 | Variable (`.env.qualif`)         | Rôle                                 |
 | -------------------------------- | ------------------------------------ |

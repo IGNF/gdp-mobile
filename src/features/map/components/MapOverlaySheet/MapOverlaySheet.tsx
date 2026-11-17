@@ -53,6 +53,11 @@ export interface MapOverlaySheetProps {
   maxExpandedHeightPx?: number;
   /** Part de la hauteur d'écran occupée à l'ouverture (mode `draggable`), défaut 0.58. */
   compactHeightRatio?: number;
+  /**
+   * Ne pas capturer les interactions dans la zone carte au-dessus du panneau (zoom, pan).
+   * Le panneau se ferme via le FAB, la poignée ou un bouton dédié — pas par tap sur la carte.
+   */
+  allowMapInteraction?: boolean;
 }
 
 export function MapOverlaySheet({
@@ -68,6 +73,7 @@ export function MapOverlaySheet({
   draggable = false,
   maxExpandedHeightPx,
   compactHeightRatio = DEFAULT_COMPACT_HEIGHT_RATIO,
+  allowMapInteraction = false,
 }: MapOverlaySheetProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [shouldRender, setShouldRender] = useState(isOpen);
@@ -131,12 +137,14 @@ export function MapOverlaySheet({
 
   const content = (
     <>
-      <button
-        type="button"
-        className={`${styles.backdrop} ${isVisible ? styles.backdropVisible : ''}`}
-        onClick={onClose}
-        aria-label="Fermer"
-      />
+      {allowMapInteraction ? null : (
+        <button
+          type="button"
+          className={`${styles.backdrop} ${isVisible ? styles.backdropVisible : ''}`}
+          onClick={onClose}
+          aria-label="Fermer"
+        />
+      )}
       <section
         className={[
           sheetChrome.surface,

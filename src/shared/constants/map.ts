@@ -9,6 +9,9 @@ export const USER_LOCATION_MARKER_Z_INDEX = 10050;
 export const MAP_CLICK_SELECTION_MARKER_LAYER_NAME = 'MapClickSelectionMarker';
 export const MAP_CLICK_SELECTION_MARKER_Z_INDEX = 9998;
 
+export const MAP_PDF_CART_MARKER_LAYER_NAME = 'MapPdfCartMarkers';
+export const MAP_PDF_CART_MARKER_Z_INDEX = 9997;
+
 /** Zoom appliqué lors de l’ouverture d’un signalement groupe sur la carte. */
 export const GROUP_REPORT_MAP_FOCUS_ZOOM = 17;
 

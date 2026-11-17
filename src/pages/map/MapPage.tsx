@@ -30,15 +30,26 @@ import type { GroupReport } from '@/domain/report/groupReportModels';
 import { isLocalReportDraftSent, type LocalReportDraft } from '@/domain/report/localReportDraft';
 import { useLocalReportDrafts } from '@/features/report/hooks/useLocalReportDrafts';
 import { useMap } from '@/features/map/hooks/useMap';
-import { useMapGeodesyClick } from '@/features/map/hooks/useMapGeodesyClick';
+import {
+  useMapGeodesyClick,
+  type MapGeodesyClickAction,
+} from '@/features/map/hooks/useMapGeodesyClick';
 import { useMapPageMatomoTracking } from '@/features/map/hooks/useMapPageMatomoTracking';
 import { useMapClickSelectionMarker } from '@/features/map/hooks/useMapClickSelectionMarker';
 import { usePersistedMapLayers } from '@/features/map/hooks/usePersistedMapLayers';
 import { useReportMapLayers } from '@/features/map/hooks/useReportMapLayers';
 import { useUserLocationMarker } from '@/features/map/hooks/useUserLocationMarker';
 import { useSearchResultMarker } from '@/features/search/hooks/useSearchResultMarker';
+import { WebPdfCartPanel } from '@/features/map/web/pdfCart/WebPdfCartPanel';
+import { useWebPdfCart } from '@/features/map/web/pdfCart/useWebPdfCart';
+import { WebPdfCartProvider } from '@/features/map/web/pdfCart/WebPdfCartProvider';
+import { useWebPdfCartMarkers } from '@/features/map/web/pdfCart/useWebPdfCartMarkers';
+import { useWebPdfCartAreaSelect } from '@/features/map/web/pdfCart/useWebPdfCartAreaSelect';
+import { GDP_GEODESY_POINT_DISPLAY_OPTIONS } from '@/features/map/utils/geodesyReportContext';
+import type { WebPdfCartEntry } from '@/features/map/web/pdfCart/pdfCartTypes';
 import { trackGeolocationMode } from '@/infra/analytics/matomo';
 import { Gdp_Geolocation } from '@/platform/device/geolocation';
+import { IS_WEB_PLATFORM } from '@/platform/web/isWebPlatform';
 import { Loading } from '@/shared/ui/Loading';
 import {
   GEOPORTAIL_LAYERS,
@@ -69,6 +80,7 @@ import IconFilter from '@/shared/assets/icons/icon-filter.svg?react';
 import IconBurger from '@/shared/assets/icons/icon-burger.svg?react';
 import IconLayers from '@/shared/assets/icons/icon-layers.svg?react';
 import IconLegend from '@/shared/assets/icons/icon-legend.svg?react';
+import IconDownload from '@/shared/assets/icons/icon-download.svg?react';
 
 import type { MapOutletContext } from './mapOutletContext';
 import styles from './MapPage.module.css';
@@ -125,7 +137,16 @@ function isRotationOffNorth(rotation: number): boolean {
 }
 
 export function MapPage() {
+  return (
+    <WebPdfCartProvider>
+      <MapPageView />
+    </WebPdfCartProvider>
+  );
+}
+
+function MapPageView() {
   const navigate = useNavigate();
+  const pdfCart = useWebPdfCart();
   const location = useLocation();
   const isSearchRoute = useMatch({ path: '/map/search', end: false }) !== null;
   const { user, isAuthenticated, logout } = useAuth();
@@ -152,7 +173,9 @@ export function MapPage() {
   const [activeBasemap, setActiveBasemap] = useState<string>(GEOPORTAIL_LAYERS.PLAN_IGN);
   const [geoservicesVisible, setGeoservicesVisible] = useState(true);
   const [activeMapPanel, setActiveMapPanel] = useState<MapPanelId | null>(null);
+  const [isPdfCartAreaSelectLoading, setIsPdfCartAreaSelectLoading] = useState(false);
   const isLegendOpen = activeMapPanel === 'legend';
+  const isPdfCartOpen = activeMapPanel === 'pdfCart';
   const layersFlowView = activeMapPanel === 'layers' || activeMapPanel === 'filters' ? activeMapPanel : null;
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const legendFabRef = useRef<HTMLButtonElement>(null);
@@ -187,6 +210,15 @@ export function MapPage() {
   const geodesyCatalog = useMemo(
     () => createGdpGeodesyCatalog(geodesyMode, wfsClusterPreferences),
     [geodesyMode, wfsClusterPreferences],
+  );
+  const pdfCartDisplayOptions = useMemo(
+    () => ({
+      ...GDP_GEODESY_POINT_DISPLAY_OPTIONS,
+      attributeCatalog: geodesyCatalog.attributes,
+      pictoUrlMaps: geodesyCatalog.wfsPictoUrlMaps,
+      geodesyCatalog,
+    }),
+    [geodesyCatalog],
   );
   const geodesyDefaultActive = useMemo(() => getGdpGeodesyDefaultActive(geodesyMode), [geodesyMode]);
   const geodesy = useGeodesyOnMap(map, {
@@ -239,6 +271,13 @@ export function MapPage() {
       : null,
   });
 
+  useWebPdfCartMarkers({
+    map,
+    isMapReady,
+    enabled: pdfCart.enabled,
+    entries: pdfCart.entries,
+  });
+
   const handleReportMapSelect = useCallback(
     (report: GroupReport) => {
       navigate(`/reports/history/${report.id}`, { state: { from: 'map' } });
@@ -283,7 +322,7 @@ export function MapPage() {
     }
 
     const handleMapClick = () => {
-      setActiveMapPanel(null);
+      setActiveMapPanel((current) => (current === 'pdfCart' ? current : null));
     };
 
     map.on('singleclick', handleMapClick);
@@ -415,9 +454,43 @@ export function MapPage() {
     return () => window.removeEventListener('resize', updateLegendMaxSheetHeight);
   }, [isLegendOpen]);
 
-  const handleCloseMapPanel = () => {
+  const handleDismissMapPanel = () => {
     setActiveMapPanel(null);
   };
+
+  const handleClosePdfCartPanel = () => {
+    setIsPdfCartAreaSelectLoading(false);
+    setActiveMapPanel(null);
+  };
+
+  const handlePdfCartAreaSelect = useCallback(
+    (actions: readonly MapGeodesyClickAction[]) => {
+      setIsPdfCartAreaSelectLoading(false);
+
+      if (actions.length === 0) {
+        return;
+      }
+
+      pdfCart.addMany(actions);
+      setActiveMapPanel('pdfCart');
+    },
+    [pdfCart],
+  );
+
+  useWebPdfCartAreaSelect({
+    map,
+    isMapReady,
+    enabled: IS_WEB_PLATFORM && isMapReady,
+    selectingDisabled: isPdfCartAreaSelectLoading,
+    displayOptions: pdfCartDisplayOptions,
+    wfsAttributeFilters: geodesy.catalog.wfsAttributeFilters,
+    wfsAttributeFilterValues: geodesy.wfsAttributeFilterValues,
+    onAreaSelectStart: () => setIsPdfCartAreaSelectLoading(true),
+    onAreaSelect: handlePdfCartAreaSelect,
+    onAreaSelectError: () => {
+      setIsPdfCartAreaSelectLoading(false);
+    },
+  });
 
   const handleMenuNavigate = (route: string) => {
     if (isLeftMenuOverlayRoute(route)) {
@@ -446,6 +519,20 @@ export function MapPage() {
       navigate('/map');
     },
     [focusOnCoordinate, navigate],
+  );
+
+  const handleSelectPdfCartEntry = useCallback(
+    (entry: WebPdfCartEntry) => {
+      setActiveMapPanel(null);
+      void (async () => {
+        await focusOnCoordinate(entry.longitude, entry.latitude, GROUP_REPORT_MAP_FOCUS_ZOOM);
+        await new Promise((resolve) => setTimeout(resolve, 300));
+        await mapClick.openPointAtCoordinate(fromLonLat([entry.longitude, entry.latitude]));
+      })();
+    },
+    // mapClick.openPointAtCoordinate est stable (mémoïsé).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [focusOnCoordinate, mapClick.openPointAtCoordinate],
   );
 
   const mapOutletContext = useMemo<MapOutletContext>(
@@ -532,6 +619,26 @@ export function MapPage() {
             >
               <IconLegend className={styles.mapFabIcon} aria-hidden />
             </button>
+            {IS_WEB_PLATFORM ? (
+              <button
+                type="button"
+                className={`${styles.mapFab} ${styles.mapFabWithBadge} ${isPdfCartOpen || pdfCart.count > 0 ? styles.mapFabActive : ''}`}
+                aria-label={
+                  pdfCart.count > 0
+                    ? `Panier PDF, ${pdfCart.count} repère${pdfCart.count > 1 ? 's' : ''}`
+                    : 'Panier PDF'
+                }
+                disabled={!isMapReady}
+                onClick={() => handleToggleMapPanel('pdfCart')}
+              >
+                <IconDownload className={styles.mapFabIcon} aria-hidden />
+                {pdfCart.count > 0 ? (
+                  <span className={styles.mapFabBadge} aria-hidden>
+                    {pdfCart.count > 99 ? '99+' : pdfCart.count}
+                  </span>
+                ) : null}
+              </button>
+            ) : null}
           </div>
 
           {!isMapReady && (
@@ -539,6 +646,12 @@ export function MapPage() {
               <Loading label="Chargement de la carte…" />
             </div>
           )}
+
+          {IS_WEB_PLATFORM && isPdfCartAreaSelectLoading ? (
+            <div className={styles.pdfCartAreaSelectLoadingOverlay} aria-live="polite">
+              <Loading size="small" label="Repères en cours de chargement…" />
+            </div>
+          ) : null}
 
           {isMapReady && GDP_GEODESY_SHOW_WFS_LOADING_INDICATOR && geodesyWfsLoading.isLoading && (
             <div className={styles.wfsLoadingBadge} aria-live="polite">
@@ -610,7 +723,9 @@ export function MapPage() {
           {isTabbarVisible && !isSearchRoute ? (
             <BottomTabbar
               activeTab="carte"
-              onTabClick={handleCloseMapPanel}
+              onTabClick={() => {
+                handleClosePdfCartPanel();
+              }}
             />
           ) : null}
         </div>
@@ -618,7 +733,7 @@ export function MapPage() {
 
       <MapLayersPanelFlow
         view={layersFlowView}
-        onClose={handleCloseMapPanel}
+        onClose={handleDismissMapPanel}
         activeBasemap={activeBasemap}
         onActiveBasemapChange={setActiveBasemap}
         geoservicesVisible={geoservicesVisible}
@@ -650,9 +765,17 @@ export function MapPage() {
 
       <MapLegendPanel
         isOpen={isLegendOpen}
-        onClose={handleCloseMapPanel}
+        onClose={handleDismissMapPanel}
         maxExpandedHeight={legendMaxSheetHeight}
       />
+
+      {IS_WEB_PLATFORM ? (
+        <WebPdfCartPanel
+          isOpen={isPdfCartOpen}
+          onClose={handleClosePdfCartPanel}
+          onSelectEntry={handleSelectPdfCartEntry}
+        />
+      ) : null}
 
       <MyAccountPage
         isOpen={activeOverlay === '/my-account'}

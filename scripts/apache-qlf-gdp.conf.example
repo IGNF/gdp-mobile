@@ -1,0 +1,70 @@
+# VirtualHost qualif Géodésie de poche (ex. sgm.ign.fr / cadillac2)
+#
+# Relais same-origin comme Vite en dev : /__sso et /__gdp-pdf.
+# Le .htaccess du dist ne couvre que le fallback SPA.
+#
+# Modules : alias, rewrite, headers, setenvif, proxy, proxy_http, ssl.
+#   a2enmod rewrite proxy proxy_http ssl headers setenvif
+#
+# Script PDF (repo scripts/apache-qlf-gdp-pdf-rewrite-map.sh) :
+#   /etc/apache2/gdp/apache-qlf-gdp-pdf-rewrite-map.sh  (chmod 755)
+#
+# __gdp-pdf : réécriture au niveau VirtualHost (pas <LocationMatch>), AVANT Alias.
+# Sinon le fallback SPA → React 404 ; avec garde-fou Directory seul → Apache 404.
+#
+# Après edit : apachectl configtest && systemctl reload apache2
+
+SSLProxyEngine On
+
+# ── Panier PDF : GET /qlf-gdp/__gdp-pdf?url=… ───────────────────────────────
+
+RewriteMap gdp_pdf_proxy prg:/etc/apache2/gdp/apache-qlf-gdp-pdf-rewrite-map.sh
+
+RewriteEngine On
+RewriteCond %{REQUEST_URI} ^/qlf-gdp/__gdp-pdf/?$ [NC]
+RewriteCond ${gdp_pdf_proxy:%{QUERY_STRING}} ^https?:// [NC]
+RewriteRule ^/qlf-gdp/__gdp-pdf/?$ ${gdp_pdf_proxy:%{QUERY_STRING}} [P,L,NE]
+
+# ── OAuth : POST /qlf-gdp/__sso/token|revoke ────────────────────────────────
+
+ProxyPass /qlf-gdp/__sso/ https://sso.geopf.fr/realms/geoplateforme/protocol/openid-connect/
+ProxyPassReverse /qlf-gdp/__sso/ https://sso.geopf.fr/realms/geoplateforme/protocol/openid-connect/
+
+SetEnvIf Request_URI "^/qlf-gdp/__sso/" GDP_SSO
+RequestHeader set Host "sso.geopf.fr" env=GDP_SSO
+RequestHeader unset Origin env=GDP_SSO
+RequestHeader unset Referer env=GDP_SSO
+
+# Ne pas utiliser RequestHeader unset … early dans <Location> (Apache 2.4 l’ignore).
+# Ne pas étendre GDP_SSO à __gdp-pdf.
+
+# ── Fichiers statiques (gdp-mobile/dist/) ───────────────────────────────────
+
+Alias /qlf-gdp /var/www/intranet/qlf-gdp
+
+<Directory /var/www/intranet/qlf-gdp>
+    Options -Indexes +FollowSymLinks
+    AllowOverride FileInfo
+    Require all granted
+
+    RewriteEngine On
+    RewriteBase /qlf-gdp/
+    RewriteRule ^index\.html$ - [L]
+    # Si le proxy VirtualHost ci-dessus ne s’applique pas : pas de index.html (404 Apache)
+    RewriteCond %{REQUEST_URI} ^/qlf-gdp/__gdp-pdf [NC,OR]
+    RewriteCond %{REQUEST_URI} ^/qlf-gdp/__sso/ [NC]
+    RewriteRule ^ - [L]
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule . /qlf-gdp/index.html [L]
+</Directory>
+
+# Test PDF (remplacer URL_PDF) — attendu : 200 + %PDF, pas text/html ni 404 Apache :
+# curl -sS -D- -o /dev/null \
+#   'http://sgm.ign.fr/qlf-gdp/__gdp-pdf?url='$(python3 -c "import urllib.parse; print(urllib.parse.quote('URL_PDF', safe=''))")
+#
+# Test RewriteMap (même entrée qu’Apache) :
+# printf '%s\n' 'url=https%3A%2F%2Fdata.geopf.fr%2Fannexes%2Fgeodesie%2Fpt-rsgf-206137.pdf' \
+#   | /etc/apache2/gdp/apache-qlf-gdp-pdf-rewrite-map.sh
+#
+# Debug proxy : LogLevel rewrite:trace3 (temporaire), error.log

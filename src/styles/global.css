@@ -388,6 +388,14 @@ a:hover {
   color: var(--color-action-primary-hover);
 }
 
+
+
+
+/* Rectangle de sélection panier PDF (OpenLayers DragBox). */
+.gdp-pdf-cart-dragbox {
+  border: 2px dashed var(--color-primary);
+  background-color: rgba(var(--color-primary-rgb), 0.14);
+}
 /* ══════════════════════════════════════════════════════════════
    OPACITY TOKENS
    ══════════════════════════════════════════════════════════════ */
