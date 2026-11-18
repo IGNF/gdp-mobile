@@ -20,6 +20,11 @@ COPY index.html ./index.html
 
 RUN mkdir ./dist
 
+# Vite inline les VITE_* au build : les fournir via --build-arg (pas au runtime).
+ARG VITE_OAUTH_WEB_REDIRECT_URI
+ARG VITE_OAUTH_CLIENT_ID
+ARG VITE_OAUTH_BASE_URL
+
 RUN npm run build 
 
 
