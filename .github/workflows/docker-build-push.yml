@@ -3,9 +3,8 @@ name: Build and Push Docker Image to GHCR
 on:
   workflow_dispatch:
   push:
-    branches:
-      - docker
     tags:
+      - 'deploy-docker-dev'
       - 'v[0-9]+.[0-9]+.[0-9]+'
 
 env:

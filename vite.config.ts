@@ -225,6 +225,7 @@ export default defineConfig(({ mode }) => {
       ],
     },
     build: {
+      outDir: mode === 'qualif' ? 'dist-qualif' : 'dist',
       commonjsOptions: {
         include: [/collaboratif-client-api/, /node_modules/],
         transformMixedEsModules: true,

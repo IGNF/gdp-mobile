@@ -14,7 +14,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "build:qualif": "tsc -b && vite build --mode qualif && cp scripts/htaccess-qualif.example dist/.htaccess",
+    "build:qualif": "tsc -b && vite build --mode qualif && cp scripts/htaccess-qualif.example dist-qualif/.htaccess",
     "build:mobile": "npm run build",
     "lint": "eslint .",
     "lint:css-modules": "node scripts/check-css-modules.js",
