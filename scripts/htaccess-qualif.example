@@ -1,5 +1,5 @@
 # Fallback SPA pour déploiement sous un sous-chemin (ex. /qlf-gdp/)
-# Copié en dist/.htaccess par npm run build:qualif
+# Copié en dist-qualif/.htaccess par npm run build:qualif
 # Ne configure pas les proxies /__sso ni /__gdp-pdf (VirtualHost, voir apache-qlf-gdp.conf.example).
 
 <IfModule mod_rewrite.c>

@@ -20,6 +20,7 @@ const IGNORE_DIRS = new Set([
     'node_modules',
     '.git',
     'dist',
+    'dist-qualif',
     'build',
     'coverage',
     '.next',

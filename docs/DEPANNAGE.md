@@ -22,7 +22,7 @@ Contrôle : le même POST **sans** `Origin` doit répondre `400` `Code not valid
 
 Config qui marche : `SetEnvIf` + `RequestHeader unset Origin` / `Referer` au niveau du VirtualHost (pas `unset … early` dans `<Location>`, ignoré sur Apache 2.4). Snippet : [scripts/apache-qlf-gdp.conf.example](../scripts/apache-qlf-gdp.conf.example). Puis `apachectl configtest` et reload.
 
-Le `.htaccess` du `dist/` ne s’applique pas au `ProxyPass`.
+Le `.htaccess` du `dist-qualif/` ne s’applique pas au `ProxyPass`.
 
 ## Qualif / prod : panier PDF — fusion échoue ou « pas un PDF »
 

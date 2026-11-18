@@ -1,6 +1,7 @@
 # Dépendances et artefacts de build
 node_modules/
 dist/
+dist-qualif/
 dist-ssr/
 
 # Logs

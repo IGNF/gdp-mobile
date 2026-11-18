@@ -38,9 +38,11 @@ git pull
 npm run build:qualif
 ```
 
-Déposer le contenu de `gdp-mobile/dist/` via SFTP :
+Déposer le contenu de `gdp-mobile/dist-qualif/` via SFTP :
 
 `sftp://cadillac2.ign.fr/var/www/intranet/qlf-gdp/`
+ou rsync :
+`rsync -avh --progress --delete dist/ user@cadillac2:/var/www/intranet/qlf-gdp`
 
 Consultation : [http://sgm.ign.fr/qlf-gdp/map](http://sgm.ign.fr/qlf-gdp/map)
 
@@ -65,7 +67,7 @@ Après modification : `sudo apachectl configtest && sudo systemctl reload apache
 
 Keycloak (client PKCE) : Valid Redirect URI `http://sgm.ign.fr/qlf-gdp/auth/callback`. Le `ProxyPass` ne remplace pas cette URI.
 
-Le `.htaccess` copié dans `dist/` ne gère que le fallback SPA ; les proxies `__sso` et `__gdp-pdf` n’existent qu’en VirtualHost.
+Le `.htaccess` copié dans `dist-qualif/` ne gère que le fallback SPA ; les proxies `__sso` et `__gdp-pdf` n’existent qu’en VirtualHost.
 
 Sans relais `__gdp-pdf` en qualif, le bouton **Télécharger les PDF** du panier web échoue (CORS / HTML SPA). Voir [docs/DEPANNAGE.md](./docs/DEPANNAGE.md).
 
@@ -167,8 +169,8 @@ Build web + sync, puis Xcode : `open ios/App/App.xcodeproj`.
 | Commande | Rôle |
 | --- | --- |
 | `npm run dev` | Serveur Vite (local) |
-| `npm run build` | Build web à la racine `/` |
-| `npm run build:qualif` | Build qualification (`/qlf-gdp/`) |
+| `npm run build` | Build web dans `dist/`, servi à la racine de l’URL (`/`, sauf si `VITE_BASE_PATH` est défini dans `.env`) |
+| `npm run build:qualif` | Build qualification dans `dist-qualif/`, servi sous `/qlf-gdp/` (`VITE_BASE_PATH` de `.env.qualif`) |
 | `npm run build:mobile` | Alias de `build` — appelé par `generate-apk` / `run-apk` |
 | `npm run preview:qualif` | Aperçu local du build qualif |
 | `npm run setup-android` | Première config Android |

@@ -1,7 +1,7 @@
 # VirtualHost qualif Géodésie de poche (ex. sgm.ign.fr / cadillac2)
 #
 # Relais same-origin comme Vite en dev : /__sso et /__gdp-pdf.
-# Le .htaccess du dist ne couvre que le fallback SPA.
+# Le .htaccess du dist-qualif ne couvre que le fallback SPA.
 #
 # Modules : alias, rewrite, headers, setenvif, proxy, proxy_http, ssl.
 #   a2enmod rewrite proxy proxy_http ssl headers setenvif
@@ -38,7 +38,7 @@ RequestHeader unset Referer env=GDP_SSO
 # Ne pas utiliser RequestHeader unset … early dans <Location> (Apache 2.4 l’ignore).
 # Ne pas étendre GDP_SSO à __gdp-pdf.
 
-# ── Fichiers statiques (gdp-mobile/dist/) ───────────────────────────────────
+# ── Fichiers statiques (gdp-mobile/dist-qualif/) ────────────────────────────
 
 Alias /qlf-gdp /var/www/intranet/qlf-gdp
 
