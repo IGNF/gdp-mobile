@@ -8,7 +8,7 @@ En cas de blocage : [Dépannage](./docs/DEPANNAGE.md).
 
 ## Installation initiale
 
-Prérequis : Node.js ≥ 22, accès SSH GitHub IGNF (`gdp-tools`, `mobile-core`, `mobile-device`, `collaboratif-client-api`).
+Prérequis : Node.js ≥ 22.13 (26 recommandé, voir .nvmrc), accès SSH GitHub IGNF (`gdp-tools`, `mobile-core`, `mobile-device`, `collaboratif-client-api`).
 
 Depuis `gdp-mobile/` (dépôt GitHub) :
 
@@ -44,7 +44,7 @@ Déposer le contenu de `gdp-mobile/dist/` via SFTP :
 
 Consultation : [http://sgm.ign.fr/qlf-gdp/map](http://sgm.ign.fr/qlf-gdp/map)
 
-Aperçu local du même build : `npm run preview:qualif -w gdp-mobile` → [http://localhost:4173/qlf-gdp/](http://localhost:4173/qlf-gdp/). `preview:qualif` n’inclut pas le reverse proxy `/__sso` : la connexion SSO se teste sur sgm ou en `npm run dev`.
+Aperçu local du même build : `npm run preview:qualif` → [http://localhost:4173/qlf-gdp/](http://localhost:4173/qlf-gdp/). `preview:qualif` n’inclut pas le reverse proxy `/__sso` : la connexion SSO se teste sur sgm ou en `npm run dev`.
 
 ### Apache sur le serveur de qualif
 

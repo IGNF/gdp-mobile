@@ -6,27 +6,10 @@ import { defineConfig, loadEnv, type ViteDevServer } from 'vite'
 import react from '@vitejs/plugin-react'
 import svgr from 'vite-plugin-svgr'
 
-import { viteGeodesyPdfProxyPlugin } from './scripts/viteGeodesyPdfProxyPlugin'
+import { viteGeodesyPdfProxyPlugin } from './scripts/viteGeodesyPdfProxyPlugin.ts'
 
-const appRoot = __dirname
-const requireFromApp = createRequire(path.join(appRoot, 'package.json'))
-
-/** Monorepo local : préférer la résolution racine (évite un stub git incomplet dans gdp-mobile/node_modules). */
-function createPackageResolver(): NodeRequire {
-  const monorepoPkgJson = path.resolve(appRoot, '..', 'package.json')
-  if (existsSync(monorepoPkgJson)) {
-    const monorepoRequire = createRequire(monorepoPkgJson)
-    try {
-      monorepoRequire.resolve('@ign/gdp-tools')
-      return monorepoRequire
-    } catch {
-      /* dépôt gdp-mobile seul */
-    }
-  }
-  return requireFromApp
-}
-
-const packageResolver = createPackageResolver()
+const appRoot = import.meta.dirname
+const packageResolver = createRequire(path.join(appRoot, 'package.json'))
 
 function resolveInstalledPackageDir(packageName: string): string {
   let dir = path.dirname(packageResolver.resolve(packageName))
@@ -53,7 +36,7 @@ const capacitorAppRoot = resolveInstalledPackageDir('@capacitor/app')
 const gdpToolsRoot = resolveInstalledPackageDir('@ign/gdp-tools')
 
 const appPackage = JSON.parse(
-  readFileSync(path.join(__dirname, 'package.json'), 'utf8'),
+  readFileSync(path.join(appRoot, 'package.json'), 'utf8'),
 ) as { version?: string }
 const appVersion = appPackage.version ?? '4.0.0'
 
@@ -181,7 +164,7 @@ function createOauthProxyAgent(
 }
 
 export default defineConfig(({ mode }) => {
-  const env = loadEnv(mode, __dirname, '')
+  const env = loadEnv(mode, appRoot, '')
   applyFileProxyEnv(env)
   const oauthSsoTarget = normalizeOAuthBaseUrl(
     env.VITE_OAUTH_BASE_URL || 'https://sso.geopf.fr/realms/geoplateforme/protocol/openid-connect',
@@ -208,7 +191,7 @@ export default defineConfig(({ mode }) => {
       alias: [
         { find: '@ign/gdp-tools/react', replacement: path.join(gdpToolsRoot, 'dist/react.js') },
         { find: '@ign/gdp-tools', replacement: path.join(gdpToolsRoot, 'dist/index.js') },
-        { find: '@', replacement: path.resolve(__dirname, './src') },
+        { find: '@', replacement: path.resolve(appRoot, './src') },
         {
           find: '@capacitor/geolocation',
           replacement: path.join(capacitorGeolocationRoot, 'dist/esm/index.js'),
