@@ -50,8 +50,18 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             VITE_OAUTH_WEB_REDIRECT_URI=https://geodiffusion.mut-dev.ign.fr/auth/callback
-            VITE_OAUTH_CLIENT_ID=${{ vars.VITE_OAUTH_CLIENT_ID }}
-            VITE_OAUTH_BASE_URL=${{ vars.VITE_OAUTH_BASE_URL }}
+            VITE_SECRET=${{ secrets.VITE_SECRET }}
+            VITE_BASE_API_URL=${{ secrets.VITE_BASE_API_URL }}
+            VITE_OAUTH_CLIENT_ID=${{ secrets.VITE_OAUTH_CLIENT_ID }}
+            VITE_OAUTH_BASE_URL=${{ secrets.VITE_OAUTH_BASE_URL }}
+            VITE_GEOPORTAIL_SCAN_API_KEY=${{ secrets.VITE_GEOPORTAIL_SCAN_API_KEY }}
+            VITE_GDP_REPORT_COMMUNITY_ID=${{ secrets.VITE_GDP_REPORT_COMMUNITY_ID }}
+            VITE_GDP_REPORT_DISPLAY_THEMES=${{ secrets.VITE_GDP_REPORT_DISPLAY_THEMES }}
+            VITE_GDP_REPORT_SUBMISSION_THEME=${{ secrets.VITE_GDP_REPORT_SUBMISSION_THEME }}
+            VITE_GDP_NEWS_URL=${{ secrets.VITE_GDP_NEWS_URL }}
+            VITE_MATOMO_URL=${{ secrets.VITE_MATOMO_URL }}
+            VITE_MATOMO_SITE_ID=${{ secrets.VITE_MATOMO_SITE_ID }}
+            VITE_AUTH_REQUIRED=${{ secrets.VITE_AUTH_REQUIRED }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
  
