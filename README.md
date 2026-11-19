@@ -102,6 +102,8 @@ npm run deps:prod
 git status
 # puis, si besoin :
 git add .; git commit -m "prepa prod-dependencies.md"; git push
+# puis, si déploiement IGN-MUT
+git tag -f deploy-docker-dev && git push origin   deploy-docker-dev  --force
 ```
 
 Merger la branche sur github, puis :
