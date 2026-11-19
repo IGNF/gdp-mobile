@@ -25,7 +25,7 @@ ensure_java_home
 
 echo "Installation des dépendances npm…"
 cd "${APP_DIR}"
-npm install
+npm install --ignore-scripts 
 
 if [[ ! -d "${APP_DIR}/android" ]]; then
   echo "Ajout de la plateforme Android Capacitor…"

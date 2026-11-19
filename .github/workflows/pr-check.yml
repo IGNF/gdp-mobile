@@ -17,6 +17,6 @@ jobs:
       - name: Known hosts (GitHub)
         run: ssh-keyscan github.com >> ~/.ssh/known_hosts
       - name: Install modules
-        run: npm install
+        run: npm install --ignore-scripts 
       - name: Run ESLint
         run: npm run lint

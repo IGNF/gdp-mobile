@@ -48,7 +48,7 @@ jobs:
           [ -n "${{ secrets.VITE_AUTH_REQUIRED }}" ] && echo "VITE_AUTH_REQUIRED=${{ secrets.VITE_AUTH_REQUIRED }}" >> .env || true
 
       - name: Install dependencies
-        run: npm install
+        run: npm install --ignore-scripts 
 
       - name: Build web bundle
         run: npm run build:mobile

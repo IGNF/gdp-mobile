@@ -22,6 +22,6 @@ jobs:
       - name: Known hosts (GitHub)
         run: ssh-keyscan github.com >> ~/.ssh/known_hosts
       - name: Installer les dépendances
-        run: npm install
+        run: npm install --ignore-scripts 
       - name: Vérifier prod-dependencies.md
         run: npm run deps:prod:check

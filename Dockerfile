@@ -4,7 +4,7 @@ WORKDIR /app
 
 
 COPY package.json package-lock.json ./
-RUN --mount=type=cache,target=/root/.npm npm ci 
+RUN --mount=type=cache,target=/root/.npm npm ci --ignore-scripts 
 
 COPY src ./src
 

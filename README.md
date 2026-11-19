@@ -14,7 +14,7 @@ Depuis `gdp-mobile/` (dépôt GitHub) :
 
 ```bash
 cp .env.dist .env   # puis renseigner les variables (gdp-mobile/.env)
-npm install
+npm install --ignore-scripts
 ```
 
 `@ign/gdp-tools` est une dépendance Git (`package.json`), consommée via le **`dist/` versionné** dans le repo (comme `@ign/mobile-core`).
