@@ -11,6 +11,7 @@ import { collabApiClient } from '@/infra/api/collabApiClient';
 import { clearCollabApiCache, getCollabApiCached } from '@/infra/api/collabApiCache';
 import { COLLAB_API_CACHE_KEYS } from '@/infra/api/collabApiKeys';
 import { clearCollabApiClientAuth, ensureCollabApiSession } from '@/infra/api/ensureCollabApiSession';
+import { ensureGdpCommunityMembership } from '@/infra/community/ensureGdpCommunityMembership';
 import {
   generateCodeChallengeFromVerifier,
   generateCodeVerifier,
@@ -284,7 +285,17 @@ export async function fetchCurrentUser(options?: FetchCurrentUserOptions): Promi
       () => collabApiClient.user.get('me'),
       options?.forceRefresh ? { forceRefresh: true } : {},
     );
-    const user = mapApiUserToAppUser(response.data as Record<string, unknown>);
+    let user = mapApiUserToAppUser(response.data as Record<string, unknown>);
+
+    const membershipUpdated = await ensureGdpCommunityMembership(user);
+    if (membershipUpdated) {
+      const refreshedResponse = await getCollabApiCached(
+        COLLAB_API_CACHE_KEYS.currentUser,
+        () => collabApiClient.user.get('me'),
+        { forceRefresh: true },
+      );
+      user = mapApiUserToAppUser(refreshedResponse.data as Record<string, unknown>);
+    }
 
     return {
       success: true,
@@ -346,10 +357,16 @@ function syncCollabApiClient(tokens: {
   );
 }
 
-async function persistSuccessfulAuth(tokens: CoreAuthTokens, user: AppUser): Promise<AuthResult> {
+async function persistSuccessfulAuth(tokens: CoreAuthTokens, fallbackUser: AppUser): Promise<AuthResult> {
   await storeTokens(tokens);
   syncCollabApiClient(tokens);
-  return { success: true, user };
+
+  const refreshed = await fetchCurrentUser({ forceRefresh: true });
+  if (refreshed.success && refreshed.user) {
+    return refreshed;
+  }
+
+  return { success: true, user: fallbackUser };
 }
 
 async function tryRestoreExistingSession(): Promise<AuthResult | null> {
