@@ -1,6 +1,10 @@
 import type { CommunityMember } from '@ign/mobile-core';
 
 import type { AppUser } from '@/domain/user/models';
+import {
+  trackCommunityAutoJoinFailed,
+  trackCommunityAutoJoinRequested,
+} from '@/infra/analytics/matomo';
 import { collabApiClient } from '@/infra/api/collabApiClient';
 import { config } from '@/shared/config/env';
 
@@ -32,8 +36,10 @@ export async function ensureGdpCommunityMembership(user: AppUser): Promise<boole
 
   try {
     await collabApiClient.member.add(GDP_COMMUNITY_ID, { user_id: user.id });
+    trackCommunityAutoJoinRequested();
     return true;
   } catch {
+    trackCommunityAutoJoinFailed();
     return false;
   }
 }

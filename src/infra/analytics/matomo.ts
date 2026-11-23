@@ -103,6 +103,15 @@ export function trackLogout(): void {
   trackEvent('Auth', 'Déconnexion', eventName('Menu', 'Déconnexion'));
 }
 
+/** Adhésion auto à la communauté géodésie (96) après connexion. */
+export function trackCommunityAutoJoinRequested(): void {
+  trackEvent('Auth', 'Adhésion communauté', eventName('Auth', 'Communauté géodésie – demande'));
+}
+
+export function trackCommunityAutoJoinFailed(): void {
+  trackEvent('Auth', 'Adhésion communauté', eventName('Auth', 'Communauté géodésie – échec'));
+}
+
 /**
  * Liens sortants suivis explicitement : `enableLinkTracking` ne voit ni les liens rendus après
  * son appel (SPA) ni les ouvertures via `Browser.open`.
