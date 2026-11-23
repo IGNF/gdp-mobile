@@ -29,7 +29,7 @@ Les panneaux ouverts par-dessus la carte et les actions ponctuelles ne changent 
 | Catégorie           | Ce qui est mesuré                                                                                                                                                                     | Question                                                                                                                          |
 | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
 | **Menu**            | Ouverture de Mon compte, Paramètres, Communauté, Aide, À propos                                                                                                                       | Quelles rubriques du menu sont réellement utilisées ?                                                                             |
-| **Auth**            | Déconnexion                                                                                                                                                                           | À quelle fréquence les utilisateurs se déconnectent-ils ?                                                                         |
+| **Auth**            | Déconnexion ; adhésion auto communauté géodésie (demande / échec)                                                                                                                     | Déconnexions ; volume d’auto-adhésions à la communauté 96 après connexion                                                        |
 | **Carte**           | Ouverture de la Légende et du panneau Couches                                                                                                                                         | La légende et le choix des couches sont-ils trouvés ?                                                                             |
 | **Couche**          | Affichage / masquage d’une couche (Géodésie, Réseau GNSS permanent, Mes signalements, fonds IGN…), rechargement des stations RGP, changement de fond sur la mini-carte de signalement | Quelles couches et quels fonds intéressent les utilisateurs ?                                                                     |
 | **Filtre géodésie** | Application des filtres (nombre de filtres actifs), chaque critère retenu séparément (ex. `Filtre – Type de point : RBF`), réinitialisation                                           | Le mode expert est-il utilisé ? Quels critères reviennent le plus ?                                                               |
@@ -148,11 +148,12 @@ Sur `/map`, les panneaux modaux n’ont pas de route React Router. Le hook `useM
 | --------- | ------------- | ----------------------------------------------------------------------------------------------- | -------------------------- |
 | `Menu`    | `Ouverture`   | `Menu – Mon compte`, `Menu – Paramètres`, `Menu – Communauté`, `Menu – Aide`, `Menu – À propos` | Menu latéral → overlay     |
 | `Auth`    | `Déconnexion` | `Menu – Déconnexion`                                                                            | Menu latéral → Déconnexion |
+| `Auth`    | `Adhésion communauté` | `Auth – Communauté géodésie – demande`, `Auth – Communauté géodésie – échec`          | Connexion / restore session : `member.add` communauté 96 |
 | `Carte`   | `Ouverture`   | `Carte – Légende`                                                                               | FAB légende                |
 | `Carte`   | `Ouverture`   | `Carte – Couches`                                                                               | FAB couches / filtres      |
 
 
-Helpers : `trackOverlayOpen`, `trackLogout`.
+Helpers : `trackOverlayOpen`, `trackLogout`, `trackCommunityAutoJoinRequested`, `trackCommunityAutoJoinFailed`.
 
 Dans Matomo : **Comportement → Événements**, filtrer par catégorie `Menu` ou `Carte`.
 
