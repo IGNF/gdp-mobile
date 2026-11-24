@@ -2,7 +2,7 @@ import { extractGeodesyPointReportDomaine, type GeodesyPointReportContext } from
 
 import type { MapGeodesyClickAction } from '@/features/map/hooks/useMapGeodesyClick';
 
-export type PointFicheVariant = 'geodesy' | 'nivellement';
+export type PointFicheVariant = 'geodesy' | 'nivellement' | 'rgp';
 
 const NIVELLEMENT_DOMAINES = new Set(['nivf', 'nivo', 'nive']);
 const GEODESY_DOMAINES = new Set(['rsgf', 'rsgo', 'rsge']);
@@ -21,6 +21,10 @@ export function resolvePointVariantFromReportContext(
   }
 
   const layerId = reportContext.layerId;
+  if (layerId === 'GDP_RGP2') {
+    return 'rgp';
+  }
+
   if (layerId === 'RN' || layerId === 'DOMAIN_NIVELLEMENT') {
     return 'nivellement';
   }

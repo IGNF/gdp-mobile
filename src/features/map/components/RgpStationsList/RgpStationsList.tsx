@@ -1,14 +1,9 @@
-import {
-  GDP_RGP2_AVAILABILITY_COLORS,
-  GDP_RGP2_AVAILABILITY_LABELS,
-  type GdpRgp2AvailabilityLevel,
-  type GdpRgp2DispoState,
-} from '@ign/gdp-tools';
+import { GDP_RGP2_AVAILABILITY_COLORS, GDP_RGP2_AVAILABILITY_LABELS } from '@ign/gdp-tools';
 
 import type { NearestRgpStation } from '@/features/map/hooks/useNearestRgpStations';
+import { RgpDispoIndicators } from '@/features/map/components/rgp/RgpDispoIndicators';
+import ui from '@/features/map/components/rgp/rgpStationUi.module.css';
 import { Loading } from '@/shared/ui/Loading';
-import IconCheck from '@/shared/assets/icons/icon-check.svg?react';
-import IconClose from '@/shared/assets/icons/icon-close.svg?react';
 import IconReset from '@/shared/assets/icons/icon-reset.svg?react';
 import { formatDateTime } from '@/shared/utils/date';
 import { formatDistanceKm } from '@/shared/utils/geo';
@@ -25,41 +20,6 @@ export interface RgpStationsListProps {
   error: string | null;
   onRefresh: () => void;
   onSelectStation: (longitude: number, latitude: number) => void;
-}
-
-function RgpDispoIndicators({
-  level,
-  states,
-}: {
-  level: GdpRgp2AvailabilityLevel;
-  states: readonly GdpRgp2DispoState[];
-}) {
-  if (level === 'down') {
-    return (
-      <div className={styles.dispoGroup} aria-hidden>
-        <span className={styles.dispoDown}>En panne</span>
-      </div>
-    );
-  }
-
-  const indicators = states.length > 0 ? states : (['unavailable'] as const);
-
-  return (
-    <div className={styles.dispoGroup} aria-hidden>
-      {indicators.map((state, index) => (
-        <span
-          key={`${state}-${index}`}
-          className={state === 'available' ? styles.dispoOk : styles.dispoBad}
-        >
-          {state === 'available' ? (
-            <IconCheck className={styles.dispoGlyph} />
-          ) : (
-            <IconClose className={styles.dispoGlyph} />
-          )}
-        </span>
-      ))}
-    </div>
-  );
 }
 
 export function RgpStationsList({
@@ -112,16 +72,16 @@ export function RgpStationsList({
             >
               <RgpDispoIndicators level={station.availabilityLevel} states={station.dispoStates} />
               <span className={styles.itemText}>
-                <span className={styles.nameRow}>
+                <span className={ui.nameRow}>
                   <span
-                    className={styles.statusDot}
+                    className={ui.statusDot}
                     style={{ background: GDP_RGP2_AVAILABILITY_COLORS[station.availabilityLevel] }}
                     role="img"
                     aria-label={GDP_RGP2_AVAILABILITY_LABELS[station.availabilityLevel]}
                   />
-                  <span className={styles.name}>{station.name}</span>
+                  <span className={ui.stationName}>{station.name}</span>
                 </span>
-                {station.commune ? <span className={styles.commune}>{station.commune}</span> : null}
+                {station.commune ? <span className={ui.commune}>{station.commune}</span> : null}
               </span>
               <span className={styles.distance}>{formatDistanceKm(station.distanceKm)}</span>
             </button>

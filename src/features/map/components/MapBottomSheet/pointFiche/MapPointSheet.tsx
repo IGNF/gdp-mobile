@@ -1,11 +1,15 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type { MapGeodesyClickAction } from '@/features/map/hooks/useMapGeodesyClick';
 import type { usePointFicheSheetDrag } from '@/features/map/hooks/usePointFicheSheetDrag';
 
 import { useTrackSheetView } from '@/features/map/hooks/useTrackSheetView';
 import { MapPointGeodesyFicheBody } from './MapPointGeodesyFicheBody';
 import { MapPointNivellementFicheBody } from './MapPointNivellementFicheBody';
+import { MapPointRgpFicheBody } from './MapPointRgpFicheBody';
+import { MapPointRgpSheetHeader } from './MapPointRgpSheetHeader';
+import { MapPointRgpSheetFooter } from './MapPointRgpSheetFooter';
 import { MapPointSheetFooter } from './MapPointSheetFooter';
+import { buildRgpStationView } from './rgpStationFromAction';
 import { MapPointSheetHeader, type DistanceReference } from './MapPointSheetHeader';
 import { PointUserReportsSection } from './PointUserReportsSection';
 import { resolvePointFicheVariant } from './resolvePointFicheVariant';
@@ -48,6 +52,10 @@ export function MapPointSheet({
   onFloorHeightChange,
 }: MapPointSheetProps) {
   const variant = resolvePointFicheVariant(action);
+  const rgpStation = useMemo(
+    () => (variant === 'rgp' ? buildRgpStationView(action) : null),
+    [action, variant],
+  );
   const isExpanded = snapIndex >= 2;
   const { trackSheetView } = useTrackSheetView();
   const sheetId =
@@ -99,17 +107,25 @@ export function MapPointSheet({
     </div>
   );
 
-  const header = <MapPointSheetHeader action={action} referencePosition={referencePosition} />;
+  const header =
+    variant === 'rgp' ? (
+      <MapPointRgpSheetHeader action={action} referencePosition={referencePosition} />
+    ) : (
+      <MapPointSheetHeader action={action} referencePosition={referencePosition} />
+    );
 
-  const footer = (
-    <MapPointSheetFooter
-      ref={footerRef}
-      canReport={canReport}
-      reportDisabledReason={reportDisabledReason}
-      onNavigate={onNavigate}
-      onReport={onReport}
-    />
-  );
+  const footer =
+    variant === 'rgp' ? (
+      <MapPointRgpSheetFooter ref={footerRef} ficheUrl={rgpStation?.ficheUrl ?? null} onNavigate={onNavigate} />
+    ) : (
+      <MapPointSheetFooter
+        ref={footerRef}
+        canReport={canReport}
+        reportDisabledReason={reportDisabledReason}
+        onNavigate={onNavigate}
+        onReport={onReport}
+      />
+    );
 
   return (
     <div className={styles.sheetLayout}>
@@ -119,7 +135,13 @@ export function MapPointSheet({
       </div>
 
       <div className={styles.body} data-scroll-root="true">
-        {variant === 'nivellement' ? (
+        {variant === 'rgp' ? (
+          <MapPointRgpFicheBody
+            action={action}
+            snapIndex={snapIndex}
+            onPhotoBlockHeightChange={setPhotoBlockHeight}
+          />
+        ) : variant === 'nivellement' ? (
           <MapPointNivellementFicheBody
             action={action}
             snapIndex={snapIndex}
@@ -134,7 +156,7 @@ export function MapPointSheet({
         )}
 
         {/* Tout en bas, avec les sections de la fiche agrandie. */}
-        {snapIndex >= 2 ? <PointUserReportsSection action={action} /> : null}
+        {variant !== 'rgp' && snapIndex >= 2 ? <PointUserReportsSection action={action} /> : null}
       </div>
 
       {footer}

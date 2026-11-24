@@ -18,6 +18,7 @@ import {
 import sheetChrome from '@/features/map/styles/mapSheet.module.css';
 
 import { MapPointSheet } from './pointFiche/MapPointSheet';
+import { resolvePointFicheVariant } from './pointFiche/resolvePointFicheVariant';
 import styles from './MapBottomSheet.module.css';
 
 function getSafeAreaTopPx(): number {
@@ -72,9 +73,21 @@ export function MapBottomSheet({
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  const isRgpFiche =
+    selectedPoint !== null && resolvePointFicheVariant(selectedPoint) === 'rgp';
+  const measuredMaxSheetHeight =
+    isRgpFiche && measuredOpenThreshold != null ? measuredOpenThreshold : null;
+
   const pointGeometry = useMemo(
-    () => getPointFicheSheetGeometry(viewportHeight, safeAreaTop, measuredOpenThreshold, measuredFloorHeight),
-    [viewportHeight, safeAreaTop, measuredOpenThreshold, measuredFloorHeight],
+    () =>
+      getPointFicheSheetGeometry(
+        viewportHeight,
+        safeAreaTop,
+        measuredOpenThreshold,
+        measuredFloorHeight,
+        measuredMaxSheetHeight,
+      ),
+    [viewportHeight, safeAreaTop, measuredOpenThreshold, measuredFloorHeight, measuredMaxSheetHeight],
   );
 
   const pointSheet = usePointFicheSheetDrag({
