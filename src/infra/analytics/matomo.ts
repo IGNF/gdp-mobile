@@ -128,6 +128,10 @@ export function trackPointPdfOpen(): void {
   trackEvent('Lien sortant', 'Fiche PDF', eventName('Fiche point', 'PDF'));
 }
 
+export function trackRgpStationFicheOpen(): void {
+  trackEvent('Lien sortant', 'Fiche RGP', eventName('Fiche station RGP', 'Voir la fiche'));
+}
+
 /** Panneau Couches de `/map` ou mini-carte du signalement. */
 export type LayerTrackingOrigin = 'Couches' | 'Mini-carte';
 

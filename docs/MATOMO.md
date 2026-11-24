@@ -248,6 +248,7 @@ Le suivi automatique de Matomo (`enableLinkTracking`) n’est **pas** utilisé :
 |---|---|---|---|
 | `Lien sortant` | `S'y rendre` | `Fiche point – Google Maps` (web, Android), `Fiche point – Plans` (iOS) | Bouton « S’y rendre » de la fiche point (`MapBottomSheet`) |
 | `Lien sortant` | `Fiche PDF` | `Fiche point – PDF` | Lien « Télécharger la fiche PDF » (`MapPointPdfSection`) |
+| `Lien sortant` | `Fiche RGP` | `Fiche station RGP – Voir la fiche` | Bouton « Voir la fiche » de la fiche station RGP (`MapPointRgpSheetFooter`) |
 | `Lien sortant` | `Ouverture` | `Menu – Je donne mon avis`, `À propos – Accessibilité`, `Connexion – Créer un compte`, `Connexion – Mot de passe oublié`, `Mon compte – Modifier la photo`, `Mes signalements – Profil Espace collaboratif`, `Actualités – <titre>`, `Bandeau actualités – <titre>`, … | Tout lien `TrackedExternalLink` |
 
 Pour un lien externe, utiliser `TrackedExternalLink` (`src/infra/analytics/TrackedExternalLink.tsx`) plutôt que `ExternalLink` (`shared/ui`, qui ne peut pas dépendre d’`infra/`). La prop `tracking` est obligatoire :
@@ -260,7 +261,7 @@ Pour un lien externe, utiliser `TrackedExternalLink` (`src/infra/analytics/Track
 
 Pour une ouverture sans balise `<a>` (ex. `Browser.open`), appeler un helper au clic, comme `trackNavigateToPoint`.
 
-Helpers : `trackOutlinkOpen`, `trackNavigateToPoint`, `trackPointPdfOpen`.
+Helpers : `trackOutlinkOpen`, `trackNavigateToPoint`, `trackPointPdfOpen`, `trackRgpStationFicheOpen`.
 
 Dans Matomo : **Comportement → Événements**, catégorie `Lien sortant`.
 
@@ -296,7 +297,7 @@ export function trackFavoriteAdded(): void {
 }
 ```
 
-Helpers existants : `trackOverlayOpen`, `trackLogout`, `trackOutlinkOpen`, `trackNavigateToPoint`, `trackPointPdfOpen`, `trackLayerVisibilityChange`, `trackLayerReload`, `trackMiniMapBasemapChange`, `trackGeodesyFiltersApplied`, `trackGeodesyFiltersResetDraft`, `trackGeolocationMode`, `trackReportDraftSaved`, `trackReportSubmitted`, `trackReportSubmittedWithoutPhotos`, `trackReportSubmitFailed`.
+Helpers existants : `trackOverlayOpen`, `trackLogout`, `trackOutlinkOpen`, `trackNavigateToPoint`, `trackPointPdfOpen`, `trackRgpStationFicheOpen`, `trackLayerVisibilityChange`, `trackLayerReload`, `trackMiniMapBasemapChange`, `trackGeodesyFiltersApplied`, `trackGeodesyFiltersResetDraft`, `trackGeolocationMode`, `trackReportDraftSaved`, `trackReportSubmitted`, `trackReportSubmittedWithoutPhotos`, `trackReportSubmitFailed`.
 
 **Changement de nommage (octobre 2026)** : les noms d’événements sont passés au format `Contexte – Détail` et les filtres sont découpés par critère. Sur une période à cheval sur ce changement, anciens noms (ex. `Géodésie (mini-carte)`, `Type de point: RBF · Origine: IGN`) et nouveaux coexistent dans les rapports.
 

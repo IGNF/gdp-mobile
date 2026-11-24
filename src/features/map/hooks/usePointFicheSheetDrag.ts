@@ -56,13 +56,18 @@ export function getPointFicheSheetGeometry(
   safeAreaTop: number,
   measuredOpenThresholdHeight?: number | null,
   measuredFloorHeight?: number | null,
+  /** Plafond absolu de la fiche (ex. contenu RGP) — empêche le plein écran au-delà du contenu utile. */
+  measuredMaxSheetHeight?: number | null,
 ): PointFicheSheetGeometry {
   const topInset = Math.max(12, safeAreaTop);
   const minHeight = Math.max(
     Math.round(viewportHeight * MIN_HEIGHT_FRACTION),
     measuredFloorHeight ?? FALLBACK_MIN_CONTENT_HEIGHT_PX,
   );
-  const fullscreenHeight = Math.max(viewportHeight - topInset, minHeight);
+  let fullscreenHeight = Math.max(viewportHeight - topInset, minHeight);
+  if (measuredMaxSheetHeight != null && measuredMaxSheetHeight > 0) {
+    fullscreenHeight = Math.min(fullscreenHeight, measuredMaxSheetHeight);
+  }
 
   const fallbackOpenThreshold = Math.round(viewportHeight * FALLBACK_OPEN_THRESHOLD_FRACTION);
   const rawOpenThreshold = measuredOpenThresholdHeight ?? fallbackOpenThreshold;
@@ -70,16 +75,23 @@ export function getPointFicheSheetGeometry(
   // Le seuil mesuré doit rester exploitable : jamais sous le plancher, et laisser au moins la
   // place pour la zone tampon du dessus avant d'atteindre le plein écran (photo très haute sur
   // un petit écran, par exemple).
-  const freeMaxHeight = Math.min(
+  let freeMaxHeight = Math.min(
     Math.max(rawOpenThreshold, minHeight),
     fullscreenHeight - viewportHeight * OPEN_THRESHOLD_UPPER_BUFFER_FRACTION,
   );
+
+  if (measuredMaxSheetHeight != null && measuredMaxSheetHeight > 0) {
+    freeMaxHeight = Math.min(freeMaxHeight, measuredMaxSheetHeight);
+  }
 
   const freeZoneUpperBound = Math.max(
     minHeight,
     freeMaxHeight - viewportHeight * OPEN_THRESHOLD_LOWER_BUFFER_FRACTION,
   );
-  const openBufferUpperBound = freeMaxHeight + viewportHeight * OPEN_THRESHOLD_UPPER_BUFFER_FRACTION;
+  const openBufferUpperBound = Math.min(
+    freeMaxHeight + viewportHeight * OPEN_THRESHOLD_UPPER_BUFFER_FRACTION,
+    fullscreenHeight,
+  );
 
   return { minHeight, freeMaxHeight, freeZoneUpperBound, openBufferUpperBound, fullscreenHeight };
 }
