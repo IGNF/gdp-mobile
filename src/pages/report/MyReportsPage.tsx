@@ -111,7 +111,7 @@ export function MyReportsPage() {
         {!isAuthenticated ? (
           <div className={styles.notConnected}>
             <p className="body">
-              Vous n'êtes pas connecté. Connectez-vous pour consulter vos signalements.
+              Vous n'êtes pas identifié. Connectez-vous pour consulter vos signalements.
             </p>
 
             <Button type="button" className={styles.actionButton} fullWidth onClick={() => navigate('/login')}>

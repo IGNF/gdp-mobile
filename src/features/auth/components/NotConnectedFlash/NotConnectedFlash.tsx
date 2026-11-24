@@ -40,7 +40,7 @@ export function NotConnectedFlash() {
 
   return (
     <FlashMessage icon={<RiCloudOffLine />} onClose={handleClose} onClick={handleClick}>
-      Vous n’êtes pas connecté
+      Vous n’êtes pas identifié
     </FlashMessage>
   );
 }
