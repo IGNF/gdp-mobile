@@ -10,7 +10,7 @@ import { config } from '@/shared/config/env';
 
 const GDP_COMMUNITY_ID = Number(config.report.communityId) || 96;
 
-export function hasActiveGdpCommunityMembership(
+function hasActiveGdpCommunityMembership(
   memberships: CommunityMember[] | undefined,
   communityId = GDP_COMMUNITY_ID,
 ): boolean {

@@ -1,4 +1,5 @@
 import {
+  buildGdpRgp2StationFicheUrl,
   GEODESY_GDP_RGP2_ATTRIBUTE_KEYS,
   GEODESY_ATTRIBUTE_LABELS,
   getGeodesyAttributeLabel,
@@ -9,20 +10,9 @@ import {
 } from '@ign/gdp-tools';
 
 import type { MapGeodesyClickAction } from '@/features/map/hooks/useMapGeodesyClick';
+import { GDP_GEODESY_POINT_DISPLAY_OPTIONS } from '@/features/map/utils/geodesyReportContext';
 
 import { readProperty } from './pointFicheUtils';
-
-/** Fiche station sur le portail RGP IGN (`#<acronyme>`). */
-export const RGP_IGN_STATIONS_FICHE_URL = 'https://rgp.ign.fr/STATIONS/';
-
-export function buildRgpIgnStationFicheUrl(stationAcronym: string): string | null {
-  const station = stationAcronym.trim();
-  if (!station) {
-    return null;
-  }
-
-  return `${RGP_IGN_STATIONS_FICHE_URL}#${encodeURIComponent(station)}`;
-}
 
 export interface RgpStationField {
   key: string;
@@ -125,6 +115,8 @@ export function buildRgpStationView(action: MapGeodesyClickAction): RgpStationVi
     availabilityLevel,
     dispoStates,
     lines,
-    ficheUrl: buildRgpIgnStationFicheUrl(name),
+    ficheUrl:
+      buildGdpRgp2StationFicheUrl(name, GDP_GEODESY_POINT_DISPLAY_OPTIONS.externalUrlSource) ??
+      null,
   };
 }
