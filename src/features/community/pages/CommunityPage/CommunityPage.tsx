@@ -138,7 +138,7 @@ export function CommunityPage({ isOpen, onClose }: CommunityPageProps) {
               <div className={styles.kpiGrid}>
                 <div className={styles.kpiCard}>
                   <span className={styles.kpiValue}>{stats.recent.opened}</span>
-                  <span className={styles.kpiLabel}>Nouveaux</span>
+                  <span className={styles.kpiLabel}>Signalements</span>
                 </div>
                 <div className={styles.kpiCard}>
                   <span className={styles.kpiValue}>{stats.recent.closed}</span>
