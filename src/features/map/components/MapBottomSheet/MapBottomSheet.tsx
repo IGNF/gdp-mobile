@@ -94,6 +94,7 @@ export function MapBottomSheet({
     geometry: pointGeometry,
     viewportHeight,
     enabled: isPointMode,
+    openExpanded: isRgpFiche,
     onDismiss: onClosePoint,
   });
 
