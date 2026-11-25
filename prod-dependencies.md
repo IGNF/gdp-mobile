@@ -20,5 +20,5 @@
 | react                          | MIT          | https://github.com/react/react.git                                                 | 19.3.1            |                                                |
 | react-dom                      | MIT          | https://github.com/react/react.git                                                 | 19.3.1            |                                                |
 | react-icons                    | MIT          | https://github.com/react-icons/react-icons.git                                     | 5.7.0             | Goran Gajic                                    |
-| react-router-dom               | MIT          | https://github.com/remix-run/react-router.git                                      | 7.18.6            | Remix Software <hello@remix.run>               |
+| react-router-dom               | MIT          | https://github.com/remix-run/react-router.git                                      | 7.18.7            | Remix Software <hello@remix.run>               |
 | vite-plugin-svgr               | MIT          | https://github.com/pd4d10/vite-plugin-svgr.git                                     | 5.2.0             | Rongjian Zhang                                 |
