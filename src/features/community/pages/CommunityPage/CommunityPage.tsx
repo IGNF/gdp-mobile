@@ -103,9 +103,27 @@ export function CommunityPage({ isOpen, onClose }: CommunityPageProps) {
 
         {stats ? (
           <>
+
+<section className={styles.section} aria-labelledby="community-recent-title">
+              <h2 id="community-recent-title" className={styles.sectionTitle}>
+                {COMMUNITY_RECENT_PERIOD_DAYS} derniers jours
+              </h2>
+              <div className={styles.kpiGrid}>
+                <div className={styles.kpiCard}>
+                  <span className={styles.kpiValue}>{stats.recent.opened}</span>
+                  <span className={styles.kpiLabel}>Signalements</span>
+                </div>
+                <div className={styles.kpiCard}>
+                  <span className={styles.kpiValue}>{stats.recent.closed}</span>
+                  <span className={styles.kpiLabel}>Traités</span>
+                </div>
+              </div>
+            </section>
+
+            
             <section className={styles.section} aria-labelledby="community-kpi-title">
               <h2 id="community-kpi-title" className={styles.sectionTitle}>
-                Vue d&apos;ensemble
+                Depuis 2018
               </h2>
               <div className={styles.kpiGrid}>
                 <div className={styles.kpiCard}>
@@ -131,21 +149,7 @@ export function CommunityPage({ isOpen, onClose }: CommunityPageProps) {
               ) : null}
             </section>
 
-            <section className={styles.section} aria-labelledby="community-recent-title">
-              <h2 id="community-recent-title" className={styles.sectionTitle}>
-                {COMMUNITY_RECENT_PERIOD_DAYS} derniers jours
-              </h2>
-              <div className={styles.kpiGrid}>
-                <div className={styles.kpiCard}>
-                  <span className={styles.kpiValue}>{stats.recent.opened}</span>
-                  <span className={styles.kpiLabel}>Signalements</span>
-                </div>
-                <div className={styles.kpiCard}>
-                  <span className={styles.kpiValue}>{stats.recent.closed}</span>
-                  <span className={styles.kpiLabel}>Traités</span>
-                </div>
-              </div>
-            </section>
+ 
 
             <section className={styles.section} aria-labelledby="community-status-title">
               <h2 id="community-status-title" className={styles.sectionTitle}>
