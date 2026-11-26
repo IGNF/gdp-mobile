@@ -100,6 +100,8 @@ interface UsePointFicheSheetDragOptions {
   geometry: PointFicheSheetGeometry;
   viewportHeight: number;
   enabled?: boolean;
+  /** Ouverture au plafond utile (ex. fiche RGP) plutôt qu'au plancher minimal. */
+  openExpanded?: boolean;
   /** Appelé quand l'utilisateur abaisse la poignée sous le plancher pour fermer la fiche. */
   onDismiss?: () => void;
 }
@@ -108,6 +110,7 @@ export function usePointFicheSheetDrag({
   geometry,
   viewportHeight,
   enabled = true,
+  openExpanded = false,
   onDismiss,
 }: UsePointFicheSheetDragOptions) {
   const { minHeight, freeMaxHeight, freeZoneUpperBound, openBufferUpperBound, fullscreenHeight } = geometry;
@@ -140,10 +143,12 @@ export function usePointFicheSheetDrag({
 
   // Réinitialise au plancher à l'ouverture d'une nouvelle fiche — mais pas quand l'utilisateur
   // clique un autre repère pendant que la fiche est déjà ouverte : sa position est conservée.
+  const idleRestingHeight = openExpanded ? fullscreenHeight : minHeight;
+
   useEffect(() => {
     if (enabled && !wasEnabledRef.current) {
       dragOffsetRef.current = 0;
-      setBaseHeight(minHeight);
+      setBaseHeight(idleRestingHeight);
       setDragOffset(0);
       hasInteractedRef.current = false;
     }
@@ -155,14 +160,14 @@ export function usePointFicheSheetDrag({
 
   useEffect(() => {
     if (!hasInteractedRef.current) {
-      setBaseHeight(minHeight);
+      setBaseHeight(idleRestingHeight);
       return;
     }
 
     // Recale la position courante si elle sort des bornes après un changement de géométrie
     // (rotation d'écran, clavier virtuel…).
     setBaseHeight((current) => Math.max(minHeight, Math.min(fullscreenHeight, current)));
-  }, [minHeight, fullscreenHeight]);
+  }, [idleRestingHeight, minHeight, fullscreenHeight]);
 
   const currentHeight = Math.max(minHeight, Math.min(fullscreenHeight, baseHeight - dragOffset));
 

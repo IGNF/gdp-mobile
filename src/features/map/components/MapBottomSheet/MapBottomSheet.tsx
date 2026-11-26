@@ -94,6 +94,7 @@ export function MapBottomSheet({
     geometry: pointGeometry,
     viewportHeight,
     enabled: isPointMode,
+    openExpanded: isRgpFiche,
     onDismiss: onClosePoint,
   });
 
@@ -103,8 +104,11 @@ export function MapBottomSheet({
   // pour le calcul des seuils. Basé sur restingHeight (pas la hauteur en plein glissé) pour ne
   // jamais monter/démonter de contenu pendant un glissé actif (peut interrompre le geste).
   const pointContentLevel = pointSheet.restingHeight >= pointGeometry.freeMaxHeight - 1 ? 2 : 1;
-  // Ouverture maximale : la fiche perd ses marges latérales et occupe toute la largeur.
-  const isPointFullscreen = isPointMode && currentHeight >= pointGeometry.fullscreenHeight - 1;
+  // Ouverture maximale (hors RGP) : la fiche perd ses marges latérales et occupe toute la largeur.
+  const isPointFullscreen =
+    isPointMode &&
+    !isRgpFiche &&
+    currentHeight >= pointGeometry.fullscreenHeight - 1;
 
   useEffect(() => {
     onTabbarVisibleChange?.(!isPointMode);
