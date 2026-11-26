@@ -60,6 +60,7 @@ import {
   DEFAULT_GDP_WFS_CLUSTER_PREFERENCES,
   GDP_GEODESY_DEFAULT_MODE,
   GDP_GEODESY_SHOW_WFS_LOADING_INDICATOR,
+  GDP_GEODESY_WFS_LOADING_INDICATOR_DELAY_MS,
   getGdpGeodesyDefaultActive,
   getGdpGeodesyDefaultWfsAttributeFilterValues,
   type GdpGeodesyMode,
@@ -231,6 +232,7 @@ function MapPageView() {
     catalog: geodesy.catalog,
     visibility: geodesy.visibility,
     showIndicator: GDP_GEODESY_SHOW_WFS_LOADING_INDICATOR,
+    showAfterMs: GDP_GEODESY_WFS_LOADING_INDICATOR_DELAY_MS,
   });
   usePersistedMapLayers({
     isMapReady,

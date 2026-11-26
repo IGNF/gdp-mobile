@@ -15,8 +15,11 @@ export type GdpGeodesyMode = GeodesyProfile;
 
 export const GDP_GEODESY_DEFAULT_MODE: GdpGeodesyMode = 'expert';
 
-/** Pastille « Chargement des repères… » sur la carte (mode expert, couches WFS actives). */
+/** Pastille « Chargement des points… » sur la carte (couches géodésie WMS/WFS actives). */
 export const GDP_GEODESY_SHOW_WFS_LOADING_INDICATOR = true;
+
+/** Ne pas afficher la pastille WMS/WFS tant que le chargement dure moins longtemps (perception utilisateur). */
+export const GDP_GEODESY_WFS_LOADING_INDICATOR_DELAY_MS = 4000;
 
 /** Champs GEODESIE_DATA affichés dans la fiche repère (ActionSheet). */
 const GDP_GEODESY_ATTRIBUTE_KEYS = [
