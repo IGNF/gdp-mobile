@@ -103,30 +103,46 @@ export function MapOverlaySheet({
     onDismiss: onClose,
   });
 
-  useEffect(() => {
+  // Transition isOpen : resynchronisation pendant le rendu (le démontage différé reste dans un effet).
+  const [wasOpen, setWasOpen] = useState(isOpen);
+  if (isOpen !== wasOpen) {
+    setWasOpen(isOpen);
     if (isOpen) {
       setHoldInDom(true);
       setIsSheetShown(false);
       if (draggable) {
         setSnapIndex(0);
       }
+    } else {
+      setIsSheetShown(false);
+    }
+  }
 
-      let outerFrame = 0;
-      let innerFrame = 0;
-      outerFrame = requestAnimationFrame(() => {
-        innerFrame = requestAnimationFrame(() => setIsSheetShown(true));
-      });
-
-      return () => {
-        cancelAnimationFrame(outerFrame);
-        cancelAnimationFrame(innerFrame);
-      };
+  useEffect(() => {
+    if (!isOpen) {
+      return;
     }
 
-    setIsSheetShown(false);
+    let outerFrame = 0;
+    let innerFrame = 0;
+    outerFrame = requestAnimationFrame(() => {
+      innerFrame = requestAnimationFrame(() => setIsSheetShown(true));
+    });
+
+    return () => {
+      cancelAnimationFrame(outerFrame);
+      cancelAnimationFrame(innerFrame);
+    };
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (isOpen || !holdInDom) {
+      return;
+    }
+
     const timer = window.setTimeout(() => setHoldInDom(false), ANIMATION_DURATION_MS);
     return () => window.clearTimeout(timer);
-  }, [draggable, isOpen, setSnapIndex]);
+  }, [holdInDom, isOpen]);
 
   if (!showPortal) {
     return null;
