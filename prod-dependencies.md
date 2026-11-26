@@ -1,5 +1,6 @@
 | Name                           | License type | Link                                                                               | Installed version | Author                                         |
 | :----------------------------- | :----------- | :--------------------------------------------------------------------------------- | :---------------- | :--------------------------------------------- |
+| @capacitor/android             | MIT          | https://github.com/ionic-team/capacitor.git                                        | 8.6.3             | Ionic Team <hi@ionic.io> (https://ionic.io)    |
 | @capacitor/app                 | MIT          | https://github.com/ionic-team/capacitor-plugins.git                                | 8.1.2             | Ionic <hi@ionicframework.com>                  |
 | @capacitor/browser             | MIT          | https://github.com/ionic-team/capacitor-plugins.git                                | 8.0.5             | Ionic <hi@ionicframework.com>                  |
 | @capacitor/core                | MIT          | https://github.com/ionic-team/capacitor.git                                        | 8.6.3             | Ionic Team <hi@ionic.io> (https://ionic.io)    |
