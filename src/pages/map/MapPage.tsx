@@ -433,7 +433,15 @@ function MapPageView() {
   // Un FAB ouvre son panneau (en remplaçant celui affiché) ou le referme s'il est déjà ouvert.
   const handleToggleMapPanel = (panel: MapPanelId) => {
     mapClick.closeActionSheet();
-    setActiveMapPanel((current) => (current === panel ? null : panel));
+    let closesPdfCart = false;
+    setActiveMapPanel((current) => {
+      const next = current === panel ? null : panel;
+      closesPdfCart = current === 'pdfCart' && next !== 'pdfCart';
+      return next;
+    });
+    if (closesPdfCart) {
+      setIsPdfCartAreaSelectLoading(false);
+    }
   };
 
   // Plafonne la fiche légende dépliée pour ne pas couvrir le bouton qui l'ouvre.
@@ -455,10 +463,6 @@ function MapPageView() {
   }, [isLegendOpen]);
 
   const handleDismissMapPanel = () => {
-    setActiveMapPanel(null);
-  };
-
-  const handleClosePdfCartPanel = () => {
     setIsPdfCartAreaSelectLoading(false);
     setActiveMapPanel(null);
   };
@@ -622,13 +626,12 @@ function MapPageView() {
             {IS_WEB_PLATFORM ? (
               <button
                 type="button"
-                className={`${styles.mapFab} ${styles.mapFabWithBadge} ${isPdfCartOpen || pdfCart.count > 0 ? styles.mapFabActive : ''}`}
+                className={`${styles.mapFab} ${styles.mapFabWithBadge} ${isPdfCartOpen ? styles.mapFabActive : ''}`}
                 aria-label={
                   pdfCart.count > 0
                     ? `Panier PDF, ${pdfCart.count} repère${pdfCart.count > 1 ? 's' : ''}`
                     : 'Panier PDF'
                 }
-                disabled={!isMapReady}
                 onClick={() => handleToggleMapPanel('pdfCart')}
               >
                 <IconDownload className={styles.mapFabIcon} aria-hidden />
@@ -723,9 +726,7 @@ function MapPageView() {
           {isTabbarVisible && !isSearchRoute ? (
             <BottomTabbar
               activeTab="carte"
-              onTabClick={() => {
-                handleClosePdfCartPanel();
-              }}
+              onTabClick={handleDismissMapPanel}
             />
           ) : null}
         </div>
@@ -772,7 +773,7 @@ function MapPageView() {
       {IS_WEB_PLATFORM ? (
         <WebPdfCartPanel
           isOpen={isPdfCartOpen}
-          onClose={handleClosePdfCartPanel}
+          onClose={handleDismissMapPanel}
           onSelectEntry={handleSelectPdfCartEntry}
         />
       ) : null}

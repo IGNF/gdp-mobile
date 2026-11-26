@@ -75,9 +75,11 @@ export function MapOverlaySheet({
   compactHeightRatio = DEFAULT_COMPACT_HEIGHT_RATIO,
   allowMapInteraction = false,
 }: MapOverlaySheetProps) {
-  const [isVisible, setIsVisible] = useState(false);
-  const [shouldRender, setShouldRender] = useState(isOpen);
+  const [holdInDom, setHoldInDom] = useState(isOpen);
+  const [isSheetShown, setIsSheetShown] = useState(false);
   const [viewportHeight, setViewportHeight] = useState(() => window.innerHeight);
+
+  const showPortal = isOpen || holdInDom;
 
   useEffect(() => {
     if (!draggable) {
@@ -101,35 +103,32 @@ export function MapOverlaySheet({
     onDismiss: onClose,
   });
 
-  // Transition isOpen : reset d'état pendant le rendu (pas de resynchronisation externe ici).
-  // Le minuteur qui enchaîne l'animation (translateY → visible, ou l'inverse) reste un effet :
-  // c'est un vrai timer, et son callback (différé) n'est pas concerné par la règle.
-  const [wasOpen, setWasOpen] = useState(isOpen);
-  if (isOpen !== wasOpen) {
-    setWasOpen(isOpen);
+  useEffect(() => {
     if (isOpen) {
-      setShouldRender(true);
-      // Repart toujours de translateY(110%) pour rejouer le glissé vers le haut.
-      setIsVisible(false);
+      setHoldInDom(true);
+      setIsSheetShown(false);
       if (draggable) {
         setSnapIndex(0);
       }
-    } else {
-      setIsVisible(false);
-    }
-  }
 
-  useEffect(() => {
-    if (isOpen) {
-      const timer = window.setTimeout(() => setIsVisible(true), 20);
-      return () => window.clearTimeout(timer);
+      let outerFrame = 0;
+      let innerFrame = 0;
+      outerFrame = requestAnimationFrame(() => {
+        innerFrame = requestAnimationFrame(() => setIsSheetShown(true));
+      });
+
+      return () => {
+        cancelAnimationFrame(outerFrame);
+        cancelAnimationFrame(innerFrame);
+      };
     }
 
-    const timer = window.setTimeout(() => setShouldRender(false), ANIMATION_DURATION_MS);
+    setIsSheetShown(false);
+    const timer = window.setTimeout(() => setHoldInDom(false), ANIMATION_DURATION_MS);
     return () => window.clearTimeout(timer);
-  }, [isOpen]);
+  }, [draggable, isOpen, setSnapIndex]);
 
-  if (!shouldRender) {
+  if (!showPortal) {
     return null;
   }
 
@@ -140,7 +139,7 @@ export function MapOverlaySheet({
       {allowMapInteraction ? null : (
         <button
           type="button"
-          className={`${styles.backdrop} ${isVisible ? styles.backdropVisible : ''}`}
+          className={`${styles.backdrop} ${isSheetShown ? styles.backdropVisible : ''}`}
           onClick={onClose}
           aria-label="Fermer"
         />
@@ -151,7 +150,7 @@ export function MapOverlaySheet({
           styles.sheet,
           size === 'large' ? styles.sheetLarge : '',
           sheetClassName ?? '',
-          isVisible ? styles.sheetVisible : '',
+          isSheetShown ? styles.sheetVisible : '',
           isDragging ? styles.sheetDragging : '',
         ]
           .filter(Boolean)
