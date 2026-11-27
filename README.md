@@ -195,3 +195,4 @@ Build web + sync, puis Xcode : `open ios/App/App.xcodeproj`.
 - [Contrat d’échange des signalements](./docs/CONTRAT_SIGNALEMENTS.md)
 - [News et alertes](./docs/NEWS.md)
 - [Statistiques Matomo](./docs/MATOMO.md)
+- [Politique de confidentialité (store)](./docs/POLITIQUE_CONFIDENTIALITE.md)
