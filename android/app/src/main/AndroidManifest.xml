@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -41,15 +42,31 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.CAMERA" />
+
+    <!-- Play : galerie via sélecteur système (&lt;input type="file"&gt;), pas d'accès étendu au stockage. -->
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" tools:node="remove" />
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" tools:node="remove" />
+    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" tools:node="remove" />
+    <uses-permission
+        android:name="android.permission.READ_MEDIA_VISUAL_USER_SELECTED"
+        tools:node="remove" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" tools:node="remove" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" tools:node="remove" />
+
     <uses-feature android:name="android.hardware.location.gps" android:required="false" />
 
-    <!-- Visibilité de paquets (Android 11+, cible ici API 36) : sans ce <queries>, l'app ne
-         "voit" aucune appli caméra via PackageManager.resolveActivity, et le WebChromeClient de
-         Capacitor (BridgeWebChromeClient#showImageCapturePicker) retombe silencieusement sur le
-         sélecteur de fichiers générique au lieu d'ouvrir l'appareil photo. -->
+    <!-- Visibilité de paquets (Android 11+, cible ici API 36) : sans ces &lt;queries&gt;, la WebView
+         ne résout pas l'appareil photo ni le sélecteur de fichiers / galerie. -->
     <queries>
         <intent>
             <action android:name="android.media.action.IMAGE_CAPTURE" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.GET_CONTENT" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.PICK" />
+            <data android:mimeType="image/*" />
         </intent>
     </queries>
 </manifest>

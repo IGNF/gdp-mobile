@@ -81,3 +81,20 @@ adb devices
 Ajouter l’utilisateur au groupe `plugdev` si besoin, puis se reconnecter.
 
 Pour tester l’APK sur le téléphone USB : `npm run run-apk` (pas Android Studio). En cas de crash natif, ouvrir `gdp-mobile/android` à la main dans Android Studio (**File → Open**).
+
+## Play Store : photos / `READ_MEDIA_*`
+
+Google exige le **sélecteur système** (pas `READ_MEDIA_IMAGES` / `READ_MEDIA_VIDEO`). Les signalements utilisent `<input type="file" accept="image/*">` ; la prise de photo utilise `CAMERA` + `capture="environment"`.
+
+Si la console signale un `versionCode` **ancien** (ex. `30106` = v3.1.x Cordova) alors qu’un bundle **4.0.x** (`400xx`) est conforme : l’alerte vient d’une **release encore active** sur un canal. Publier le nouveau AAB sur **production** (et autres pistes concernées).
+
+Dans **Contenu de l’application** → **Autorisations liées aux photos et vidéos**, déclarer un accès **ponctuel** via sélecteur, sans accès large à la médiathèque.
+
+Vérifier le manifeste fusionné release :
+
+```bash
+cd android && ./gradlew :app:processReleaseMainManifest
+rg READ_MEDIA app/build/intermediates/merged_manifests/release/*/AndroidManifest.xml
+```
+
+(résultat attendu : aucune correspondance ; les suppressions sont dans `android/app/src/main/AndroidManifest.xml` via `tools:node="remove"`.)
